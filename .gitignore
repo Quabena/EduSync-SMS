@@ -1,0 +1,88 @@
+# --- Python / Flask ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.log
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.Python
+
+# Flask-specific
+instance/
+*.db
+*.sqlite3
+
+# Environment variables
+.env
+.env.*
+
+# Testing and coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.pytest_cache/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Jupyter
+.ipynb_checkpoints
+
+# PyCharm / VSCode
+.idea/
+*.iml
+.vscode/
+
+# OS-generated
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Node.js / Frontend ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+.pnpm-debug.log
+dist/
+build/
+
+# Frontend environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- Docker (if used) ---
+*.pid
+*.tar
+*.bak
+docker-compose.override.yml
+
+# --- Logs ---
+logs/
+*.log
+
