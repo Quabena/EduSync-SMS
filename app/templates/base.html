@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{}" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}EduSync SMS{% endblock %}</title>
+
+    <!-- Local CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/all-tailwind-classes-full.css') }}"
+    />
+
+    <!-- Local JS -->
+    <script
+      src="{{ url_for('static', filename='js/htmx.min.js') }}"
+      defer
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/zxing.min.js') }}"
+      defer
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/chart.umd.min.js') }}"
+      defer
+    ></script>
+
+    <script>
+      document.addEventListener("alpine:init", () => {
+        Alpine.store("theme", {
+          dark: localStorage.getItem("darkMode") === "true",
+          toggle() {
+            this.dark = !this.dark;
+            localStorage.setItem("darkMode", this.dark);
+            document.documentElement.classList.toggle("dark", this.dark);
+          },
+        });
+
+        if (localStorage.getItem("darkMode") === "true") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      });
+    </script>
+
+    <script
+      src="{{ url_for('static', filename='js/alpine.min.js') }}"
+      defer
+    ></script>
+
+    <style>
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+      }
+
+      .animate-slide-down {
+        animation: slideDown 0.3s ease-out forwards;
+      }
+
+      .glass-effect {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .dark .glass-effect {
+        background: rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950 text-gray-800 dark:text-gray-100 transition-colors duration-300"
+  >
+    <div class="min-h-screen flex flex-col relative">
+      <!-- Decorative Background Elements -->
+      <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div
+          class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl"
+        ></div>
+        <div
+          class="absolute top-1/2 -left-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-600/20 rounded-full blur-3xl"
+        ></div>
+        <div
+          class="absolute -bottom-40 right-1/3 w-80 h-80 bg-gradient-to-br from-emerald-400/20 to-teal-600/20 rounded-full blur-3xl"
+        ></div>
+      </div>
+
+      <!-- Header -->
+      <header
+        class="relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-gray-200/20 dark:shadow-gray-900/20 animate-slide-down"
+      >
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-20">
+            <div class="flex items-center space-x-4">
+              <!-- Logo/Icon -->
+              <div
+                class="flex-shrink-0 p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg mr-2"
+              >
+                <svg
+                  class="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+
+              <!-- Brand Text -->
+              <div>
+                <a href="/">
+                  <h1
+                    class="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent"
+                  >
+                    EduSync
+                  </h1>
+                  <p
+                    class="text-sm text-gray-500 dark:text-gray-400 font-medium"
+                  >
+                    School Management System
+                  </p>
+                </a>
+              </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center space-x-4">
+              <!-- Theme Toggle -->
+              <button
+                class="relative p-3 rounded-xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 group"
+                type="submit"
+              >
+                <h3>Logout</h3>
+                <!-- Sun Icon -->
+                <!-- <svg
+                  x-show="$store.theme.dark"
+                  x-transition:enter="transition ease-out duration-200"
+                  x-transition:enter-start="opacity-0 rotate-90 scale-75"
+                  x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                  x-transition:leave="transition ease-in duration-150"
+                  x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                  x-transition:leave-end="opacity-0 -rotate-90 scale-75"
+                  class="h-5 w-5 text-yellow-500 group-hover:text-yellow-400"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"
+                  />
+                </svg> -->
+
+                <!-- Moon Icon -->
+                <!-- <svg
+                  x-show="!$store.theme.dark"
+                  x-transition:enter="transition ease-out duration-200"
+                  x-transition:enter-start="opacity-0 rotate-90 scale-75"
+                  x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                  x-transition:leave="transition ease-in duration-150"
+                  x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                  x-transition:leave-end="opacity-0 -rotate-90 scale-75"
+                  class="h-5 w-5 text-gray-700 group-hover:text-gray-600"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"
+                    clip-rule="evenodd"
+                  />
+                </svg> -->
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="flex-grow relative z-10 animate-fade-in-up">
+        <div class="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
+          <div
+            class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/20 dark:shadow-gray-900/20 border border-gray-200/50 dark:border-gray-700/50 min-h-[calc(100vh-12rem)]"
+          >
+            <div class="p-6 sm:p-8 lg:p-10">
+              {% block content %}{% endblock %}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer
+        class="relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-gray-200/20 dark:shadow-gray-900/20"
+      >
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0"
+          >
+            <div class="flex items-center space-x-2">
+              <div
+                class="p-1.5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg"
+              >
+                <svg
+                  class="h-4 w-4 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <span
+                class="text-sm font-medium text-gray-600 ml-1 dark:text-gray-300"
+              >
+                EduSync - School Management System
+              </span>
+            </div>
+
+            <div
+              class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+            >
+              <span>&copy; 2025</span>
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+              <span
+                >Developed by
+                <span class="font-semibold text-indigo-600 dark:text-indigo-400"
+                  >Evans Adu</span
+                ></span
+              >
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
