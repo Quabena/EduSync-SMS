@@ -76,7 +76,7 @@ build/
 .env.test.local
 .env.production.local
 
-# --- Docker (if used) ---
+# --- Docker (not used for this project) ---
 *.pid
 *.tar
 *.bak
