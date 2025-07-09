@@ -1,0 +1,56 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="container mx-auto px-4">
+  <h1 class="text-2xl font-bold mb-6">Class: {{ class.name }}</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Class Information</h2>
+      <div class="space-y-2">
+        <p><strong>Level:</strong> {{ class.level }}</p>
+        <p><strong>Section:</strong> {{ class.section }}</p>
+        <p>
+          <strong>Class Teacher:</strong>
+          {% if class.teachers %} {{ class.teachers[0].full_name }} {% else %}
+          Not assigned {% endif %}
+        </p>
+        <p><strong>Total Students:</strong>{{ class.students|length }}</p>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Students</h2>
+      <ul class="space-y-2 max-h-60 overflow-y-auto">
+        {% for student in class.students %}
+        <li class="border-b border-gray-200 dark:border-gray-700 py-2">
+          <a
+            href="{{ url_for('students.detail', student_id=student.id) }}"
+            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:text-indigo-300"
+          >
+            {{ student.full_name }}
+          </a>
+        </li>
+        {% else %}
+        <li>No students assigned</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <a
+      href="{{ url_for('classes.edit', class_id=class.id) }}"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2"
+    >
+      Edit Class
+    </a>
+    <a
+      href="{{ url_for('classes.index') }}"
+      class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+    >
+      Back to List
+    </a>
+  </div>
+</div>
+
+{% endblock %}

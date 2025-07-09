@@ -371,31 +371,6 @@ endblock %} {% block content %}
             </div>
           </div>
 
-          <!-- Terms and Conditions -->
-          <div class="flex items-start space-x-3">
-            <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              required
-            />
-            <label for="terms" class="text-sm text-gray-700 dark:text-gray-300">
-              I agree to the
-              <a
-                href="#"
-                class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
-                >Terms of Service</a
-              >
-              and
-              <a
-                href="#"
-                class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
-                >Privacy Policy</a
-              >
-            </label>
-          </div>
-
           <!-- Submit Button -->
           <div class="pt-2">
             {{ form.submit(class="w-full inline-flex items-center justify-center
