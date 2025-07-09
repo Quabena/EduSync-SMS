@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mx-auto px-4">
+  <h1 class="text-2xl font-bold mb-6">Edit Student: {{ student.full_name }}</h1>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <form method="POST" enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Personal Information -->
+        <div>
+          <label
+            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+            for="first_name"
+          >
+            First Name
+          </label>
+          {{ form.first_name(class="shadow appearance-none border rounded w-full
+          py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+          leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
+
+        <div>
+          <label
+            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+            for="middle_name"
+          >
+            Middle Name
+          </label>
+          {{ form.middle_name(class="shadow appearance-none border rounded
+          w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+          leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
+
+        <!-- ... (similar to create.html but with existing values) ... -->
+
+        <!-- Current Photo -->
+        <div
+          class="md:col-span-2 border-t border-gray-300 dark:border-gray-700 pt-4"
+        >
+          <h2 class="text-lg font-semibold mb-3">Current Photo</h2>
+          {% if student.photo_path %}
+          <img
+            src="{{ url_for('static', filename='documents/' + student.photo_path) }}"
+            alt="{{ student.full_name }}"
+            class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 dark:border-gray-600"
+          />
+          {% else %}
+          <div
+            class="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-lg w-32 h-32 flex items-center justify-center"
+          >
+            <span class="text-gray-500 dark:text-gray-400">No photo</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="md:col-span-2">
+          <label
+            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+            for="photo"
+          >
+            Update Photo
+          </label>
+          {{ form.photo(class="shadow appearance-none border rounded w-full py-2
+          px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+          focus:outline-none focus:shadow-outline") }}
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end mt-6">
+        <button
+          type="submit"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Update Student
+        </button>
+        <a
+          href="{{ url_for('students.detail', student_id=student.id) }}"
+          class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
+        >
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
