@@ -1,1 +1,160 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<div class="container mx-auto px-4">
+  <h1 class="text-2xl font-bold mb-6">Headteacher Dashboard</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Attendance Summary -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Attendance Summary</h2>
+      <div class="space-y-4">
+        <div>
+          <p class="text-lg">Today's Attendance Rate</p>
+          <!-- Accurate computations will done later -->
+          <div
+            class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-2"
+          >
+            <div class="bg-green-600 h-4 rounded-full" style="width: 92%"></div>
+          </div>
+          <p class="text-right text-sm mt-1">92% (332/375 students)</p>
+        </div>
+
+        <div>
+          <p class="text-lg">Monthly Average</p>
+          <div
+            class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-2"
+          >
+            <div class="bg-blue-600 h-4 rounded-full" style="width: 88%"></div>
+          </div>
+          <p class="text-right text-sm mt-1">88%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Class Performance -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Top Performing Classes</h2>
+      <ul class="space-y-3">
+        {% for class in top_classes %}
+        <li class="flex justify-between items-center">
+          <span>{{ class.name }}</span>
+          <span
+            class="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm"
+          >
+            {{ class.avg_score }}%
+          </span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Teacher Performance -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Teacher of the Month</h2>
+      <div class="flex items-center">
+        <div class="mr-4">
+          <div
+            class="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-full w-16 h-16 flex items-center justify-center"
+          >
+            <span class="text-gray-500 dark:text-gray-400 text-xs">Photo</span>
+          </div>
+        </div>
+        <div>
+          <p class="font-bold">Mr. Kwame Mensah</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Mathematics</p>
+          <p class="text-sm mt-1">Avg. student score: 86%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mood Analytics -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Classroom Mood Analytics</h2>
+    <div
+      class="chart-container"
+      style="position: relative; height: 300px; width: 100%"
+    >
+      <canvas id="moodChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <a
+        href="{{ url_for('attendance.overview') }}"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded text-center"
+      >
+        View Attendance
+      </a>
+      <a
+        href="{{ url_for('grading.reports') }}"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded text-center"
+      >
+        Generate Reports
+      </a>
+      <a
+        href="{{ url_for('teachers.index') }}"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded text-center"
+      >
+        Manage Teachers
+      </a>
+      <a
+        href="{{ url_for('students.index') }}"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded text-center"
+      >
+        Manage Students
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/chart.min.js') }}"></script>
+<script>
+  // Mood chart
+  const moodCtx = document.getElementById("moodChart").getContext("2d");
+  const moodChart = new Chart(moodCtx, {
+    type: "bar",
+    data: {
+      labels: ["JHS1A", "JHS1B", "JHS2A", "JHS2B", "JHS3A", "JHS3B"],
+      datasets: [
+        {
+          label: "Positive Mood",
+          data: [75, 68, 82, 79, 88, 72],
+          backgroundColor: "rgba(75, 192, 192, 0.7)",
+        },
+        {
+          label: "Neutral Mood",
+          data: [15, 20, 12, 14, 8, 18],
+          backgroundColor: "rgba(54, 162, 235, 0.7)",
+        },
+        {
+          label: "Negative Mood",
+          data: [10, 12, 6, 7, 4, 10],
+          backgroundColor: "rgba(255, 99, 132, 0.7)",
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: function (value) {
+              return value + "%";
+            },
+          },
+        },
+      },
+    },
+  });
+</script>
+{% endblock %}

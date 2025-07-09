@@ -72,7 +72,7 @@ class TeacherForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
         self.specialization_id.choices = [
-            (s.id, s.name) for s in Subject.query.order_by(Subject.name).all()
+            (s.id, s.name) for s in Subject.query.order_by(Subject.name).all()  # type: ignore
         ]
         self.assigned_classes.choices = [
             (c.id, c.name) for c in Class.query.order_by(Class.name).all()
