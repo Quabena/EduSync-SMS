@@ -321,6 +321,68 @@ class User(UserMixin, db.Model):
         return f"<User {self.username}>"
 
 
+# Assignment Class Model
+class Assignment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey("class.id"), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False)
+    due_date = db.Column(db.DateTime)
+    total_marks = db.Column(db.Float)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    document_path = db.Column(db.String(200))
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    # Relationships
+    subject = db.relationship("Subject")
+    classroom = db.relationship("Class")
+    teacher = db.relationship("Teacher")
+    submissions = db.relationship("StudentAssignment", back_populates="assignment")
+
+    def __repr__(self) -> str:
+        return f"<Assignment {self.title}>"
+
+
+# StudentAssignment Class Model
+class StudentAssignment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    assignment_id = db.Column(
+        db.Integer, db.ForeignKey("assignment.id"), nullable=False
+    )
+    submission_path = db.Column(db.String(200))  # For student's submission
+    submitted_at = db.Column(db.DateTime)
+    marks_obtained = db.Column(db.Float)
+    feedback = db.Column(db.Text)
+    status = db.Column(
+        db.String(20), default="not_submitted"
+    )  # will be not_submitted, submitted, graded
+
+    # Relationships
+    student = db.relationship("Student", backref="assignments")
+    assignment = db.relationship("Assignment", back_populates="submissions")
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @property
+    def status_class(self):
+        return {
+            "not_submitted": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+            "submitted": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+            "graded": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+        }.get(self.status, "")
+
+    def __repr__(self) -> str:
+        return f"<Submission {self.id} for {self.assignment.title}>"
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
