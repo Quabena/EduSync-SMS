@@ -180,6 +180,10 @@ class AcademicRecord(db.Model):
     grade = db.Column(db.String(2))
     remarks = db.Column(db.Text)
 
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
     # Relationships
     student = db.relationship("Student", back_populates="academic_records")
     subject = db.relationship("Subject")
@@ -193,6 +197,10 @@ class MedicalRecord(db.Model):
     diagnosis_date = db.Column(db.Date)
     treatment = db.Column(db.Text)
     notes = db.Column(db.Text)
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     # Relationship
     student = db.relationship("Student", backref="medical_history")
@@ -219,6 +227,10 @@ class Enrollment(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
     session_year = db.Column(db.String(20), nullable=False)
 
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
 
 # Grade Class Model
 class Grade(db.Model):
@@ -230,6 +242,10 @@ class Grade(db.Model):
     term = db.Column(db.String(10), nullable=False)
     score = db.Column(db.Float, nullable=False)
     remarks = db.Column(db.String(200))
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 
 class HallPass(db.Model):
@@ -270,6 +286,10 @@ class Classroom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mood_data = db.Column(db.JSON)  # for mood-tracking
     qr_code = db.Column(db.String(100))  # Class-specific QR
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 
 # MoodEntry class - for classroom mood tracking/analysis
