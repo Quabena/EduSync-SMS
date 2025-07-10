@@ -81,7 +81,7 @@
             Total Students
           </h3>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Active enrollments
+            <a href="{{ url_for('students.index') }}"> View All Students </a>
           </p>
         </div>
       </div>
@@ -129,7 +129,7 @@
             Total Teachers
           </h3>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Active faculty
+            <a href="{{ url_for('teachers.index') }}"> View Teaching Staff </a>
           </p>
         </div>
       </div>
@@ -166,7 +166,7 @@
               {{ total_classes }}
             </div>
             <div class="text-xs text-blue-600 dark:text-blue-400 font-medium">
-              8 active today
+              7 active today
             </div>
           </div>
         </div>
@@ -177,7 +177,7 @@
             Total Classes
           </h3>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Academic sessions
+            <a href="{{ url_for('classes.index') }}"> View All Classes </a>
           </p>
         </div>
       </div>

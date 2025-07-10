@@ -7,9 +7,12 @@
     <strong>{{ today.strftime('%A, %B %d, %Y') }}</strong>
   </p>
 
-  <form method="POST" action="{{ url_for('attendance.manual_attendance') }}">
+  <form
+    method="POST"
+    action="{{ url_for('attendance.manual_attendance', class_id=class_.id)}}"
+  >
     <input type="hidden" name="class_id" value="{{ class_.id }}" />
-    <input type="hidden" name="date" value="{{ date.strftime('%Y-%m-%d') }}" />
+    <input type="hidden" name="date" value="{{ today.strftime('%Y-%m-%d') }}" />
 
     <div class="overflow-x-auto shadow rounded-lg border border-gray-200">
       <table class="min-w-full bg-white divide-y divide-gray-200">

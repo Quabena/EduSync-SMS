@@ -26,5 +26,5 @@ class ClassForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(ClassForm, self).__init__(*args, **kwargs)
         self.teacher_id.choices = [
-            (t.id, t.full_name) for t in Teacher.query.order_by(Teacher.surnname).all()
+            (t.id, t.full_name) for t in Teacher.query.order_by(Teacher.surname).all()
         ]
