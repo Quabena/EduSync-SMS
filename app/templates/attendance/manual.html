@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% block title %}Manual Attendance - {{ class_.name
+}}{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <h1 class="text-3xl font-bold text-gray-800 mb-4">Manual Attendance</h1>
+  <p class="text-gray-600 mb-6">
+    Class: <strong>{{ class_.name }}</strong> | Date:
+    <strong>{{ today.strftime('%A, %B %d, %Y') }}</strong>
+  </p>
+
+  <form method="POST" action="{{ url_for('attendance.manual_attendance') }}">
+    <input type="hidden" name="class_id" value="{{ class_.id }}" />
+    <input type="hidden" name="date" value="{{ date.strftime('%Y-%m-%d') }}" />
+
+    <div class="overflow-x-auto shadow rounded-lg border border-gray-200">
+      <table class="min-w-full bg-white divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="text-left px-4 py-2 text-sm font-medium text-gray-700">
+              #
+            </th>
+            <th class="text-left px-4 py-2 text-sm font-medium text-gray-700">
+              Student Name
+            </th>
+            <th class="text-left px-4 py-2 text-sm font-medium text-gray-700">
+              Gender
+            </th>
+            <th class="text-left px-4 py-2 text-sm font-medium text-gray-700">
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for student in students %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-2 text-sm text-gray-800">{{ loop.index }}</td>
+            <td class="px-4 py-2 text-sm text-gray-800">
+              {{ student.full_name }}
+            </td>
+            <td class="px-4 py-2 text-sm text-gray-600">
+              {{ student.gender }}
+            </td>
+            <td class="px-4 py-2">
+              <select
+                name="attendance_{{ student.id }}"
+                class="w-full py-1 px-2 border rounded text-sm"
+              >
+                <option value="Present" selected>Present</option>
+                <option value="Absent">Absent</option>
+                <option value="Late">Late</option>
+              </select>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 text-right">
+      <button
+        type="submit"
+        class="inline-flex items-center px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700"
+      >
+        Submit Attendance
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

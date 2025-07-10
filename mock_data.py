@@ -95,7 +95,7 @@ def create_teachers(classes, subjects):
         teacher = Teacher(
             first_name=first_name,
             middle_name=fake.first_name(),
-            surnname=fake.last_name(),
+            surname=fake.last_name(),
             gender=gender,
             date_of_birth=fake.date_of_birth(minimum_age=25, maximum_age=60),
             hometown=fake.city(),
@@ -122,6 +122,13 @@ def create_teachers(classes, subjects):
             emergency_contact_name=fake.name(),
             emergency_contact_number=fake.numerify("05########"),
             specialization=specializations[i],
+            certificate_paths="certificates/"
+            + ",".join(
+                [
+                    f"{fake.file_name(extension='pdf')}"
+                    for _ in range(random.randint(1, 3))
+                ]
+            ),
         )
 
         # Assign to 1-3 random classes

@@ -1,22 +1,10 @@
-import os
 from pathlib import Path
-from flask import current_app
 
 
 def create_storage_dirs(app):
-    """Creating all required storage directories"""
+    """Create required directories and placeholder files."""
     with app.app_context():
-        dirs = [
-            app.config["BACKUP_DIR"],
-            app.config["DOCUMENT_DIR"],
-            app.config["QR_DIR"],
-            app.config["REPORT_DIR"],
-        ]
-
-        for directory in dirs:
+        for key in ["BACKUP_DIR", "DOCUMENT_DIR", "QR_DIR", "REPORT_DIR"]:
+            directory = app.config[key]
             directory.mkdir(parents=True, exist_ok=True)
-
-        # Creating Initial placeholder files
-        (app.config["DOCUMENT_DIR"] / "placeholder.txt").touch()
-        (app.config["QR_DIR"] / "placeholder.txt").touch()
-        (app.config["REPORT_DIR"] / "placeholder.txt").touch()
+            (directory / "placeholder.txt").touch(exist_ok=True)

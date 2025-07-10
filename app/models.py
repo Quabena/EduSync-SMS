@@ -92,9 +92,8 @@ class Student(db.Model):
     def age(self):
         today = date.today()
         born = self.date_of_birth
-        return today.year - born.year - ((today.month, today.day)) < (
-            born.month,
-            born.day,
+        return (
+            today.year - born.year - ((today.month, today.day) < (born.month, born.day))
         )
 
     @property
@@ -114,7 +113,7 @@ class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
     middle_name = db.Column(db.String(50))
-    surnname = db.Column(db.String(50), nullable=False)
+    surname = db.Column(db.String(50), nullable=False)
     gender = db.Column(db.String(10), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     hometown = db.Column(db.String(100))
@@ -135,6 +134,7 @@ class Teacher(db.Model):
     emergency_contact_name = db.Column(db.String(100))
     emergency_contact_number = db.Column(db.String(10))
     photo_path = db.Column(db.String(200))
+    certificate_paths = db.Column(db.Text, nullable=True)
 
     # Relationships
     specialization_id = db.Column(db.Integer, db.ForeignKey("subject.id"))
@@ -152,17 +152,15 @@ class Teacher(db.Model):
         today = date.today()
         born = self.date_of_birth
         return (
-            today.year
-            - born.year
-            - ((today.month, today.day) < (born.month - born.day))
+            today.year - born.year - ((today.month, today.day) < (born.month, born.day))
         )
 
     @property
     def full_name(self):
         return (
-            f"{self.first_name} {self.middle_name} {self.surnname}"
+            f"{self.first_name} {self.middle_name} {self.surname}"
             if self.middle_name
-            else f"{self.first_name} {self.surnname}"
+            else f"{self.first_name} {self.surname}"
         )
 
     def __repr__(self) -> str:

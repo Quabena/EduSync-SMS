@@ -45,7 +45,7 @@ Details - Namong SDA JHS{% endblock %} {% block content %}
             <div class="relative">
               {% if student.photo %}
               <img
-                src="{{ url_for('static', filename='uploads/students/' + student.photo) }}"
+                src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
                 alt="{{ student.full_name }}"
                 class="w-32 h-32 lg:w-40 lg:h-40 rounded-2xl object-cover border-4 border-white dark:border-gray-700 shadow-xl"
               />

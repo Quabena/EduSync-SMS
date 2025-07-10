@@ -10,6 +10,7 @@ from flask import (
     current_app,
     send_file,
     Response,
+    send_from_directory,
 )
 import csv
 from datetime import datetime
@@ -76,9 +77,19 @@ def create():
         if form.photo.data:
             photo = form.photo.data
             filename = secure_filename(photo.filename)
-            photo_path = os.path.join("student_photos", filename)
-            save_path = os.path.join(current_app.config["DOCUMENT_DIR"], photo_path)
-            photo.save(save_path)
+
+            # DOCUMENT_DIR is a Path object
+            save_path = current_app.config["DOCUMENT_DIR"] / filename
+            save_path.parent.mkdir(parents=True, exist_ok=True)  # Just in case
+
+            print("Save path:", save_path)
+            print("Exists:", save_path.parent.exists())
+
+            photo.save(str(save_path))  # Save expects string path
+
+            # Store relative path from BASE_DIR
+            rel_path = save_path.relative_to(current_app.config["BASE_DIR"])
+            photo_path = str(rel_path)
 
         student = Student(
             first_name=form.first_name.data,
@@ -129,22 +140,25 @@ def edit(student_id):
     ]
 
     if form.validate_on_submit():
-        # Handling file upload
         if form.photo.data:
-            # Delete old photo if exists
             if student.photo_path:
                 old_path = os.path.join(
-                    current_app.config["DOCUMENT_DIR"], student.photo_path
+                    current_app.config["BASE_DIR"], student.photo_path
                 )
                 if os.path.exists(old_path):
-                    os.rename(old_path)  # type: ignore
+                    os.remove(old_path)
 
+            # Save new photo
             photo = form.photo.data
             filename = secure_filename(photo.filename)
-            photo_path = os.path.join("student_photos", filename)
-            save_path = os.path.join(current_app.config["DOCUMENT_DIR"], photo_path)
+            save_path = os.path.join(current_app.config["DOCUMENT_DIR"], filename)
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
             photo.save(save_path)
-            student.photo_path = photo_path
+
+            # Store relative path from BASE_DIR (e.g. student_photos/filename.jpg)
+            student.photo_path = os.path.relpath(
+                save_path, start=current_app.config["BASE_DIR"]
+            )
 
         student.first_name = form.first_name.data
         student.middle_name = form.middle_name.data
@@ -165,6 +179,15 @@ def edit(student_id):
         return redirect(url_for("students.detail", student_id=student.id))
 
     return render_template("students/edit.html", form=form, student=student)
+
+
+@bp.route("/photo/<path:filename>")
+@login_required
+def student_photo(filename):
+    full_path = os.path.join(current_app.config["BASE_DIR"])
+    directory = os.path.dirname(full_path)
+    file = os.path.basename(full_path)
+    return send_from_directory(directory, file)
 
 
 # Delete Route
