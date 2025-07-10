@@ -2,48 +2,214 @@
 <div class="container mx-auto px-4">
   <h1 class="text-2xl font-bold mb-6">Edit Student: {{ student.full_name }}</h1>
 
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-    <form method="POST" enctype="multipart/form-data">
-      {{ form.hidden_tag() }}
+  <form
+    method="POST"
+    enctype="multipart/form-data"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+  >
+    {{ form.hidden_tag() }}
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <!-- Personal Information -->
-        <div>
-          <label
-            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-            for="first_name"
-          >
-            First Name
-          </label>
-          {{ form.first_name(class="shadow appearance-none border rounded w-full
-          py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-          leading-tight focus:outline-none focus:shadow-outline") }}
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Personal Information -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Personal Information
+        </h2>
+      </div>
 
-        <div>
-          <label
-            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-            for="middle_name"
-          >
-            Middle Name
-          </label>
-          {{ form.middle_name(class="shadow appearance-none border rounded
-          w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-          leading-tight focus:outline-none focus:shadow-outline") }}
-        </div>
-
-        <!-- ... (will include similar codes from create.html but with existing values, later) ... -->
-
-        <!-- Current Photo -->
-        <div
-          class="md:col-span-2 border-t border-gray-300 dark:border-gray-700 pt-4"
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="first_name"
         >
-          <h2 class="text-lg font-semibold mb-3">Current Photo</h2>
+          First Name
+        </label>
+        {{ form.first_name(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="middle_name"
+        >
+          Middle Name
+        </label>
+        {{ form.middle_name(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="surname"
+        >
+          Surname
+        </label>
+        {{ form.surname(class="shadow appearance-none border rounded w-full py-2
+        px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="gender"
+        >
+          Gender
+        </label>
+        {{ form.gender(class="shadow border rounded w-full py-2 px-3
+        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="date_of_birth"
+        >
+          Date of Birth
+        </label>
+        {{ form.date_of_birth(class="shadow appearance-none border rounded
+        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline", type="date") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="hometown"
+        >
+          Hometown
+        </label>
+        {{ form.hometown(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <!-- Family Information -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Family Information
+        </h2>
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="father_name"
+        >
+          Father's Name
+        </label>
+        {{ form.father_name(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="mother_name"
+        >
+          Mother's Name
+        </label>
+        {{ form.mother_name(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="guardian_name"
+        >
+          Guardian's Name
+        </label>
+        {{ form.guardian_name(class="shadow appearance-none border rounded
+        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="guardian_contact"
+        >
+          Guardian's Contact
+        </label>
+        {{ form.guardian_contact(class="shadow appearance-none border rounded
+        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <!-- Academic Information -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Academic Information
+        </h2>
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="class_id"
+        >
+          Class
+        </label>
+        {{ form.class_id(class="shadow border rounded w-full py-2 px-3
+        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="learning_style"
+        >
+          Learning Style
+        </label>
+        {{ form.learning_style(class="shadow border rounded w-full py-2 px-3
+        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <!-- Medical Information -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Medical Information
+        </h2>
+      </div>
+
+      <div class="md:col-span-2">
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="medical_records"
+        >
+          Medical Records
+        </label>
+        {{ form.medical_records(class="shadow appearance-none border rounded
+        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline", rows="5") }}
+      </div>
+
+      <!-- Photo -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">Student Photo</h2>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="mb-4">
+          <label
+            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          >
+            Current Photo
+          </label>
           {% if student.photo_path %}
           <img
             src="{{ url_for('static', filename='documents/' + student.photo_path) }}"
-            alt="{{ student.full_name }}"
-            class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 dark:border-gray-600"
+            class="w-32 h-32 rounded-lg border-2 border-gray-300 dark:border-gray-600 object-cover"
           />
           {% else %}
           <div
@@ -54,34 +220,32 @@
           {% endif %}
         </div>
 
-        <div class="md:col-span-2">
-          <label
-            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-            for="photo"
-          >
-            Update Photo
-          </label>
-          {{ form.photo(class="shadow appearance-none border rounded w-full py-2
-          px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
-          focus:outline-none focus:shadow-outline") }}
-        </div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="photo"
+        >
+          Update Photo
+        </label>
+        {{ form.photo(class="shadow appearance-none border rounded w-full py-2
+        px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
       </div>
+    </div>
 
-      <div class="flex items-center justify-end mt-6">
-        <button
-          type="submit"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Update Student
-        </button>
-        <a
-          href="{{ url_for('students.detail', student_id=student.id) }}"
-          class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
-        >
-          Cancel
-        </a>
-      </div>
-    </form>
-  </div>
+    <div class="flex items-center justify-end mt-6">
+      <button
+        type="submit"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        Update Student
+      </button>
+      <a
+        href="{{ url_for('students.detail', student_id=student.id) }}"
+        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
+      >
+        Cancel
+      </a>
+    </div>
+  </form>
 </div>
 {% endblock %}

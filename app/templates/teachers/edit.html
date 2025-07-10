@@ -2,23 +2,328 @@
 <div class="container mx-auto px-4">
   <h1 class="text-2xl font-bold mb-6">Edit Teacher: {{ teacher.full_name }}</h1>
 
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-    <form method="POST" enctype="multipart/form-data">
-      {{ form.hidden_tag() }}
+  <form
+    method="POST"
+    enctype="multipart/form-data"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+  >
+    {{ form.hidden_tag() }}
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <!-- ... (will include similar codes from create.html but with existing values, later) ... -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Personal Information -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Personal Information
+        </h2>
+      </div>
 
-        <!-- Current Photo -->
-        <div
-          class="md:col-span-2 border-t border-gray-300 dark:border-gray-700 pt-4"
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="first_name"
         >
-          <h2 class="text-lg font-semibold mb-3">Current Photo</h2>
+          First Name
+        </label>
+        {{ form.first_name(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="middle_name"
+        >
+          Middle Name
+        </label>
+        {{ form.middle_name(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="surname"
+        >
+          Surname
+        </label>
+        {{ form.surname(class="shadow appearance-none border rounded w-full py-2
+        px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="gender"
+        >
+          Gender
+        </label>
+        {{ form.gender(class="shadow border rounded w-full py-2 px-3
+        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="date_of_birth"
+        >
+          Date of Birth
+        </label>
+        {{ form.date_of_birth(class="shadow appearance-none border rounded
+        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline", type="date") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="hometown"
+        >
+          Hometown
+        </label>
+        {{ form.hometown(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="phone_number"
+        >
+          Phone Number
+        </label>
+        {{ form.phone_number(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="email"
+        >
+          Email
+        </label>
+        {{ form.email(class="shadow appearance-none border rounded w-full py-2
+        px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <!-- Professional Information -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Professional Information
+        </h2>
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="staff_id"
+        >
+          Staff ID
+        </label>
+        {{ form.staff_id(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="registered_number"
+        >
+          Registered Number
+        </label>
+        {{ form.registered_number(class="shadow appearance-none border rounded
+        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="ntc_number"
+        >
+          NTC Number
+        </label>
+        {{ form.ntc_number(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="ssnit_number"
+        >
+          SSNIT Number
+        </label>
+        {{ form.ssnit_number(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="specialization_id"
+        >
+          Specialization Subject
+        </label>
+        {{ form.specialization_id(class="shadow border rounded w-full py-2 px-3
+        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="area_of_specialization"
+        >
+          Area of Specialization
+        </label>
+        {{ form.area_of_specialization(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300
+        dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline")
+        }}
+      </div>
+
+      <!-- Education Information -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Education Information
+        </h2>
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="college_attended"
+        >
+          College Attended
+        </label>
+        {{ form.college_attended(class="shadow appearance-none border rounded
+        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="academic_certificate"
+        >
+          Academic Certificate
+        </label>
+        {{ form.academic_certificate(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300
+        dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline")
+        }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="academic_area_of_study"
+        >
+          Academic Area of Study
+        </label>
+        {{ form.academic_area_of_study(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300
+        dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline")
+        }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="academic_college"
+        >
+          Academic College
+        </label>
+        {{ form.academic_college(class="shadow appearance-none border rounded
+        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="professional_certificate"
+        >
+          Professional Certificate
+        </label>
+        {{ form.professional_certificate(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300
+        dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline")
+        }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="professional_area_of_study"
+        >
+          Professional Area of Study
+        </label>
+        {{ form.professional_area_of_study(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300
+        dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline")
+        }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="professional_college"
+        >
+          Professional College
+        </label>
+        {{ form.professional_college(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300
+        dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline")
+        }}
+      </div>
+
+      <!-- Class Assignment -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Class Assignment
+        </h2>
+      </div>
+
+      <div class="md:col-span-2">
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="assigned_classes"
+        >
+          Assigned Classes
+        </label>
+        {{ form.assigned_classes(class="shadow border rounded w-full py-2 px-3
+        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline", size="5") }}
+      </div>
+
+      <!-- Documents -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">Documents</h2>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="mb-4">
+          <label
+            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          >
+            Current Photo
+          </label>
           {% if teacher.photo_path %}
           <img
             src="{{ url_for('static', filename='documents/' + teacher.photo_path) }}"
-            alt="{{ teacher.full_name }}"
-            class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 dark:border-gray-600"
+            class="w-32 h-32 rounded-lg border-2 border-gray-300 dark:border-gray-600 object-cover"
           />
           {% else %}
           <div
@@ -29,78 +334,123 @@
           {% endif %}
         </div>
 
-        <div class="md:col-span-2">
-          <label
-            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-            for="photo"
-          >
-            Update Photo
-          </label>
-          {{ form.photo(class="shadow appearance-none border rounded w-full py-2
-          px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
-          focus:outline-none focus:shadow-outline") }}
-        </div>
-
-        <!-- Current Certificates -->
-        <div
-          class="md:col-span-2 border-t border-gray-300 dark:border-gray-700 pt-4"
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="photo"
         >
-          <h2 class="text-lg font-semibold mb-3">Current Certificates</h2>
-          {% if teacher.certificate_paths %}
-          <ul class="space-y-2">
-            {% for cert_path in teacher.certificate_paths.split(',') %}
-            <li
-              class="flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded"
+          Update Photo
+        </label>
+        {{ form.photo(class="shadow appearance-none border rounded w-full py-2
+        px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
+        focus:outline-none focus:shadow-outline") }}
+      </div>
+
+      <div class="md:col-span-2">
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+        >
+          Current Certificates
+        </label>
+
+        {% if teacher.certificate_paths %}
+        <ul class="space-y-2 mb-4">
+          {% for cert_path in teacher.certificate_paths.split(',') %}
+          <li
+            class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded"
+          >
+            <span>Certificate {{ loop.index }}</span>
+            <a
+              href="{{ url_for('static', filename='documents/' + cert_path) }}"
+              target="_blank"
+              class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm flex items-center"
             >
-              <span>Certificate {{ loop.index }}</span>
-              <a
-                href="{{ url_for('static', filename='documents/' + cert_path) }}"
-                target="_blank"
-                class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm"
+              <svg
+                class="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                View
-              </a>
-            </li>
-            {% endfor %}
-          </ul>
-          {% else %}
-          <p class="text-gray-500 dark:text-gray-400">
-            No certificates uploaded
-          </p>
-          {% endif %}
-        </div>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+              View
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-500 dark:text-gray-400 mb-4">
+          No certificates uploaded
+        </p>
+        {% endif %}
 
-        <div class="md:col-span-2">
-          <label
-            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-            for="certificates"
-          >
-            Update Certificates
-          </label>
-          {{ form.certificates(class="shadow appearance-none border rounded
-          w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-          leading-tight focus:outline-none focus:shadow-outline") }}
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Uploading new certificates will replace existing ones
-          </p>
-        </div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="certificates"
+        >
+          Update Certificates
+        </label>
+        {{ form.certificates(class="shadow appearance-none border rounded w-full
+        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
+        leading-tight focus:outline-none focus:shadow-outline") }}
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          Uploading new certificates will replace existing ones
+        </p>
       </div>
 
-      <div class="flex items-center justify-end mt-6">
-        <button
-          type="submit"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Update Teacher
-        </button>
-        <a
-          href="{{ url_for('teachers.detail', teacher_id=teacher.id) }}"
-          class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
-        >
-          Cancel
-        </a>
+      <!-- Emergency Contact -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
+          Emergency Contact
+        </h2>
       </div>
-    </form>
-  </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="emergency_contact_name"
+        >
+          Contact Name
+        </label>
+        {{ form.emergency_contact_name(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300
+        dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline")
+        }}
+      </div>
+
+      <div>
+        <label
+          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          for="emergency_contact_number"
+        >
+          Contact Number
+        </label>
+        {{ form.emergency_contact_number(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300
+        dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline")
+        }}
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end mt-6">
+      <button
+        type="submit"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        Update Teacher
+      </button>
+      <a
+        href="{{ url_for('teachers.detail', teacher_id=teacher.id) }}"
+        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
+      >
+        Cancel
+      </a>
+    </div>
+  </form>
 </div>
 {% endblock %}
