@@ -1,4 +1,4 @@
-# 🎓 EduSync-SMS
+# EduSync-SMS
 
 **ALX Final Portfolio Project**
 
@@ -28,7 +28,7 @@ EduSync-SMS is a capstone portfolio project for the ALX Software Engineering Pro
 
 ## Features
 
-- 🔐 User authentication and role-based access (`admin`, `headteacher`, `teacher`)
+- User authentication and role-based access (`admin`, `headteacher`, `teacher`)
 - Class and student information management
 - Class scheduling (basic structure)
 - QR-based and manual attendance tracking
