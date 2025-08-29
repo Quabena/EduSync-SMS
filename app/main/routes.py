@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app.decorators import role_required
 from app.models import User, Student, Teacher, Class, Attendance
 from app.main import bp
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 @bp.route("/")
@@ -32,6 +32,7 @@ def index():
             total_classes=total_classes,
             total_users=total_users,
             attendance_data=attendance_data,
+            date=datetime.now(timezone.utc),
         )
     elif current_user.role == "headteacher":
         return render_template(

@@ -7,6 +7,7 @@ from wtforms import (
     TextAreaField,
     SubmitField,
     FileField,
+    IntegerField,
 )
 from wtforms.validators import DataRequired, Optional
 from app.models import Class
@@ -22,23 +23,50 @@ class StudentForm(FlaskForm):
         validators=[DataRequired()],
     )
     date_of_birth = DateField(
-        "Date of Birth", format="%Y-%m-%d", validators=[DataRequired()]
+        "Date of Birth",
+        format="%Y-%m-%d",
+        render_kw={"type": "date"},
+        validators=[DataRequired()],
+    )
+    admission_date = DateField(
+        "Admission Date",
+        format="%Y-%m-%d",
+        render_kw={"type": "date"},  # Added HTML5 date input
+        validators=[DataRequired()],
     )
     hometown = StringField("Hometown", validators=[Optional()])
     father_name = StringField("Father's Name", validators=[Optional()])
     mother_name = StringField("Mother's Name", validators=[Optional()])
-    guardian_name = StringField("Guardian Name", validators=[Optional()])
-    guardian_contact = StringField("Guardian Contact", validators=[Optional()])
+    guardian_name = StringField(
+        "Guardian Name", validators=[DataRequired()]
+    )  # Changed to required
+    guardian_contact = StringField(
+        "Guardian Contact", validators=[DataRequired()]
+    )  # Changed to required
     medical_records = TextAreaField("Medical Records", validators=[Optional()])
+    height = IntegerField("Height (cm)", validators=[Optional()])  # Added unit label
+    weight = IntegerField("Weight (kg)", validators=[Optional()])  # Added unit label
     photo = FileField("Student Photo", validators=[Optional()])
     class_id = SelectField("Class", coerce=int, validators=[DataRequired()])
     learning_style = SelectField(
         "Learning Style",
         choices=[
             ("", "Not Assessed"),
-            ("visual", "Visual"),
-            ("auditory", "Auditory"),
-            ("kinesthetic", "Kinesthetic"),
+            ("Visual", "Visual"),
+            ("Auditory", "Auditory"),
+            ("Kinesthetic", "Kinesthetic"),
+            ("Reading/Writing", "Reading/Writing"),
+        ],
+        validators=[Optional()],
+    )
+    religion = SelectField(  # Added religion field
+        "Religion",
+        choices=[
+            ("", "Select Religion"),
+            ("Christian", "Christian"),
+            ("Muslim", "Muslim"),
+            ("Traditionalist", "Traditionalist"),
+            ("Other", "Other"),
         ],
         validators=[Optional()],
     )

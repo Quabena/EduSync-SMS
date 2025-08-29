@@ -1,0 +1,247 @@
+{% extends "base.html" %} {% block title %}Assignments - Teacher Assignment
+System{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+  <!-- Assignments List Card -->
+  <div
+    class="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 animate-fade-in"
+  >
+    <div class="flex items-center space-x-4 mb-8">
+      <div
+        class="p-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg"
+      >
+        <i class="fas fa-list-check text-white text-2xl"></i>
+      </div>
+      <div>
+        <h2 class="text-3xl font-bold text-gray-800">Current Assignments</h2>
+        <p class="text-gray-600 mt-1">
+          Active teacher-subject-class assignments
+        </p>
+      </div>
+    </div>
+
+    <div id="assignmentsList" class="space-y-4">
+      {% if assignments %} {% for assignment in assignments %}
+      <div
+        class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 hover:shadow-md transition-all duration-200"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="p-3 bg-blue-100 rounded-xl">
+              <i class="fas fa-user text-blue-600 text-xl"></i>
+            </div>
+            <div>
+              <p class="font-bold text-gray-800 text-lg">
+                {{ assignment.teacher.full_name if assignment.teacher else 'N/A'
+                }}
+              </p>
+              <p class="text-gray-600">
+                <i class="fas fa-book mr-2 text-green-500"></i>{{
+                assignment.subject.name if assignment.subject else 'N/A' }}
+              </p>
+              <p class="text-gray-600">
+                <i class="fas fa-graduation-cap mr-2 text-purple-500"></i>{{
+                assignment.class_.name if assignment.class_ else 'N/A' }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span
+              class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium"
+            >
+              <i class="fas fa-check-circle mr-1"></i>Active
+            </span>
+            <div class="flex space-x-2">
+              <a
+                href="{{ url_for('exams_grading.grading_page', class_id=assignment.class_id, subject_id=assignment.subject_id, term='1', year='2024') }}"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 flex items-center space-x-2"
+              >
+                <i class="fas fa-edit"></i>
+                <span>Grade</span>
+              </a>
+              {% if current_user.role in ['admin', 'headteacher'] %}
+              <button
+                onclick="unassignAssignment({{ assignment.id }})"
+                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-200 flex items-center space-x-2"
+              >
+                <i class="fas fa-trash"></i>
+                <span>Remove</span>
+              </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %} {% else %}
+      <div class="text-center py-12 text-gray-500">
+        <i class="fas fa-clipboard-list text-6xl mb-6 opacity-50"></i>
+        <p class="text-xl font-medium mb-2">No assignments found</p>
+        <p class="text-gray-600">Create your first assignment to get started</p>
+        <a
+          href="{{ url_for('exams_grading.assign_teacher_subject') }}"
+          class="mt-6 inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-200"
+        >
+          <i class="fas fa-plus-circle mr-2"></i>Create Assignment
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div
+  id="confirmModal"
+  class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4"
+>
+  <div
+    class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform transition-all duration-300 scale-95 animate-slide-up"
+  >
+    <div class="flex items-center space-x-4 mb-6">
+      <div
+        class="p-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl shadow-lg"
+      >
+        <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold text-gray-800">Confirm Removal</h3>
+        <p class="text-sm text-gray-600">This action cannot be undone</p>
+      </div>
+    </div>
+
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <p class="text-gray-700 mb-2">
+        Are you sure you want to remove this assignment?
+      </p>
+      <p class="text-sm text-red-600 font-medium">
+        The teacher will no longer have access to grade this subject and class.
+      </p>
+    </div>
+
+    <div class="flex justify-end space-x-4">
+      <button
+        onclick="closeModal()"
+        class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+      >
+        <i class="fas fa-times mr-2"></i>Cancel
+      </button>
+      <button
+        id="confirmUnassign"
+        class="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+      >
+        <i class="fas fa-trash mr-2"></i>Remove Assignment
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentAssignmentId = null;
+
+  // Function to unassign an assignment
+  function unassignAssignment(assignmentId) {
+    currentAssignmentId = assignmentId;
+    document.getElementById("confirmModal").classList.remove("hidden");
+  }
+
+  // Function to close modal
+  function closeModal() {
+    document.getElementById("confirmModal").classList.add("hidden");
+    currentAssignmentId = null;
+  }
+
+  // Confirm unassignment
+  document
+    .getElementById("confirmUnassign")
+    .addEventListener("click", function () {
+      if (!currentAssignmentId) return;
+
+      const csrfToken = document.querySelector(
+        'meta[name="csrf-token"]'
+      ).content;
+      const data = new URLSearchParams();
+      data.append("assignment_id", currentAssignmentId);
+      data.append("csrf_token", csrfToken);
+
+      fetch('{{ url_for("exams_grading.unassign_teacher_subject") }}', {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
+        body: data,
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.status === "success") {
+            showNotification("success", "Assignment removed successfully!");
+            // Reload the page to reflect changes
+            window.location.reload();
+          } else {
+            showNotification(
+              "error",
+              result.message || "Error removing assignment"
+            );
+          }
+          closeModal();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          showNotification(
+            "error",
+            "An error occurred while removing the assignment"
+          );
+          closeModal();
+        });
+    });
+
+  // Close modal when clicking outside
+  document
+    .getElementById("confirmModal")
+    .addEventListener("click", function (e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+  // Add keyboard support
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      closeModal();
+    }
+  });
+
+  // Notification function (if not already defined)
+  function showNotification(type, message) {
+    // Your existing notification code here
+  }
+</script>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px) scale(0.95);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+</style>
+{% endblock %}

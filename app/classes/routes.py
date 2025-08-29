@@ -23,7 +23,7 @@ def create():
     form = ClassForm()
     if form.validate_on_submit():
         class_ = Class(
-            name=f"{form.level.data}{form.section.data}",
+            name=f"{form.level.data} {form.section.data}",
             level=form.level.data,
             section=form.section.data,
         )
@@ -44,7 +44,19 @@ def create():
 @role_required(["admin", "headteacher", "teacher"])
 def detail(class_id):
     class_ = Class.query.get_or_404(class_id)
-    return render_template("classes/detail.html", class_=class_)
+
+    # Assuming you have relationships in models.py:
+    # class_.teachers (many-to-many)
+    # class_.students (one-to-many)
+    teachers = class_.teachers
+    students = class_.students
+
+    return render_template(
+        "classes/detail.html",
+        class_=class_,
+        teachers=teachers,
+        students=students,
+    )
 
 
 @bp.route("/<int:class_id>/edit", methods=["GET", "POST"])
@@ -55,7 +67,7 @@ def edit(class_id):
     form = ClassForm(obj=class_)
 
     if form.validate_on_submit():
-        class_.name = f"{form.level.data}{form.section.data}"
+        class_.name = f"{form.level.data} {form.section.data}"
         class_.level = form.level.data
         class_.section = form.section.data
 

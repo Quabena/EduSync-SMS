@@ -1,0 +1,118 @@
+{% extends "base.html" %} {% block title %}Class Reports - {{ class_.name }} -
+{{ term }} {{ year }}{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Class Term Reports</h1>
+        <p class="text-gray-600">{{ class_.name }} - {{ term }} {{ year }}</p>
+      </div>
+      <div class="flex space-x-3">
+        <a
+          href="{{ url_for('exams_grading.master_sheet', class_group=class_.master_class, term=term, year=year) }}"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          View Master Sheet
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Students List -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Student ID
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Name
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Average Score
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Position
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for student in students %} {% set term_scores =
+        TermScore.query.filter_by(student_id=student.id, term=term,
+        year=year).all() %} {% set total_score = term_scores |
+        map(attribute='total_score') | sum %} {% set average_score = total_score
+        / term_scores | length if term_scores else 0 %}
+
+        <tr>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            {{ student.id }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            {{ student.full_name }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ average_score | round(2) }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {% set student_totals = {} %} {% for s in students %} {% set
+            s_scores = TermScore.query.filter_by(student_id=s.id, term=term,
+            year=year).all() %} {% set s_total = s_scores |
+            map(attribute='total_score') | sum %} {% set _ =
+            student_totals.update({s.id: s_total}) %} {% endfor %} {% set
+            sorted_totals = student_totals.items() | sort(attribute='1',
+            reverse=True) %} {% for rank, (s_id, total) in
+            enumerate(sorted_totals, 1) %} {% if s_id == student.id %} {{ rank
+            }} {% endif %} {% endfor %}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <a
+              href="{{ url_for('exams_grading.student_term_report', student_id=student.id, term=term, year=year) }}"
+              class="text-indigo-600 hover:text-indigo-900 mr-3"
+              >View Report</a
+            >
+            <a
+              href="{{ url_for('exams_grading.student_performance', student_id=student.id) }}"
+              class="text-green-600 hover:text-green-900"
+              >Performance</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="mt-6 flex justify-between">
+    <a
+      href="{{ url_for('exams_grading.index') }}"
+      class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+    >
+      Back to Grading Dashboard
+    </a>
+    <button
+      onclick="window.print()"
+      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+    >
+      Print All Reports
+    </button>
+  </div>
+</div>
+{% endblock %}

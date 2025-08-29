@@ -1,0 +1,123 @@
+{% extends "base.html" %} {% block title %}Attendance Dashboard{% endblock %} {%
+block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Attendance Dashboard</h1>
+    <p class="text-gray-600">Today: {{ today.strftime('%A, %B %d, %Y') }}</p>
+  </div>
+
+  <!-- Today's Attendance Summary -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    {% for class_ in classes %}
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">
+        {{ class_.name }}
+      </h2>
+
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="text-center">
+          <p class="text-2xl font-bold text-blue-600">
+            {{ today_attendance[class_.id].present or 0 }}
+          </p>
+          <p class="text-sm text-gray-500">Present</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-red-600">
+            {{ today_attendance[class_.id].absent or 0 }}
+          </p>
+          <p class="text-sm text-gray-500">Absent</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-gray-600">
+            {{ today_attendance[class_.id].total or 0 }}
+          </p>
+          <p class="text-sm text-gray-500">Total</p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <a
+          href="{{ url_for('attendance.mark_attendance', class_id=class_.id) }}"
+          class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Mark Attendance
+        </a>
+        <a
+          href="{{ url_for('attendance.term_attendance', class_id=class_.id, term='Term 1', year=2025) }}"
+          class="w-full inline-flex justify-center items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+        >
+          View Term Report
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white rounded-xl shadow-md p-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a
+        href="{{ url_for('attendance.scanner') }}"
+        class="inline-flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+          ></path>
+        </svg>
+        QR Scanner
+      </a>
+
+      <a
+        href="{{ url_for('attendance.manual_attendance', class_id=classes[0].id) if classes else '#' }}"
+        class="inline-flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          ></path>
+        </svg>
+        Manual Entry
+      </a>
+
+      <a
+        href="{{ url_for('attendance.term_attendance', class_id=classes[0].id, term='Term 1', year=2025) if classes else '#' }}"
+        class="inline-flex items-center justify-center px-4 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          ></path>
+        </svg>
+        Term Reports
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

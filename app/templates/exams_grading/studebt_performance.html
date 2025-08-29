@@ -1,0 +1,148 @@
+{% extends "base.html" %} {% block title %}Student Performance - {{
+student.full_name }}{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Academic Performance</h1>
+    <p class="text-gray-600">{{ student.full_name }}</p>
+    {% if student.classroom %}
+    <p class="text-gray-600">{{ student.classroom.name }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Performance by Subject -->
+  <div class="grid grid-cols-1 gap-6">
+    {% for subject_id, data in performance_data.items() %}
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <div class="flex justify-between items-start mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">
+          {{ data.subject.name }}
+        </h2>
+        <div class="flex items-center">
+          <span
+            class="text-sm font-medium {% if data.trend == 'improving' %}text-green-600{% elif data.trend == 'declining' %}text-red-600{% else %}text-gray-600{% endif %}"
+          >
+            {{ data.trend | capitalize }}
+          </span>
+          <span
+            class="ml-3 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full"
+          >
+            Avg: {{ data.average | round(2) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Performance Chart -->
+      <div class="mt-4">
+        <div class="flex items-end h-8 space-x-px">
+          {% for term, score_data in data.scores.items() %}
+          <div class="flex flex-col items-center">
+            <div
+              class="w-8 bg-blue-500 rounded-t"
+              style="height: {{ (score_data.total_score / 100 * 32) | round }}px;"
+            ></div>
+            <span class="text-xs text-gray-500 mt-1"
+              >{{ term.split(' ')[0] }}</span
+            >
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Detailed Scores -->
+      <div class="mt-6 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Term
+              </th>
+              <th
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Class Work
+              </th>
+              <th
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Exam
+              </th>
+              <th
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Total
+              </th>
+              <th
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Grade
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for term, score_data in data.scores.items() %}
+            <tr>
+              <td
+                class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900"
+              >
+                {{ term }}
+              </td>
+              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                {{ score_data.class_total | round(2) }}
+              </td>
+              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                {{ score_data.exam_score | round(2) }}
+              </td>
+              <td
+                class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900"
+              >
+                {{ score_data.total_score | round(2) }}
+              </td>
+              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                {% if score_data.total_score >= 80 %}A {% elif
+                score_data.total_score >= 70 %}B {% elif score_data.total_score
+                >= 60 %}C {% elif score_data.total_score >= 50 %}D {% else %}F
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="mt-6 flex justify-between">
+    <a
+      href="{% if student.classroom %}{{ url_for('exams_grading.class_term_reports', class_id=student.classroom.id, term='Term 1', year=2025) }}{% else %}#{% endif %}"
+      class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+    >
+      Back to Class
+    </a>
+    <div class="space-x-3">
+      <a
+        href="{{ url_for('exams_grading.student_term_report', student_id=student.id, term='Term 1', year=2025) }}"
+        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      >
+        Term 1 Report
+      </a>
+      <a
+        href="{{ url_for('exams_grading.student_term_report', student_id=student.id, term='Term 2', year=2025) }}"
+        class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+      >
+        Term 2 Report
+      </a>
+      <a
+        href="{{ url_for('exams_grading.student_term_report', student_id=student.id, term='Term 3', year=2025) }}"
+        class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+      >
+        Term 3 Report
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

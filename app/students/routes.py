@@ -10,9 +10,16 @@ from flask import (
     current_app,
     send_file,
     Response,
+    abort,
     send_from_directory,
+    make_response,
 )
 import csv
+from pathlib import Path
+from PIL import Image
+import secrets
+import mimetypes
+from config import Config
 from datetime import datetime
 from flask_login import login_required, current_user
 import qrcode.constants
@@ -23,6 +30,7 @@ from app.models import Student, Class
 from app.students.forms import StudentForm
 from app.students import bp
 from app.utils.storage import backup_database
+from datetime import date
 
 
 # Generating student QR code
@@ -70,27 +78,82 @@ def index():
 @role_required(["admin", "headteacher"])
 def create():
     form = StudentForm()
+    # if not form:
+    #     return render_template("students/create.html", form=form)
+
+    # Allowed types / extensions
+    ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+    ALLOWED_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
     if form.validate_on_submit():
+        photo_filename = None
+        saved_path = None
 
-        # Handling file upload
-        photo_path = None
+        # 1) Handle uploaded photo
         if form.photo.data:
-            photo = form.photo.data
-            filename = secure_filename(photo.filename)
+            file = form.photo.data
 
-            # DOCUMENT_DIR is a Path object
-            save_path = current_app.config["DOCUMENT_DIR"] / filename
-            save_path.parent.mkdir(parents=True, exist_ok=True)  # Just in case
+            # 1.a) basic content-type check from upload
+            content_type = getattr(file, "content_type", None)
+            if content_type not in ALLOWED_MIME_TYPES:
+                flash("Unsupported image type. Use JPG/PNG/GIF/WEBP.", "danger")
+                return render_template("students/create.html", form=form)
 
-            print("Save path:", save_path)
-            print("Exists:", save_path.parent.exists())
+            # 1.b) secure filename and extension
+            original_name = secure_filename(file.filename or "")
+            if not original_name:
+                flash("Invalid file name.", "danger")
+                return render_template("students/create.html", form=form)
 
-            photo.save(str(save_path))  # Save expects string path
+            ext = Path(original_name).suffix.lower()
+            if ext not in ALLOWED_EXTS:
+                flash("Unsupported file extension.", "danger")
+                return render_template("students/create.html", form=form)
 
-            # Store relative path from BASE_DIR
-            rel_path = save_path.relative_to(current_app.config["BASE_DIR"])
-            photo_path = str(rel_path)
+            # 1.c) generate randomized filename
+            photo_filename = f"{secrets.token_hex(12)}{ext}"
 
+            # 1.d) prepare save directory (DOCUMENT_DIR should be a Path or str)
+            doc_dir = current_app.config.get("DOCUMENT_DIR")
+            if not doc_dir:
+                flash("Server misconfiguration: no DOCUMENT_DIR.", "danger")
+                return render_template("students/create.html", form=form)
+
+            # ensure Path
+            doc_dir = Path(doc_dir)
+            try:
+                doc_dir.mkdir(parents=True, exist_ok=True)
+            except Exception as exc:
+                current_app.logger.exception("Failed to create document dir")
+                flash("Server error when preparing storage.", "danger")
+                return render_template("students/create.html", form=form)
+
+            saved_path = doc_dir / photo_filename
+
+            # 1.e) verify image with Pillow and save safely (resize/normalize)
+            try:
+                # Pillow can validate and process the image
+                img = Image.open(file)
+                img.verify()  # raises if broken
+                file.stream.seek(0)  # reset stream after verify
+
+                img = Image.open(file)  # reopen for processing
+                img = img.convert("RGB")  # normalize to RGB (drop alpha)
+                max_size = (1000, 1000)  # tweak as needed
+                img.thumbnail(max_size)
+                img.save(saved_path, quality=85)
+            except Exception as exc:
+                # delete partial file if created
+                if saved_path.exists():
+                    try:
+                        saved_path.unlink()
+                    except Exception:
+                        current_app.logger.exception("Could not remove invalid image")
+                current_app.logger.exception("Invalid image upload")
+                flash("Uploaded file is not a valid image.", "danger")
+                return render_template("students/create.html", form=form)
+
+        # 2) build the Student model; store only filename (photo_filename) or None
         student = Student(
             first_name=form.first_name.data,
             middle_name=form.middle_name.data,
@@ -100,22 +163,49 @@ def create():
             hometown=form.hometown.data,
             father_name=form.father_name.data,
             mother_name=form.mother_name.data,
-            guardian=form.guardian_name.data,
+            guardian_name=form.guardian_name.data,
             guardian_contact=form.guardian_contact.data,
             medical_records=form.medical_records.data,
-            photo_path=photo_path,
+            photo_path=photo_filename,  # store just the filename
             class_id=form.class_id.data,
         )
 
-        db.session.add(student)
-        db.session.commit()
+        # 3) save to DB with safe commit and cleanup on failure
+        try:
+            db.session.add(student)
+            db.session.commit()
+        except Exception as exc:
+            db.session.rollback()
+            current_app.logger.exception("Failed to create student")
+            # If we saved a file already, remove it because DB failed
+            if saved_path and saved_path.exists():
+                try:
+                    saved_path.unlink()
+                except Exception:
+                    current_app.logger.exception(
+                        "Failed to remove photo after DB error"
+                    )
+            flash("Failed to create student. Try again.", "danger")
+            return render_template("students/create.html", form=form)
 
-        # Generating QR Code
-        generate_student_qr(student.id)
+        # 4) post-commit tasks (QR generation, backups) — keep them non-blocking if possible
+        try:
+            generate_student_qr(student.id)
+        except Exception:
+            current_app.logger.exception("Failed to generate QR for student")
+
+        try:
+            backup_database()
+        except Exception:
+            current_app.logger.exception("Backup failed")
 
         flash("Student created successfully!", "success")
-        backup_database()  # Backing up after important changes
         return redirect(url_for("students.detail", student_id=student.id))
+
+    else:
+        current_app.logger.error("Form validation failed: %s", form.errors)
+
+    # GET or invalid form
     return render_template("students/create.html", form=form)
 
 
@@ -125,7 +215,9 @@ def create():
 @role_required(["admin", "headteacher", "teacher"])
 def detail(student_id):
     student = Student.query.get_or_404(student_id)
-    return render_template("students/detail.html", student=student)
+    return render_template(
+        "students/detail.html", student=student, current_date=date.today()
+    )
 
 
 # Edit Route
@@ -141,24 +233,28 @@ def edit(student_id):
 
     if form.validate_on_submit():
         if form.photo.data:
+            # delete previous photo if present (safe)
             if student.photo_path:
-                old_path = os.path.join(
-                    current_app.config["BASE_DIR"], student.photo_path
-                )
-                if os.path.exists(old_path):
-                    os.remove(old_path)
+                document_dir = Path(current_app.config["DOCUMENT_DIR"]).resolve()
+                old = (document_dir / student.photo_path).resolve()
+                try:
+                    # ensure old is inside document_dir
+                    old.relative_to(document_dir)
+                    if old.exists():
+                        old.unlink()
+                except Exception:
+                    # log/warn but don't crash the edit flow
+                    current_app.logger.warning(
+                        "Tried to delete a photo outside DOCUMENT_DIR or missing"
+                    )
 
-            # Save new photo
-            photo = form.photo.data
-            filename = secure_filename(photo.filename)
-            save_path = os.path.join(current_app.config["DOCUMENT_DIR"], filename)
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            photo.save(save_path)
-
-            # Store relative path from BASE_DIR (e.g. student_photos/filename.jpg)
-            student.photo_path = os.path.relpath(
-                save_path, start=current_app.config["BASE_DIR"]
-            )
+            # Save new photo using helper
+            try:
+                new_filename = save_student_photo(form.photo.data)
+                student.photo_path = new_filename
+            except ValueError as e:
+                flash(str(e), "danger")
+                return redirect(url_for("students.edit", student_id=student.id))
 
         student.first_name = form.first_name.data
         student.middle_name = form.middle_name.data
@@ -172,6 +268,10 @@ def edit(student_id):
         student.guardian_contact = form.guardian_contact.data
         student.medical_records = form.medical_records.data
         student.class_id = form.class_id.data
+        student.religion = form.religion.data
+        student.admission_date = form.admission_date.data
+        student.height = form.height.data
+        student.weight = form.weight.data
 
         db.session.commit()
         flash("Student info successfully updated!", "success")
@@ -181,13 +281,87 @@ def edit(student_id):
     return render_template("students/edit.html", form=form, student=student)
 
 
-@bp.route("/photo/<path:filename>")
+# Allowed MIME types for images
+ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+ALLOWED_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+
+def _is_safe_path(base_dir: Path, path: Path) -> bool:
+    """Return True if path is inside base_dir."""
+    try:
+        path.resolve().relative_to(base_dir.resolve())
+        return True
+    except Exception:
+        return False
+
+
+@bp.route("/photos/<path:filename>")
 @login_required
 def student_photo(filename):
-    full_path = os.path.join(current_app.config["BASE_DIR"])
-    directory = os.path.dirname(full_path)
-    file = os.path.basename(full_path)
-    return send_from_directory(directory, file)
+    """
+    Serve student photos from DOCUMENT_DIR in a safe way.
+    Example URL: url_for('students.student_photo', filename='abc123.jpg')
+    """
+    document_dir = Path(current_app.config["DOCUMENT_DIR"]).resolve()
+
+    # Prevent absolute or traversal requests
+    if os.path.isabs(filename) or ".." in filename.split(os.path.sep):
+        abort(403)
+
+    # secure_filename will strip unsafe characters; but we still must resolve and check
+    safe_name = secure_filename(filename)
+    requested = (document_dir / safe_name).resolve()
+
+    # ensure requested is under document_dir (prevent traversal)
+    if not _is_safe_path(document_dir, requested):
+        abort(403)
+
+    if not requested.is_file():
+        abort(404)
+
+    mime_type, _ = mimetypes.guess_type(str(requested))
+    if not mime_type:
+        mime_type = "application/octet-stream"
+
+    if mime_type not in ALLOWED_MIME_TYPES:
+        abort(403)
+
+    # Use send_file on the resolved path so Flask/Werkzeug handles conditional requests
+    response = send_file(str(requested), mimetype=mime_type, conditional=True)
+    # Cache for 1 day; you can increase if images are immutable
+    response.headers["Cache-Control"] = "public, max-age=86400, immutable"
+    return response
+
+
+def save_student_photo(file_storage, *, output_size=(600, 600)):
+    """
+    Save an uploaded image (werkzeug FileStorage) into DOCUMENT_DIR.
+    Returns the saved filename (string) to store in the DB (do NOT store full path).
+    - Generates random hex name
+    - Validates extension
+    - Resizes using PIL.thumbnail
+    """
+    filename = secure_filename(file_storage.filename or "")
+    if not filename:
+        raise ValueError("No filename provided")
+
+    ext = Path(filename).suffix.lower()
+    if ext not in ALLOWED_EXTS:
+        raise ValueError("Unsupported file extension")
+
+    random_name = secrets.token_hex(12) + ext
+    document_dir = Path(current_app.config["DOCUMENT_DIR"])
+    document_dir.mkdir(parents=True, exist_ok=True)
+
+    save_path = document_dir / random_name
+
+    # open via stream to avoid saving original raw first
+    img = Image.open(file_storage.stream)
+    img.convert("RGB")  # normalize
+    img.thumbnail(output_size)
+    img.save(save_path, quality=85)
+
+    return random_name
 
 
 # Delete Route

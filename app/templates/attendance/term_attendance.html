@@ -1,0 +1,161 @@
+{% extends "base.html" %} {% block title %}Term Attendance - {{ class_.name }}{%
+endblock %} {% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Term Attendance</h1>
+        <p class="text-gray-600">{{ class_.name }} - {{ term }} {{ year }}</p>
+        <p class="text-sm text-gray-500">
+          Total School Days: {{ summary.total_days }}
+        </p>
+      </div>
+      <div class="flex space-x-3">
+        <button
+          onclick="window.print()"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Print Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance Summary -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg shadow p-4">
+      <p class="text-2xl font-bold text-blue-600">{{ summary.total_days }}</p>
+      <p class="text-sm text-gray-500">Total Days</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4">
+      <p class="text-2xl font-bold text-green-600">
+        {{ (summary.student_stats.values() | map(attribute='present') | sum /
+        summary.student_stats.values() | length) | round(1) if
+        summary.student_stats else 0 }}
+      </p>
+      <p class="text-sm text-gray-500">Avg. Present</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4">
+      <p class="text-2xl font-bold text-red-600">
+        {{ (summary.student_stats.values() | map(attribute='absent') | sum /
+        summary.student_stats.values() | length) | round(1) if
+        summary.student_stats else 0 }}
+      </p>
+      <p class="text-sm text-gray-500">Avg. Absent</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4">
+      <p class="text-2xl font-bold text-purple-600">
+        {{ (summary.student_stats.values() | map(attribute='percentage') | sum /
+        summary.student_stats.values() | length) | round(1) if
+        summary.student_stats else 0 }}%
+      </p>
+      <p class="text-sm text-gray-500">Avg. Attendance</p>
+    </div>
+  </div>
+
+  <!-- Attendance Table -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10"
+            >
+              Student
+            </th>
+            {% for day in attendance_days %}
+            <th
+              class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              {{ day.strftime('%m/%d') }}
+            </th>
+            {% endfor %}
+            <th
+              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Present
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Absent
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              %
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for student in students %}
+          <tr>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white z-10"
+            >
+              {{ student.full_name }}
+            </td>
+            {% for day in attendance_days %}
+            <td class="px-2 py-4 text-center text-sm">
+              {% set status = attendance_records[student.id].get(day) %}
+              <span
+                class="inline-block w-4 h-4 rounded-full {% if status == 'present' %}bg-green-500{% elif status == 'absent' %}bg-red-500{% else %}bg-gray-300{% endif %}"
+              ></span>
+            </td>
+            {% endfor %}
+            <td
+              class="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600"
+            >
+              {{ summary.student_stats[student.id].present }}
+            </td>
+            <td
+              class="px-4 py-4 whitespace-nowrap text-sm font-medium text-red-600"
+            >
+              {{ summary.student_stats[student.id].absent }}
+            </td>
+            <td
+              class="px-4 py-4 whitespace-nowrap text-sm font-medium {% if summary.student_stats[student.id].percentage >= 90 %}text-green-600{% elif summary.student_stats[student.id].percentage >= 75 %}text-yellow-600{% else %}text-red-600{% endif %}"
+            >
+              {{ summary.student_stats[student.id].percentage | round(1) }}%
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="mt-6 flex justify-between">
+    <a
+      href="{{ url_for('attendance.attendance_dashboard') }}"
+      class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+    >
+      Back to Dashboard
+    </a>
+    <a
+      href="{{ url_for('attendance.mark_attendance', class_id=class_.id) }}"
+      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+    >
+      Mark Today's Attendance
+    </a>
+  </div>
+</div>
+
+<style>
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
+  .sticky {
+    position: sticky;
+  }
+  .left-0 {
+    left: 0;
+  }
+  .z-10 {
+    z-index: 10;
+  }
+</style>
+{% endblock %}

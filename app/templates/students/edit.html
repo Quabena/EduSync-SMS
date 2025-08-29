@@ -1,251 +1,546 @@
-{% extends "base.html" %} {% block content %}
-<div class="container mx-auto px-4">
-  <h1 class="text-2xl font-bold mb-6">Edit Student: {{ student.full_name }}</h1>
+{% extends "base.html" %}
+{% block title %}Edit {{ student.full_name }} - Namong SDA JHS{% endblock %}
 
-  <form
-    method="POST"
-    enctype="multipart/form-data"
-    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
-  >
+{% block content %}
+<div class="space-y-8">
+  <!-- Animated Header -->
+  <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 shadow-2xl">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')]"></div>
+    
+    <div class="relative p-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-4xl font-bold text-white">
+            Edit Student
+          </h1>
+          <p class="mt-2 text-lg text-indigo-100">
+            Update information for {{ student.full_name }}
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white backdrop-blur-sm">
+            ID: {{ student.id }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Form -->
+  <form method="POST" enctype="multipart/form-data" class="space-y-8">
     {{ form.hidden_tag() }}
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-      <!-- Personal Information -->
-      <div class="md:col-span-2">
-        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
-          Personal Information
-        </h2>
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="first_name"
-        >
-          First Name
-        </label>
-        {{ form.first_name(class="shadow appearance-none border rounded w-full
-        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="middle_name"
-        >
-          Middle Name
-        </label>
-        {{ form.middle_name(class="shadow appearance-none border rounded w-full
-        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="surname"
-        >
-          Surname
-        </label>
-        {{ form.surname(class="shadow appearance-none border rounded w-full py-2
-        px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
-        focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="gender"
-        >
-          Gender
-        </label>
-        {{ form.gender(class="shadow border rounded w-full py-2 px-3
-        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
-        focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="date_of_birth"
-        >
-          Date of Birth
-        </label>
-        {{ form.date_of_birth(class="shadow appearance-none border rounded
-        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline", type="date") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="hometown"
-        >
-          Hometown
-        </label>
-        {{ form.hometown(class="shadow appearance-none border rounded w-full
-        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <!-- Family Information -->
-      <div class="md:col-span-2">
-        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
-          Family Information
-        </h2>
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="father_name"
-        >
-          Father's Name
-        </label>
-        {{ form.father_name(class="shadow appearance-none border rounded w-full
-        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="mother_name"
-        >
-          Mother's Name
-        </label>
-        {{ form.mother_name(class="shadow appearance-none border rounded w-full
-        py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="guardian_name"
-        >
-          Guardian's Name
-        </label>
-        {{ form.guardian_name(class="shadow appearance-none border rounded
-        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="guardian_contact"
-        >
-          Guardian's Contact
-        </label>
-        {{ form.guardian_contact(class="shadow appearance-none border rounded
-        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <!-- Academic Information -->
-      <div class="md:col-span-2">
-        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
-          Academic Information
-        </h2>
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="class_id"
-        >
-          Class
-        </label>
-        {{ form.class_id(class="shadow border rounded w-full py-2 px-3
-        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
-        focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <div>
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="learning_style"
-        >
-          Learning Style
-        </label>
-        {{ form.learning_style(class="shadow border rounded w-full py-2 px-3
-        text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
-        focus:outline-none focus:shadow-outline") }}
-      </div>
-
-      <!-- Medical Information -->
-      <div class="md:col-span-2">
-        <h2 class="text-lg font-semibold mb-3 border-b pb-2">
-          Medical Information
-        </h2>
-      </div>
-
-      <div class="md:col-span-2">
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="medical_records"
-        >
-          Medical Records
-        </label>
-        {{ form.medical_records(class="shadow appearance-none border rounded
-        w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700
-        leading-tight focus:outline-none focus:shadow-outline", rows="5") }}
-      </div>
-
-      <!-- Photo -->
-      <div class="md:col-span-2">
-        <h2 class="text-lg font-semibold mb-3 border-b pb-2">Student Photo</h2>
-      </div>
-
-      <div class="md:col-span-2">
-        <div class="mb-4">
-          <label
-            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          >
-            Current Photo
-          </label>
-          {% if student.photo_path %}
-          <img
-            src="{{ url_for('static', filename='documents/' + student.photo_path) }}"
-            class="w-32 h-32 rounded-lg border-2 border-gray-300 dark:border-gray-600 object-cover"
-          />
-          {% else %}
-          <div
-            class="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-lg w-32 h-32 flex items-center justify-center"
-          >
-            <span class="text-gray-500 dark:text-gray-400">No photo</span>
+    
+    <!-- Personal Information Card -->
+    <div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl shadow-gray-300/20 dark:shadow-gray-900/20 overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-blue-100/30 dark:hover:shadow-blue-900/10">
+      <div class="p-8">
+        <div class="flex items-center mb-6">
+          <div class="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg mr-4 transform hover:rotate-6 transition-transform duration-300">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
           </div>
-          {% endif %}
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+              Personal Information
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Basic student details
+            </p>
+          </div>
         </div>
 
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="photo"
-        >
-          Update Photo
-        </label>
-        {{ form.photo(class="shadow appearance-none border rounded w-full py-2
-        px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight
-        focus:outline-none focus:shadow-outline") }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- First Name -->
+          <div class="space-y-2">
+            <label for="{{ form.first_name.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              First Name
+            </label>
+            {{ form.first_name(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter first name") }}
+            {% for error in form.first_name.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Middle Name -->
+          <div class="space-y-2">
+            <label for="{{ form.middle_name.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Middle Name
+            </label>
+            {{ form.middle_name(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter middle name") }}
+            {% for error in form.middle_name.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Surname -->
+          <div class="space-y-2">
+            <label for="{{ form.surname.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Surname
+            </label>
+            {{ form.surname(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter surname") }}
+            {% for error in form.surname.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Gender -->
+          <div class="space-y-2">
+            <label for="{{ form.gender.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Gender
+            </label>
+            {{ form.gender(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200") }}
+            {% for error in form.gender.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="space-y-2">
+            <label for="{{ form.date_of_birth.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Date of Birth
+            </label>
+            {{ form.date_of_birth(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="YYYY-MM-DD") }}
+            {% for error in form.date_of_birth.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Hometown -->
+          <div class="space-y-2">
+            <label for="{{ form.hometown.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Hometown
+            </label>
+            {{ form.hometown(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter hometown") }}
+            {% for error in form.hometown.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Religion -->
+          <div class="space-y-2">
+            <label for="{{ form.religion.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Religion
+            </label>
+            {{ form.religion(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200") }}
+            {% for error in form.religion.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Admission Date -->
+          <div class="space-y-2">
+            <label for="{{ form.admission_date.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Admission Date
+            </label>
+            {{ form.admission_date(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="YYYY-MM-DD") }}
+            {% for error in form.admission_date.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flex items-center justify-end mt-6">
-      <button
-        type="submit"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-      >
-        Update Student
-      </button>
-      <a
-        href="{{ url_for('students.detail', student_id=student.id) }}"
-        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
-      >
+    <!-- Academic Information Card -->
+    <div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl shadow-gray-300/20 dark:shadow-gray-900/20 overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-amber-100/30 dark:hover:shadow-amber-900/10">
+      <div class="p-8">
+        <div class="flex items-center mb-6">
+          <div class="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg mr-4 transform hover:rotate-6 transition-transform duration-300">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+              Academic Information
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Educational details and preferences
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Classroom -->
+          <div class="space-y-2">
+            <label for="{{ form.class_id.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Class
+            </label>
+            {{ form.class_id(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200") }}
+            {% for error in form.class_id.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Learning Style -->
+          <div class="space-y-2">
+            <label for="{{ form.learning_style.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Learning Style
+            </label>
+            {{ form.learning_style(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200") }}
+            {% for error in form.learning_style.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guardian Information Card -->
+    <div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl shadow-gray-300/20 dark:shadow-gray-900/20 overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-emerald-100/30 dark:hover:shadow-emerald-900/10">
+      <div class="p-8">
+        <div class="flex items-center mb-6">
+          <div class="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-lg mr-4 transform hover:rotate-6 transition-transform duration-300">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+              Guardian Information
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Family and emergency contacts
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Father's Name -->
+          <div class="space-y-2">
+            <label for="{{ form.father_name.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Father's Name
+            </label>
+            {{ form.father_name(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter father's name") }}
+            {% for error in form.father_name.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Mother's Name -->
+          <div class="space-y-2">
+            <label for="{{ form.mother_name.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Mother's Name
+            </label>
+            {{ form.mother_name(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter mother's name") }}
+            {% for error in form.mother_name.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Guardian Name -->
+          <div class="space-y-2">
+            <label for="{{ form.guardian_name.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Primary Guardian
+            </label>
+            {{ form.guardian_name(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter guardian's name") }}
+            {% for error in form.guardian_name.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Guardian Contact -->
+          <div class="space-y-2">
+            <label for="{{ form.guardian_contact.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Guardian Contact
+            </label>
+            {{ form.guardian_contact(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter phone number") }}
+            {% for error in form.guardian_contact.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health & Photo Card -->
+    <div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl shadow-gray-300/20 dark:shadow-gray-900/20 overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-red-100/30 dark:hover:shadow-red-900/10">
+      <div class="p-8">
+        <div class="flex items-center mb-6">
+          <div class="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg mr-4 transform hover:rotate-6 transition-transform duration-300">
+            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+              Health & Identification
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Medical records and student photo
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Medical Records -->
+          <div class="space-y-2 md:col-span-2">
+            <label for="{{ form.medical_records.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Medical Records
+            </label>
+            {{ form.medical_records(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", rows="4", placeholder="Enter any medical conditions or allergies") }}
+            {% for error in form.medical_records.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+          
+          <!-- Height -->
+          <div class="space-y-2">
+            <label for="{{ form.height.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Height (cm)
+            </label>
+            {{ form.height(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter height in cm") }}
+            {% for error in form.height.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Weight -->
+          <div class="space-y-2">
+            <label for="{{ form.weight.id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Weight (kg)
+            </label>
+            {{ form.weight(class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter weight in kg") }}
+            {% for error in form.weight.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Student Photo -->
+          <div class="space-y-4 md:col-span-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Student Photo
+              </label>
+              {% if student.photo_path %}
+                <span class="text-xs text-gray-500 dark:text-gray-400">Current photo uploaded</span>
+              {% else %}
+                <span class="text-xs text-gray-500 dark:text-gray-400">No photo uploaded</span>
+              {% endif %}
+            </div>
+            
+            <div class="flex items-center space-x-6">
+              {% if student.photo_path %}
+              <div class="relative">
+                <img src="{{ url_for('students.student_photo', filename=student.photo_path) }}" alt="Current Photo" class="w-24 h-24 rounded-lg object-cover border border-gray-200 dark:border-gray-600">
+                <button type="button" onclick="document.getElementById('remove_photo').value = '1'; document.getElementById('photo-preview').src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"%3E%3Crect width=\"96\" height=\"96\" fill=\"%23" + (student.gender == 'Male' ? '3b82f6' : 'ec4899') + "\"/%3E%3Ctext x=\"50%\" y=\"50%\" font-family=\"Arial\" font-size=\"36\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\"%3E{{ student.first_name[0] }}{{ student.surname[0] }}%3C/text%3E%3C/svg%3E'; showToast('Photo will be removed on save', 'warning')" class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors duration-200">
+                  <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+                <input type="hidden" id="remove_photo" name="remove_photo" value="0">
+              </div>
+              {% else %}
+              <div class="w-24 h-24 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+                {{ student.first_name[0] }}{{ student.surname[0] }}
+              </div>
+              {% endif %}
+              
+              <div class="flex-1">
+                <div class="flex items-center space-x-4">
+                  <label for="photo" class="cursor-pointer inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-200">
+                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Change Photo
+                    {{ form.photo(id="photo", class="hidden", onchange="previewPhoto(this)") }}
+                  </label>
+                  
+                  <span id="photo-filename" class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">No file selected</span>
+                </div>
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">JPG or PNG, max 2MB. Ideal size: 300x300px</p>
+                {% for error in form.photo.errors %}
+                  <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                {% endfor %}
+              </div>
+            </div>
+            
+            <!-- Photo Preview -->
+            <div class="mt-4 hidden" id="photo-preview-container">
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preview:</p>
+              <img id="photo-preview" class="w-32 h-32 rounded-lg object-cover border border-gray-200 dark:border-gray-600">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4">
+      <a href="{{ url_for('students.detail', student_id=student.id) }}" class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl transition-all duration-200 hover:scale-105">
+        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
         Cancel
       </a>
+      <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        Save Changes
+      </button>
     </div>
   </form>
 </div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 hidden transform translate-x-64 transition-all duration-300"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animate form sections on load
+    const sections = document.querySelectorAll('.bg-white\\/80, .bg-gray-900\\/80');
+    sections.forEach((section, index) => {
+      section.style.opacity = '0';
+      section.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        section.style.transition = 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
+        section.style.opacity = '1';
+        section.style.transform = 'translateY(0)';
+      }, index * 150);
+    });
+
+    // Initialize date pickers
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+      if (!input.value && input.id.includes('date')) {
+        // Set default value to today for new records
+        const today = new Date().toISOString().split('T')[0];
+        input.value = today;
+      }
+    });
+  });
+
+  function previewPhoto(input) {
+    const previewContainer = document.getElementById('photo-preview-container');
+    const preview = document.getElementById('photo-preview');
+    const filenameDisplay = document.getElementById('photo-filename');
+    
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      filenameDisplay.textContent = file.name;
+      
+      // Check file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('File size exceeds 2MB limit', 'error');
+        input.value = '';
+        filenameDisplay.textContent = 'No file selected';
+        return;
+      }
+      
+      // Check file type
+      if (!file.type.match('image.*')) {
+        showToast('Please select an image file (JPG/PNG)', 'error');
+        input.value = '';
+        filenameDisplay.textContent = 'No file selected';
+        return;
+      }
+      
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        previewContainer.classList.remove('hidden');
+        showToast('Photo selected - ready to upload', 'success');
+      }
+      
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function showToast(message, type) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 flex items-center transform translate-x-64 transition-all duration-300';
+    
+    // Set styles based on type
+    if (type === 'success') {
+      toast.className += ' bg-green-500 text-white';
+    } else if (type === 'error') {
+      toast.className += ' bg-red-500 text-white';
+    } else if (type === 'warning') {
+      toast.className += ' bg-yellow-500 text-white';
+    } else {
+      toast.className += ' bg-blue-500 text-white';
+    }
+    
+    // Add icon based on type
+    let iconPath = '';
+    if (type === 'success') {
+      iconPath = 'M5 13l4 4L19 7';
+    } else if (type === 'error') {
+      iconPath = 'M6 18L18 6M6 6l12 12';
+    } else if (type === 'warning') {
+      iconPath = 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z';
+    } else {
+      iconPath = 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+    }
+    
+    toast.innerHTML = `
+      <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}" />
+      </svg>
+      ${message}
+    `;
+    
+    // Animate in
+    setTimeout(() => {
+      toast.classList.remove('translate-x-64');
+      toast.classList.add('translate-x-0');
+    }, 10);
+    
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-x-64');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 300);
+    }, 3000);
+  }
+</script>
+
+<style>
+  @keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 6s ease infinite;
+  }
+  
+  select[multiple] {
+    height: auto;
+    min-height: 120px;
+    background-image: none !important;
+  }
+  
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    body {
+      background: white !important;
+      font-size: 12pt;
+    }
+    
+    .bg-white\/80,
+    .bg-gray-900\/80 {
+      background: white !important;
+      border: 1px solid #e5e7eb !important;
+    }
+    
+    .shadow-xl, .shadow-lg {
+      box-shadow: none !important;
+    }
+    
+    .fixed {
+      display: none !important;
+    }
+  }
+</style>
+
 {% endblock %}

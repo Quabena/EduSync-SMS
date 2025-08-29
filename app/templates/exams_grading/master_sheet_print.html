@@ -1,0 +1,177 @@
+{% extends "base.html" %} {% block title %}Master Sheet Print - {{ class_group
+}} {{ term }} {{ year }}{% endblock %} {% block content %}
+<div class="min-h-screen bg-white py-4">
+  <div class="max-w-full mx-auto px-2">
+    <!-- Print Header -->
+    <div class="text-center mb-6 border-b-2 border-gray-300 pb-4">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">
+        ACADEMIC MASTER SHEET
+      </h1>
+      <div class="text-lg font-semibold text-gray-700">
+        {{ class_group }} - {{ term }} {{ year }}
+      </div>
+      <div class="text-sm text-gray-600 mt-2">
+        Total Students: {{ students|length }} | Subjects: {{ subjects|length }}
+      </div>
+    </div>
+
+    <!-- Master Sheet Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-collapse border border-gray-400 text-xs">
+        <thead>
+          <!-- Main Subject Headers -->
+          <tr>
+            <th
+              rowspan="2"
+              class="border border-gray-400 px-2 py-2 text-left font-bold bg-gray-100 min-w-[120px]"
+            >
+              Student Information
+            </th>
+            {% for subject in subjects %}
+            <th
+              colspan="5"
+              class="border border-gray-400 px-1 py-2 text-center font-bold bg-gray-100"
+            >
+              {{ subject.name }}
+            </th>
+            {% endfor %}
+            <th
+              rowspan="2"
+              class="border border-gray-400 px-2 py-2 text-center font-bold bg-gray-100"
+            >
+              Grand Total
+            </th>
+            <th
+              rowspan="2"
+              class="border border-gray-400 px-2 py-2 text-center font-bold bg-gray-100"
+            >
+              Position
+            </th>
+          </tr>
+          <!-- Sub Headers -->
+          <tr>
+            {% for subject in subjects %}
+            <th
+              class="border border-gray-400 px-1 py-1 text-center text-xs bg-gray-50"
+            >
+              Class/60
+            </th>
+            <th
+              class="border border-gray-400 px-1 py-1 text-center text-xs bg-gray-50"
+            >
+              50%
+            </th>
+            <th
+              class="border border-gray-400 px-1 py-1 text-center text-xs bg-gray-50"
+            >
+              Exam/100
+            </th>
+            <th
+              class="border border-gray-400 px-1 py-1 text-center text-xs bg-gray-50"
+            >
+              50%
+            </th>
+            <th
+              class="border border-gray-400 px-1 py-1 text-center text-xs bg-gray-50"
+            >
+              Total
+            </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr>
+            <!-- Student Info -->
+            <td class="border border-gray-400 px-2 py-2">
+              <div class="font-semibold">{{ student.full_name }}</div>
+              <div class="text-xs text-gray-600">{{ student.class_name }}</div>
+            </td>
+
+            <!-- Subject Scores -->
+            {% for subject in subjects %} {% set score =
+            term_scores[student.id][subject.id] if student.id in term_scores and
+            subject.id in term_scores[student.id] else none %}
+
+            <!-- Class Score -->
+            <td class="border border-gray-400 px-1 py-2 text-center">
+              {{ score.class_total|round(1) if score and score.class_total else
+              '-' }}
+            </td>
+
+            <!-- Scaled Class Score -->
+            <td class="border border-gray-400 px-1 py-2 text-center">
+              {{ score.scaled_class|round(1) if score and score.scaled_class
+              else '-' }}
+            </td>
+
+            <!-- Exam Score -->
+            <td class="border border-gray-400 px-1 py-2 text-center">
+              {{ score.exam_score|round(1) if score and score.exam_score else
+              '-' }}
+            </td>
+
+            <!-- Scaled Exam Score -->
+            <td class="border border-gray-400 px-1 py-2 text-center">
+              {{ score.scaled_exam|round(1) if score and score.scaled_exam else
+              '-' }}
+            </td>
+
+            <!-- Subject Total -->
+            <td
+              class="border border-gray-400 px-1 py-2 text-center font-semibold"
+            >
+              {{ score.total_score|round(1) if score and score.total_score else
+              '-' }}
+            </td>
+            {% endfor %}
+
+            <!-- Grand Total -->
+            <td
+              class="border border-gray-400 px-2 py-2 text-center font-bold text-lg"
+            >
+              {{ student_totals[student.id]|round(1) if
+              student_totals[student.id] else '-' }}
+            </td>
+
+            <!-- Position -->
+            <td class="border border-gray-400 px-2 py-2 text-center font-bold">
+              {% if positions[student.id] %} {% if positions[student.id] <= 3 %}
+              {{ positions[student.id] }}★ {% else %} {{ positions[student.id]
+              }} {% endif %} {% else %} - {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Print Footer -->
+    <div
+      class="mt-6 text-center text-xs text-gray-600 border-t border-gray-300 pt-4"
+    >
+      <p>
+        Generated on {{ moment().format('MMMM Do YYYY, h:mm:ss a') if moment
+        else 'System Date' }}
+      </p>
+      <p>Academic Master Sheet - {{ class_group }} {{ term }} {{ year }}</p>
+    </div>
+  </div>
+</div>
+
+<style media="print">
+  @page {
+    size: landscape;
+    margin: 0.5in;
+  }
+  body {
+    font-size: 10px;
+  }
+  table {
+    font-size: 8px;
+  }
+  .no-print {
+    display: none !important;
+  }
+</style>
+{% endblock %}

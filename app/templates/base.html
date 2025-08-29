@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{}" class="scroll-smooth">
+<html lang="en" x-data="{ mobileMenuOpen: false }" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>{% block title %}EduSync SMS{% endblock %}</title>
 
     <!-- Local CSS -->
@@ -72,12 +73,26 @@
         }
       }
 
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
       .animate-fade-in-up {
         animation: fadeInUp 0.6s ease-out forwards;
       }
 
       .animate-slide-down {
         animation: slideDown 0.3s ease-out forwards;
+      }
+
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
       }
 
       .glass-effect {
@@ -88,14 +103,79 @@
       .dark .glass-effect {
         background: rgba(0, 0, 0, 0.2);
       }
+
+      .gradient-text {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .nav-link {
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        transition: width 0.3s ease;
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      .nav-link.active::after {
+        width: 100%;
+      }
     </style>
   </head>
   <body
     class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950 text-gray-800 dark:text-gray-100 transition-colors duration-300"
   >
-    <div class="min-h-screen flex flex-col relative">
-      <!-- Decorative Background Elements -->
-      <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="min-h-screen flex flex-col relative overflow-hidden">
+      <!-- Floating Particles Background -->
+      <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-indigo-100/30 dark:from-gray-900/80 dark:to-indigo-950/80"
+        ></div>
+
+        <!-- Animated particles -->
+        <div
+          class="particle absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-indigo-400/20 animate-pulse"
+        ></div>
+        <div
+          class="particle absolute top-1/3 right-1/5 w-4 h-4 rounded-full bg-purple-400/20 animate-pulse"
+          style="animation-delay: 0.5s"
+        ></div>
+        <div
+          class="particle absolute bottom-1/4 left-1/3 w-2 h-2 rounded-full bg-blue-400/20 animate-pulse"
+          style="animation-delay: 1s"
+        ></div>
+        <div
+          class="particle absolute bottom-1/3 right-1/4 w-3 h-3 rounded-full bg-emerald-400/20 animate-pulse"
+          style="animation-delay: 1.5s"
+        ></div>
+        <div
+          class="particle absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-pink-400/20 animate-pulse"
+          style="animation-delay: 2s"
+        ></div>
+
+        <!-- Larger blur elements -->
         <div
           class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl"
         ></div>
@@ -109,35 +189,35 @@
 
       <!-- Header -->
       <header
-        class="relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-gray-200/20 dark:shadow-gray-900/20 animate-slide-down"
+        class="relative z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-gray-200/20 dark:shadow-gray-900/20 animate-slide-down"
       >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-20">
             <div class="flex items-center space-x-4">
               <!-- Logo/Icon -->
-              <div
-                class="flex-shrink-0 p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg mr-2"
-              >
-                <svg
-                  class="h-8 w-8 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <a href="/" class="flex items-center space-x-3 group">
+                <div
+                  class="flex-shrink-0 p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg group-hover:shadow-indigo-300/30 dark:group-hover:shadow-purple-500/20 transition-shadow duration-300"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
-              </div>
+                  <svg
+                    class="h-8 w-8 text-white transform group-hover:rotate-12 transition-transform duration-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477 4.5 1.253"
+                    />
+                  </svg>
+                </div>
 
-              <!-- Brand Text -->
-              <div>
-                <a href="/">
+                <!-- Brand Text -->
+                <div>
                   <h1
-                    class="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent"
+                    class="text-2xl font-bold gradient-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400"
                   >
                     EduSync
                   </h1>
@@ -146,56 +226,233 @@
                   >
                     School Management System
                   </p>
-                </a>
-              </div>
+                </div>
+              </a>
             </div>
 
-            <!-- Header Actions -->
-            <div class="flex items-center space-x-4">
-              <!-- Theme Toggle -->
+            <!-- Mobile menu button -->
+            <div class="flex items-center lg:hidden">
               <button
-                class="relative p-3 rounded-xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 group"
-                type="submit"
+                @click="mobileMenuOpen = !mobileMenuOpen"
+                class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
               >
-                <h3>Logout</h3>
-                <!-- Sun Icon -->
-                <!-- <svg
-                  x-show="$store.theme.dark"
-                  x-transition:enter="transition ease-out duration-200"
-                  x-transition:enter-start="opacity-0 rotate-90 scale-75"
-                  x-transition:enter-end="opacity-100 rotate-0 scale-100"
-                  x-transition:leave="transition ease-in duration-150"
-                  x-transition:leave-start="opacity-100 rotate-0 scale-100"
-                  x-transition:leave-end="opacity-0 -rotate-90 scale-75"
-                  class="h-5 w-5 text-yellow-500 group-hover:text-yellow-400"
-                  fill="currentColor"
+                <svg
+                  x-show="!mobileMenuOpen"
+                  class="h-6 w-6"
+                  fill="none"
                   viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
                   <path
-                    d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"
                   />
-                </svg> -->
-
-                <!-- Moon Icon -->
-                <!-- <svg
-                  x-show="!$store.theme.dark"
-                  x-transition:enter="transition ease-out duration-200"
-                  x-transition:enter-start="opacity-0 rotate-90 scale-75"
-                  x-transition:enter-end="opacity-100 rotate-0 scale-100"
-                  x-transition:leave="transition ease-in duration-150"
-                  x-transition:leave-start="opacity-100 rotate-0 scale-100"
-                  x-transition:leave-end="opacity-0 -rotate-90 scale-75"
-                  class="h-5 w-5 text-gray-700 group-hover:text-gray-600"
-                  fill="currentColor"
+                </svg>
+                <svg
+                  x-show="mobileMenuOpen"
+                  class="h-6 w-6"
+                  fill="none"
                   viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
                   <path
-                    fill-rule="evenodd"
-                    d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"
-                    clip-rule="evenodd"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
                   />
-                </svg> -->
+                </svg>
               </button>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden lg:flex items-center space-x-1">
+              <a href="/" class="px-4 py-2 text-sm font-medium nav-link active">
+                Dashboard
+              </a>
+              <a
+                href="/students"
+                class="px-4 py-2 text-sm font-medium nav-link"
+              >
+                Students
+              </a>
+              <a
+                href="/teachers"
+                class="px-4 py-2 text-sm font-medium nav-link"
+              >
+                Teachers
+              </a>
+              <a href="/classes" class="px-4 py-2 text-sm font-medium nav-link">
+                Classes
+              </a>
+              <a
+                href="/attendance"
+                class="px-4 py-2 text-sm font-medium nav-link"
+              >
+                Attendance
+              </a>
+              <a
+                href="/exams_grading"
+                class="px-4 py-2 text-sm font-medium nav-link"
+              >
+                Exams Grading
+              </a>
+            </nav>
+
+            <!-- Header Actions -->
+            <div class="hidden lg:flex items-center space-x-4">
+              <!-- User Profile Dropdown -->
+              <div class="relative" x-data="{ open: false }">
+                <button
+                  @click="open = !open"
+                  class="flex items-center space-x-2 focus:outline-none"
+                >
+                  <span class="text-sm font-medium hidden md:inline"
+                    >Admin</span
+                  >
+                  <svg
+                    class="h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform duration-200"
+                    :class="{ 'transform rotate-180': open }"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Dropdown menu -->
+                <div
+                  x-show="open"
+                  @click.away="open = false"
+                  x-transition:enter="transition ease-out duration-100"
+                  x-transition:enter-start="transform opacity-0 scale-95"
+                  x-transition:enter-end="transform opacity-100 scale-100"
+                  x-transition:leave="transition ease-in duration-75"
+                  x-transition:leave-start="transform opacity-100 scale-100"
+                  x-transition:leave-end="transform opacity-0 scale-95"
+                  class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-30 border border-gray-200 dark:border-gray-700"
+                >
+                  <div class="py-1">
+                    <a
+                      href="/profile"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      Your Profile
+                    </a>
+                    <a
+                      href="/settings"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      Settings
+                    </a>
+                    <div
+                      class="border-t border-gray-200 dark:border-gray-700"
+                    ></div>
+                    <a
+                      href="/logout"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      Sign out
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div
+          x-show="mobileMenuOpen"
+          x-transition:enter="transition ease-out duration-100"
+          x-transition:enter-start="opacity-0 scale-95"
+          x-transition:enter-end="opacity-100 scale-100"
+          x-transition:leave="transition ease-in duration-75"
+          x-transition:leave-start="opacity-100 scale-100"
+          x-transition:leave-end="opacity-0 scale-95"
+          class="lg:hidden absolute inset-x-0 top-20 bg-white dark:bg-gray-800 shadow-lg rounded-b-lg z-10"
+        >
+          <div class="px-2 pt-2 pb-3 space-y-1">
+            <a
+              href="/dashboard"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Dashboard
+            </a>
+            <a
+              href="/students"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Students
+            </a>
+            <a
+              href="/teachers"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Teachers
+            </a>
+            <a
+              href="/classes"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Classes
+            </a>
+            <a
+              href="/reports"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Reports
+            </a>
+          </div>
+          <div class="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex items-center px-5">
+              <div class="flex-shrink-0">
+                <div
+                  class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium"
+                >
+                  EA
+                </div>
+              </div>
+              <div class="ml-3">
+                <div
+                  class="text-base font-medium text-gray-800 dark:text-gray-200"
+                >
+                  Admin User
+                </div>
+                <div
+                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  admin@edusync.edu
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 px-2 space-y-1">
+              <a
+                href="/profile"
+                class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Your Profile
+              </a>
+              <a
+                href="/settings"
+                class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Settings
+              </a>
+              <a
+                href="/logout"
+                class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Sign out
+              </a>
             </div>
           </div>
         </div>
@@ -204,12 +461,61 @@
       <!-- Main Content -->
       <main class="flex-grow relative z-10 animate-fade-in-up">
         <div class="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
+          <!-- Breadcrumbs -->
+          <nav class="flex mb-6 px-4 sm:px-0" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+              <li class="inline-flex items-center">
+                <a
+                  href="/"
+                  class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-white"
+                >
+                  <svg
+                    class="w-3 h-3 mr-2.5"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                    />
+                  </svg>
+                  Home
+                </a>
+              </li>
+              <li>
+                <div class="flex items-center">
+                  <svg
+                    class="w-3 h-3 text-gray-400 mx-1"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 6 10"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m1 9 4-4-4-4"
+                    />
+                  </svg>
+                  <a
+                    href="#"
+                    class="ml-1 text-sm font-medium text-gray-700 hover:text-indigo-600 md:ml-2 dark:text-gray-400 dark:hover:text-white"
+                  >
+                    {% block breadcrumb %}{% endblock %}
+                  </a>
+                </div>
+              </li>
+            </ol>
+          </nav>
+
+          <!-- Content Container -->
           <div
-            class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/20 dark:shadow-gray-900/20 border border-gray-200/50 dark:border-gray-700/50 min-h-[calc(100vh-12rem)]"
+            class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/20 dark:shadow-gray-900/20 border border-gray-200/50 dark:border-gray-700/50 min-h-[calc(100vh-12rem)] overflow-hidden"
           >
-            <div class="p-6 sm:p-8 lg:p-10">
-              {% block content %}{% endblock %}
-            </div>
+            {% block content %}{% endblock %}
           </div>
         </div>
       </main>
@@ -219,45 +525,202 @@
         class="relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-gray-200/20 dark:shadow-gray-900/20"
       >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div
-            class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0"
-          >
-            <div class="flex items-center space-x-2">
-              <div
-                class="p-1.5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg"
-              >
-                <svg
-                  class="h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div class="flex items-center space-x-2">
+                <div
+                  class="p-1.5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
+                  <svg
+                    class="h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477 4.5 1.253"
+                    />
+                  </svg>
+                </div>
+                <span
+                  class="text-lg font-bold gradient-text bg-gradient-to-r from-indigo-600 to-purple-600"
+                >
+                  EduSync
+                </span>
               </div>
-              <span
-                class="text-sm font-medium text-gray-600 ml-1 dark:text-gray-300"
-              >
-                EduSync - School Management System
-              </span>
+              <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Modern school management system designed to streamline
+                educational administration.
+              </p>
             </div>
 
-            <div
-              class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
-            >
-              <span>&copy; 2025</span>
-              <span class="text-gray-300 dark:text-gray-600">|</span>
-              <span
-                >Developed by
-                <span class="font-semibold text-indigo-600 dark:text-indigo-400"
-                  >Evans Adu</span
-                ></span
-              >
+            <div class="md:col-span-2">
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                <div>
+                  <h3
+                    class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider"
+                  >
+                    Quick Links
+                  </h3>
+                  <ul class="mt-4 space-y-2">
+                    <li>
+                      <a
+                        href="/dashboard"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Dashboard
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/students"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Students
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/teachers"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Teachers
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/classes"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Classes
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3
+                    class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider"
+                  >
+                    Resources
+                  </h3>
+                  <ul class="mt-4 space-y-2">
+                    <li>
+                      <a
+                        href="/docs"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Documentation
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/support"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Support
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/blog"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Blog
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/status"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        System Status
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3
+                    class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider"
+                  >
+                    Legal
+                  </h3>
+                  <ul class="mt-4 space-y-2">
+                    <li>
+                      <a
+                        href="/privacy"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Privacy Policy
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/terms"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Terms of Service
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/cookies"
+                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        Cookie Policy
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                &copy; 2025 EduSync SMS. All rights reserved.
+              </p>
+              <div class="mt-4 md:mt-0 flex space-x-6">
+                <a
+                  href="#"
+                  class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                >
+                  <span class="sr-only">Twitter</span>
+                  <svg
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"
+                    />
+                  </svg>
+                </a>
+                <a
+                  href="#"
+                  class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                >
+                  <span class="sr-only">GitHub</span>
+                  <svg
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 # mock_data.py
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from faker import Faker
 from sqlalchemy.exc import IntegrityError
 from app.models import (
@@ -20,6 +20,8 @@ from app.models import (
     User,
     Assignment,
     StudentAssignment,
+    TeacherSubjectClass,  # ADDED
+    TermScore,  # ADDED
 )
 
 fake = Faker()
@@ -38,12 +40,19 @@ ATTENDANCE_PROBABILITY = 0.85  # 85% chance of attendance
 def create_classes():
     classes = []
     levels = ["JHS 1", "JHS 2", "JHS 3"]
-    sections = ["A", "B", "C", "D"]
+    sections = ["A", "B", "C"]
+    master_classes = ["JHS 1", "JHS 2", "JHS 3"]
 
     for _ in range(NUM_CLASSES):
         level = random.choice(levels)
         section = random.choice(sections)
-        class_ = Class(name=f"{level} {section}", level=level, section=section)
+        master_class = random.choice(master_classes)
+        class_ = Class(
+            name=f"{level} {section}",
+            level=level,
+            section=section,
+            master_class=master_class,  # ADDED
+        )
         classes.append(class_)
         db.session.add(class_)
 
@@ -144,9 +153,48 @@ def create_teachers(classes, subjects):
     return teachers
 
 
+def create_teacher_subject_assignments(teachers, classes, subjects):
+    """Create TeacherSubjectClass assignments"""
+    assignments = []
+
+    for teacher in teachers:
+        # Each teacher gets 2-4 subject-class assignments
+        num_assignments = random.randint(2, min(4, len(subjects), len(classes)))
+
+        for _ in range(num_assignments):
+            subject = random.choice(subjects)
+            class_ = random.choice(classes)
+
+            # Check if this assignment already exists
+            existing = TeacherSubjectClass.query.filter_by(
+                teacher_id=teacher.id, subject_id=subject.id, class_id=class_.id
+            ).first()
+
+            if not existing:
+                assignment = TeacherSubjectClass(
+                    teacher_id=teacher.id,
+                    subject_id=subject.id,
+                    class_id=class_.id,
+                    is_active=True,
+                )
+                assignments.append(assignment)
+                db.session.add(assignment)
+
+    db.session.commit()
+    print(f"Created {len(assignments)} teacher-subject-class assignments")
+    return assignments
+
+
 def create_students(classes, subjects):
     students = []
     learning_styles = ["Visual", "Auditory", "Kinesthetic", "Reading/Writing"]
+    religions = ["Christian", "Muslim", "Traditionalist", "None"]
+    photo_paths = [
+        None,  # Some students won't have photos
+        "student_photos/photo1.jpg",
+        "student_photos/photo2.png",
+        "student_photos/photo3.webp",
+    ]
 
     for i in range(NUM_STUDENTS):
         gender = random.choice(["Male", "Female"])
@@ -160,6 +208,9 @@ def create_students(classes, subjects):
             surname=fake.last_name(),
             gender=gender,
             date_of_birth=fake.date_of_birth(minimum_age=10, maximum_age=18),
+            admission_date=date(
+                random.randint(2017, 2022), random.randint(1, 12), random.randint(1, 28)
+            ),
             hometown=fake.city(),
             father_name=fake.name_male(),
             mother_name=fake.name_female(),
@@ -167,6 +218,10 @@ def create_students(classes, subjects):
             guardian_contact=fake.numerify("05########"),
             medical_records=fake.text(max_nb_chars=200),
             class_id=random.choice(classes).id,
+            religion=random.choice(religions),
+            height=random.randint(140, 190),
+            weight=random.randint(40, 90),
+            photo_path=random.choice(photo_paths),
             learning_style=random.choice(learning_styles),
         )
 
@@ -181,6 +236,60 @@ def create_students(classes, subjects):
     db.session.commit()
     print(f"Created {len(students)} students")
     return students
+
+
+def create_term_scores(students, subjects, teachers):
+    """Create TermScore records for grading system"""
+    term_scores = []
+    terms = ["Term 1", "Term 2", "Term 3"]
+    years = ["2024", "2025"]
+
+    for student in students:
+        for subject in student.subjects:
+            for term in terms:
+                for year in years:
+                    # Only create scores for some combinations (70% chance)
+                    if random.random() > 0.7:
+                        continue
+
+                    # Find a teacher assignment for this subject and class
+                    assignment = TeacherSubjectClass.query.filter_by(
+                        subject_id=subject.id, class_id=student.class_id, is_active=True
+                    ).first()
+
+                    if not assignment:
+                        continue
+
+                    # Generate component scores
+                    individual_test = round(random.uniform(0, 15), 1)
+                    group_work = round(random.uniform(0, 15), 1)
+                    class_test = round(random.uniform(0, 15), 1)
+                    project = round(random.uniform(0, 15), 1)
+                    exam_score = round(random.uniform(0, 100), 1)
+
+                    term_score = TermScore(
+                        student_id=student.id,
+                        subject_id=subject.id,
+                        class_id=student.class_id,
+                        teacher_id=assignment.teacher_id,
+                        term=term,
+                        year=year,
+                        individual_test=individual_test,
+                        group_work=group_work,
+                        class_test=class_test,
+                        project=project,
+                        exam_score=exam_score,
+                    )
+
+                    # Calculate totals
+                    term_score.calculate_totals()
+
+                    term_scores.append(term_score)
+                    db.session.add(term_score)
+
+    db.session.commit()
+    print(f"Created {len(term_scores)} term scores")
+    return term_scores
 
 
 def create_users(teachers):
@@ -201,13 +310,11 @@ def create_users(teachers):
     users.append(headteacher)
     db.session.add(headteacher)
 
-    # Create teacher users
-    for i, teacher in enumerate(
-        random.sample(teachers, k=min(NUM_USERS - 2, len(teachers)))
-    ):
+    # Create teacher users - link to actual teachers
+    for i, teacher in enumerate(teachers[: NUM_USERS - 2]):
         user = User(
             username=f"teacher{i+1}",
-            email=f"teacher{i+1}@school.edu.gh",
+            email=teacher.email,  # Use teacher's email
             role="teacher",
         )
         user.set_password(f"teacher{i+1}")
@@ -251,14 +358,16 @@ def create_academic_records(students, subjects):
 
 def get_grade(score):
     if score >= 80:
-        return "A"
+        return "1"
     if score >= 70:
-        return "B"
+        return "2"
     if score >= 60:
-        return "C"
+        return "3"
     if score >= 50:
-        return "D"
-    return "F"
+        return "4"
+    if score >= 40:
+        return "5"
+    return "9"
 
 
 def create_medical_records(students):
@@ -295,11 +404,21 @@ def create_medical_records(students):
 def create_attendances(students, classes):
     records = []
     start_date = datetime.now() - timedelta(days=DAYS_OF_ATTENDANCE)
+    terms = ["Term 1", "Term 2", "Term 3"]
+    current_year = str(datetime.now().year)
 
     for single_date in (start_date + timedelta(n) for n in range(DAYS_OF_ATTENDANCE)):
         # Skip weekends
         if single_date.weekday() >= 5:  # 5=Sat, 6=Sun
             continue
+
+        # Determine term based on date (simplified)
+        if single_date.month <= 4:
+            term = "Term 1"
+        elif single_date.month <= 8:
+            term = "Term 2"
+        else:
+            term = "Term 3"
 
         for student in students:
             # Skip some attendance records based on probability
@@ -307,15 +426,17 @@ def create_attendances(students, classes):
                 continue
 
             status = random.choices(
-                ["Present", "Absent", "Late"], weights=[0.85, 0.1, 0.05]
+                ["present", "absent", "late"], weights=[0.85, 0.1, 0.05]
             )[0]
 
             record = Attendance(
                 student_id=student.id,
                 class_id=student.class_id,
                 date=single_date,
+                term=term,  # ADDED
+                year=current_year,  # ADDED
                 status=status,
-                method=random.choice(["Manual", "QR"]),
+                method=random.choice(["manual", "QR"]),
             )
             records.append(record)
             db.session.add(record)
@@ -515,7 +636,11 @@ def generate_mock_data():
     classes = create_classes()
     subjects = create_subjects()
     teachers = create_teachers(classes, subjects)
+    teacher_assignments = create_teacher_subject_assignments(
+        teachers, classes, subjects
+    )  # ADDED
     students = create_students(classes, subjects)
+    term_scores = create_term_scores(students, subjects, teachers)  # ADDED
     users = create_users(teachers)
 
     # Create related records

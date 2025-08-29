@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block title %}Add New Student - Namong SDA JHS{%
 endblock %} {% block content %}
-<div class="space-y-8">
+<div class="space-y-8 m-6">
   <!-- Page Header -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
     <div>
@@ -41,10 +41,20 @@ endblock %} {% block content %}
     class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl shadow-gray-200/20 dark:shadow-gray-900/20 overflow-hidden"
   >
     <form method="POST" enctype="multipart/form-data" class="p-8 lg:p-10">
-      {{ form.hidden_tag() }}
+      {{ form.hidden_tag() }} {% if form.errors %}
+      <div class="mb-6 p-4 bg-red-50 text-red-700 rounded-xl">
+        <h3 class="font-bold">Form Errors:</h3>
+        <ul class="list-disc pl-5 mt-2">
+          {% for field, errors in form.errors.items() %} {% for error in errors
+          %}
+          <li>{{ form[field].label.text }}: {{ error }}</li>
+          {% endfor %} {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
 
       <!-- Personal Information Section -->
-      <div class="mb-12">
+      <div class="mb-12 data-section">
         <div class="flex items-center mb-8">
           <div
             class="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg mr-4"
@@ -87,7 +97,10 @@ endblock %} {% block content %}
             rounded-xl text-gray-900 dark:text-white placeholder-gray-500
             dark:placeholder-gray-400 focus:outline-none focus:ring-2
             focus:ring-indigo-500 focus:border-transparent transition-all
-            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }} {%
+            for err in form.first_name.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ err }}</p>
+            {% endfor %}
           </div>
 
           <!-- Middle Name -->
@@ -154,6 +167,22 @@ endblock %} {% block content %}
             dark:hover:bg-gray-700/50", type="date") }}
           </div>
 
+          <!-- Admission Date -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="admission_date"
+            >
+              Admission Date <span class="text-red-500">*</span>
+            </label>
+            {{ form.admission_date(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white focus:outline-none
+            focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 hover:bg-gray-100/50
+            dark:hover:bg-gray-700/50", type="date") }}
+          </div>
+
           <!-- Hometown -->
           <div class="space-y-2">
             <label
@@ -169,11 +198,59 @@ endblock %} {% block content %}
             focus:ring-indigo-500 focus:border-transparent transition-all
             duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
           </div>
+
+          <!-- Religion -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="religion"
+            >
+              Religion
+            </label>
+            {{ form.religion(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white focus:outline-none
+            focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 hover:bg-gray-100/50
+            dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Height -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="height"
+            >
+              Height (cm)
+            </label>
+            {{ form.height(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Weight -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="weight"
+            >
+              Weight (kg)
+            </label>
+            {{ form.weight(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
         </div>
       </div>
 
       <!-- Guardian Information Section -->
-      <div class="mb-12">
+      <div class="mb-12" data-section>
         <div class="flex items-center mb-8">
           <div
             class="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-lg mr-4"
@@ -270,7 +347,7 @@ endblock %} {% block content %}
       </div>
 
       <!-- Academic Information Section -->
-      <div class="mb-12">
+      <div class="mb-12" data-section>
         <div class="flex items-center mb-8">
           <div
             class="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg mr-4"
@@ -335,7 +412,7 @@ endblock %} {% block content %}
       </div>
 
       <!-- Medical Information Section -->
-      <div class="mb-12">
+      <div class="mb-12" data-section>
         <div class="flex items-center mb-8">
           <div
             class="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg mr-4"
@@ -420,7 +497,7 @@ endblock %} {% block content %}
             Upload Photo
           </label>
           <div class="relative">
-            {{ form.photo(class="w-full px-4 py-3 bg-gray-50/50
+            {{ form.photo(id="photoInput", class="w-full px-4 py-3 bg-gray-50/50
             dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
             rounded-xl text-gray-900 dark:text-white focus:outline-none
             focus:ring-2 focus:ring-indigo-500 focus:border-transparent
@@ -429,7 +506,7 @@ endblock %} {% block content %}
             file:rounded-lg file:border-0 file:text-sm file:font-medium
             file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100
             dark:file:bg-indigo-900/50 dark:file:text-indigo-300
-            dark:hover:file:bg-indigo-900/70") }}
+            dark:hover:file:bg-indigo-900/70", accept="image/*") }}
           </div>
           <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
             <svg
@@ -502,7 +579,7 @@ endblock %} {% block content %}
   // Add form validation and interactivity
   document.addEventListener("DOMContentLoaded", function () {
     // Animate form sections on load
-    const sections = document.querySelectorAll("form > div");
+    const sections = document.querySelectorAll("form > div, [data-section]");
     sections.forEach((section, index) => {
       section.style.opacity = "0";
       section.style.transform = "translateY(20px)";

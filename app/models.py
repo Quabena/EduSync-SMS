@@ -21,6 +21,14 @@ teacher_class = db.Table(
     db.Column("class_id", db.Integer, db.ForeignKey("class.id"), primary_key=True),
 )
 
+# Association table for teacher-subject-class assignments
+# teacher_subject_class = db.Table(
+#     "teacher_subject_class",
+#     db.Column("teacher_id", db.Integer, db.ForeignKey("teacher.id"), primary_key=True),
+#     db.Column("subject_id", db.Integer, db.ForeignKey("subject.id"), primary_key=True),
+#     db.Column("class_id", db.Integer, db.ForeignKey("class.id"), primary_key=True),
+# )
+
 
 # Class Model
 class Class(db.Model):
@@ -28,10 +36,14 @@ class Class(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
     level = db.Column(db.String(20))
     section = db.Column(db.String(1))
+    master_class = db.Column(db.String(50))  # For grouping classes
 
     students = db.relationship("Student", backref="classroom", lazy=True)
     teachers = db.relationship(
         "Teacher", secondary=teacher_class, back_populates="classes"
+    )
+    subject_assignments = db.relationship(
+        "TeacherSubjectClass", back_populates="class_"
     )
 
     def __repr__(self) -> str:
@@ -57,6 +69,36 @@ class Subject(db.Model):
     )
     teachers = db.relationship("Teacher", back_populates="specialization")
 
+    class_assignments = db.relationship("TeacherSubjectClass", back_populates="subject")
+
+    def __repr__(self) -> str:
+        return self.name
+
+
+# TeacherSubjectClass Model for tracking sybject assignments to teachers
+class TeacherSubjectClass(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"))
+    subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"))
+    class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
+    is_active = db.Column(db.Boolean, default=True)
+
+    # Add unique constraint instead of composite primary key
+    __table_args__ = (
+        db.UniqueConstraint(
+            "teacher_id", "subject_id", "class_id", name="unique_assignment"
+        ),
+    )
+
+    # Relationships
+    teacher = db.relationship("Teacher", back_populates="subject_assignments")
+    subject = db.relationship("Subject", back_populates="class_assignments")
+    class_ = db.relationship("Class", back_populates="subject_assignments")
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
 
 # Student Class Model
 class Student(db.Model):
@@ -66,12 +108,16 @@ class Student(db.Model):
     surname = db.Column(db.String(50), nullable=False)
     gender = db.Column(db.String(10), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
+    admission_date = db.Column(db.Date, nullable=True)
     hometown = db.Column(db.String(100))
     father_name = db.Column(db.String(100))
     mother_name = db.Column(db.String(100))
     guardian_name = db.Column(db.String(100))
     guardian_contact = db.Column(db.String(20))
+    religion = db.Column(db.String(100), nullable=True)
     medical_records = db.Column(db.Text)
+    height = db.Column(db.Integer, nullable=True)
+    weight = db.Column(db.Integer, nullable=True)
     photo_path = db.Column(db.String(200))
     class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
     learning_style = db.Column(
@@ -83,6 +129,7 @@ class Student(db.Model):
         "Subject", secondary=student_subject, back_populates="students"
     )
     academic_records = db.relationship("AcademicRecord", back_populates="student")
+    term_scores = db.relationship("TermScore", back_populates="student")
 
     def __init__(self, **kwargs) -> None:
         for key, value in kwargs.items():
@@ -142,6 +189,9 @@ class Teacher(db.Model):
     classes = db.relationship(
         "Class", secondary=teacher_class, back_populates="teachers"
     )
+    subject_assignments = db.relationship(
+        "TeacherSubjectClass", back_populates="teacher"
+    )
 
     def __init__(self, **kwargs) -> None:
         for key, value in kwargs.items():
@@ -165,6 +215,55 @@ class Teacher(db.Model):
 
     def __repr__(self) -> str:
         return self.full_name
+
+
+# TermScore Model for scoring component scores
+class TermScore(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey("class.id"), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False)
+    term = db.Column(db.String(20), nullable=False)
+    year = db.Column(db.String(10), nullable=False)
+    individual_test = db.Column(db.Float, default=0.0)
+    group_work = db.Column(db.Float, default=0.0)
+    class_test = db.Column(db.Float, default=0.0)
+    project = db.Column(db.Float, default=0.0)
+    class_total = db.Column(db.Float, default=0.0)  # Sum of the above 60
+    exam_score = db.Column(db.Float, default=0.0)  # 100 marks max
+    total_score = db.Column(db.Float, default=0.0)
+
+    # Relationships
+    student = db.relationship("Student", back_populates="term_scores")
+    subject = db.relationship("Subject")
+    class_ = db.relationship("Class")
+    teacher = db.relationship("Teacher")
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def calculate_totals(self):
+        # Calculate class total (sum of components, max is 60)
+        self.class_total = min(
+            (self.individual_test or 0)
+            + (self.group_work or 0)
+            + (self.class_test or 0)
+            + (self.project or 0),
+            60,
+        )
+
+        # Scaling class total to 50%
+        scaled_class = (self.class_total / 60) * 50 if self.class_total else 0
+
+        # Scaling exam score to 50%
+        scaled_exam = (self.class_total / 100) * 50 if self.exam_score else 0
+
+        # Calculating total score (100%)
+        self.total_score = scaled_class + scaled_exam
+
+        return self.total_score
 
 
 # Academic Records Model
@@ -210,6 +309,8 @@ class Attendance(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey("class.id"), nullable=False)
     date = db.Column(db.Date, nullable=False)
+    term = db.Column(db.String(20), nullable=False)
+    year = db.Column(db.String(10), nullable=False)
     status = db.Column(db.String(10), nullable=False)
     method = db.Column(db.String(10))  # Manual input, or QR
 

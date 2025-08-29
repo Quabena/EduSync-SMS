@@ -1,0 +1,661 @@
+{% extends "base.html" %} {% block title %}Master Sheet - {{ class_group }} {{
+term }} {{ year }}{% endblock %} {% block content %}
+<div
+  class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8"
+>
+  <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Back Navigation -->
+    <div class="mb-6 animate-fade-in">
+      <a
+        href="{{ url_for('exams_grading.index') }}"
+        class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-all duration-200 group bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg hover:shadow-xl"
+      >
+        <i
+          class="fas fa-arrow-left mr-3 transform group-hover:-translate-x-1 transition-transform duration-200"
+        ></i>
+        <span class="font-medium">Back to Grading Dashboard</span>
+      </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="mb-8 animate-slide-up">
+      <div
+        class="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20"
+      >
+        <div class="flex items-center space-x-6">
+          <div class="flex-shrink-0">
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg"
+            >
+              <i class="fas fa-chart-bar text-white text-2xl"></i>
+            </div>
+          </div>
+          <div class="flex-1">
+            <h1
+              class="text-4xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent"
+            >
+              Master Sheet - {{ class_group }}
+            </h1>
+            <p class="text-gray-600 mt-2 text-lg">
+              Comprehensive academic performance overview for {{ term }} {{ year
+              }}
+            </p>
+            <div class="flex items-center space-x-6 mt-4">
+              <div class="flex items-center text-sm text-gray-500">
+                <i class="fas fa-users mr-2 text-blue-500"></i>
+                <span class="font-medium">{{ students|length }} Students</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500">
+                <i class="fas fa-book mr-2 text-green-500"></i>
+                <span class="font-medium">{{ subjects|length }} Subjects</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500">
+                <i class="fas fa-graduation-cap mr-2 text-purple-500"></i>
+                <span class="font-medium">{{ classes|join(', ') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
+      <div
+        class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-calendar-alt text-blue-600 text-xl"></i>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Academic Period</p>
+            <p class="text-lg font-bold text-gray-900">
+              {{ term }} / {{ year }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-users text-green-600 text-xl"></i>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Total Students</p>
+            <p class="text-lg font-bold text-gray-900">{{ students|length }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-book text-purple-600 text-xl"></i>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Subjects</p>
+            <p class="text-lg font-bold text-gray-900">{{ subjects|length }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-trophy text-orange-600 text-xl"></i>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Highest Score</p>
+            <p class="text-lg font-bold text-gray-900">
+              {% set max_score = student_totals.values()|max if
+              student_totals.values() else 0 %} {{ max_score|round(1) }}%
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Master Sheet Table -->
+    <div
+      class="bg-white/95 backdrop-blur-sm shadow-2xl rounded-3xl overflow-hidden border border-white/20 animate-slide-up"
+    >
+      <!-- Table Header -->
+      <div class="bg-gradient-to-r from-green-500 to-teal-600 px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-white flex items-center">
+              <i class="fas fa-chart-line mr-3"></i>
+              Academic Performance Overview
+            </h2>
+            <p class="text-green-100 text-sm mt-2">
+              Complete breakdown of student scores across all subjects with
+              class rankings
+            </p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <!-- Search Input -->
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+              >
+                <i class="fas fa-search text-green-200"></i>
+              </div>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Search students..."
+                class="pl-12 pr-4 py-3 bg-white/20 border border-white/30 rounded-xl text-white placeholder-green-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/30 transition-all duration-200 w-64 backdrop-blur-sm"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead>
+            <!-- Main Subject Headers -->
+            <tr>
+              <th
+                rowspan="2"
+                class="sticky left-0 bg-gray-50 px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300 z-20 min-w-[200px]"
+              >
+                <div class="flex flex-col">
+                  <span class="text-sm">Student Information</span>
+                  <span class="text-xs font-normal text-gray-500 mt-1"
+                    >Name & Class</span
+                  >
+                </div>
+              </th>
+              {% for subject in subjects %}
+              <th
+                colspan="5"
+                class="px-3 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-100 to-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-200 border-x border-gray-300"
+              >
+                <div class="flex flex-col items-center">
+                  <i
+                    class="fas fa-book text-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-600 mb-1"
+                  ></i>
+                  <span class="text-sm font-bold">{{ subject.name }}</span>
+                </div>
+              </th>
+              {% endfor %}
+              <th
+                rowspan="2"
+                class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-green-100 to-blue-100 border-l border-gray-300 min-w-[120px]"
+              >
+                <div class="flex flex-col items-center">
+                  <i class="fas fa-calculator text-green-600 mb-1"></i>
+                  <span class="text-sm">Grand Total</span>
+                  <span class="text-xs font-normal text-gray-500 mt-1"
+                    >All Subjects</span
+                  >
+                </div>
+              </th>
+              <th
+                rowspan="2"
+                class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-yellow-100 to-orange-100 border-l border-gray-300 min-w-[100px]"
+              >
+                <div class="flex flex-col items-center">
+                  <i class="fas fa-trophy text-yellow-600 mb-1"></i>
+                  <span class="text-sm">Position</span>
+                  <span class="text-xs font-normal text-gray-500 mt-1"
+                    >Class Rank</span
+                  >
+                </div>
+              </th>
+            </tr>
+            <!-- Sub Headers -->
+            <tr>
+              {% for subject in subjects %}
+              <th
+                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
+              >
+                <div class="flex flex-col">
+                  <span class="text-xs">Class</span>
+                  <span class="text-xs text-gray-500">/60</span>
+                </div>
+              </th>
+              <th
+                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
+              >
+                <div class="flex flex-col">
+                  <span class="text-xs">50%</span>
+                  <span class="text-xs text-gray-500">Scale</span>
+                </div>
+              </th>
+              <th
+                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
+              >
+                <div class="flex flex-col">
+                  <span class="text-xs">Exam</span>
+                  <span class="text-xs text-gray-500">/100</span>
+                </div>
+              </th>
+              <th
+                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
+              >
+                <div class="flex flex-col">
+                  <span class="text-xs">50%</span>
+                  <span class="text-xs text-gray-500">Scale</span>
+                </div>
+              </th>
+              <th
+                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
+              >
+                <div class="flex flex-col">
+                  <span class="text-xs font-bold">Total</span>
+                  <span class="text-xs text-gray-500">/100</span>
+                </div>
+              </th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for student in students %}
+            <tr
+              class="hover:bg-gray-50 transition-colors duration-200 student-row"
+            >
+              <!-- Student Info -->
+              <td
+                class="sticky left-0 bg-white px-6 py-4 border-r border-gray-300 z-10"
+              >
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-12 w-12">
+                    <div
+                      class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center shadow-lg"
+                    >
+                      <span class="text-sm font-bold text-white">
+                        {% set name_parts = student.full_name.split() %} {{
+                        name_parts[0][0] }}{{ name_parts[-1][0] if
+                        name_parts|length > 1 else '' }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-bold text-gray-900">
+                      {{ student.full_name }}
+                    </div>
+                    <div class="text-sm text-gray-500 flex items-center">
+                      <i class="fas fa-graduation-cap mr-1 text-blue-500"></i>
+                      {{ student.class_name }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Subject Scores -->
+              {% for subject in subjects %} {% set score =
+              term_scores[student.id][subject.id] if student.id in term_scores
+              and subject.id in term_scores[student.id] else none %}
+
+              <!-- Class Score -->
+              <td class="px-2 py-3 text-center text-sm border border-gray-200">
+                {% if score and score.class_total %}
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800"
+                >
+                  {{ score.class_total|round(1) }}
+                </span>
+                {% else %}
+                <span class="text-gray-400 text-xs">-</span>
+                {% endif %}
+              </td>
+
+              <!-- Scaled Class Score -->
+              <td class="px-2 py-3 text-center text-sm border border-gray-200">
+                {% if score and score.scaled_class %}
+                <span class="text-gray-700 font-medium text-xs"
+                  >{{ score.scaled_class|round(1) }}</span
+                >
+                {% else %}
+                <span class="text-gray-400 text-xs">-</span>
+                {% endif %}
+              </td>
+
+              <!-- Exam Score -->
+              <td class="px-2 py-3 text-center text-sm border border-gray-200">
+                {% if score and score.exam_score %}
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800"
+                >
+                  {{ score.exam_score|round(1) }}
+                </span>
+                {% else %}
+                <span class="text-gray-400 text-xs">-</span>
+                {% endif %}
+              </td>
+
+              <!-- Scaled Exam Score -->
+              <td class="px-2 py-3 text-center text-sm border border-gray-200">
+                {% if score and score.scaled_exam %}
+                <span class="text-gray-700 font-medium text-xs"
+                  >{{ score.scaled_exam|round(1) }}</span
+                >
+                {% else %}
+                <span class="text-gray-400 text-xs">-</span>
+                {% endif %}
+              </td>
+
+              <!-- Subject Total -->
+              <td class="px-2 py-3 text-center text-sm border border-gray-200">
+                {% if score and score.total_score %}
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800"
+                >
+                  {{ score.total_score|round(1) }}
+                </span>
+                {% else %}
+                <span class="text-gray-400 text-xs">-</span>
+                {% endif %}
+              </td>
+              {% endfor %}
+
+              <!-- Grand Total -->
+              <td class="px-6 py-4 text-center border-l border-gray-300">
+                {% if student_totals[student.id] %}
+                <span
+                  class="inline-flex items-center px-4 py-2 rounded-xl text-lg font-bold bg-gradient-to-r from-green-100 to-blue-100 text-green-800 shadow-lg"
+                >
+                  {{ student_totals[student.id]|round(1) }}
+                </span>
+                {% else %}
+                <span class="text-gray-400 text-lg">-</span>
+                {% endif %}
+              </td>
+
+              <!-- Position -->
+              <td class="px-6 py-4 text-center border-l border-gray-300">
+                {% if positions[student.id] %}
+                <span
+                  class="inline-flex items-center px-3 py-2 rounded-full text-sm font-bold {% if positions[student.id] == 1 %}bg-gradient-to-r from-yellow-200 to-yellow-300 text-yellow-800 shadow-lg {% elif positions[student.id] == 2 %}bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800 shadow-lg {% elif positions[student.id] == 3 %}bg-gradient-to-r from-orange-200 to-orange-300 text-orange-800 shadow-lg {% else %}bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800{% endif %}"
+                >
+                  {% if positions[student.id] == 1 %}
+                  <i class="fas fa-crown mr-1"></i>{{ positions[student.id] }}
+                  {% elif positions[student.id] == 2 %}
+                  <i class="fas fa-medal mr-1"></i>{{ positions[student.id] }}
+                  {% elif positions[student.id] == 3 %}
+                  <i class="fas fa-award mr-1"></i>{{ positions[student.id] }}
+                  {% else %} {{ positions[student.id] }} {% endif %}
+                </span>
+                {% else %}
+                <span class="text-gray-400">-</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Export Section -->
+      <div
+        class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-t border-gray-200"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center text-sm text-gray-600">
+            <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+            <span class="font-medium">
+              Showing {{ students|length }} students across {{ subjects|length
+              }} subjects
+            </span>
+          </div>
+          <div class="flex space-x-4">
+            <button
+              onclick="window.print()"
+              class="inline-flex items-center px-6 py-3 border-2 border-gray-300 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              <i class="fas fa-print mr-2"></i>
+              Print Report
+            </button>
+            <a
+              href="{{ url_for('exams_grading.master_sheet_print', class_group=class_group, term=term.split()[1], year=year) }}"
+              class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              <i class="fas fa-download mr-2"></i>
+              Download Excel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Search functionality
+    const searchInput = document.getElementById("searchInput");
+    const studentRows = document.querySelectorAll(".student-row");
+
+    searchInput.addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+
+      studentRows.forEach((row) => {
+        const studentName = row
+          .querySelector("td:first-child .text-sm.font-bold")
+          .textContent.toLowerCase();
+        const className = row
+          .querySelector("td:first-child .text-sm.text-gray-500")
+          .textContent.toLowerCase();
+
+        if (
+          studentName.includes(searchTerm) ||
+          className.includes(searchTerm)
+        ) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    });
+
+    // Add print styles
+    const printStyles = `
+        <style media="print">
+            @page { 
+                size: landscape; 
+                margin: 0.5in; 
+            }
+            .no-print { 
+                display: none !important; 
+            }
+            body { 
+                font-size: 10px; 
+            }
+            table { 
+                font-size: 8px; 
+            }
+            .sticky { 
+                position: static !important; 
+            }
+            .bg-gradient-to-r,
+            .bg-gradient-to-br {
+                background: #f3f4f6 !important;
+                color: #374151 !important;
+            }
+        </style>
+    `;
+    document.head.insertAdjacentHTML("beforeend", printStyles);
+
+    // Add smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute("href"));
+        if (target) {
+          target.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      });
+    });
+  });
+</script>
+
+<!-- Custom Tailwind Color Classes for better compatibility -->
+<style>
+  /* Color variations for subject headers */
+  .bg-blue-50 {
+    background-color: #eff6ff;
+  }
+  .bg-blue-100 {
+    background-color: #dbeafe;
+  }
+  .bg-blue-200 {
+    background-color: #bfdbfe;
+  }
+  .text-blue-600 {
+    color: #2563eb;
+  }
+  .text-blue-800 {
+    color: #1e40af;
+  }
+
+  .bg-green-50 {
+    background-color: #f0fdf4;
+  }
+  .bg-green-100 {
+    background-color: #dcfce7;
+  }
+  .bg-green-200 {
+    background-color: #bbf7d0;
+  }
+  .text-green-600 {
+    color: #16a34a;
+  }
+  .text-green-800 {
+    color: #166534;
+  }
+
+  .bg-purple-50 {
+    background-color: #faf5ff;
+  }
+  .bg-purple-100 {
+    background-color: #f3e8ff;
+  }
+  .bg-purple-200 {
+    background-color: #e9d5ff;
+  }
+  .text-purple-600 {
+    color: #9333ea;
+  }
+  .text-purple-800 {
+    color: #6b21a8;
+  }
+
+  .bg-pink-50 {
+    background-color: #fdf2f8;
+  }
+  .bg-pink-100 {
+    background-color: #fce7f3;
+  }
+  .bg-pink-200 {
+    background-color: #fbcfe8;
+  }
+
+  .bg-indigo-50 {
+    background-color: #eef2ff;
+  }
+  .bg-indigo-100 {
+    background-color: #e0e7ff;
+  }
+  .bg-indigo-200 {
+    background-color: #c7d2fe;
+  }
+
+  .bg-yellow-50 {
+    background-color: #fefce8;
+  }
+  .bg-yellow-100 {
+    background-color: #fef3c7;
+  }
+  .bg-yellow-200 {
+    background-color: #fde68a;
+  }
+  .bg-yellow-300 {
+    background-color: #fcd34d;
+  }
+  .text-yellow-600 {
+    color: #d97706;
+  }
+  .text-yellow-800 {
+    color: #92400e;
+  }
+
+  .bg-red-50 {
+    background-color: #fef2f2;
+  }
+  .bg-red-100 {
+    background-color: #fee2e2;
+  }
+  .bg-red-200 {
+    background-color: #fecaca;
+  }
+
+  .bg-teal-50 {
+    background-color: #f0fdfa;
+  }
+  .bg-teal-100 {
+    background-color: #ccfbf1;
+  }
+  .bg-teal-200 {
+    background-color: #99f6e4;
+  }
+  .text-teal-600 {
+    color: #0d9488;
+  }
+
+  .bg-orange-100 {
+    background-color: #fed7aa;
+  }
+  .bg-orange-200 {
+    background-color: #fecaca;
+  }
+  .bg-orange-300 {
+    background-color: #fdba74;
+  }
+  .text-orange-600 {
+    color: #ea580c;
+  }
+  .text-orange-800 {
+    color: #9a3412;
+  }
+
+  .bg-gray-200 {
+    background-color: #e5e7eb;
+  }
+  .bg-gray-300 {
+    background-color: #d1d5db;
+  }
+  .text-gray-800 {
+    color: #1f2937;
+  }
+</style>
+{% endblock %}

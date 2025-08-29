@@ -10,9 +10,9 @@ class ClassForm(FlaskForm):
     level = SelectField(
         "Level",
         choices=[
-            ("JHS1", "JHS1"),
-            ("JHS2", "JHS2"),
-            ("JHS3", "JHS3"),
+            ("JHS 1", "JHS 1"),
+            ("JHS 2", "JHS 2"),
+            ("JHS 3", "JHS 3"),
         ],
         validators=[DataRequired()],
     )

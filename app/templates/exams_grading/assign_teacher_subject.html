@@ -1,0 +1,545 @@
+{% extends "base.html" %} {% block title %}Assign Teachers - Teacher Assignment
+System{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+  <!-- Assignment Form Card -->
+  <div
+    class="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 animate-fade-in"
+  >
+    <div class="flex items-center space-x-4 mb-8">
+      <div
+        class="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg"
+      >
+        <i class="fas fa-user-plus text-white text-2xl"></i>
+      </div>
+      <div>
+        <h2 class="text-3xl font-bold text-gray-800">
+          Assign Teacher to Subject
+        </h2>
+        <p class="text-gray-600 mt-1">
+          Create new teaching assignments for classes
+        </p>
+      </div>
+    </div>
+
+    <form id="assignmentForm" method="POST" class="space-y-6">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Teacher Selection -->
+        <div class="space-y-3">
+          <label
+            for="teacher_id"
+            class="flex items-center space-x-2 text-sm font-bold text-gray-700"
+          >
+            <i class="fas fa-user text-blue-500"></i>
+            <span>Select Teacher</span>
+          </label>
+          <div class="relative">
+            <select
+              name="teacher_id"
+              id="teacher_id"
+              class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-300 appearance-none cursor-pointer"
+              required
+            >
+              <option value="">Choose a teacher...</option>
+              {% for teacher in teachers %}
+              <option value="{{ teacher.id }}">{{ teacher.full_name }}</option>
+              {% endfor %}
+            </select>
+            <i
+              class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+            ></i>
+          </div>
+        </div>
+
+        <!-- Subject Selection -->
+        <div class="space-y-3">
+          <label
+            for="subject_id"
+            class="flex items-center space-x-2 text-sm font-bold text-gray-700"
+          >
+            <i class="fas fa-book text-green-500"></i>
+            <span>Select Subject</span>
+          </label>
+          <div class="relative">
+            <select
+              name="subject_id"
+              id="subject_id"
+              class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-300 appearance-none cursor-pointer"
+              required
+            >
+              <option value="">Choose a subject...</option>
+              {% for subject in subjects %}
+              <option value="{{ subject.id }}">{{ subject.name }}</option>
+              {% endfor %}
+            </select>
+            <i
+              class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+            ></i>
+          </div>
+        </div>
+
+        <!-- Class Selection -->
+        <div class="space-y-3">
+          <label
+            for="class_id"
+            class="flex items-center space-x-2 text-sm font-bold text-gray-700"
+          >
+            <i class="fas fa-graduation-cap text-purple-500"></i>
+            <span>Select Class</span>
+          </label>
+          <div class="relative">
+            <select
+              name="class_id"
+              id="class_id"
+              class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-300 appearance-none cursor-pointer"
+              required
+            >
+              <option value="">Choose a class...</option>
+              {% for class in classes %}
+              <option value="{{ class.id }}">{{ class.name }}</option>
+              {% endfor %}
+            </select>
+            <i
+              class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+            ></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="flex justify-end pt-6">
+        <button
+          type="submit"
+          id="submitBtn"
+          class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-blue-500/30 shadow-lg hover:shadow-xl flex items-center space-x-3"
+        >
+          <i class="fas fa-plus-circle"></i>
+          <span>Create Assignment</span>
+          <div id="loadingSpinner" class="hidden animate-spin">
+            <i class="fas fa-spinner"></i>
+          </div>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Current Assignments Display -->
+  <div
+    class="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 animate-fade-in"
+  >
+    <div class="flex items-center space-x-4 mb-6">
+      <div
+        class="p-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg"
+      >
+        <i class="fas fa-list-check text-white text-2xl"></i>
+      </div>
+      <div>
+        <h3 class="text-2xl font-bold text-gray-800">Current Assignments</h3>
+        <p class="text-gray-600 mt-1">Active teacher-subject assignments</p>
+      </div>
+    </div>
+
+    <div id="assignmentsList" class="space-y-4">
+      <!-- Assignments will be loaded here -->
+      <div class="text-center py-8 text-gray-500">
+        <i class="fas fa-clipboard-list text-4xl mb-4 opacity-50"></i>
+        <p>Loading assignments...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reassignment Modal -->
+<div
+  id="reassignModal"
+  class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4"
+>
+  <div
+    class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform transition-all duration-300 scale-95 animate-slide-up"
+  >
+    <div class="flex items-center space-x-4 mb-6">
+      <div
+        class="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg"
+      >
+        <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold text-gray-800">Assignment Conflict</h3>
+        <p class="text-sm text-gray-600">This assignment already exists</p>
+      </div>
+    </div>
+
+    <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+      <p class="text-gray-700 mb-2" id="modalMessage">
+        This class-subject combination is already assigned to a teacher.
+      </p>
+      <p class="text-sm text-orange-600 font-medium">
+        Would you like to reassign this class to a different teacher?
+      </p>
+    </div>
+
+    <div class="mb-6">
+      <label
+        for="reassign_teacher"
+        class="flex items-center space-x-2 text-sm font-bold text-gray-700 mb-3"
+      >
+        <i class="fas fa-user-edit text-blue-500"></i>
+        <span>Reassign to:</span>
+      </label>
+      <div class="relative">
+        <select
+          name="reassign_teacher"
+          id="reassign_teacher"
+          class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
+        >
+          <option value="">Select a teacher...</option>
+          {% for teacher in teachers %}
+          <option value="{{ teacher.id }}">{{ teacher.full_name }}</option>
+          {% endfor %}
+        </select>
+        <i
+          class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+        ></i>
+      </div>
+    </div>
+
+    <div class="flex justify-end space-x-4">
+      <button
+        type="button"
+        id="cancelReassign"
+        class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+      >
+        <i class="fas fa-times mr-2"></i>
+        Cancel
+      </button>
+      <button
+        type="button"
+        id="confirmReassign"
+        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+      >
+        <i class="fas fa-exchange-alt mr-2"></i>
+        <span>Reassign</span>
+        <div id="reassignSpinner" class="hidden animate-spin ml-2">
+          <i class="fas fa-spinner"></i>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Notification function
+  function showNotification(type, message) {
+    // Remove any existing notifications
+    const existingNotifications = document.querySelectorAll(
+      ".custom-notification"
+    );
+    existingNotifications.forEach((notif) => notif.remove());
+
+    const notification = document.createElement("div");
+    notification.className = `custom-notification fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-lg text-white font-medium transform transition-all duration-300 ${
+      type === "success"
+        ? "bg-gradient-to-r from-green-500 to-emerald-600"
+        : "bg-gradient-to-r from-red-500 to-orange-600"
+    }`;
+    notification.innerHTML = `
+    <div class="flex items-center space-x-3">
+      <i class="fas ${
+        type === "success" ? "fa-check-circle" : "fa-exclamation-circle"
+      }"></i>
+      <span>${message}</span>
+    </div>
+  `;
+
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+      notification.classList.add("translate-x-0", "opacity-100");
+    }, 10);
+
+    // Remove after 5 seconds
+    setTimeout(() => {
+      notification.classList.remove("translate-x-0", "opacity-100");
+      notification.classList.add("translate-x-full", "opacity-0");
+      setTimeout(() => notification.remove(), 300);
+    }, 5000);
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("assignmentForm");
+    const modal = document.getElementById("reassignModal");
+    const modalMessage = document.getElementById("modalMessage");
+    const reassignTeacher = document.getElementById("reassign_teacher");
+    const cancelBtn = document.getElementById("cancelReassign");
+    const confirmBtn = document.getElementById("confirmReassign");
+    const submitBtn = document.getElementById("submitBtn");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+    const reassignSpinner = document.getElementById("reassignSpinner");
+
+    let currentAssignmentId = null;
+    let currentFormData = null;
+
+    // Load assignments function
+    function loadAssignments() {
+      fetch('{{ url_for("exams_grading.view_assignments") }}', {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          Accept: "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const assignmentsList = document.getElementById("assignmentsList");
+          if (data.assignments && data.assignments.length > 0) {
+            assignmentsList.innerHTML = data.assignments
+              .map(
+                (assignment) => `
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 hover:shadow-md transition-all duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="p-3 bg-blue-100 rounded-xl">
+                <i class="fas fa-user text-blue-600 text-xl"></i>
+              </div>
+              <div>
+                <p class="font-bold text-gray-800 text-lg">${assignment.teacher_name}</p>
+                <p class="text-gray-600">
+                  <i class="fas fa-book mr-2 text-green-500"></i>${assignment.subject_name}
+                </p>
+                <p class="text-gray-600">
+                  <i class="fas fa-graduation-cap mr-2 text-purple-500"></i>${assignment.class_name}
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                <i class="fas fa-check-circle mr-1"></i>Active
+              </span>
+              
+            </div>
+          </div>
+        </div>
+      `
+              )
+              .join("");
+          } else {
+            assignmentsList.innerHTML = `
+        <div class="text-center py-12 text-gray-500">
+          <i class="fas fa-clipboard-list text-6xl mb-6 opacity-50"></i>
+          <p class="text-xl font-medium mb-2">No assignments found</p>
+          <p class="text-gray-600">Create your first assignment to get started</p>
+        </div>
+      `;
+          }
+        })
+        .catch((error) => {
+          console.error("Error loading assignments:", error);
+          document.getElementById("assignmentsList").innerHTML = `
+      <div class="text-center py-8 text-red-500">
+        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+        <p>Error loading assignments. Please refresh the page.</p>
+      </div>
+    `;
+        });
+    }
+
+    // Call this function on page load
+    document.addEventListener("DOMContentLoaded", function () {
+      loadAssignments();
+    });
+    // Load assignments on page load
+    loadAssignments();
+
+    // Form submission
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Show loading state
+      submitBtn.disabled = true;
+      loadingSpinner.classList.remove("hidden");
+      submitBtn.querySelector("span").textContent = "Creating...";
+
+      const formData = new FormData(form);
+      const data = new URLSearchParams();
+      for (const [key, value] of formData.entries()) {
+        data.append(key, value);
+      }
+
+      fetch('{{ url_for("exams_grading.assign_teacher_subject") }}', {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": formData.get("csrf_token"),
+        },
+        body: data,
+      })
+        .then((response) => {
+          // Check if response is JSON
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            return response
+              .json()
+              .then((data) => ({ status: response.status, data }));
+          } else {
+            return response
+              .text()
+              .then((text) => ({ status: response.status, text }));
+          }
+        })
+        .then((result) => {
+          // Reset loading state
+          submitBtn.disabled = false;
+          loadingSpinner.classList.add("hidden");
+          submitBtn.querySelector("span").textContent = "Create Assignment";
+
+          if (result.status === 409) {
+            // This is a conflict - show reassignment modal
+            modalMessage.textContent = result.data.message;
+            currentAssignmentId = result.data.assignment_id;
+            modal.classList.remove("hidden");
+            modal.querySelector(".bg-white").classList.add("scale-100");
+            modal.querySelector(".bg-white").classList.remove("scale-95");
+          } else if (
+            result.status === 200 &&
+            result.data.status === "success"
+          ) {
+            showNotification("success", "Assignment created successfully!");
+            form.reset();
+            loadAssignments(); // Reload assignments
+          } else {
+            showNotification(
+              "error",
+              result.data.message ||
+                "An error occurred while creating assignment."
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          // Reset loading state
+          submitBtn.disabled = false;
+          loadingSpinner.classList.add("hidden");
+          submitBtn.querySelector("span").textContent = "Create Assignment";
+          showNotification(
+            "error",
+            "An error occurred while creating assignment."
+          );
+        });
+    });
+
+    // Cancel reassignment
+    cancelBtn.addEventListener("click", function () {
+      closeModal();
+    });
+
+    // Confirm reassignment
+    // Confirm reassignment
+    confirmBtn.addEventListener("click", function () {
+      if (!reassignTeacher.value) {
+        showNotification("error", "Please select a teacher for reassignment");
+        return;
+      }
+
+      // Show loading state
+      confirmBtn.disabled = true;
+      reassignSpinner.classList.remove("hidden");
+      confirmBtn.querySelector("span").textContent = "Reassigning...";
+
+      const data = new FormData();
+      data.append("assignment_id", currentAssignmentId);
+      data.append("teacher_id", reassignTeacher.value);
+      data.append(
+        "csrf_token",
+        document.querySelector("input[name=csrf_token]").value
+      );
+
+      fetch('{{ url_for("exams_grading.reassign_teacher_subject") }}', {
+        method: "POST",
+        body: data,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((result) => {
+          // Reset loading state
+          confirmBtn.disabled = false;
+          reassignSpinner.classList.add("hidden");
+          confirmBtn.querySelector("span").textContent = "Reassign";
+
+          if (result.status === "success") {
+            showNotification("success", "Reassignment successful!");
+            closeModal();
+            form.reset();
+            loadAssignments(); // Reload assignments
+          } else {
+            showNotification(
+              "error",
+              result.message || "An error occurred during reassignment."
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          // Reset loading state
+          confirmBtn.disabled = false;
+          reassignSpinner.classList.add("hidden");
+          confirmBtn.querySelector("span").textContent = "Reassign";
+          showNotification("error", "An error occurred during reassignment.");
+        });
+    });
+
+    // Close modal function
+    function closeModal() {
+      modal.querySelector(".bg-white").classList.add("scale-95");
+      modal.querySelector(".bg-white").classList.remove("scale-100");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        currentAssignmentId = null;
+        currentFormData = null;
+        reassignTeacher.value = "";
+      }, 200);
+    }
+
+    // Close modal when clicking outside
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Add keyboard support
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+        closeModal();
+      }
+    });
+  });
+
+  function unassignAssignment(assignmentId) {
+    currentAssignmentId = assignmentId;
+    document.getElementById("confirmModal").classList.remove("hidden");
+    if (!confirm("Are you sure you want to remove this assignment?")) return;
+
+    fetch(`/exams_grading/unassign/${id}`, {
+      method: "DELETE",
+      headers: { "X-CSRFToken": "{{ csrf_token() }}" },
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.status === "success") {
+          showNotification("success", "Assignment removed");
+          loadAssignments();
+        } else {
+          showNotification("error", data.message || "Failed to unassign");
+        }
+      })
+      .catch((err) => {
+        console.error("Error:", err);
+        showNotification("error", "Server error while unassigning");
+      });
+  }
+</script>
+{% endblock %}

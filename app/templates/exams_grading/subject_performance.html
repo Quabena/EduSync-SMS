@@ -1,0 +1,157 @@
+{% extends "base.html" %} {% block title %}Subject Performance - {{ subject.name
+}}{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Subject Performance</h1>
+    <p class="text-gray-600">{{ subject.name }} - {{ class_.name }}</p>
+  </div>
+
+  <!-- Performance Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white rounded-xl shadow-md p-4">
+      <h3 class="text-sm font-medium text-gray-500">Total Students</h3>
+      <p class="text-2xl font-bold text-gray-800">
+        {{ performance_data | length }}
+      </p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-4">
+      <h3 class="text-sm font-medium text-gray-500">Class Average</h3>
+      <p class="text-2xl font-bold text-gray-800">
+        {% set all_scores = [] %} {% for student_id, data in
+        performance_data.items() %} {% for score in data.scores.values() %} {%
+        set _ = all_scores.append(score) %} {% endfor %} {% endfor %} {{
+        (all_scores | sum / all_scores | length) | round(2) if all_scores else 0
+        }}
+      </p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-4">
+      <h3 class="text-sm font-medium text-gray-500">Performance Trend</h3>
+      <p class="text-2xl font-bold text-gray-800">
+        {% set term_avgs = term_averages.values() %} {% if term_avgs | length >
+        1 %} {% if term_avgs | last > term_avgs | first %}Improving {% elif
+        term_avgs | last < term_avgs | first %}Declining {% else %}Stable {%
+        endif %} {% else %}N/A {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <!-- Student Performance Table -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Student
+          </th>
+          {% for term in term_averages.keys() %}
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            {{ term }}
+          </th>
+          {% endfor %}
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Average
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Trend
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for student_id, data in performance_data.items() %}
+        <tr>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            {{ data.student.full_name }}
+          </td>
+          {% for term in term_averages.keys() %}
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ data.scores.get(term, 'N/A') }}
+          </td>
+          {% endfor %}
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            {% set scores = data.scores.values() %} {{ (scores | sum / scores |
+            length) | round(2) if scores else 'N/A' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            {% set scores_list = data.scores.values() | list %} {% if
+            scores_list | length > 1 %}
+            <span
+              class="px-2 py-1 text-xs font-medium rounded-full {% if scores_list | last > scores_list | first %}bg-green-100 text-green-800{% elif scores_list | last < scores_list | first %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+            >
+              {% if scores_list | last > scores_list | first %}↑ {% elif
+              scores_list | last < scores_list | first %}↓ {% else %}→ {% endif
+              %}
+            </span>
+            {% else %}N/A {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <!-- Class Averages Footer -->
+      <tfoot class="bg-gray-50">
+        <tr>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            Class Average
+          </td>
+          {% for term, avg in term_averages.items() %}
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            {{ avg | round(2) }}
+          </td>
+          {% endfor %}
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            {{ (term_averages.values() | sum / term_averages | length) |
+            round(2) if term_averages else 0 }}
+          </td>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            {% set avg_list = term_averages.values() | list %} {% if avg_list |
+            length > 1 %}
+            <span
+              class="px-2 py-1 text-xs font-medium rounded-full {% if avg_list | last > avg_list | first %}bg-green-100 text-green-800{% elif avg_list | last < avg_list | first %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+            >
+              {% if avg_list | last > avg_list | first %}↑ {% elif avg_list |
+              last < avg_list | first %}↓ {% else %}→ {% endif %}
+            </span>
+            {% else %}N/A {% endif %}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="mt-6 flex justify-between">
+    <a
+      href="{{ url_for('exams_grading.index') }}"
+      class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+    >
+      Back to Dashboard
+    </a>
+    <button
+      onclick="window.print()"
+      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+    >
+      Print Report
+    </button>
+  </div>
+</div>
+{% endblock %}

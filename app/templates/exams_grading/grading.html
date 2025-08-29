@@ -1,0 +1,786 @@
+{% extends "base.html" %} {% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Back Navigation -->
+    <div class="mb-6">
+      <a
+        href="{{ url_for('exams_grading.index') }}"
+        class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200 group"
+      >
+        <svg
+          class="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          ></path>
+        </svg>
+        Back to Grading Dashboard
+      </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-center space-x-4">
+        <div class="flex-shrink-0">
+          <div
+            class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+              ></path>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">
+            Grading - {{ subject.name }}
+          </h1>
+          <p class="text-gray-600 mt-1">
+            Enter and manage student scores for this subject
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Class</p>
+            <p class="text-lg font-semibold text-gray-900">{{ class_.name }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Teacher</p>
+            <p class="text-lg font-semibold text-gray-900">
+              {{ teacher.full_name }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Students</p>
+            <p class="text-lg font-semibold text-gray-900">
+              {{ students|length }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-amber-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Term/Year</p>
+            <p class="text-lg font-semibold text-gray-900">
+              {{ term }} / {{ year }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grading Form -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-semibold text-white flex items-center">
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                ></path>
+              </svg>
+              Student Scores
+            </h2>
+            <p class="text-blue-100 text-sm mt-1">
+              Enter scores for each assessment component
+            </p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <!-- Search Input -->
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <svg
+                  class="h-4 w-4 text-blue-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Search students..."
+                class="pl-10 pr-4 py-2 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:bg-opacity-30 transition-all duration-200 w-64"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <form id="gradingForm">
+          <input type="hidden" name="class_id" value="{{ class_.id }}" />
+          <input type="hidden" name="subject_id" value="{{ subject.id }}" />
+          <input type="hidden" name="term" value="{{ term }}" />
+          <input type="hidden" name="year" value="{{ year }}" />
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="bg-gray-50 border-b border-gray-200">
+                  <th
+                    class="py-4 px-6 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    Student Name
+                  </th>
+                  <th
+                    class="py-4 px-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    <div class="flex flex-col items-center">
+                      <span>Individual Test</span>
+                      <span class="text-xs font-normal text-gray-400 mt-1"
+                        >(Max 15)</span
+                      >
+                    </div>
+                  </th>
+                  <th
+                    class="py-4 px-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    <div class="flex flex-col items-center">
+                      <span>Group Work</span>
+                      <span class="text-xs font-normal text-gray-400 mt-1"
+                        >(Max 15)</span
+                      >
+                    </div>
+                  </th>
+                  <th
+                    class="py-4 px-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    <div class="flex flex-col items-center">
+                      <span>Class Test</span>
+                      <span class="text-xs font-normal text-gray-400 mt-1"
+                        >(Max 15)</span
+                      >
+                    </div>
+                  </th>
+                  <th
+                    class="py-4 px-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    <div class="flex flex-col items-center">
+                      <span>Project</span>
+                      <span class="text-xs font-normal text-gray-400 mt-1"
+                        >(Max 15)</span
+                      >
+                    </div>
+                  </th>
+                  <th
+                    class="py-4 px-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    <div class="flex flex-col items-center">
+                      <span>Class Total</span>
+                      <span class="text-xs font-normal text-gray-400 mt-1"
+                        >(Max 60)</span
+                      >
+                    </div>
+                  </th>
+                  <th
+                    class="py-4 px-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    <div class="flex flex-col items-center">
+                      <span>Exam Score</span>
+                      <span class="text-xs font-normal text-gray-400 mt-1"
+                        >(Max 100)</span
+                      >
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {% for student in students %}
+                <tr
+                  class="hover:bg-gray-50 transition-colors duration-150 student-row"
+                >
+                  <td class="py-4 px-6">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <div
+                          class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center"
+                        >
+                          <span class="text-sm font-medium text-white">
+                            {{ student.full_name.split()[0][0] }}{{
+                            student.full_name.split()[-1][0] if
+                            student.full_name.split()|length > 1 else '' }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          {{ student.full_name }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          {{ student.classroom.name }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-center">
+                    <input
+                      type="number"
+                      name="scores[{{ student.id }}][individual_test]"
+                      value="{{ term_scores[student.id].individual_test if term_scores[student.id] else 0 }}"
+                      min="0"
+                      max="15"
+                      step="0.5"
+                      class="score-input w-20 px-3 py-2 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                      data-student="{{ student.id }}"
+                      data-field="individual_test"
+                    />
+                  </td>
+                  <td class="py-4 px-4 text-center">
+                    <input
+                      type="number"
+                      name="scores[{{ student.id }}][group_work]"
+                      value="{{ term_scores[student.id].group_work if term_scores[student.id] else 0 }}"
+                      min="0"
+                      max="15"
+                      step="0.5"
+                      class="score-input w-20 px-3 py-2 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                      data-student="{{ student.id }}"
+                      data-field="group_work"
+                    />
+                  </td>
+                  <td class="py-4 px-4 text-center">
+                    <input
+                      type="number"
+                      name="scores[{{ student.id }}][class_test]"
+                      value="{{ term_scores[student.id].class_test if term_scores[student.id] else 0 }}"
+                      min="0"
+                      max="15"
+                      step="0.5"
+                      class="score-input w-20 px-3 py-2 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                      data-student="{{ student.id }}"
+                      data-field="class_test"
+                    />
+                  </td>
+                  <td class="py-4 px-4 text-center">
+                    <input
+                      type="number"
+                      name="scores[{{ student.id }}][project]"
+                      value="{{ term_scores[student.id].project if term_scores[student.id] else 0 }}"
+                      min="0"
+                      max="15"
+                      step="0.5"
+                      class="score-input w-20 px-3 py-2 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                      data-student="{{ student.id }}"
+                      data-field="project"
+                    />
+                  </td>
+                  <td class="py-4 px-4 text-center">
+                    <div
+                      class="inline-flex items-center px-3 py-2 rounded-lg bg-blue-50 border border-blue-200"
+                    >
+                      <span
+                        class="class-total text-sm font-semibold text-blue-700"
+                        id="class-total-{{ student.id }}"
+                      >
+                        {{ term_scores[student.id].class_total if
+                        term_scores[student.id] else 0 }}
+                      </span>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-center">
+                    <input
+                      type="number"
+                      name="scores[{{ student.id }}][exam_score]"
+                      value="{{ term_scores[student.id].exam_score if term_scores[student.id] else 0 }}"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      class="w-20 px-3 py-2 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                      data-student="{{ student.id }}"
+                      data-field="exam_score"
+                    />
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Save Button -->
+          <div class="mt-8 flex justify-end space-x-4">
+            <button
+              type="button"
+              id="saveBtn"
+              class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              <span class="flex items-center">
+                <svg
+                  id="saveSpinner"
+                  class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <svg
+                  id="saveIcon"
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                  ></path>
+                </svg>
+                <span id="saveText">Save All Scores</span>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div
+  id="successToast"
+  class="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg transform translate-x-full transition-transform duration-300 z-50"
+>
+  <div class="flex items-center">
+    <svg
+      class="w-5 h-5 mr-3"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M5 13l4 4L19 7"
+      ></path>
+    </svg>
+    <span id="successMessage">Scores saved successfully!</span>
+  </div>
+</div>
+
+<!-- Error Toast -->
+<div
+  id="errorToast"
+  class="fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded-xl shadow-lg transform translate-x-full transition-transform duration-300 z-50"
+>
+  <div class="flex items-center">
+    <svg
+      class="w-5 h-5 mr-3"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      ></path>
+    </svg>
+    <span id="errorMessage">An error occurred!</span>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Toast elements
+    const successToast = document.getElementById("successToast");
+    const errorToast = document.getElementById("errorToast");
+    const successMessage = document.getElementById("successMessage");
+    const errorMessage = document.getElementById("errorMessage");
+
+    // Loading elements
+    const saveBtn = document.getElementById("saveBtn");
+    const saveSpinner = document.getElementById("saveSpinner");
+    const saveIcon = document.getElementById("saveIcon");
+    const saveText = document.getElementById("saveText");
+
+    // Show loading state
+    function showLoading() {
+      saveSpinner.classList.remove("hidden");
+      saveIcon.classList.add("hidden");
+      saveText.textContent = "Saving...";
+      saveBtn.disabled = true;
+    }
+
+    // Hide loading state
+    function hideLoading() {
+      saveSpinner.classList.add("hidden");
+      saveIcon.classList.remove("hidden");
+      saveText.textContent = "Save All Scores";
+      saveBtn.disabled = false;
+    }
+
+    // Show toast notification
+    function showToast(element, message) {
+      element.querySelector('span[id$="Message"]').textContent = message;
+      element.classList.remove("translate-x-full");
+      element.classList.add("translate-x-0");
+
+      setTimeout(() => {
+        element.classList.remove("translate-x-0");
+        element.classList.add("translate-x-full");
+      }, 4000);
+    }
+
+    // Show success message
+    function showSuccess(message) {
+      showToast(successToast, message);
+    }
+
+    // Show error message
+    function showError(message) {
+      showToast(errorToast, message);
+    }
+
+    // Search functionality
+    const searchInput = document.getElementById("searchInput");
+    const studentRows = document.querySelectorAll(".student-row");
+
+    searchInput.addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+
+      studentRows.forEach((row) => {
+        const studentName = row
+          .querySelector("td:first-child .text-sm.font-medium")
+          .textContent.toLowerCase();
+        if (studentName.includes(searchTerm)) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    });
+
+    // Calculate class total when component scores change
+    const scoreInputs = document.querySelectorAll(".score-input");
+
+    scoreInputs.forEach((input) => {
+      input.addEventListener("input", function () {
+        const studentId = this.dataset.student;
+        calculateClassTotal(studentId);
+      });
+
+      // Add visual feedback for invalid values
+      input.addEventListener("blur", function () {
+        const value = parseFloat(this.value) || 0;
+        const max = parseFloat(this.getAttribute("max"));
+
+        if (value > max) {
+          this.classList.add("border-red-500", "bg-red-50");
+          setTimeout(() => {
+            this.classList.remove("border-red-500", "bg-red-50");
+          }, 2000);
+        }
+      });
+    });
+
+    function calculateClassTotal(studentId) {
+      const individualTest =
+        parseFloat(
+          document.querySelector(
+            `input[data-student="${studentId}"][data-field="individual_test"]`
+          ).value
+        ) || 0;
+      const groupWork =
+        parseFloat(
+          document.querySelector(
+            `input[data-student="${studentId}"][data-field="group_work"]`
+          ).value
+        ) || 0;
+      const classTest =
+        parseFloat(
+          document.querySelector(
+            `input[data-student="${studentId}"][data-field="class_test"]`
+          ).value
+        ) || 0;
+      const project =
+        parseFloat(
+          document.querySelector(
+            `input[data-student="${studentId}"][data-field="project"]`
+          ).value
+        ) || 0;
+
+      // Cap each component at 15
+      const cappedIndividual = Math.min(individualTest, 15);
+      const cappedGroup = Math.min(groupWork, 15);
+      const cappedTest = Math.min(classTest, 15);
+      const cappedProject = Math.min(project, 15);
+
+      // Update input values if they were capped
+      const individualInput = document.querySelector(
+        `input[data-student="${studentId}"][data-field="individual_test"]`
+      );
+      const groupInput = document.querySelector(
+        `input[data-student="${studentId}"][data-field="group_work"]`
+      );
+      const testInput = document.querySelector(
+        `input[data-student="${studentId}"][data-field="class_test"]`
+      );
+      const projectInput = document.querySelector(
+        `input[data-student="${studentId}"][data-field="project"]`
+      );
+
+      if (individualTest !== cappedIndividual) {
+        individualInput.value = cappedIndividual;
+        individualInput.classList.add("border-amber-500", "bg-amber-50");
+        setTimeout(() => {
+          individualInput.classList.remove("border-amber-500", "bg-amber-50");
+        }, 2000);
+      }
+      if (groupWork !== cappedGroup) {
+        groupInput.value = cappedGroup;
+        groupInput.classList.add("border-amber-500", "bg-amber-50");
+        setTimeout(() => {
+          groupInput.classList.remove("border-amber-500", "bg-amber-50");
+        }, 2000);
+      }
+      if (classTest !== cappedTest) {
+        testInput.value = cappedTest;
+        testInput.classList.add("border-amber-500", "bg-amber-50");
+        setTimeout(() => {
+          testInput.classList.remove("border-amber-500", "bg-amber-50");
+        }, 2000);
+      }
+      if (project !== cappedProject) {
+        projectInput.value = cappedProject;
+        projectInput.classList.add("border-amber-500", "bg-amber-50");
+        setTimeout(() => {
+          projectInput.classList.remove("border-amber-500", "bg-amber-50");
+        }, 2000);
+      }
+
+      // Calculate and display total
+      const total = cappedIndividual + cappedGroup + cappedTest + cappedProject;
+      const totalElement = document.getElementById(`class-total-${studentId}`);
+      totalElement.textContent = total.toFixed(1);
+
+      // Add animation for total update
+      totalElement.parentElement.classList.add(
+        "bg-green-100",
+        "border-green-300"
+      );
+      setTimeout(() => {
+        totalElement.parentElement.classList.remove(
+          "bg-green-100",
+          "border-green-300"
+        );
+      }, 1000);
+    }
+
+    // Save scores
+    saveBtn.addEventListener("click", function () {
+      showLoading();
+
+      const form = document.getElementById("gradingForm");
+      const formData = new FormData(form);
+      const data = {
+        class_id: formData.get("class_id"),
+        subject_id: formData.get("subject_id"),
+        term: formData.get("term"),
+        year: formData.get("year"),
+        scores: {},
+      };
+
+      // Collect all scores
+      for (const [key, value] of formData.entries()) {
+        if (key.startsWith("scores[")) {
+          const matches = key.match(/scores\[(\d+)\]\[(\w+)\]/);
+          if (matches) {
+            const studentId = matches[1];
+            const field = matches[2];
+
+            if (!data.scores[studentId]) {
+              data.scores[studentId] = {};
+            }
+
+            data.scores[studentId][field] = value;
+          }
+        }
+      }
+
+      // Send AJAX request
+      fetch('{{ url_for("exams_grading.save_grades") }}', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token() }}",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((result) => {
+          hideLoading();
+
+          if (result.status === "success") {
+            showSuccess("All scores saved successfully!");
+          } else {
+            showError(
+              result.message || "An error occurred while saving scores."
+            );
+          }
+        })
+        .catch((error) => {
+          hideLoading();
+          console.error("Error:", error);
+          showError("An error occurred while saving scores.");
+        });
+    });
+  });
+</script>
+{% endblock %}
