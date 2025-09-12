@@ -2,8 +2,9 @@ from app import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date, timezone
-from sqlalchemy import event
+from sqlalchemy import event, func
 from sqlalchemy.orm import validates
+from sqlalchemy.ext.hybrid import hybrid_property
 import os
 from flask import current_app
 
@@ -38,7 +39,7 @@ class Class(db.Model):
     section = db.Column(db.String(1))
     master_class = db.Column(db.String(50))  # For grouping classes
 
-    students = db.relationship("Student", backref="classroom", lazy=True)
+    students = db.relationship("Student", backref="classroom", lazy="dynamic")
     teachers = db.relationship(
         "Teacher", secondary=teacher_class, back_populates="classes"
     )
@@ -73,6 +74,79 @@ class Subject(db.Model):
 
     def __repr__(self) -> str:
         return self.name
+
+
+# School Info Model Class
+class SchoolInfo(db.Model):
+    """Store school information for reports"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    motto = db.Column(db.String(200))
+    address = db.Column(db.Text)
+    phone = db.Column(db.String(10))
+    email = db.Column(db.String(120))
+    website = db.Column(db.String(200))
+    logo_path = db.Column(db.String(200))
+
+    def __repr__(self) -> str:
+        return f"<SchoolInfo {self.name}>"
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+# Class for Term Dates
+class TermDates(db.Model):
+    """Store term dates for academic years"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    academic_year = db.Column(db.String(20), nullable=False)
+    term = db.Column(db.String(20), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    vacation_date = db.Column(db.Date, nullable=False)
+    reopening_date = db.Column(db.Date, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"<TermDates {self.academic_year} {self.term}>"
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+# Class for leaving remarks on students
+class StudentRemarks(db.Model):
+    """Store teacher remarks for students"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False)
+    term = db.Column(db.String(20), nullable=False)
+    year = db.Column(db.String(10), nullable=False)
+    conduct = db.Column(db.Text)
+    attitude = db.Column(db.Text)
+    interests = db.Column(db.Text)
+    remarks = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
+
+    # Relationships
+    student = db.relationship("Student", backref="student_remarks")
+    teacher = db.relationship("Teacher", backref="given_remarks")
+
+    def __repr__(self) -> str:
+        return f"<StudentRemarks {self.student_id} {self.term} {self.year}>"
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 
 # TeacherSubjectClass Model for tracking sybject assignments to teachers
@@ -143,13 +217,13 @@ class Student(db.Model):
             today.year - born.year - ((today.month, today.day) < (born.month, born.day))
         )
 
-    @property
-    def full_name(self):
-        return (
-            f"{self.first_name} {self.middle_name} {self.surname}"
-            if self.middle_name
-            else f"{self.first_name} {self.surname}"
-        )
+    @hybrid_property
+    def full_name(self):  # type: ignore
+        return f"{self.first_name or ''} {self.middle_name or ''} {self.surname or ''}".strip()
+
+    @full_name.expression
+    def full_name(cls):
+        return func.concat(cls.first_name, " ", cls.middle_name, " ", cls.surname)
 
     def __repr__(self) -> str:
         return self.full_name
@@ -313,10 +387,70 @@ class Attendance(db.Model):
     year = db.Column(db.String(10), nullable=False)
     status = db.Column(db.String(10), nullable=False)
     method = db.Column(db.String(10))  # Manual input, or QR
+    excuse_reason = db.Column(db.Text, nullable=True)  # Reason for excused absence
+    marked_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
+
+    # Relationships
+    student = db.relationship("Student", backref="attendance_records")
+    classroom = db.relationship("Class", backref="attendance_records")
+    marker = db.relationship("User", foreign_keys=[marked_by])
 
     def __init__(self, **kwargs) -> None:
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+
+# Attendance audit class
+class AttendanceAudit(db.Model):
+    """Track changes to attendance records"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    attendance_id = db.Column(
+        db.Integer, db.ForeignKey("attendance.id"), nullable=False
+    )
+    changed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    change_type = db.Column(db.String(10), nullable=False)  # create, update, delete
+    old_status = db.Column(db.String(10), nullable=True)
+    new_status = db.Column(db.String(10), nullable=True)
+    change_reason = db.Column(db.Text, nullable=True)
+    changed_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationships
+    attendance = db.relationship("Attendance", backref="audit_trail")
+    user = db.relationship("User", foreign_keys=[changed_by])
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+# School Calendar Model
+class SchoolCalendar(db.Model):
+    """Storing school days, holidays, and events"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, nullable=False, unique=True)
+    day_type = db.Column(
+        db.String(20), nullable=False
+    )  # For school day, holiday, weekend, event
+    description = db.Column(db.Text, nullable=True)
+    term = db.Column(db.String(20), nullable=True)
+    year = db.Column(db.String(10), nullable=True)
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @classmethod
+    def is_school_day(cls, date):
+        day = cls.query.filter_by(date=date).first()
+        return day and day.day_type == "school_day"
 
 
 # Enrollment Class Model

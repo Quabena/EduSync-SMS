@@ -1,0 +1,753 @@
+{% extends "base.html" %} {% block title %}School Information Management -
+Settings{% endblock %} {% block content %}
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+  :root {
+    --primary: #1e40af;
+    --primary-light: #3b82f6;
+    --secondary: #059669;
+    --accent: #7c3aed;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --success: #10b981;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --border-radius: 16px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+      sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    color: var(--gray-800);
+    line-height: 1.6;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .main-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .main-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 20% 80%,
+        rgba(120, 119, 198, 0.3) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 20%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+  }
+
+  .content-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .header-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(248, 250, 252, 0.95) 100%
+    );
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+    animation: slideInDown 0.8s ease-out;
+  }
+
+  .page-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 15px 35px rgba(30, 64, 175, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-icon::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transform: rotate(45deg);
+    animation: shimmer 3s infinite;
+  }
+
+  .page-icon svg {
+    width: 40px;
+    height: 40px;
+    color: white;
+    z-index: 1;
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    background: linear-gradient(
+      135deg,
+      var(--gray-900) 0%,
+      var(--primary) 50%,
+      var(--accent) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .page-subtitle {
+    font-size: 1.125rem;
+    color: var(--gray-600);
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+  }
+
+  .form-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    animation: slideInUp 0.8s ease-out;
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+  }
+
+  .form-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gray-100);
+  }
+
+  .form-section-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(
+      135deg,
+      var(--success) 0%,
+      var(--secondary) 100%
+    );
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    background: white;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-control[type="file"] {
+    padding: 0.5rem;
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    margin-right: 0.75rem;
+  }
+
+  .btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .btn:hover::before {
+    left: 100%;
+  }
+
+  .btn-primary {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-light) 100%
+    );
+    color: white;
+    box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(
+      135deg,
+      var(--gray-400) 0%,
+      var(--gray-500) 100%
+    );
+    color: white;
+    box-shadow: 0 4px 15px rgba(148, 163, 184, 0.3);
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(148, 163, 184, 0.4);
+  }
+
+  .logo-preview {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: 12px;
+    border: 2px dashed var(--gray-200);
+  }
+
+  .logo-preview img {
+    max-height: 120px;
+    max-width: 200px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .logo-preview-text {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  /* Grid Layout */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  /* Animations */
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+      transform: translateX(100%) rotate(45deg);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 1rem;
+    }
+
+    .header-card {
+      padding: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+    }
+
+    .form-grid,
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+    }
+
+    .btn {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 0.75rem;
+    }
+  }
+</style>
+
+<div class="main-container">
+  <div class="content-wrapper">
+    <!-- Professional Header -->
+    <div class="header-card">
+      <div style="display: flex; align-items: center; gap: 1.5rem">
+        <div class="page-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h10M7 15h10"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1 class="page-title">School Information</h1>
+          <p class="page-subtitle">
+            Manage your institution's profile and branding
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- School Information Form -->
+    <div class="form-card">
+      <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <div class="form-section-icon">
+              <svg
+                style="width: 16px; height: 16px; color: white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            Basic Information
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name" class="form-label">School Name *</label>
+              <input
+                class="form-control"
+                type="text"
+                id="name"
+                name="name"
+                value="{{ school.name if school else '' }}"
+                placeholder="Enter your school's full name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="motto" class="form-label">School Motto</label>
+              <input
+                class="form-control"
+                type="text"
+                id="motto"
+                name="motto"
+                value="{{ school.motto if school else '' }}"
+                placeholder="Enter your school's motto"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="address" class="form-label">Address</label>
+            <textarea
+              class="form-control"
+              id="address"
+              name="address"
+              placeholder="Enter the complete school address"
+            >
+{{ school.address if school else '' }}</textarea
+            >
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <div class="form-section-icon">
+              <svg
+                style="width: 16px; height: 16px; color: white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                />
+              </svg>
+            </div>
+            Contact Information
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="phone" class="form-label">Phone Number</label>
+              <input
+                class="form-control"
+                type="tel"
+                id="phone"
+                name="phone"
+                value="{{ school.phone if school else '' }}"
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">Email Address</label>
+              <input
+                class="form-control"
+                type="email"
+                id="email"
+                name="email"
+                value="{{ school.email if school else '' }}"
+                placeholder="info@yourschool.edu"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="website" class="form-label">Website</label>
+            <input
+              class="form-control"
+              type="url"
+              id="website"
+              name="website"
+              value="{{ school.website if school else '' }}"
+              placeholder="https://www.yourschool.edu"
+            />
+          </div>
+        </div>
+
+        <!-- Branding Section -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <div class="form-section-icon">
+              <svg
+                style="width: 16px; height: 16px; color: white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            School Branding
+          </div>
+
+          <div class="form-group">
+            <label for="logo" class="form-label">School Logo</label>
+            <input
+              class="form-control"
+              type="file"
+              id="logo"
+              name="logo"
+              accept="image/*"
+            />
+            <small
+              style="
+                color: var(--gray-500);
+                font-size: 0.75rem;
+                margin-top: 0.5rem;
+                display: block;
+              "
+            >
+              Recommended: PNG or JPG format, maximum 2MB, square aspect ratio
+              for best results
+            </small>
+
+            {% if school and school.logo_path %}
+            <div class="logo-preview">
+              <div class="logo-preview-text">Current Logo:</div>
+              <img
+                src="{{ url_for('static', filename='uploads/' + school.logo_path) }}"
+                alt="School Logo"
+              />
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="padding-top: 1.5rem; border-top: 2px solid var(--gray-100)">
+          <button type="submit" class="btn btn-primary">
+            <svg
+              style="width: 20px; height: 20px; margin-right: 0.5rem"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Save School Information
+          </button>
+          <a
+            href="{{ url_for('exams_grading.index') }}"
+            class="btn btn-secondary"
+          >
+            <svg
+              style="width: 20px; height: 20px; margin-right: 0.5rem"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Form enhancement and validation
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const logoInput = document.getElementById("logo");
+    const phoneInput = document.getElementById("phone");
+    const websiteInput = document.getElementById("website");
+
+    // Logo preview functionality
+    logoInput.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Validate file size (2MB limit)
+        if (file.size > 2 * 1024 * 1024) {
+          alert("Logo file size must be less than 2MB");
+          this.value = "";
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith("image/")) {
+          alert("Please select a valid image file");
+          this.value = "";
+          return;
+        }
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          let preview = document.querySelector(".logo-preview");
+          if (!preview) {
+            preview = document.createElement("div");
+            preview.className = "logo-preview";
+            logoInput.parentNode.appendChild(preview);
+          }
+
+          preview.innerHTML = `
+          <div class="logo-preview-text">New Logo Preview:</div>
+          <img src="${e.target.result}" alt="Logo Preview" style="max-height: 120px; max-width: 200px; border-radius: 8px; box-shadow: var(--shadow-md);">
+        `;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Phone number formatting
+    phoneInput.addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, "");
+      if (value.length >= 10) {
+        value = value.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+      }
+      e.target.value = value;
+    });
+
+    // Website URL validation
+    websiteInput.addEventListener("blur", function (e) {
+      let value = e.target.value.trim();
+      if (
+        value &&
+        !value.startsWith("http://") &&
+        !value.startsWith("https://")
+      ) {
+        e.target.value = "https://" + value;
+      }
+    });
+
+    // Form submission enhancement
+    form.addEventListener("submit", function (e) {
+      const requiredFields = form.querySelectorAll("[required]");
+      let isValid = true;
+
+      requiredFields.forEach((field) => {
+        if (!field.value.trim()) {
+          field.style.borderColor = "var(--error)";
+          isValid = false;
+        } else {
+          field.style.borderColor = "var(--gray-200)";
+        }
+      });
+
+      if (!isValid) {
+        e.preventDefault();
+        alert("Please fill in all required fields");
+      }
+    });
+
+    // Real-time validation feedback
+    const inputs = form.querySelectorAll(".form-control");
+    inputs.forEach((input) => {
+      input.addEventListener("input", function () {
+        if (this.hasAttribute("required") && this.value.trim()) {
+          this.style.borderColor = "var(--success)";
+        } else if (this.hasAttribute("required")) {
+          this.style.borderColor = "var(--gray-200)";
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

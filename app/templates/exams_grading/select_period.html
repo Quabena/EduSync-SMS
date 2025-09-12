@@ -1,73 +1,159 @@
-{% extends "base.html" %} {% block content %}
-<div class="container mx-auto px-4 py-8">
-  <div class="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
-    <h2 class="text-2xl font-bold mb-6 text-center">Select Grading Period</h2>
-
-    <div class="mb-4 p-4 bg-gray-50 rounded">
-      <p class="font-semibold">{{ class_.name }} - {{ subject.name }}</p>
+{% extends "base.html" %} {% block title %}Select Grading Period{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+  <!-- Header Section -->
+  <div class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">
+              Select Grading Period
+            </h1>
+            <p class="mt-2 text-gray-600">
+              {{ class_.name }} - {{ subject.name }}
+            </p>
+          </div>
+          <a
+            href="{{ url_for('exams_grading.index') }}"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
+          >
+            <svg
+              class="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              ></path>
+            </svg>
+            Back to Dashboard
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <form
-      method="GET"
-      action="{{ url_for('exams_grading.grading_page', class_id=class_.id, subject_id=subject.id, term='', year='') }}"
-    >
-      <div class="mb-4">
-        <label for="term" class="block text-gray-700 mb-2">Term</label>
-        <select
-          name="term"
-          id="term"
-          class="w-full p-2 border border-gray-300 rounded"
-          required
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+      <div class="text-center mb-8">
+        <div
+          class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"
         >
-          <option value="">Select Term</option>
-          <option value="1">First Term</option>
-          <option value="2">Second Term</option>
-          <option value="3">Third Term</option>
-        </select>
+          <svg
+            class="w-8 h-8 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            ></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-semibold text-gray-900">
+          Choose Term and Year
+        </h2>
+        <p class="text-gray-600 mt-2">Select the academic period for grading</p>
       </div>
 
-      <div class="mb-6">
-        <label for="year" class="block text-gray-700 mb-2">Academic Year</label>
-        <input
-          type="text"
-          name="year"
-          id="year"
-          placeholder="e.g., 2024"
-          class="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-      </div>
+      <form id="periodForm" class="space-y-6">
+        <div>
+          <label for="term" class="block text-sm font-medium text-gray-700 mb-2"
+            >Term</label
+          >
+          <select
+            id="term"
+            name="term"
+            required
+            class="w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+          >
+            <option value="">Select Term</option>
+            {% set current_term =
+    'Term 1' if current_month <= 4
+    else ('Term 2' if current_month <= 8 else 'Term 3')
+%}
 
-      <div class="flex justify-center">
-        <button
-          type="submit"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
-        >
-          Continue to Grading
-        </button>
-      </div>
-    </form>
+<option value="Term 1" {{ 'selected' if current_term == 'Term 1' else '' }}>Term 1</option>
+<option value="Term 2" {{ 'selected' if current_term == 'Term 2' else '' }}>Term 2</option>
+<option value="Term 3" {{ 'selected' if current_term == 'Term 3' else '' }}>Term 3</option>
+
+          </select>
+        </div>
+
+        <div>
+          <label for="year" class="block text-sm font-medium text-gray-700 mb-2"
+            >Academic Year</label
+          >
+          <select
+            id="year"
+            name="year"
+            required
+            class="w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+          >
+            <option value="">Select Year</option>
+            {% set current_year = now().year %}
+            <option value="{{ current_year }}" selected>
+              {{ current_year }}
+            </option>
+            <option value="{{ current_year - 1 }}">
+              {{ current_year - 1 }}
+            </option>
+            <option value="{{ current_year - 2 }}">
+              {{ current_year - 2 }}
+            </option>
+          </select>
+        </div>
+
+        <div class="pt-4">
+          <button
+            type="submit"
+            class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 text-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled
+          >
+            Proceed to Grading
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form");
+    const form = document.getElementById("periodForm");
+    const termSelect = document.getElementById("term");
+    const yearSelect = document.getElementById("year");
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    function toggleSubmitButton() {
+      const hasTermAndYear = termSelect.value !== "" && yearSelect.value !== "";
+      submitBtn.disabled = !hasTermAndYear;
+    }
+
+    termSelect.addEventListener("change", toggleSubmitButton);
+    yearSelect.addEventListener("change", toggleSubmitButton);
+
     form.addEventListener("submit", function (e) {
-      const term = document.getElementById("term").value;
-      const year = document.getElementById("year").value;
+      e.preventDefault();
 
-      if (!term || !year) {
-        e.preventDefault();
-        alert("Please select both term and year");
-        return;
+      if (termSelect.value && yearSelect.value) {
+        window.location.href =
+          `{{ url_for('exams_grading.grading_page', class_id=class_.id, subject_id=subject.id, term='TERM_PLACEHOLDER', year='YEAR_PLACEHOLDER') }}`
+            .replace("TERM_PLACEHOLDER", encodeURIComponent(termSelect.value))
+            .replace("YEAR_PLACEHOLDER", encodeURIComponent(yearSelect.value));
       }
-
-      const action = form.action
-        .replace("term=", `term=${term}`)
-        .replace("year=", `year=${year}`);
-      form.action = action;
     });
+
+    // Auto-enable if default values are selected
+    toggleSubmitButton();
   });
 </script>
 {% endblock %}

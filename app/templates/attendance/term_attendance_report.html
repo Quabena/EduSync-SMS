@@ -5,13 +5,19 @@ endblock %} {% block content %}
   <div class="bg-white rounded-xl shadow-md p-6 mb-6">
     <div class="flex justify-between items-start">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">Term Attendance</h1>
+        <h1 class="text-2xl font-bold text-gray-800">Term Attendance Report</h1>
         <p class="text-gray-600">{{ class_.name }} - {{ term }} {{ year }}</p>
         <p class="text-sm text-gray-500">
           Total School Days: {{ summary.total_days }}
         </p>
       </div>
       <div class="flex space-x-3">
+        <a
+          href="{{ url_for('attendance.term_attendance') }}"
+          class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+        >
+          Change Term
+        </a>
         <button
           onclick="window.print()"
           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -102,6 +108,7 @@ endblock %} {% block content %}
               {% set status = attendance_records[student.id].get(day) %}
               <span
                 class="inline-block w-4 h-4 rounded-full {% if status == 'present' %}bg-green-500{% elif status == 'absent' %}bg-red-500{% else %}bg-gray-300{% endif %}"
+                title="{{ day.strftime('%Y-%m-%d') }}: {{ status if status else 'No record' }}"
               ></span>
             </td>
             {% endfor %}
@@ -136,10 +143,10 @@ endblock %} {% block content %}
       Back to Dashboard
     </a>
     <a
-      href="{{ url_for('attendance.mark_attendance', class_id=class_.id) }}"
+      href="{{ url_for('attendance.select_attendance_date') }}?class_id={{ class_.id }}&term={{ term }}&year={{ year }}"
       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
     >
-      Mark Today's Attendance
+      Mark Attendance for This Term
     </a>
   </div>
 </div>
@@ -156,6 +163,44 @@ endblock %} {% block content %}
   }
   .z-10 {
     z-index: 10;
+  }
+
+  @media print {
+    .bg-white {
+      background-color: white !important;
+    }
+    .shadow-md,
+    .shadow {
+      box-shadow: none !important;
+    }
+    .rounded-xl,
+    .rounded-lg {
+      border-radius: 0 !important;
+    }
+    .px-4,
+    .px-6,
+    .px-2 {
+      padding-left: 0.5rem !important;
+      padding-right: 0.5rem !important;
+    }
+    .py-8,
+    .py-6,
+    .py-4,
+    .py-3 {
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+    }
+    .mt-6,
+    .mb-6 {
+      margin-top: 1rem !important;
+      margin-bottom: 1rem !important;
+    }
+    .grid {
+      display: block !important;
+    }
+    .flex {
+      display: none !important;
+    }
   }
 </style>
 {% endblock %}

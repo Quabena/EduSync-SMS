@@ -1,123 +1,829 @@
+<!-- templates/attendance/dashboard.html -->
 {% extends "base.html" %} {% block title %}Attendance Dashboard{% endblock %} {%
 block content %}
-<div class="max-w-6xl mx-auto px-4 py-8">
-  <!-- Header -->
-  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Attendance Dashboard</h1>
-    <p class="text-gray-600">Today: {{ today.strftime('%A, %B %d, %Y') }}</p>
-  </div>
 
-  <!-- Today's Attendance Summary -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-    {% for class_ in classes %}
-    <div class="bg-white rounded-xl shadow-md p-6">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">
-        {{ class_.name }}
-      </h2>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-      <div class="grid grid-cols-3 gap-4 mb-4">
-        <div class="text-center">
-          <p class="text-2xl font-bold text-blue-600">
-            {{ today_attendance[class_.id].present or 0 }}
-          </p>
-          <p class="text-sm text-gray-500">Present</p>
-        </div>
-        <div class="text-center">
-          <p class="text-2xl font-bold text-red-600">
-            {{ today_attendance[class_.id].absent or 0 }}
-          </p>
-          <p class="text-sm text-gray-500">Absent</p>
-        </div>
-        <div class="text-center">
-          <p class="text-2xl font-bold text-gray-600">
-            {{ today_attendance[class_.id].total or 0 }}
-          </p>
-          <p class="text-sm text-gray-500">Total</p>
-        </div>
-      </div>
+  body {
+    font-family: "Inter", sans-serif;
+  }
 
-      <div class="space-y-2">
-        <a
-          href="{{ url_for('attendance.mark_attendance', class_id=class_.id) }}"
-          class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  .stat-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .progress-glow {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+  }
+
+  .alert-card {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-left: 4px solid #ef4444;
+  }
+
+  .activity-dot {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .trend-chart-placeholder {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 2px dashed #cbd5e1;
+  }
+</style>
+
+<div
+  class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50"
+>
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Enhanced Header -->
+    <div
+      class="glass-effect rounded-2xl shadow-xl p-8 mb-8 border border-white/20"
+    >
+      <div
+        class="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-6 lg:space-y-0"
+      >
+        <div class="space-y-3">
+          <h1
+            class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
+          >
+            Attendance Dashboard
+          </h1>
+          <p class="text-lg text-gray-600 font-medium">
+            Real-time overview of attendance data and analytics
+          </p>
+          <div class="flex items-center space-x-2 text-sm text-gray-500">
+            <svg
+              class="w-4 h-4 text-indigo-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
+              />
+            </svg>
+            <span class="font-medium"
+              >{{ today.strftime('%A, %B %d, %Y') }}</span
+            >
+            <span class="text-gray-300">•</span>
+            <span
+              class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold"
+            >
+              {{ current_term }} {{ current_year }}
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4"
         >
-          Mark Attendance
-        </a>
-        <a
-          href="{{ url_for('attendance.term_attendance', class_id=class_.id, term='Term 1', year=2025) }}"
-          class="w-full inline-flex justify-center items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-        >
-          View Term Report
-        </a>
+          <a
+            href="{{ url_for('attendance.select_attendance_date') }}"
+            class="btn-primary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+            Mark Attendance
+          </a>
+          <a
+            href="{{ url_for('attendance.term_attendance') }}"
+            class="btn-secondary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg transition-all"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            View Reports
+          </a>
+        </div>
       </div>
     </div>
-    {% endfor %}
-  </div>
 
-  <!-- Quick Actions -->
-  <div class="bg-white rounded-xl shadow-md p-6">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <a
-        href="{{ url_for('attendance.scanner') }}"
-        class="inline-flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
-      >
-        <svg
-          class="w-5 h-5 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-          ></path>
-        </svg>
-        QR Scanner
-      </a>
+    <!-- Enhanced Quick Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+      <div class="stat-card card-hover rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center space-x-3">
+              <div
+                class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-3xl font-bold text-gray-800">
+                  {{ classes | length }}
+                </p>
+                <p class="text-sm font-medium text-gray-500">Total Classes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <a
-        href="{{ url_for('attendance.manual_attendance', class_id=classes[0].id) if classes else '#' }}"
-        class="inline-flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      >
-        <svg
-          class="w-5 h-5 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-          ></path>
-        </svg>
-        Manual Entry
-      </a>
+      <div class="stat-card card-hover rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center space-x-3">
+              <div
+                class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-3xl font-bold text-gray-800">
+                  {% set total_present = today_attendance.values() |
+                  sum(attribute='present') %} {{ total_present }}
+                </p>
+                <p class="text-sm font-medium text-gray-500">Present Today</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <a
-        href="{{ url_for('attendance.term_attendance', class_id=classes[0].id, term='Term 1', year=2025) if classes else '#' }}"
-        class="inline-flex items-center justify-center px-4 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-      >
-        <svg
-          class="w-5 h-5 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div class="stat-card card-hover rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center space-x-3">
+              <div
+                class="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-3xl font-bold text-gray-800">
+                  {% set total_absent = today_attendance.values() |
+                  sum(attribute='absent') %} {{ total_absent }}
+                </p>
+                <p class="text-sm font-medium text-gray-500">Absent Today</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card card-hover rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center space-x-3">
+              <div
+                class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-3xl font-bold text-gray-800">
+                  {% if today_attendance.values() | sum(attribute='total') > 0
+                  %} {{ ((today_attendance.values() | sum(attribute='present'))
+                  / (today_attendance.values() | sum(attribute='total')) * 100)
+                  | round(1) }}% {% else %} 0% {% endif %}
+                </p>
+                <p class="text-sm font-medium text-gray-500">Attendance Rate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Main Content Grid -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+      <!-- Class Attendance Overview -->
+      <div class="xl:col-span-2">
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-          ></path>
-        </svg>
-        Term Reports
-      </a>
+          <div class="flex items-center space-x-3 mb-8">
+            <div
+              class="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">
+              Class Attendance Overview
+            </h2>
+          </div>
+
+          <div class="space-y-6">
+            {% for class_ in classes %}
+            <div
+              class="bg-gradient-to-r from-white to-gray-50/50 border border-gray-200/60 rounded-xl p-6 card-hover"
+            >
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">
+                  {{ class_.name }}
+                </h3>
+                <div class="flex items-center space-x-2">
+                  <span
+                    class="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-bold rounded-full shadow-md"
+                  >
+                    {{ today_attendance[class_.id].attendance_rate | round(1)
+                    }}%
+                  </span>
+                  <span class="text-xs text-gray-500 font-medium">Today</span>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <div class="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+                  <div
+                    class="bg-gradient-to-r from-emerald-400 to-emerald-600 h-3 rounded-full progress-glow transition-all duration-1000 ease-out"
+                    style="width: {{ today_attendance[class_.id].attendance_rate }}%"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-4 gap-4 mb-4">
+                <div
+                  class="text-center p-3 bg-emerald-50 rounded-lg border border-emerald-100"
+                >
+                  <p class="text-2xl font-bold text-emerald-700">
+                    {{ today_attendance[class_.id].present }}
+                  </p>
+                  <p class="text-xs text-emerald-600 font-semibold">Present</p>
+                </div>
+                <div
+                  class="text-center p-3 bg-red-50 rounded-lg border border-red-100"
+                >
+                  <p class="text-2xl font-bold text-red-700">
+                    {{ today_attendance[class_.id].absent }}
+                  </p>
+                  <p class="text-xs text-red-600 font-semibold">Absent</p>
+                </div>
+                <div
+                  class="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-100"
+                >
+                  <p class="text-2xl font-bold text-yellow-700">
+                    {{ today_attendance[class_.id].late }}
+                  </p>
+                  <p class="text-xs text-yellow-600 font-semibold">Late</p>
+                </div>
+                <div
+                  class="text-center p-3 bg-blue-50 rounded-lg border border-blue-100"
+                >
+                  <p class="text-2xl font-bold text-blue-700">
+                    {{ today_attendance[class_.id].excused }}
+                  </p>
+                  <p class="text-xs text-blue-600 font-semibold">Excused</p>
+                </div>
+              </div>
+
+              <div class="flex space-x-2">
+                <a
+                  href="{{ url_for('attendance.select_attendance_date') }}?class_id={{ class_.id }}"
+                  class="flex-1 text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  Mark
+                </a>
+                <a
+                  href="{{ url_for('attendance.term_attendance_report', class_id=class_.id, term=current_term, year=current_year) }}"
+                  class="flex-1 text-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-semibold rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  Report
+                </a>
+                <a
+                  href="{{ url_for('attendance.attendance_analytics', class_id=class_.id) }}"
+                  class="flex-1 text-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-semibold rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  Analytics
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Right Sidebar -->
+      <div class="space-y-6">
+        <!-- Enhanced Chronic Absenteeism Alerts -->
+        {% if chronic_absenteeism %}
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20"
+        >
+          <div class="flex items-center space-x-3 mb-6">
+            <div
+              class="p-2 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg"
+            >
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Attendance Alerts</h2>
+          </div>
+
+          <div class="space-y-4">
+            {% for alert in chronic_absenteeism %}
+            <div class="alert-card rounded-xl p-4 border">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-sm font-semibold text-red-800">
+                  {{ alert.student.full_name }}
+                </h3>
+                <span
+                  class="px-2 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full shadow-sm"
+                >
+                  {{ alert.attendance_rate | round(1) }}%
+                </span>
+              </div>
+              <p class="text-xs text-red-600 font-medium">
+                {{ alert.class.name }} • {{ alert.absent_days }} absent days
+              </p>
+            </div>
+            {% endfor %}
+          </div>
+
+          <a
+            href="{{ url_for('attendance.attendance_analytics') }}"
+            class="block mt-6 text-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 py-2 rounded-lg"
+          >
+            View All Analytics →
+          </a>
+        </div>
+        {% endif %}
+
+        <!-- Enhanced Recent Activity -->
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20"
+        >
+          <div class="flex items-center space-x-3 mb-6">
+            <div
+              class="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg"
+            >
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Recent Activity</h2>
+          </div>
+
+          <div class="space-y-4">
+            {% for activity in recent_activity %}
+            <div
+              class="flex items-start space-x-3 p-3 bg-gray-50/50 rounded-lg border border-gray-100 hover:bg-gray-100/50 transition-colors"
+            >
+              <div class="flex-shrink-0 mt-1">
+                {% if activity.status == 'present' %}
+                <div
+                  class="w-3 h-3 bg-gradient-to-r from-green-400 to-green-500 rounded-full activity-dot shadow-sm"
+                ></div>
+                {% elif activity.status == 'absent' %}
+                <div
+                  class="w-3 h-3 bg-gradient-to-r from-red-400 to-red-500 rounded-full activity-dot shadow-sm"
+                ></div>
+                {% elif activity.status == 'late' %}
+                <div
+                  class="w-3 h-3 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full activity-dot shadow-sm"
+                ></div>
+                {% else %}
+                <div
+                  class="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full activity-dot shadow-sm"
+                ></div>
+                {% endif %}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-800">
+                  {{ activity.student.full_name }}
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                  Marked
+                  <span class="font-medium text-gray-700"
+                    >{{ activity.status }}</span
+                  >
+                  in
+                  <span class="font-medium text-gray-700"
+                    >{{ activity.classroom.name }}</span
+                  >
+                  • {{ activity.date.strftime('%m/%d') }} at {{
+                  activity.created_at.strftime('%H:%M') }}
+                </p>
+              </div>
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+              <svg
+                class="w-12 h-12 text-gray-400 mx-auto mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
+              </svg>
+              <p class="text-sm text-gray-500 font-medium">
+                No recent activity
+              </p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Enhanced Quick Actions -->
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20"
+        >
+          <div class="flex items-center space-x-3 mb-6">
+            <div
+              class="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg"
+            >
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Quick Actions</h2>
+          </div>
+
+          <div class="space-y-3">
+            <a
+              href="{{ url_for('attendance.select_attendance_date') }}"
+              class="group flex items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl transition-all duration-200 border border-blue-100 hover:border-blue-200"
+            >
+              <div
+                class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200 shadow-lg"
+              >
+                <svg
+                  class="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-800">
+                  Mark Attendance
+                </p>
+                <p class="text-xs text-gray-600">Record today's attendance</p>
+              </div>
+            </a>
+
+            <a
+              href="{{ url_for('attendance.term_attendance') }}"
+              class="group flex items-center p-4 bg-gradient-to-r from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 rounded-xl transition-all duration-200 border border-emerald-100 hover:border-emerald-200"
+            >
+              <div
+                class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200 shadow-lg"
+              >
+                <svg
+                  class="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-800">View Reports</p>
+                <p class="text-xs text-gray-600">Generate attendance reports</p>
+              </div>
+            </a>
+
+            <a
+              href="{{ url_for('attendance.scanner') }}"
+              class="group flex items-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 rounded-xl transition-all duration-200 border border-purple-100 hover:border-purple-200"
+            >
+              <div
+                class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200 shadow-lg"
+              >
+                <svg
+                  class="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-800">QR Scanner</p>
+                <p class="text-xs text-gray-600">Scan student QR codes</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Monthly Trends -->
+    <div
+      class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20"
+    >
+      <div class="flex items-center space-x-3 mb-8">
+        <div
+          class="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg"
+        >
+          <svg
+            class="w-6 h-6 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Attendance Trends</h2>
+        <span
+          class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full"
+          >Last 30 Days</span
+        >
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {% for class_ in classes %}
+        <div
+          class="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-6 card-hover"
+        >
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            {{ class_.name }}
+          </h3>
+
+          <div class="h-48">
+            <div
+              class="trend-chart-placeholder w-full h-full rounded-xl flex flex-col items-center justify-center space-y-2"
+            >
+              <svg
+                class="w-12 h-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              <p class="text-gray-500 text-sm font-medium text-center">
+                Attendance trend chart for<br />{{ class_.name }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="mt-4 flex justify-between items-center text-xs font-medium text-gray-500"
+          >
+            <span class="px-2 py-1 bg-gray-100 rounded-md">30 days ago</span>
+            <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-md"
+              >Today</span
+            >
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  // Enhanced functionality for modern interactions
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize attendance trend charts
+    console.log("Attendance trend charts would be initialized here");
+
+    // Sample data for demonstration
+    const sampleData = {
+      labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"],
+      datasets: [
+        {
+          label: "Attendance Rate",
+          data: [85, 92, 78, 95, 87, 93, 96],
+          borderColor: "#4F46E5",
+          backgroundColor: "rgba(79, 70, 229, 0.1)",
+          tension: 0.4,
+          fill: true,
+        },
+      ],
+    };
+
+    // Add smooth scroll behavior for better UX
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute("href"));
+        if (target) {
+          target.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      });
+    });
+
+    // Add loading states for better perceived performance
+    document.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", function () {
+        if (!this.href.includes("#")) {
+          this.style.opacity = "0.7";
+          this.style.pointerEvents = "none";
+          setTimeout(() => {
+            this.style.opacity = "1";
+            this.style.pointerEvents = "auto";
+          }, 1000);
+        }
+      });
+    });
+
+    // Animate progress bars on load
+    const progressBars = document.querySelectorAll(".progress-glow");
+    progressBars.forEach((bar) => {
+      const width = bar.style.width;
+      bar.style.width = "0%";
+      setTimeout(() => {
+        bar.style.width = width;
+      }, 300);
+    });
+  });
+</script>
 {% endblock %}

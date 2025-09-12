@@ -1,0 +1,306 @@
+<!-- templates/attendance/analytics.html -->
+{% extends "base.html" %} {% block title %}Attendance Analytics - {{ class_.name
+}}{% endblock %} {% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Attendance Analytics</h1>
+    <p class="text-gray-600">{{ class_.name }}</p>
+    <p class="text-sm text-gray-500">Last 30 Days</p>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-green-100 rounded-lg mr-4">
+          <svg
+            class="w-6 h-6 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-gray-800">
+            {% set total_present = attendance_data | sum(attribute='present') %}
+            {{ total_present }}
+          </p>
+          <p class="text-sm text-gray-500">Present Records</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-red-100 rounded-lg mr-4">
+          <svg
+            class="w-6 h-6 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-gray-800">
+            {% set total_absent = attendance_data | sum(attribute='absent') %}
+            {{ total_absent }}
+          </p>
+          <p class="text-sm text-gray-500">Absent Records</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-yellow-100 rounded-lg mr-4">
+          <svg
+            class="w-6 h-6 text-yellow-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-gray-800">
+            {% set total_late = attendance_data | sum(attribute='late') %} {{
+            total_late }}
+          </p>
+          <p class="text-sm text-gray-500">Late Records</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-blue-100 rounded-lg mr-4">
+          <svg
+            class="w-6 h-6 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-gray-800">
+            {% set total_excused = attendance_data | sum(attribute='excused') %}
+            {{ total_excused }}
+          </p>
+          <p class="text-sm text-gray-500">Excused Records</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance Trends Chart -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">
+        Daily Attendance Trend
+      </h2>
+      <div class="h-64">
+        <!-- Chart container - would be populated with Chart.js or similar -->
+        <div id="attendance-trend-chart" class="w-full h-full">
+          <p class="text-gray-500 text-center py-16">
+            Attendance trend chart would appear here
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">
+        Attendance Distribution
+      </h2>
+      <div class="h-64">
+        <!-- Pie chart container -->
+        <div id="attendance-pie-chart" class="w-full h-full">
+          <p class="text-gray-500 text-center py-16">
+            Attendance distribution chart would appear here
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chronic Absenteeism Alert -->
+  {% if chronic_absenteeism %}
+  <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8">
+    <h2 class="text-lg font-semibold text-yellow-800 mb-4">
+      Chronic Absenteeism Alert
+    </h2>
+    <p class="text-yellow-700 mb-4">
+      The following students have attendance rates below 80%:
+    </p>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-yellow-200">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-left text-sm font-medium text-yellow-800">
+              Student
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-yellow-800">
+              Attendance Rate
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-yellow-800">
+              Absent Days
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-yellow-800">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-yellow-200">
+          {% for student in chronic_absenteeism %}
+          <tr>
+            <td class="px-4 py-2 text-sm text-yellow-700">
+              {{ student.student }}
+            </td>
+            <td class="px-4 py-2 text-sm text-yellow-700">
+              {{ student.attendance_rate | round(1) }}%
+            </td>
+            <td class="px-4 py-2 text-sm text-yellow-700">
+              {{ student.absent_days }}
+            </td>
+            <td class="px-4 py-2 text-sm">
+              <a href="#" class="text-blue-600 hover:text-blue-800"
+                >View Details</a
+              >
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Student Attendance Summary -->
+  <div class="bg-white rounded-xl shadow-md p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-lg font-semibold text-gray-800">
+        Student Attendance Summary
+      </h2>
+      <a
+        href="{{ url_for('attendance.export_attendance', class_id=class_.id, term='Term 1', year=2025) }}"
+        class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+      >
+        <svg
+          class="w-4 h-4 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+          ></path>
+        </svg>
+        Export to CSV
+      </a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">
+              Student
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">
+              Present Days
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">
+              Total Days
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">
+              Attendance Rate
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for student in student_attendance %}
+          <tr>
+            <td class="px-4 py-2 text-sm font-medium text-gray-900">
+              {{ student.full_name }}
+            </td>
+            <td class="px-4 py-2 text-sm text-gray-500">
+              {{ student.present_days }}
+            </td>
+            <td class="px-4 py-2 text-sm text-gray-500">
+              {{ student.total_days }}
+            </td>
+            <td
+              class="px-4 py-2 text-sm font-medium {% if (student.present_days / student.total_days * 100) >= 90 %}text-green-600{% elif (student.present_days / student.total_days * 100) >= 80 %}text-yellow-600{% else %}text-red-600{% endif %}"
+            >
+              {{ (student.present_days / student.total_days * 100) | round(1)
+              }}%
+            </td>
+            <td class="px-4 py-2 text-sm">
+              {% if (student.present_days / student.total_days * 100) >= 90 %}
+              <span
+                class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                >Excellent</span
+              >
+              {% elif (student.present_days / student.total_days * 100) >= 80 %}
+              <span
+                class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full"
+                >Good</span
+              >
+              {% else %}
+              <span
+                class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full"
+                >Needs Improvement</span
+              >
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // This would be implemented with Chart.js or similar library
+  document.addEventListener("DOMContentLoaded", function () {
+    // Sample chart initialization code
+    console.log("Charts would be initialized here with data from the server");
+  });
+</script>
+{% endblock %}

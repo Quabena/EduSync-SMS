@@ -1,0 +1,565 @@
+{% extends "base.html" %} {% block title %}Select Attendance Date{% endblock %}
+{% block content %}
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+  body {
+    font-family: "Inter", sans-serif;
+  }
+
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .form-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .input-field {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(226, 232, 240, 0.6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .input-field:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+  }
+
+  .floating-label {
+    position: relative;
+  }
+
+  .floating-label label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    padding: 0 8px;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-label input:focus + label,
+  .floating-label select:focus + label,
+  .floating-label input:not(:placeholder-shown) + label,
+  .floating-label select:not([value=""]) + label {
+    top: 0;
+    font-size: 12px;
+    color: #3b82f6;
+    font-weight: 600;
+  }
+
+  .form-step {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideInUp 0.6s ease forwards;
+  }
+
+  .form-step:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .form-step:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .form-step:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .form-step:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .form-step:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+
+  @keyframes slideInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .progress-indicator {
+    background: linear-gradient(90deg, #e5e7eb 0%, #e5e7eb 100%);
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease;
+    border-radius: 2px;
+  }
+
+  .icon-wrapper {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  }
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .step-indicator.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+
+  .step-indicator.completed {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+</style>
+
+<div
+  class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50"
+>
+  <div class="max-w-2xl mx-auto px-4 py-12">
+    <!-- Enhanced Header -->
+    <div
+      class="glass-effect rounded-2xl shadow-xl p-8 mb-8 border border-white/20"
+    >
+      <div class="text-center space-y-4">
+        <div
+          class="icon-wrapper w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
+        >
+          <svg
+            class="w-8 h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1
+            class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
+          >
+            Select Attendance Date
+          </h1>
+          <p class="text-lg text-gray-600 font-medium mt-2">
+            Choose the term, year, and date for attendance marking
+          </p>
+        </div>
+      </div>
+
+      <!-- Progress Indicator -->
+      <div class="mt-8">
+        <div class="progress-indicator">
+          <div class="progress-bar" id="form-progress"></div>
+        </div>
+        <div class="flex justify-between mt-4">
+          <div class="flex items-center space-x-2">
+            <div class="step-indicator active" id="step-1">1</div>
+            <span class="text-sm font-medium text-gray-600">Class</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="step-indicator" id="step-2">2</div>
+            <span class="text-sm font-medium text-gray-600">Term</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="step-indicator" id="step-3">3</div>
+            <span class="text-sm font-medium text-gray-600">Year</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="step-indicator" id="step-4">4</div>
+            <span class="text-sm font-medium text-gray-600">Date</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Date Selection Form -->
+    <form method="POST" class="form-card rounded-2xl shadow-xl p-8 border">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+      <div class="space-y-8">
+        <!-- Class Selection -->
+        <div class="form-step floating-label">
+          <select
+            id="class_id"
+            name="class_id"
+            required
+            class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
+            onchange="updateProgress()"
+          >
+            <option value="">Select a Class</option>
+            {% for class_ in classes %}
+            <option value="{{ class_.id }}">{{ class_.name }}</option>
+            {% endfor %}
+          </select>
+          <label for="class_id">Class</label>
+          <div class="mt-2 flex items-center space-x-2">
+            <svg
+              class="w-4 h-4 text-indigo-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+            <span class="text-sm text-gray-500 font-medium"
+              >Choose the class for attendance marking</span
+            >
+          </div>
+        </div>
+
+        <!-- Term Selection -->
+        <div class="form-step floating-label">
+          <select
+            id="term"
+            name="term"
+            required
+            class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
+            onchange="updateProgress()"
+          >
+            <option value="">Select Term</option>
+            <option value="Term 1">Term 1</option>
+            <option value="Term 2">Term 2</option>
+            <option value="Term 3">Term 3</option>
+          </select>
+          <label for="term">Academic Term</label>
+          <div class="mt-2 flex items-center space-x-2">
+            <svg
+              class="w-4 h-4 text-indigo-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
+            </svg>
+            <span class="text-sm text-gray-500 font-medium"
+              >Select the academic term</span
+            >
+          </div>
+        </div>
+
+        <!-- Year Selection -->
+        <div class="form-step floating-label">
+          <select
+            id="year"
+            name="year"
+            required
+            class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
+            onchange="updateProgress()"
+          >
+            <option value="">Select Year</option>
+            {% for year in range(current_year - 2, current_year + 1) %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+          </select>
+          <label for="year">Academic Year</label>
+          <div class="mt-2 flex items-center space-x-2">
+            <svg
+              class="w-4 h-4 text-indigo-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
+              />
+            </svg>
+            <span class="text-sm text-gray-500 font-medium"
+              >Choose the academic year</span
+            >
+          </div>
+        </div>
+
+        <!-- Date Selection -->
+        <div class="form-step floating-label">
+          <input
+            type="date"
+            id="attendance_date"
+            name="attendance_date"
+            required
+            class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
+            max="{{ today.strftime('%Y-%m-%d') }}"
+            onchange="updateProgress()"
+          />
+          <label for="attendance_date">Attendance Date</label>
+          <div class="mt-2 flex items-center space-x-2">
+            <svg
+              class="w-4 h-4 text-indigo-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span class="text-sm text-gray-500 font-medium"
+              >Select the date for attendance marking</span
+            >
+          </div>
+        </div>
+
+        <!-- Enhanced Submit Section -->
+        <div class="form-step pt-6 border-t border-gray-200/60">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4"
+          >
+            <div class="text-center sm:text-left">
+              <p class="text-sm text-gray-600 font-medium">Ready to proceed?</p>
+              <p class="text-xs text-gray-500">
+                All fields must be completed to continue
+              </p>
+            </div>
+            <div class="flex space-x-3 w-full sm:w-auto">
+              <a
+                href="{{ url_for('attendance.attendance_dashboard') }}"
+                class="btn-secondary flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
+              >
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+                Cancel
+              </a>
+              <button
+                type="submit"
+                id="submit-btn"
+                disabled
+                class="btn-primary flex-1 sm:flex-none inline-flex items-center justify-center px-1 py-3 text-white rounded-xl font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+                Continue to Mark Attendance
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Enhanced Quick Tips -->
+    <div
+      class="mt-8 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/30"
+    >
+      <div class="flex items-center space-x-3 mb-4">
+        <div
+          class="p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg"
+        >
+          <svg
+            class="w-5 h-5 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Quick Tips</h3>
+      </div>
+      <div class="space-y-3 text-sm text-gray-600">
+        <div class="flex items-start space-x-3">
+          <div
+            class="w-2 h-2 bg-indigo-400 rounded-full mt-2 flex-shrink-0"
+          ></div>
+          <p>You can only mark attendance for today or past dates</p>
+        </div>
+        <div class="flex items-start space-x-3">
+          <div
+            class="w-2 h-2 bg-indigo-400 rounded-full mt-2 flex-shrink-0"
+          ></div>
+          <p>Default values are automatically set based on the current date</p>
+        </div>
+        <div class="flex items-start space-x-3">
+          <div
+            class="w-2 h-2 bg-indigo-400 rounded-full mt-2 flex-shrink-0"
+          ></div>
+          <p>You can modify attendance records for any previous date</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Set default date to today
+    document.getElementById("attendance_date").value = new Date()
+      .toISOString()
+      .split("T")[0];
+
+    // Set default year to current year
+    const currentYear = new Date().getFullYear();
+    document.getElementById("year").value = currentYear;
+
+    // Set default term based on current month
+    const currentMonth = new Date().getMonth() + 1;
+    let defaultTerm = "";
+    if (currentMonth >= 1 && currentMonth <= 4) defaultTerm = "Term 1";
+    else if (currentMonth >= 5 && currentMonth <= 8) defaultTerm = "Term 2";
+    else defaultTerm = "Term 3";
+
+    document.getElementById("term").value = defaultTerm;
+
+    // Initialize progress
+    updateProgress();
+  });
+
+  function updateProgress() {
+    const fields = ["class_id", "term", "year", "attendance_date"];
+    let completed = 0;
+
+    fields.forEach((fieldId, index) => {
+      const field = document.getElementById(fieldId);
+      const stepIndicator = document.getElementById(`step-${index + 1}`);
+
+      if (field.value) {
+        completed++;
+        stepIndicator.classList.add("completed");
+        stepIndicator.classList.remove("active");
+        stepIndicator.innerHTML = `
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      `;
+      } else {
+        stepIndicator.classList.remove("completed");
+        if (completed === index) {
+          stepIndicator.classList.add("active");
+        } else {
+          stepIndicator.classList.remove("active");
+        }
+        stepIndicator.textContent = index + 1;
+      }
+    });
+
+    // Update progress bar
+    const progressBar = document.getElementById("form-progress");
+    const progressPercentage = (completed / fields.length) * 100;
+    progressBar.style.width = `${progressPercentage}%`;
+
+    // Enable/disable submit button
+    const submitBtn = document.getElementById("submit-btn");
+    submitBtn.disabled = completed < fields.length;
+
+    if (completed === fields.length) {
+      submitBtn.classList.remove(
+        "disabled:opacity-50",
+        "disabled:cursor-not-allowed",
+        "disabled:transform-none"
+      );
+    } else {
+      submitBtn.classList.add(
+        "disabled:opacity-50",
+        "disabled:cursor-not-allowed",
+        "disabled:transform-none"
+      );
+    }
+  }
+
+  // Add smooth transitions for form interactions
+  document.querySelectorAll(".input-field").forEach((field) => {
+    field.addEventListener("focus", function () {
+      this.parentElement.classList.add("focused");
+    });
+
+    field.addEventListener("blur", function () {
+      this.parentElement.classList.remove("focused");
+    });
+  });
+</script>
+{% endblock %}

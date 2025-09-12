@@ -4,6 +4,7 @@ from pathlib import Path
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_moment import Moment
 from config import Config
 import os
 
@@ -40,6 +41,7 @@ def create_app(config_class=Config):
             app.config[key] = Path(str(val))
 
     # Initialize extensions
+    moment = Moment(app)
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)

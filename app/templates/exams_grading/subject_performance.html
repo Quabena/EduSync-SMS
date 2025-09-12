@@ -1,157 +1,655 @@
 {% extends "base.html" %} {% block title %}Subject Performance - {{ subject.name
-}}{% endblock %} {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-8">
-  <!-- Header -->
-  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Subject Performance</h1>
-    <p class="text-gray-600">{{ subject.name }} - {{ class_.name }}</p>
-  </div>
+}} - {{ class_.name }}{% endblock %} {% block content %}
 
-  <!-- Performance Overview -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-    <div class="bg-white rounded-xl shadow-md p-4">
-      <h3 class="text-sm font-medium text-gray-500">Total Students</h3>
-      <p class="text-2xl font-bold text-gray-800">
-        {{ performance_data | length }}
-      </p>
-    </div>
-    <div class="bg-white rounded-xl shadow-md p-4">
-      <h3 class="text-sm font-medium text-gray-500">Class Average</h3>
-      <p class="text-2xl font-bold text-gray-800">
-        {% set all_scores = [] %} {% for student_id, data in
-        performance_data.items() %} {% for score in data.scores.values() %} {%
-        set _ = all_scores.append(score) %} {% endfor %} {% endfor %} {{
-        (all_scores | sum / all_scores | length) | round(2) if all_scores else 0
-        }}
-      </p>
-    </div>
-    <div class="bg-white rounded-xl shadow-md p-4">
-      <h3 class="text-sm font-medium text-gray-500">Performance Trend</h3>
-      <p class="text-2xl font-bold text-gray-800">
-        {% set term_avgs = term_averages.values() %} {% if term_avgs | length >
-        1 %} {% if term_avgs | last > term_avgs | first %}Improving {% elif
-        term_avgs | last < term_avgs | first %}Declining {% else %}Stable {%
-        endif %} {% else %}N/A {% endif %}
-      </p>
-    </div>
-  </div>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-  <!-- Student Performance Table -->
-  <div class="bg-white rounded-xl shadow-md overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            Student
-          </th>
-          {% for term in term_averages.keys() %}
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            {{ term }}
-          </th>
-          {% endfor %}
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            Average
-          </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            Trend
-          </th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        {% for student_id, data in performance_data.items() %}
-        <tr>
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            {{ data.student.full_name }}
-          </td>
-          {% for term in term_averages.keys() %}
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            {{ data.scores.get(term, 'N/A') }}
-          </td>
-          {% endfor %}
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            {% set scores = data.scores.values() %} {{ (scores | sum / scores |
-            length) | round(2) if scores else 'N/A' }}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm">
-            {% set scores_list = data.scores.values() | list %} {% if
-            scores_list | length > 1 %}
-            <span
-              class="px-2 py-1 text-xs font-medium rounded-full {% if scores_list | last > scores_list | first %}bg-green-100 text-green-800{% elif scores_list | last < scores_list | first %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %}"
-            >
-              {% if scores_list | last > scores_list | first %}↑ {% elif
-              scores_list | last < scores_list | first %}↓ {% else %}→ {% endif
-              %}
-            </span>
-            {% else %}N/A {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      <!-- Class Averages Footer -->
-      <tfoot class="bg-gray-50">
-        <tr>
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            Class Average
-          </td>
-          {% for term, avg in term_averages.items() %}
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            {{ avg | round(2) }}
-          </td>
-          {% endfor %}
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            {{ (term_averages.values() | sum / term_averages | length) |
-            round(2) if term_averages else 0 }}
-          </td>
-          <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-          >
-            {% set avg_list = term_averages.values() | list %} {% if avg_list |
-            length > 1 %}
-            <span
-              class="px-2 py-1 text-xs font-medium rounded-full {% if avg_list | last > avg_list | first %}bg-green-100 text-green-800{% elif avg_list | last < avg_list | first %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %}"
-            >
-              {% if avg_list | last > avg_list | first %}↑ {% elif avg_list |
-              last < avg_list | first %}↓ {% else %}→ {% endif %}
-            </span>
-            {% else %}N/A {% endif %}
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+  body {
+    font-family: "Inter", sans-serif;
+  }
 
-  <!-- Action Buttons -->
-  <div class="mt-6 flex justify-between">
-    <a
-      href="{{ url_for('exams_grading.index') }}"
-      class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .analytics-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.3s ease;
+  }
+
+  .analytics-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  }
+
+  .icon-wrapper {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  }
+
+  .performance-excellent {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+
+  .performance-good {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+  }
+
+  .performance-average {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+  }
+
+  .performance-poor {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+  }
+
+  .progress-bar {
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+    height: 8px;
+    border-radius: 4px;
+    transition: width 0.8s ease;
+  }
+
+  .progress-bg {
+    background: #e5e7eb;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .chart-placeholder {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 2px dashed #cbd5e1;
+    min-height: 300px;
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  .fade-in:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .fade-in:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .fade-in:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .fade-in:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Table styles for the performance table */
+  .performance-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .performance-table th {
+    background-color: #f8fafc;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .performance-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .performance-table tr:hover {
+    background-color: #f1f5f9;
+  }
+
+  .trend-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 12px;
+  }
+
+  .trend-up {
+    background-color: #dcfce7;
+    color: #16a34a;
+  }
+
+  .trend-down {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+
+  .trend-stable {
+    background-color: #fef3c7;
+    color: #d97706;
+  }
+</style>
+
+<div
+  class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50"
+>
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Enhanced Header -->
+    <div
+      class="glass-effect rounded-2xl shadow-xl p-8 mb-8 border border-white/20 fade-in"
     >
-      Back to Dashboard
-    </a>
-    <button
-      onclick="window.print()"
-      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-    >
-      Print Report
-    </button>
+      <div
+        class="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-6 lg:space-y-0"
+      >
+        <div class="space-y-3">
+          <div class="flex items-center space-x-4">
+            <div
+              class="icon-wrapper w-16 h-16 rounded-2xl flex items-center justify-center"
+            >
+              <svg
+                class="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1
+                class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
+              >
+                Subject Performance
+              </h1>
+              <p class="text-lg text-gray-600 font-medium">
+                {{ subject.name }} - {{ class_.name }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4 text-sm">
+            <div class="flex items-center space-x-2">
+              <svg
+                class="w-4 h-4 text-indigo-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <span class="font-medium text-gray-700"
+                >{{ performance_data | length }} Students</span
+              >
+            </div>
+            <span class="text-gray-300">•</span>
+            <span
+              class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold"
+            >
+              Current Term
+            </span>
+          </div>
+        </div>
+
+        <div class="flex space-x-3">
+          <a
+            href="{{ url_for('exams_grading.select_grading_period', class_id=class_.id, subject_id=subject.id) }}"
+            class="btn-success inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            Grade Students
+          </a>
+          <a
+            href="{{ url_for('exams_grading.index') }}"
+            class="btn-secondary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 fade-in">
+      <div class="analytics-card rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center space-x-4">
+          <div
+            class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+          </div>
+          <div>
+            {% set all_scores = [] %} {% for student_id, data in
+            performance_data.items() %} {% for score in data.scores.values() %}
+            {% if score is number %} {% set _ = all_scores.append(score) %} {%
+            endif %} {% endfor %} {% endfor %} {% set class_avg = (all_scores |
+            sum / all_scores | length) | round(2) if all_scores else 0 %}
+            <p class="text-3xl font-bold text-gray-800">{{ class_avg }}%</p>
+            <p class="text-sm font-medium text-gray-500">Class Average</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-card rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center space-x-4">
+          <div
+            class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+              />
+            </svg>
+          </div>
+          <div>
+            {% set max_score = all_scores | max if all_scores else 0 %}
+            <p class="text-3xl font-bold text-gray-800">{{ max_score }}%</p>
+            <p class="text-sm font-medium text-gray-500">Highest Score</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-card rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center space-x-4">
+          <div
+            class="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
+              />
+            </svg>
+          </div>
+          <div>
+            {% set min_score = all_scores | min if all_scores else 0 %}
+            <p class="text-3xl font-bold text-gray-800">{{ min_score }}%</p>
+            <p class="text-sm font-medium text-gray-500">Lowest Score</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-card rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center space-x-4">
+          <div
+            class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            {% set passing_count = all_scores | select('>=', 50) | list | length
+            %} {% set pass_rate = ((passing_count / all_scores | length) * 100)
+            | round(2) if all_scores else 0 %}
+            <p class="text-3xl font-bold text-gray-800">{{ pass_rate }}%</p>
+            <p class="text-sm font-medium text-gray-500">Pass Rate</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Performance Table (from old design) -->
+    <div class="analytics-card rounded-2xl shadow-xl border fade-in mb-8">
+      <div class="p-6 border-b border-gray-200/60">
+        <div class="flex items-center space-x-3">
+          <div
+            class="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg"
+          >
+            <svg
+              class="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-800">
+            Student Performance by Term
+          </h2>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="performance-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              {% for term in term_averages.keys() %}
+              <th>{{ term }}</th>
+              {% endfor %}
+              <th>Average</th>
+              <th>Trend</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student_id, data in performance_data.items() %}
+            <tr>
+              <td class="font-medium">{{ data.student.full_name }}</td>
+              {% for term in term_averages.keys() %}
+              <td>{{ data.scores.get(term, 'N/A') }}</td>
+              {% endfor %}
+              <td class="font-medium">
+                {% set scores = data.scores.values() | select('number') | list
+                %} {{ (scores | sum / scores | length) | round(2) if scores else
+                'N/A' }}
+              </td>
+              <td>
+                {% set scores_list = data.scores.values() | select('number') |
+                list %} {% if scores_list | length > 1 %} {% if scores_list |
+                last > scores_list | first %}
+                <span class="trend-indicator trend-up">↑</span>
+                {% elif scores_list | last < scores_list | first %}
+                <span class="trend-indicator trend-down">↓</span>
+                {% else %}
+                <span class="trend-indicator trend-stable">→</span>
+                {% endif %} {% else %} N/A {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr class="bg-gray-50 font-semibold">
+              <td>Class Average</td>
+              {% for term, avg in term_averages.items() %}
+              <td>{{ avg | round(2) }}</td>
+              {% endfor %}
+              <td>
+                {{ (term_averages.values() | sum / term_averages | length) |
+                round(2) if term_averages else 0 }}
+              </td>
+              <td>
+                {% set avg_list = term_averages.values() | list %} {% if
+                avg_list | length > 1 %} {% if avg_list | last > avg_list |
+                first %}
+                <span class="trend-indicator trend-up">↑</span>
+                {% elif avg_list | last < avg_list | first %}
+                <span class="trend-indicator trend-down">↓</span>
+                {% else %}
+                <span class="trend-indicator trend-stable">→</span>
+                {% endif %} {% else %} N/A {% endif %}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Performance Distribution -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+      <!-- Grade Distribution -->
+      <div class="analytics-card rounded-2xl shadow-xl border fade-in">
+        <div class="p-6 border-b border-gray-200/60">
+          <div class="flex items-center space-x-3">
+            <div
+              class="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg"
+            >
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Grade Distribution</h2>
+          </div>
+        </div>
+        <div class="p-6">
+          {% set grade_ranges = [ {"letter": "A", "range": "90-100%",
+          "description": "Excellent", "level": "excellent", "min": 90, "max":
+          100}, {"letter": "B", "range": "80-89%", "description": "Good",
+          "level": "good", "min": 80, "max": 89}, {"letter": "C", "range":
+          "70-79%", "description": "Average", "level": "average", "min": 70,
+          "max": 79}, {"letter": "D", "range": "60-69%", "description": "Below
+          Average", "level": "poor", "min": 60, "max": 69}, {"letter": "F",
+          "range": "0-59%", "description": "Fail", "level": "poor", "min": 0,
+          "max": 59} ] %} {% set grade_counts = {} %} {% for grade in
+          grade_ranges %} {% set count = all_scores | select('>=', grade.min) |
+          select('<=', grade.max) | list | length %} {% set _ =
+          grade_counts.update({grade.letter: count}) %} {% endfor %}
+
+          <div class="space-y-4">
+            {% for grade in grade_ranges %} {% set count =
+            grade_counts[grade.letter] %} {% set percentage = ((count /
+            all_scores | length) * 100) | round(1) if all_scores else 0 %}
+            <div
+              class="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
+            >
+              <div class="flex items-center space-x-3">
+                <div
+                  class="w-8 h-8 performance-{{ grade.level }} rounded-lg flex items-center justify-center font-bold text-sm"
+                >
+                  {{ grade.letter }}
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800">{{ grade.range }}</p>
+                  <p class="text-xs text-gray-500">{{ grade.description }}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-2xl font-bold text-gray-800">{{ count }}</p>
+                <p class="text-xs text-gray-500">{{ percentage }}%</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Chart -->
+      <div class="analytics-card rounded-2xl shadow-xl border fade-in">
+        <div class="p-6 border-b border-gray-200/60">
+          <div class="flex items-center space-x-3">
+            <div
+              class="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg"
+            >
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Performance Trends</h2>
+          </div>
+        </div>
+        <div class="p-6">
+          <div
+            class="chart-placeholder rounded-xl flex flex-col items-center justify-center"
+          >
+            <svg
+              class="w-16 h-16 text-gray-400 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            <p class="text-gray-500 text-center font-medium">
+              Performance trend chart<br />
+              <span class="text-sm"
+                >{{ subject.name }} - {{ class_.name }}</span
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-6 flex justify-between fade-in">
+      <a
+        href="{{ url_for('exams_grading.index') }}"
+        class="btn-secondary inline-flex items-center px-4 py-2 text-white rounded-md"
+      >
+        Back to Dashboard
+      </a>
+      <button
+        onclick="window.print()"
+        class="btn-primary inline-flex items-center px-4 py-2 text-white rounded-md"
+      >
+        Print Report
+      </button>
+    </div>
   </div>
 </div>
+
+<script>
+  // Initialize progress bars animation
+  document.addEventListener("DOMContentLoaded", function () {
+    const progressBars = document.querySelectorAll(".progress-bar");
+    progressBars.forEach((bar) => {
+      const width = bar.style.width;
+      bar.style.width = "0%";
+      setTimeout(() => {
+        bar.style.width = width;
+      }, 500);
+    });
+  });
+</script>
 {% endblock %}

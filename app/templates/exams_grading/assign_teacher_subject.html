@@ -1,545 +1,881 @@
-{% extends "base.html" %} {% block title %}Assign Teachers - Teacher Assignment
-System{% endblock %} {% block content %}
-<div class="max-w-6xl mx-auto space-y-8">
-  <!-- Assignment Form Card -->
-  <div
-    class="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 animate-fade-in"
-  >
-    <div class="flex items-center space-x-4 mb-8">
-      <div
-        class="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg"
-      >
-        <i class="fas fa-user-plus text-white text-2xl"></i>
-      </div>
-      <div>
-        <h2 class="text-3xl font-bold text-gray-800">
-          Assign Teacher to Subject
-        </h2>
-        <p class="text-gray-600 mt-1">
-          Create new teaching assignments for classes
-        </p>
-      </div>
-    </div>
+{% extends "base.html" %} {% block title %}Assign Teachers to Subjects{%
+endblock %} {% block content %}
 
-    <form id="assignmentForm" method="POST" class="space-y-6">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Teacher Selection -->
-        <div class="space-y-3">
-          <label
-            for="teacher_id"
-            class="flex items-center space-x-2 text-sm font-bold text-gray-700"
-          >
-            <i class="fas fa-user text-blue-500"></i>
-            <span>Select Teacher</span>
-          </label>
-          <div class="relative">
-            <select
-              name="teacher_id"
-              id="teacher_id"
-              class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-300 appearance-none cursor-pointer"
-              required
-            >
-              <option value="">Choose a teacher...</option>
-              {% for teacher in teachers %}
-              <option value="{{ teacher.id }}">{{ teacher.full_name }}</option>
-              {% endfor %}
-            </select>
-            <i
-              class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-            ></i>
-          </div>
-        </div>
+  body {
+    font-family: "Inter", sans-serif;
+  }
 
-        <!-- Subject Selection -->
-        <div class="space-y-3">
-          <label
-            for="subject_id"
-            class="flex items-center space-x-2 text-sm font-bold text-gray-700"
-          >
-            <i class="fas fa-book text-green-500"></i>
-            <span>Select Subject</span>
-          </label>
-          <div class="relative">
-            <select
-              name="subject_id"
-              id="subject_id"
-              class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-300 appearance-none cursor-pointer"
-              required
-            >
-              <option value="">Choose a subject...</option>
-              {% for subject in subjects %}
-              <option value="{{ subject.id }}">{{ subject.name }}</option>
-              {% endfor %}
-            </select>
-            <i
-              class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-            ></i>
-          </div>
-        </div>
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
 
-        <!-- Class Selection -->
-        <div class="space-y-3">
-          <label
-            for="class_id"
-            class="flex items-center space-x-2 text-sm font-bold text-gray-700"
-          >
-            <i class="fas fa-graduation-cap text-purple-500"></i>
-            <span>Select Class</span>
-          </label>
-          <div class="relative">
-            <select
-              name="class_id"
-              id="class_id"
-              class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-300 appearance-none cursor-pointer"
-              required
-            >
-              <option value="">Choose a class...</option>
-              {% for class in classes %}
-              <option value="{{ class.id }}">{{ class.name }}</option>
-              {% endfor %}
-            </select>
-            <i
-              class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-            ></i>
-          </div>
-        </div>
-      </div>
+  .form-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
 
-      <!-- Submit Button -->
-      <div class="flex justify-end pt-6">
-        <button
-          type="submit"
-          id="submitBtn"
-          class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-blue-500/30 shadow-lg hover:shadow-xl flex items-center space-x-3"
-        >
-          <i class="fas fa-plus-circle"></i>
-          <span>Create Assignment</span>
-          <div id="loadingSpinner" class="hidden animate-spin">
-            <i class="fas fa-spinner"></i>
-          </div>
-        </button>
-      </div>
-    </form>
-  </div>
+  .input-field {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(226, 232, 240, 0.6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-  <!-- Current Assignments Display -->
-  <div
-    class="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 animate-fade-in"
-  >
-    <div class="flex items-center space-x-4 mb-6">
-      <div
-        class="p-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg"
-      >
-        <i class="fas fa-list-check text-white text-2xl"></i>
-      </div>
-      <div>
-        <h3 class="text-2xl font-bold text-gray-800">Current Assignments</h3>
-        <p class="text-gray-600 mt-1">Active teacher-subject assignments</p>
-      </div>
-    </div>
+  .input-field:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+  }
 
-    <div id="assignmentsList" class="space-y-4">
-      <!-- Assignments will be loaded here -->
-      <div class="text-center py-8 text-gray-500">
-        <i class="fas fa-clipboard-list text-4xl mb-4 opacity-50"></i>
-        <p>Loading assignments...</p>
-      </div>
-    </div>
-  </div>
-</div>
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
 
-<!-- Reassignment Modal -->
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    transition: all 0.3s ease;
+  }
+
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    transition: all 0.3s ease;
+  }
+
+  .btn-warning:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+  }
+
+  .floating-label {
+    position: relative;
+  }
+
+  .floating-label label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    padding: 0 8px;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-label select:focus + label,
+  .floating-label select:not([value=""]) + label {
+    top: 0;
+    font-size: 12px;
+    color: #3b82f6;
+    font-weight: 600;
+  }
+
+  .assignment-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.3s ease;
+  }
+
+  .assignment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .icon-wrapper {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  .fade-in:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .fade-in:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .fade-in:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .status-active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+
+  .status-inactive {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+  }
+
+  .table-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .table-row {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  }
+
+  .table-row:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    transform: translateX(2px);
+  }
+</style>
+
 <div
-  id="reassignModal"
-  class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4"
+  class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50"
 >
-  <div
-    class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform transition-all duration-300 scale-95 animate-slide-up"
-  >
-    <div class="flex items-center space-x-4 mb-6">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Enhanced Header -->
+    <div
+      class="glass-effect rounded-2xl shadow-xl p-8 mb-8 border border-white/20 fade-in"
+    >
       <div
-        class="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg"
+        class="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-6 lg:space-y-0"
       >
-        <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
-      </div>
-      <div>
-        <h3 class="text-xl font-bold text-gray-800">Assignment Conflict</h3>
-        <p class="text-sm text-gray-600">This assignment already exists</p>
-      </div>
-    </div>
-
-    <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
-      <p class="text-gray-700 mb-2" id="modalMessage">
-        This class-subject combination is already assigned to a teacher.
-      </p>
-      <p class="text-sm text-orange-600 font-medium">
-        Would you like to reassign this class to a different teacher?
-      </p>
-    </div>
-
-    <div class="mb-6">
-      <label
-        for="reassign_teacher"
-        class="flex items-center space-x-2 text-sm font-bold text-gray-700 mb-3"
-      >
-        <i class="fas fa-user-edit text-blue-500"></i>
-        <span>Reassign to:</span>
-      </label>
-      <div class="relative">
-        <select
-          name="reassign_teacher"
-          id="reassign_teacher"
-          class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
-        >
-          <option value="">Select a teacher...</option>
-          {% for teacher in teachers %}
-          <option value="{{ teacher.id }}">{{ teacher.full_name }}</option>
-          {% endfor %}
-        </select>
-        <i
-          class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-        ></i>
-      </div>
-    </div>
-
-    <div class="flex justify-end space-x-4">
-      <button
-        type="button"
-        id="cancelReassign"
-        class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
-      >
-        <i class="fas fa-times mr-2"></i>
-        Cancel
-      </button>
-      <button
-        type="button"
-        id="confirmReassign"
-        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-      >
-        <i class="fas fa-exchange-alt mr-2"></i>
-        <span>Reassign</span>
-        <div id="reassignSpinner" class="hidden animate-spin ml-2">
-          <i class="fas fa-spinner"></i>
+        <div class="space-y-3">
+          <div class="flex items-center space-x-4">
+            <div
+              class="icon-wrapper w-16 h-16 rounded-2xl flex items-center justify-center"
+            >
+              <svg
+                class="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1
+                class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
+              >
+                Assign Teachers
+              </h1>
+              <p class="text-lg text-gray-600 font-medium">
+                Manage teacher-subject-class assignments for academic year
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 text-sm text-gray-500">
+            <svg
+              class="w-4 h-4 text-indigo-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
+              />
+            </svg>
+            <span class="font-medium">Academic Year 2025</span>
+            <span class="text-gray-300">•</span>
+            <span
+              class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold"
+            >
+              Active Assignments
+            </span>
+          </div>
         </div>
-      </button>
+
+        <div class="flex space-x-3">
+          <a
+            href="{{ url_for('exams_grading.view_assignments') }}"
+            class="btn-secondary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            View All Assignments
+          </a>
+          <a
+            href="{{ url_for('exams_grading.index') }}"
+            class="btn-primary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assignment Form -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+      <div class="xl:col-span-1">
+        <div class="form-card rounded-2xl shadow-xl p-8 border fade-in">
+          <div class="flex items-center space-x-3 mb-8">
+            <div
+              class="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">New Assignment</h2>
+          </div>
+
+          <form id="assignment-form" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+            <!-- Teacher Selection -->
+            <div class="floating-label">
+              <select
+                id="teacher_id"
+                name="teacher_id"
+                required
+                class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
+              >
+                <option value="">Select Teacher</option>
+                {% for teacher in teachers %}
+                <option value="{{ teacher.id }}">
+                  {{ teacher.full_name }}
+                </option>
+                {% endfor %}
+              </select>
+              <label for="teacher_id">Teacher</label>
+            </div>
+
+            <!-- Subject Selection -->
+            <div class="floating-label">
+              <select
+                id="subject_id"
+                name="subject_id"
+                required
+                class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
+              >
+                <option value="">Select Subject</option>
+                {% for subject in subjects %}
+                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
+              </select>
+              <label for="subject_id">Subject</label>
+            </div>
+
+            <!-- Class Selection -->
+            <div class="floating-label">
+              <select
+                id="class_id"
+                name="class_id"
+                required
+                class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
+              >
+                <option value="">Select Class</option>
+                {% for class_ in classes %}
+                <option value="{{ class_.id }}">{{ class_.name }}</option>
+                {% endfor %}
+              </select>
+              <label for="class_id">Class</label>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn-primary w-full px-6 py-4 text-white rounded-xl font-semibold shadow-lg"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Create Assignment
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Current Assignments -->
+      <div class="xl:col-span-2">
+        <div class="table-card rounded-2xl shadow-xl border fade-in">
+          <div class="p-6 border-b border-gray-200/60">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div
+                  class="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg"
+                >
+                  <svg
+                    class="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">
+                  Current Assignments
+                </h2>
+              </div>
+              <span
+                class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full"
+              >
+                Active: {{ assignments | length }}
+              </span>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                <tr>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Teacher
+                  </th>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Subject
+                  </th>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Class
+                  </th>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white" id="assignments-table">
+                {% for assignment in assignments %}
+                <tr class="table-row" data-assignment-id="{{ assignment.id }}">
+                  <td class="py-4 px-6">
+                    <div class="flex items-center space-x-3">
+                      <div
+                        class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg"
+                      >
+                        {{ assignment.teacher.full_name.split()[0][0] if
+                        assignment.teacher else 'N' }}{{
+                        assignment.teacher.full_name.split()[-1][0] if
+                        assignment.teacher and
+                        assignment.teacher.full_name.split()|length > 1 else 'A'
+                        }}
+                      </div>
+                      <div>
+                        <p class="text-sm font-semibold text-gray-900">
+                          {{ assignment.teacher.full_name if assignment.teacher
+                          else 'Unknown Teacher' }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          {{ assignment.teacher.email if assignment.teacher else
+                          'No email' }}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6">
+                    <div class="flex items-center space-x-2">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center"
+                      >
+                        <svg
+                          class="w-4 h-4 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                          />
+                        </svg>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900"
+                        >{{ assignment.subject.name if assignment.subject else
+                        'Unknown Subject' }}</span
+                      >
+                    </div>
+                  </td>
+                  <td class="py-4 px-6">
+                    <div class="flex items-center space-x-2">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center"
+                      >
+                        <svg
+                          class="w-4 h-4 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h10M7 15h10"
+                          />
+                        </svg>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900"
+                        >{{ assignment.class_.name if assignment.class_ else
+                        'Unknown Class' }}</span
+                      >
+                    </div>
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="status-badge status-active">
+                      <svg
+                        class="w-3 h-3 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-6">
+                    <div class="flex space-x-2">
+                      <button
+                        onclick="reassignTeacher({{ assignment.id }})"
+                        class="btn-warning text-xs px-3 py-1 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
+                      >
+                        <svg
+                          class="w-3 h-3 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                          />
+                        </svg>
+                        Reassign
+                      </button>
+                      <button
+                        onclick="unassignTeacher({{ assignment.id }})"
+                        class="btn-danger text-xs px-3 py-1 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
+                      >
+                        <svg
+                          class="w-3 h-3 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                        Remove
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="5" class="py-12 text-center">
+                    <svg
+                      class="w-16 h-16 text-gray-400 mx-auto mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                      />
+                    </svg>
+                    <p class="text-lg text-gray-500 font-medium mb-2">
+                      No assignments found
+                    </p>
+                    <p class="text-sm text-gray-400">
+                      Create your first teacher assignment to get started
+                    </p>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in">
+      <div class="assignment-card rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center space-x-4">
+          <div
+            class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-gray-800">
+              {{ teachers | length }}
+            </p>
+            <p class="text-sm font-medium text-gray-500">Total Teachers</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="assignment-card rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center space-x-4">
+          <div
+            class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-gray-800">
+              {{ subjects | length }}
+            </p>
+            <p class="text-sm font-medium text-gray-500">Total Subjects</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="assignment-card rounded-2xl shadow-lg p-6 border">
+        <div class="flex items-center space-x-4">
+          <div
+            class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h10M7 15h10"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-gray-800">
+              {{ classes | length }}
+            </p>
+            <p class="text-sm font-medium text-gray-500">Total Classes</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-  // Notification function
-  function showNotification(type, message) {
-    // Remove any existing notifications
-    const existingNotifications = document.querySelectorAll(
-      ".custom-notification"
-    );
-    existingNotifications.forEach((notif) => notif.remove());
-
-    const notification = document.createElement("div");
-    notification.className = `custom-notification fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-lg text-white font-medium transform transition-all duration-300 ${
-      type === "success"
-        ? "bg-gradient-to-r from-green-500 to-emerald-600"
-        : "bg-gradient-to-r from-red-500 to-orange-600"
-    }`;
-    notification.innerHTML = `
-    <div class="flex items-center space-x-3">
-      <i class="fas ${
-        type === "success" ? "fa-check-circle" : "fa-exclamation-circle"
-      }"></i>
-      <span>${message}</span>
-    </div>
-  `;
-
-    document.body.appendChild(notification);
-
-    // Animate in
-    setTimeout(() => {
-      notification.classList.add("translate-x-0", "opacity-100");
-    }, 10);
-
-    // Remove after 5 seconds
-    setTimeout(() => {
-      notification.classList.remove("translate-x-0", "opacity-100");
-      notification.classList.add("translate-x-full", "opacity-0");
-      setTimeout(() => notification.remove(), 300);
-    }, 5000);
-  }
-  document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("assignmentForm");
-    const modal = document.getElementById("reassignModal");
-    const modalMessage = document.getElementById("modalMessage");
-    const reassignTeacher = document.getElementById("reassign_teacher");
-    const cancelBtn = document.getElementById("cancelReassign");
-    const confirmBtn = document.getElementById("confirmReassign");
-    const submitBtn = document.getElementById("submitBtn");
-    const loadingSpinner = document.getElementById("loadingSpinner");
-    const reassignSpinner = document.getElementById("reassignSpinner");
-
-    let currentAssignmentId = null;
-    let currentFormData = null;
-
-    // Load assignments function
-    function loadAssignments() {
-      fetch('{{ url_for("exams_grading.view_assignments") }}', {
-        method: "GET",
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          Accept: "application/json",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          const assignmentsList = document.getElementById("assignmentsList");
-          if (data.assignments && data.assignments.length > 0) {
-            assignmentsList.innerHTML = data.assignments
-              .map(
-                (assignment) => `
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 hover:shadow-md transition-all duration-200">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <div class="p-3 bg-blue-100 rounded-xl">
-                <i class="fas fa-user text-blue-600 text-xl"></i>
-              </div>
-              <div>
-                <p class="font-bold text-gray-800 text-lg">${assignment.teacher_name}</p>
-                <p class="text-gray-600">
-                  <i class="fas fa-book mr-2 text-green-500"></i>${assignment.subject_name}
-                </p>
-                <p class="text-gray-600">
-                  <i class="fas fa-graduation-cap mr-2 text-purple-500"></i>${assignment.class_name}
-                </p>
-              </div>
-            </div>
-            <div class="flex items-center space-x-4">
-              <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                <i class="fas fa-check-circle mr-1"></i>Active
-              </span>
-              
-            </div>
-          </div>
-        </div>
-      `
-              )
-              .join("");
-          } else {
-            assignmentsList.innerHTML = `
-        <div class="text-center py-12 text-gray-500">
-          <i class="fas fa-clipboard-list text-6xl mb-6 opacity-50"></i>
-          <p class="text-xl font-medium mb-2">No assignments found</p>
-          <p class="text-gray-600">Create your first assignment to get started</p>
-        </div>
-      `;
-          }
-        })
-        .catch((error) => {
-          console.error("Error loading assignments:", error);
-          document.getElementById("assignmentsList").innerHTML = `
-      <div class="text-center py-8 text-red-500">
-        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
-        <p>Error loading assignments. Please refresh the page.</p>
-      </div>
-    `;
-        });
-    }
-
-    // Call this function on page load
-    document.addEventListener("DOMContentLoaded", function () {
-      loadAssignments();
-    });
-    // Load assignments on page load
-    loadAssignments();
-
-    // Form submission
-    form.addEventListener("submit", function (e) {
+  // Form submission handler
+  document
+    .getElementById("assignment-form")
+    .addEventListener("submit", function (e) {
       e.preventDefault();
 
-      // Show loading state
-      submitBtn.disabled = true;
-      loadingSpinner.classList.remove("hidden");
-      submitBtn.querySelector("span").textContent = "Creating...";
+      const formData = new FormData(this);
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
 
-      const formData = new FormData(form);
-      const data = new URLSearchParams();
-      for (const [key, value] of formData.entries()) {
-        data.append(key, value);
-      }
+      // Show loading state
+      submitBtn.innerHTML = `
+    <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Creating...
+  `;
+      submitBtn.disabled = true;
 
       fetch('{{ url_for("exams_grading.assign_teacher_subject") }}', {
         method: "POST",
-        headers: {
-          "X-CSRFToken": formData.get("csrf_token"),
-        },
-        body: data,
+        body: formData,
       })
-        .then((response) => {
-          // Check if response is JSON
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            return response
-              .json()
-              .then((data) => ({ status: response.status, data }));
-          } else {
-            return response
-              .text()
-              .then((text) => ({ status: response.status, text }));
-          }
-        })
-        .then((result) => {
-          // Reset loading state
-          submitBtn.disabled = false;
-          loadingSpinner.classList.add("hidden");
-          submitBtn.querySelector("span").textContent = "Create Assignment";
-
-          if (result.status === 409) {
-            // This is a conflict - show reassignment modal
-            modalMessage.textContent = result.data.message;
-            currentAssignmentId = result.data.assignment_id;
-            modal.classList.remove("hidden");
-            modal.querySelector(".bg-white").classList.add("scale-100");
-            modal.querySelector(".bg-white").classList.remove("scale-95");
-          } else if (
-            result.status === 200 &&
-            result.data.status === "success"
-          ) {
-            showNotification("success", "Assignment created successfully!");
-            form.reset();
-            loadAssignments(); // Reload assignments
-          } else {
-            showNotification(
-              "error",
-              result.data.message ||
-                "An error occurred while creating assignment."
-            );
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            showNotification(data.message, "success");
+            this.reset();
+            // Refresh the assignments table
+            location.reload();
+          } else if (data.status === "error") {
+            if (data.assignment_data) {
+              // Show reassignment option
+              showReassignmentModal(data);
+            } else {
+              showNotification(data.message, "error");
+            }
           }
         })
         .catch((error) => {
           console.error("Error:", error);
-          // Reset loading state
-          submitBtn.disabled = false;
-          loadingSpinner.classList.add("hidden");
-          submitBtn.querySelector("span").textContent = "Create Assignment";
           showNotification(
-            "error",
-            "An error occurred while creating assignment."
+            "An error occurred while creating the assignment",
+            "error"
           );
+        })
+        .finally(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
         });
     });
 
-    // Cancel reassignment
-    cancelBtn.addEventListener("click", function () {
-      closeModal();
-    });
+  function showReassignmentModal(data) {
+    const modal = document.createElement("div");
+    modal.className =
+      "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+    modal.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800">Assignment Conflict</h3>
+      </div>
+      <p class="text-gray-600 mb-6">${data.message}</p>
+      <div class="flex space-x-3">
+        <button onclick="closeModal()" class="flex-1 btn-secondary px-4 py-2 text-white rounded-xl font-semibold">Cancel</button>
+        <button onclick="proceedWithReassignment(${JSON.stringify(
+          data.assignment_data
+        ).replace(
+          /"/g,
+          "&quot;"
+        )})" class="flex-1 btn-warning px-4 py-2 text-white rounded-xl font-semibold">Reassign</button>
+      </div>
+    </div>
+  `;
+    document.body.appendChild(modal);
+  }
 
-    // Confirm reassignment
-    // Confirm reassignment
-    confirmBtn.addEventListener("click", function () {
-      if (!reassignTeacher.value) {
-        showNotification("error", "Please select a teacher for reassignment");
-        return;
-      }
+  function proceedWithReassignment(assignmentData) {
+    // Implementation for reassignment
+    closeModal();
+    showNotification(
+      "Reassignment functionality would be implemented here",
+      "info"
+    );
+  }
 
-      // Show loading state
-      confirmBtn.disabled = true;
-      reassignSpinner.classList.remove("hidden");
-      confirmBtn.querySelector("span").textContent = "Reassigning...";
+  function reassignTeacher(assignmentId) {
+    showNotification(
+      "Reassignment functionality would be implemented here",
+      "info"
+    );
+  }
 
-      const data = new FormData();
-      data.append("assignment_id", currentAssignmentId);
-      data.append("teacher_id", reassignTeacher.value);
-      data.append(
-        "csrf_token",
-        document.querySelector("input[name=csrf_token]").value
-      );
-
-      fetch('{{ url_for("exams_grading.reassign_teacher_subject") }}', {
-        method: "POST",
-        body: data,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((result) => {
-          // Reset loading state
-          confirmBtn.disabled = false;
-          reassignSpinner.classList.add("hidden");
-          confirmBtn.querySelector("span").textContent = "Reassign";
-
-          if (result.status === "success") {
-            showNotification("success", "Reassignment successful!");
-            closeModal();
-            form.reset();
-            loadAssignments(); // Reload assignments
-          } else {
-            showNotification(
-              "error",
-              result.message || "An error occurred during reassignment."
-            );
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          // Reset loading state
-          confirmBtn.disabled = false;
-          reassignSpinner.classList.add("hidden");
-          confirmBtn.querySelector("span").textContent = "Reassign";
-          showNotification("error", "An error occurred during reassignment.");
-        });
-    });
-
-    // Close modal function
-    function closeModal() {
-      modal.querySelector(".bg-white").classList.add("scale-95");
-      modal.querySelector(".bg-white").classList.remove("scale-100");
-      setTimeout(() => {
-        modal.classList.add("hidden");
-        currentAssignmentId = null;
-        currentFormData = null;
-        reassignTeacher.value = "";
-      }, 200);
-    }
-
-    // Close modal when clicking outside
-    modal.addEventListener("click", function (e) {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
-
-    // Add keyboard support
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && !modal.classList.contains("hidden")) {
-        closeModal();
-      }
-    });
-  });
-
-  function unassignAssignment(assignmentId) {
-    currentAssignmentId = assignmentId;
-    document.getElementById("confirmModal").classList.remove("hidden");
+  function unassignTeacher(assignmentId) {
     if (!confirm("Are you sure you want to remove this assignment?")) return;
 
-    fetch(`/exams_grading/unassign/${id}`, {
-      method: "DELETE",
-      headers: { "X-CSRFToken": "{{ csrf_token() }}" },
+    const formData = new FormData();
+    formData.append("csrf_token", "{{ csrf_token() }}");
+    formData.append("assignment_id", assignmentId);
+
+    fetch('{{ url_for("exams_grading.unassign_teacher_subject") }}', {
+      method: "POST",
+      body: formData,
     })
-      .then((resp) => resp.json())
+      .then((response) => response.json())
       .then((data) => {
         if (data.status === "success") {
-          showNotification("success", "Assignment removed");
-          loadAssignments();
+          showNotification(data.message, "success");
+          // Remove the row from table
+          const row = document.querySelector(
+            `tr[data-assignment-id="${assignmentId}"]`
+          );
+          if (row) {
+            row.style.opacity = "0";
+            row.style.transform = "translateX(-100%)";
+            setTimeout(() => row.remove(), 300);
+          }
         } else {
-          showNotification("error", data.message || "Failed to unassign");
+          showNotification(data.message, "error");
         }
       })
-      .catch((err) => {
-        console.error("Error:", err);
-        showNotification("error", "Server error while unassigning");
+      .catch((error) => {
+        console.error("Error:", error);
+        showNotification(
+          "An error occurred while removing the assignment",
+          "error"
+        );
       });
+  }
+
+  function closeModal() {
+    const modal = document.querySelector(".fixed.inset-0");
+    if (modal) modal.remove();
+  }
+
+  function showNotification(message, type = "info") {
+    const notification = document.createElement("div");
+    const colors = {
+      success: "bg-green-500",
+      error: "bg-red-500",
+      warning: "bg-yellow-500",
+      info: "bg-blue-500",
+    };
+
+    notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.style.transform = "translateX(0)";
+    }, 100);
+
+    setTimeout(() => {
+      notification.style.transform = "translateX(full)";
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
   }
 </script>
 {% endblock %}

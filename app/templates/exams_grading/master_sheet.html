@@ -1,446 +1,1256 @@
-{% extends "base.html" %} {% block title %}Master Sheet - {{ class_group }} {{
+{% extends "base.html" %} {% block title %}Master Sheet - {{ class_group }} - {{
 term }} {{ year }}{% endblock %} {% block content %}
-<div
-  class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8"
->
-  <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Back Navigation -->
-    <div class="mb-6 animate-fade-in">
-      <a
-        href="{{ url_for('exams_grading.index') }}"
-        class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-all duration-200 group bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg hover:shadow-xl"
-      >
-        <i
-          class="fas fa-arrow-left mr-3 transform group-hover:-translate-x-1 transition-transform duration-200"
-        ></i>
-        <span class="font-medium">Back to Grading Dashboard</span>
-      </a>
-    </div>
 
-    <!-- Page Header -->
-    <div class="mb-8 animate-slide-up">
-      <div
-        class="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20"
-      >
-        <div class="flex items-center space-x-6">
-          <div class="flex-shrink-0">
-            <div
-              class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg"
-            >
-              <i class="fas fa-chart-bar text-white text-2xl"></i>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&display=swap");
+
+  :root {
+    --primary: #1a4f72;
+    --primary-light: #2c6c9a;
+    --primary-dark: #0d3a5c;
+    --secondary: #4a7b9d;
+    --accent: #3a8bbb;
+    --success: #2e7d32;
+    --warning: #f57c00;
+    --error: #d32f2f;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --divider: #cbd5e1;
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08),
+      0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
+      0 4px 6px -2px rgba(0, 0, 0, 0.03);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08),
+      0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+      sans-serif;
+    background: var(--background);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Source Serif Pro", serif;
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+
+  .main-container {
+    min-height: 100vh;
+    background: var(--background);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .content-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .glass-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+  }
+
+  .header-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+    animation: slideInDown 0.8s ease-out;
+  }
+
+  .school-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-light) 100%
+    );
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(26, 79, 114, 0.25);
+  }
+
+  .school-logo svg {
+    width: 40px;
+    height: 40px;
+    color: white;
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .page-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+  }
+
+  .info-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .badge-primary {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-light) 100%
+    );
+    color: white;
+    box-shadow: 0 4px 12px rgba(26, 79, 114, 0.25);
+  }
+
+  .badge-secondary {
+    background: linear-gradient(135deg, var(--success) 0%, #3d9c41 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+  }
+
+  .badge-info {
+    background: var(--background);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-light) 100%
+    );
+    color: white;
+    box-shadow: 0 4px 12px rgba(26, 79, 114, 0.25);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(26, 79, 114, 0.3);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, var(--success) 0%, #3d9c41 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+  }
+
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
+  }
+
+  .btn-warning {
+    background: linear-gradient(135deg, var(--warning) 0%, #ff9800 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 124, 0, 0.25);
+  }
+
+  .btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(245, 124, 0, 0.3);
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: #f1f5f9;
+    transform: translateY(-1px);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-light) 100%
+    );
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .stat-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .stat-icon-primary {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-light) 100%
+    );
+    box-shadow: 0 8px 20px rgba(26, 79, 114, 0.25);
+  }
+
+  .stat-icon-success {
+    background: linear-gradient(135deg, var(--success) 0%, #3d9c41 100%);
+    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.25);
+  }
+
+  .stat-icon-accent {
+    background: linear-gradient(135deg, var(--accent) 0%, #4a9cc5 100%);
+    box-shadow: 0 8px 20px rgba(58, 139, 187, 0.25);
+  }
+
+  .stat-icon-warning {
+    background: linear-gradient(135deg, var(--warning) 0%, #ff9800 100%);
+    box-shadow: 0 8px 20px rgba(245, 124, 0, 0.25);
+  }
+
+  .stat-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin: 0;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin: 0.25rem 0 0 0;
+  }
+
+  .table-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    animation: slideInUp 0.8s ease-out;
+  }
+
+  .table-header {
+    background: var(--background);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .table-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .table-title-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent) 0%, #4a9cc5 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .table-title h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin: 0;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    max-height: 70vh;
+    position: relative;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .data-table thead {
+    background: var(--background);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .data-table th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .data-table th.text-center {
+    text-align: center;
+  }
+
+  .data-table th.sticky-left {
+    position: sticky;
+    left: 0;
+    background: var(--background);
+    z-index: 11;
+  }
+
+  .data-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+
+  .data-table tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  .data-table td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+  }
+
+  .data-table td.sticky-left {
+    position: sticky;
+    left: 0;
+    background: var(--surface);
+    z-index: 9;
+  }
+
+  .data-table tbody tr:hover td.sticky-left {
+    background: #f8fafc;
+  }
+
+  .student-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .student-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-light) 100%
+    );
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    box-shadow: 0 4px 12px rgba(26, 79, 114, 0.2);
+  }
+
+  .student-details h4 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+  }
+
+  .student-id {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .class-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(
+      135deg,
+      var(--primary-light) 0%,
+      var(--primary) 100%
+    );
+    color: white;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .score-cell {
+    text-align: center;
+    font-weight: 700;
+    padding: 0.5rem;
+    border-radius: 6px;
+    min-width: 60px;
+    position: relative;
+  }
+
+  .score-excellent {
+    background: linear-gradient(135deg, var(--success) 0%, #3d9c41 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+  }
+
+  .score-good {
+    background: linear-gradient(
+      135deg,
+      var(--primary-light) 0%,
+      var(--primary) 100%
+    );
+    color: white;
+    box-shadow: 0 4px 12px rgba(26, 79, 114, 0.25);
+  }
+
+  .score-average {
+    background: linear-gradient(135deg, var(--warning) 0%, #ff9800 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 124, 0, 0.25);
+  }
+
+  .score-poor {
+    background: linear-gradient(135deg, var(--error) 0%, #e53935 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.25);
+  }
+
+  .score-fail {
+    background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(120, 144, 156, 0.25);
+  }
+
+  .total-score {
+    background: linear-gradient(135deg, var(--accent) 0%, #4a9cc5 100%);
+    color: white;
+    font-weight: 700;
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(58, 139, 187, 0.25);
+  }
+
+  .position-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 40px;
+    font-weight: 700;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    position: relative;
+  }
+
+  .position-1 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffecb3 100%);
+    color: #7c5900;
+    box-shadow: 0 6px 18px rgba(255, 215, 0, 0.25);
+  }
+
+  .position-2 {
+    background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+    color: #424242;
+    box-shadow: 0 6px 18px rgba(224, 224, 224, 0.25);
+  }
+
+  .position-3 {
+    background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+    color: white;
+    box-shadow: 0 6px 18px rgba(255, 183, 77, 0.25);
+  }
+
+  .position-default {
+    background: linear-gradient(135deg, #eeeeee 0%, #e0e0e0 100%);
+    color: #616161;
+    box-shadow: 0 4px 12px rgba(176, 190, 197, 0.2);
+  }
+
+  .legend-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .legend-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .legend-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--success) 0%, #3d9c41 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .legend-sample {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+  }
+
+  .empty-state svg {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .notification {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .notification.show {
+    transform: translateX(0);
+  }
+
+  .notification-success {
+    background: linear-gradient(135deg, var(--success) 0%, #3d9c41 100%);
+  }
+
+  .notification-error {
+    background: linear-gradient(135deg, var(--error) 0%, #e53935 100%);
+  }
+
+  /* Animations */
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in {
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  .fade-in:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .fade-in:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .fade-in:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .fade-in:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  /* Print Styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    .print-only {
+      display: block !important;
+    }
+
+    body {
+      background: white !important;
+      color: black !important;
+    }
+
+    .main-container {
+      background: white !important;
+    }
+
+    .glass-card,
+    .header-card,
+    .table-container,
+    .stat-card {
+      background: white !important;
+      box-shadow: none !important;
+      border: 1px solid #000 !important;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid #000 !important;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 1rem;
+    }
+
+    .header-card {
+      padding: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .table-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .data-table {
+      font-size: 0.75rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 0.5rem 0.25rem;
+    }
+  }
+</style>
+
+<div class="main-container">
+  <div class="content-wrapper">
+    <!-- Professional Header -->
+    <div class="header-card no-print">
+      <div style="display: flex; flex-direction: column; gap: 2rem">
+        <div
+          style="
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 1.5rem">
+            <div class="school-logo">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1 class="page-title">Academic Master Sheet</h1>
+              <p class="page-subtitle">
+                Comprehensive Student Performance Analysis
+              </p>
             </div>
           </div>
-          <div class="flex-1">
-            <h1
-              class="text-4xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent"
-            >
-              Master Sheet - {{ class_group }}
-            </h1>
-            <p class="text-gray-600 mt-2 text-lg">
-              Comprehensive academic performance overview for {{ term }} {{ year
-              }}
-            </p>
-            <div class="flex items-center space-x-6 mt-4">
-              <div class="flex items-center text-sm text-gray-500">
-                <i class="fas fa-users mr-2 text-blue-500"></i>
-                <span class="font-medium">{{ students|length }} Students</span>
-              </div>
-              <div class="flex items-center text-sm text-gray-500">
-                <i class="fas fa-book mr-2 text-green-500"></i>
-                <span class="font-medium">{{ subjects|length }} Subjects</span>
-              </div>
-              <div class="flex items-center text-sm text-gray-500">
-                <i class="fas fa-graduation-cap mr-2 text-purple-500"></i>
-                <span class="font-medium">{{ classes|join(', ') }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Info Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
-      <div
-        class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-      >
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <div
-              class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"
+          <div class="action-buttons">
+            <a
+              href="{{ url_for('exams_grading.master_sheet_print', class_group=class_group, term=term, year=year) }}"
+              target="_blank"
+              class="btn btn-warning"
             >
-              <i class="fas fa-calendar-alt text-blue-600 text-xl"></i>
-            </div>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-500">Academic Period</p>
-            <p class="text-lg font-bold text-gray-900">
-              {{ term }} / {{ year }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-      >
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <div
-              class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center"
-            >
-              <i class="fas fa-users text-green-600 text-xl"></i>
-            </div>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-500">Total Students</p>
-            <p class="text-lg font-bold text-gray-900">{{ students|length }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-      >
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <div
-              class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center"
-            >
-              <i class="fas fa-book text-purple-600 text-xl"></i>
-            </div>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-500">Subjects</p>
-            <p class="text-lg font-bold text-gray-900">{{ subjects|length }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-      >
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <div
-              class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center"
-            >
-              <i class="fas fa-trophy text-orange-600 text-xl"></i>
-            </div>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-500">Highest Score</p>
-            <p class="text-lg font-bold text-gray-900">
-              {% set max_score = student_totals.values()|max if
-              student_totals.values() else 0 %} {{ max_score|round(1) }}%
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Master Sheet Table -->
-    <div
-      class="bg-white/95 backdrop-blur-sm shadow-2xl rounded-3xl overflow-hidden border border-white/20 animate-slide-up"
-    >
-      <!-- Table Header -->
-      <div class="bg-gradient-to-r from-green-500 to-teal-600 px-8 py-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold text-white flex items-center">
-              <i class="fas fa-chart-line mr-3"></i>
-              Academic Performance Overview
-            </h2>
-            <p class="text-green-100 text-sm mt-2">
-              Complete breakdown of student scores across all subjects with
-              class rankings
-            </p>
-          </div>
-          <div class="flex items-center space-x-4">
-            <!-- Search Input -->
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+              <svg
+                style="width: 20px; height: 20px; margin-right: 0.5rem"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <i class="fas fa-search text-green-200"></i>
-              </div>
-              <input
-                type="text"
-                id="searchInput"
-                placeholder="Search students..."
-                class="pl-12 pr-4 py-3 bg-white/20 border border-white/30 rounded-xl text-white placeholder-green-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/30 transition-all duration-200 w-64 backdrop-blur-sm"
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                />
+              </svg>
+              Print Report
+            </a>
+            <button onclick="exportToCSV()" class="btn btn-success">
+              <svg
+                style="width: 20px; height: 20px; margin-right: 0.5rem"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 10v6m0 0l-4-4m4 4l4-4m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v11a2 2 0 002 2z"
+                />
+              </svg>
+              Export CSV
+            </button>
+            <a
+              href="{{ url_for('exams_grading.index') }}"
+              class="btn btn-secondary"
+            >
+              <svg
+                style="width: 20px; height: 20px; margin-right: 0.5rem"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              Dashboard
+            </a>
+          </div>
+        </div>
+
+        <div class="info-badges">
+          <div class="badge badge-primary">
+            <svg
+              style="width: 16px; height: 16px; margin-right: 0.5rem"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h10M7 15h10"
               />
-            </div>
+            </svg>
+            {{ class_group|title if class_group != 'all' else 'All Classes' }}
+          </div>
+          <div class="badge badge-secondary">{{ term }} {{ year }}</div>
+          <div class="badge badge-info">{{ students|length }} Students</div>
+          <div class="badge badge-info">{{ subjects|length }} Subjects</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print-Only Header -->
+    <div
+      class="print-only"
+      style="
+        display: none;
+        text-align: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #000;
+        padding-bottom: 1rem;
+      "
+    >
+      <h1 style="font-size: 2rem; font-weight: bold; margin: 0 0 0.5rem 0">
+        ACADEMIC MASTER SHEET
+      </h1>
+      <h2 style="font-size: 1.5rem; margin: 0 0 0.5rem 0">
+        {{ class_group|title if class_group != 'all' else 'All Classes' }}
+      </h2>
+      <p style="font-size: 1rem; margin: 0; color: #666">
+        {{ term }} {{ year }}
+      </p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid no-print">
+      <div class="stat-card fade-in">
+        <div class="stat-content">
+          <div class="stat-icon stat-icon-primary">
+            <svg
+              style="width: 28px; height: 28px; color: white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stat-value">{{ students|length }}</p>
+            <p class="stat-label">Total Students</p>
           </div>
         </div>
       </div>
 
-      <!-- Table Container -->
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+      <div class="stat-card fade-in">
+        <div class="stat-content">
+          <div class="stat-icon stat-icon-success">
+            <svg
+              style="width: 28px; height: 28px; color: white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stat-value">{{ subjects|length }}</p>
+            <p class="stat-label">Subjects Offered</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card fade-in">
+        <div class="stat-content">
+          <div class="stat-icon stat-icon-accent">
+            <svg
+              style="width: 28px; height: 28px; color: white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stat-value">
+              {% set total_scores = student_totals.values() | list %} {% if
+              total_scores %} {{ "%.1f"|format(total_scores | sum / total_scores
+              | length) }}% {% else %} 0.0% {% endif %}
+            </p>
+            <p class="stat-label">Class Average</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card fade-in">
+        <div class="stat-content">
+          <div class="stat-icon stat-icon-warning">
+            <svg
+              style="width: 28px; height: 28px; color: white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stat-value">
+              {% if student_totals.values() | list %} {{
+              "%.1f"|format(student_totals.values() | max) }}% {% else %} 0.0%
+              {% endif %}
+            </p>
+            <p class="stat-label">Highest Score</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional Data Table -->
+    <div class="table-container fade-in">
+      <div class="table-header no-print">
+        <div class="table-title">
+          <div class="table-title-icon">
+            <svg
+              style="width: 20px; height: 20px; color: white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h2>Student Performance Analysis</h2>
+            <p
+              style="
+                margin: 0;
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+              "
+            >
+              Comprehensive academic results by total score ranking
+            </p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem">
+          <span style="font-size: 0.75rem; color: var(--text-secondary)"
+            >Sorted by Total Score</span
+          >
+          <div
+            style="
+              width: 8px;
+              height: 8px;
+              background: var(--primary);
+              border-radius: 50%;
+            "
+          ></div>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
           <thead>
-            <!-- Main Subject Headers -->
             <tr>
-              <th
-                rowspan="2"
-                class="sticky left-0 bg-gray-50 px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-300 z-20 min-w-[200px]"
-              >
-                <div class="flex flex-col">
-                  <span class="text-sm">Student Information</span>
-                  <span class="text-xs font-normal text-gray-500 mt-1"
-                    >Name & Class</span
-                  >
-                </div>
-              </th>
+              <th class="sticky-left">Student Information</th>
+              <th class="sticky-left">Class</th>
               {% for subject in subjects %}
-              <th
-                colspan="5"
-                class="px-3 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-100 to-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-200 border-x border-gray-300"
-              >
-                <div class="flex flex-col items-center">
-                  <i
-                    class="fas fa-book text-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-600 mb-1"
-                  ></i>
-                  <span class="text-sm font-bold">{{ subject.name }}</span>
-                </div>
+              <th class="text-center">
+                {{ subject.name }}
+                <br /><span
+                  style="
+                    font-size: 0.75rem;
+                    color: var(--text-secondary);
+                    font-weight: 400;
+                  "
+                  >(100)</span
+                >
               </th>
               {% endfor %}
               <th
-                rowspan="2"
-                class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-green-100 to-blue-100 border-l border-gray-300 min-w-[120px]"
+                class="text-center"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    var(--accent) 0%,
+                    #4a9cc5 100%
+                  );
+                  color: white;
+                "
               >
-                <div class="flex flex-col items-center">
-                  <i class="fas fa-calculator text-green-600 mb-1"></i>
-                  <span class="text-sm">Grand Total</span>
-                  <span class="text-xs font-normal text-gray-500 mt-1"
-                    >All Subjects</span
-                  >
-                </div>
+                Total Score
+                <br /><span
+                  style="font-size: 0.75rem; opacity: 0.9; font-weight: 400"
+                  >({{ subjects|length * 100 }})</span
+                >
               </th>
               <th
-                rowspan="2"
-                class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-yellow-100 to-orange-100 border-l border-gray-300 min-w-[100px]"
+                class="text-center"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    var(--warning) 0%,
+                    #ff9800 100%
+                  );
+                  color: white;
+                "
               >
-                <div class="flex flex-col items-center">
-                  <i class="fas fa-trophy text-yellow-600 mb-1"></i>
-                  <span class="text-sm">Position</span>
-                  <span class="text-xs font-normal text-gray-500 mt-1"
-                    >Class Rank</span
-                  >
-                </div>
+                Position
               </th>
-            </tr>
-            <!-- Sub Headers -->
-            <tr>
-              {% for subject in subjects %}
-              <th
-                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
-              >
-                <div class="flex flex-col">
-                  <span class="text-xs">Class</span>
-                  <span class="text-xs text-gray-500">/60</span>
-                </div>
-              </th>
-              <th
-                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
-              >
-                <div class="flex flex-col">
-                  <span class="text-xs">50%</span>
-                  <span class="text-xs text-gray-500">Scale</span>
-                </div>
-              </th>
-              <th
-                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
-              >
-                <div class="flex flex-col">
-                  <span class="text-xs">Exam</span>
-                  <span class="text-xs text-gray-500">/100</span>
-                </div>
-              </th>
-              <th
-                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
-              >
-                <div class="flex flex-col">
-                  <span class="text-xs">50%</span>
-                  <span class="text-xs text-gray-500">Scale</span>
-                </div>
-              </th>
-              <th
-                class="px-2 py-3 text-center text-xs font-semibold text-gray-600 bg-{{ loop.cycle('blue', 'green', 'purple', 'pink', 'indigo', 'yellow', 'red', 'teal') }}-50 border border-gray-200"
-              >
-                <div class="flex flex-col">
-                  <span class="text-xs font-bold">Total</span>
-                  <span class="text-xs text-gray-500">/100</span>
-                </div>
-              </th>
-              {% endfor %}
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            {% for student in students %}
-            <tr
-              class="hover:bg-gray-50 transition-colors duration-200 student-row"
-            >
-              <!-- Student Info -->
-              <td
-                class="sticky left-0 bg-white px-6 py-4 border-r border-gray-300 z-10"
-              >
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-12 w-12">
-                    <div
-                      class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center shadow-lg"
-                    >
-                      <span class="text-sm font-bold text-white">
-                        {% set name_parts = student.full_name.split() %} {{
-                        name_parts[0][0] }}{{ name_parts[-1][0] if
-                        name_parts|length > 1 else '' }}
-                      </span>
-                    </div>
+          <tbody>
+            {% for student in students %} {% set student_position =
+            positions.get(student.id, 0) %} {% set student_total =
+            student_totals.get(student.id, 0) %}
+            <tr>
+              <td class="sticky-left">
+                <div class="student-info">
+                  <div class="student-avatar">
+                    {{ student.full_name.split()[0][0] }}{{
+                    student.full_name.split()[-1][0] if
+                    student.full_name.split()|length > 1 else '' }}
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-bold text-gray-900">
-                      {{ student.full_name }}
-                    </div>
-                    <div class="text-sm text-gray-500 flex items-center">
-                      <i class="fas fa-graduation-cap mr-1 text-blue-500"></i>
-                      {{ student.class_name }}
-                    </div>
+                  <div class="student-details">
+                    <h4>{{ student.full_name }}</h4>
+                    <p class="student-id">ID: {{ student.id }}</p>
                   </div>
                 </div>
               </td>
-
-              <!-- Subject Scores -->
+              <td class="sticky-left">
+                <span class="class-badge">
+                  {{ student.classroom.name if student.classroom else 'N/A' }}
+                </span>
+              </td>
               {% for subject in subjects %} {% set score =
-              term_scores[student.id][subject.id] if student.id in term_scores
-              and subject.id in term_scores[student.id] else none %}
-
-              <!-- Class Score -->
-              <td class="px-2 py-3 text-center text-sm border border-gray-200">
-                {% if score and score.class_total %}
-                <span
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800"
+              term_scores.get(student.id, {}).get(subject.id) %}
+              <td class="text-center">
+                {% if score and score.total_score is not none %}
+                <div
+                  class="score-cell {% if score.total_score >= 80 %}score-excellent{% elif score.total_score >= 70 %}score-good{% elif score.total_score >= 60 %}score-average{% elif score.total_score >= 50 %}score-poor{% else %}score-fail{% endif %}"
                 >
-                  {{ score.class_total|round(1) }}
-                </span>
+                  {{ "%.1f"|format(score.total_score) }}
+                </div>
                 {% else %}
-                <span class="text-gray-400 text-xs">-</span>
-                {% endif %}
-              </td>
-
-              <!-- Scaled Class Score -->
-              <td class="px-2 py-3 text-center text-sm border border-gray-200">
-                {% if score and score.scaled_class %}
-                <span class="text-gray-700 font-medium text-xs"
-                  >{{ score.scaled_class|round(1) }}</span
-                >
-                {% else %}
-                <span class="text-gray-400 text-xs">-</span>
-                {% endif %}
-              </td>
-
-              <!-- Exam Score -->
-              <td class="px-2 py-3 text-center text-sm border border-gray-200">
-                {% if score and score.exam_score %}
-                <span
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800"
-                >
-                  {{ score.exam_score|round(1) }}
-                </span>
-                {% else %}
-                <span class="text-gray-400 text-xs">-</span>
-                {% endif %}
-              </td>
-
-              <!-- Scaled Exam Score -->
-              <td class="px-2 py-3 text-center text-sm border border-gray-200">
-                {% if score and score.scaled_exam %}
-                <span class="text-gray-700 font-medium text-xs"
-                  >{{ score.scaled_exam|round(1) }}</span
-                >
-                {% else %}
-                <span class="text-gray-400 text-xs">-</span>
-                {% endif %}
-              </td>
-
-              <!-- Subject Total -->
-              <td class="px-2 py-3 text-center text-sm border border-gray-200">
-                {% if score and score.total_score %}
-                <span
-                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800"
-                >
-                  {{ score.total_score|round(1) }}
-                </span>
-                {% else %}
-                <span class="text-gray-400 text-xs">-</span>
+                <div class="score-cell score-fail">—</div>
                 {% endif %}
               </td>
               {% endfor %}
-
-              <!-- Grand Total -->
-              <td class="px-6 py-4 text-center border-l border-gray-300">
-                {% if student_totals[student.id] %}
-                <span
-                  class="inline-flex items-center px-4 py-2 rounded-xl text-lg font-bold bg-gradient-to-r from-green-100 to-blue-100 text-green-800 shadow-lg"
-                >
-                  {{ student_totals[student.id]|round(1) }}
-                </span>
-                {% else %}
-                <span class="text-gray-400 text-lg">-</span>
-                {% endif %}
+              <td
+                class="text-center"
+                style="background: rgba(58, 139, 187, 0.05)"
+              >
+                <div class="total-score">
+                  {{ "%.1f"|format(student_total) }}
+                </div>
               </td>
-
-              <!-- Position -->
-              <td class="px-6 py-4 text-center border-l border-gray-300">
-                {% if positions[student.id] %}
-                <span
-                  class="inline-flex items-center px-3 py-2 rounded-full text-sm font-bold {% if positions[student.id] == 1 %}bg-gradient-to-r from-yellow-200 to-yellow-300 text-yellow-800 shadow-lg {% elif positions[student.id] == 2 %}bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800 shadow-lg {% elif positions[student.id] == 3 %}bg-gradient-to-r from-orange-200 to-orange-300 text-orange-800 shadow-lg {% else %}bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800{% endif %}"
+              <td
+                class="text-center"
+                style="background: rgba(245, 124, 0, 0.05)"
+              >
+                <div
+                  class="position-badge {% if student_position == 1 %}position-1{% elif student_position == 2 %}position-2{% elif student_position == 3 %}position-3{% else %}position-default{% endif %}"
                 >
-                  {% if positions[student.id] == 1 %}
-                  <i class="fas fa-crown mr-1"></i>{{ positions[student.id] }}
-                  {% elif positions[student.id] == 2 %}
-                  <i class="fas fa-medal mr-1"></i>{{ positions[student.id] }}
-                  {% elif positions[student.id] == 3 %}
-                  <i class="fas fa-award mr-1"></i>{{ positions[student.id] }}
-                  {% else %} {{ positions[student.id] }} {% endif %}
-                </span>
-                {% else %}
-                <span class="text-gray-400">-</span>
-                {% endif %}
+                  {{ student_position }}
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="{{ subjects|length + 4 }}" class="empty-state">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                <h3>No Students Found</h3>
+                <p>
+                  No academic records are available for the selected criteria.
+                </p>
               </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
+    </div>
 
-      <!-- Export Section -->
-      <div
-        class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-t border-gray-200"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-            <span class="font-medium">
-              Showing {{ students|length }} students across {{ subjects|length
-              }} subjects
-            </span>
-          </div>
-          <div class="flex space-x-4">
-            <button
-              onclick="window.print()"
-              class="inline-flex items-center px-6 py-3 border-2 border-gray-300 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              <i class="fas fa-print mr-2"></i>
-              Print Report
-            </button>
-            <a
-              href="{{ url_for('exams_grading.master_sheet_print', class_group=class_group, term=term.split()[1], year=year) }}"
-              class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              <i class="fas fa-download mr-2"></i>
-              Download Excel
-            </a>
-          </div>
+    <!-- Grade Legend -->
+    <div class="legend-card no-print">
+      <div class="legend-header">
+        <div class="legend-icon">
+          <svg
+            style="width: 20px; height: 20px; color: white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.25rem; font-weight: 600">
+            Grading Scale
+          </h3>
+          <p
+            style="margin: 0; font-size: 0.875rem; color: var(--text-secondary)"
+          >
+            Performance evaluation criteria
+          </p>
+        </div>
+      </div>
+
+      <div class="legend-grid">
+        <div class="legend-item">
+          <div class="legend-sample score-excellent">A</div>
+          <span>Excellent (80-100%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-sample score-good">B</div>
+          <span>Good (70-79%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-sample score-average">C</div>
+          <span>Average (60-69%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-sample score-poor">D</div>
+          <span>Poor (50-59%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-sample score-fail">F</div>
+          <span>Fail (0-49%)</span>
         </div>
       </div>
     </div>
@@ -448,64 +1258,76 @@ term }} {{ year }}{% endblock %} {% block content %}
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Search functionality
-    const searchInput = document.getElementById("searchInput");
-    const studentRows = document.querySelectorAll(".student-row");
+  function exportToCSV() {
+    const table = document.querySelector(".data-table");
+    const rows = table.querySelectorAll("tr");
+    let csvContent = "";
 
-    searchInput.addEventListener("input", function () {
-      const searchTerm = this.value.toLowerCase();
+    // Add header information
+    csvContent += `"Academic Master Sheet"\n`;
+    csvContent += `"Class: {{ class_group|title if class_group != 'all' else 'All Classes' }}"\n`;
+    csvContent += `"Term: {{ term }} {{ year }}"\n`;
+    csvContent += `"Generated: ${new Date().toLocaleDateString()}"\n\n`;
 
-      studentRows.forEach((row) => {
-        const studentName = row
-          .querySelector("td:first-child .text-sm.font-bold")
-          .textContent.toLowerCase();
-        const className = row
-          .querySelector("td:first-child .text-sm.text-gray-500")
-          .textContent.toLowerCase();
+    rows.forEach((row, index) => {
+      const cells = row.querySelectorAll("th, td");
+      const rowData = [];
 
-        if (
-          studentName.includes(searchTerm) ||
-          className.includes(searchTerm)
-        ) {
-          row.style.display = "";
-        } else {
-          row.style.display = "none";
-        }
+      cells.forEach((cell) => {
+        let text = cell.textContent.trim();
+        text = text.replace(/\s+/g, " ");
+        text = text.replace(/"/g, '""');
+        rowData.push(`"${text}"`);
       });
+
+      csvContent += rowData.join(",") + "\n";
     });
 
-    // Add print styles
-    const printStyles = `
-        <style media="print">
-            @page { 
-                size: landscape; 
-                margin: 0.5in; 
-            }
-            .no-print { 
-                display: none !important; 
-            }
-            body { 
-                font-size: 10px; 
-            }
-            table { 
-                font-size: 8px; 
-            }
-            .sticky { 
-                position: static !important; 
-            }
-            .bg-gradient-to-r,
-            .bg-gradient-to-br {
-                background: #f3f4f6 !important;
-                color: #374151 !important;
-            }
-        </style>
-    `;
-    document.head.insertAdjacentHTML("beforeend", printStyles);
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `master_sheet_{{ class_group }}_{{ term }}_{{ year }}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
 
-    // Add smooth scrolling
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      anchor.addEventListener("click", function (e) {
+    showNotification("Master sheet exported successfully!", "success");
+  }
+
+  function showNotification(message, type = "success") {
+    const notification = document.createElement("div");
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.classList.add("show");
+    }, 100);
+
+    setTimeout(() => {
+      notification.classList.remove("show");
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 300);
+    }, 3000);
+  }
+
+  // Enhanced print functionality
+  window.addEventListener("beforeprint", function () {
+    document.title = `Master Sheet - {{ class_group|title if class_group != 'all' else 'All Classes' }} - {{ term }} {{ year }}`;
+  });
+
+  // Smooth scroll for better UX
+  document.addEventListener("DOMContentLoaded", function () {
+    const links = document.querySelectorAll('a[href^="#"]');
+    links.forEach((link) => {
+      link.addEventListener("click", function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute("href"));
         if (target) {
@@ -517,145 +1339,22 @@ term }} {{ year }}{% endblock %} {% block content %}
       });
     });
   });
+
+  // Keyboard shortcuts
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key) {
+        case "p":
+          e.preventDefault();
+          window.print();
+          break;
+        case "s":
+          e.preventDefault();
+          exportToCSV();
+          break;
+      }
+    }
+  });
 </script>
 
-<!-- Custom Tailwind Color Classes for better compatibility -->
-<style>
-  /* Color variations for subject headers */
-  .bg-blue-50 {
-    background-color: #eff6ff;
-  }
-  .bg-blue-100 {
-    background-color: #dbeafe;
-  }
-  .bg-blue-200 {
-    background-color: #bfdbfe;
-  }
-  .text-blue-600 {
-    color: #2563eb;
-  }
-  .text-blue-800 {
-    color: #1e40af;
-  }
-
-  .bg-green-50 {
-    background-color: #f0fdf4;
-  }
-  .bg-green-100 {
-    background-color: #dcfce7;
-  }
-  .bg-green-200 {
-    background-color: #bbf7d0;
-  }
-  .text-green-600 {
-    color: #16a34a;
-  }
-  .text-green-800 {
-    color: #166534;
-  }
-
-  .bg-purple-50 {
-    background-color: #faf5ff;
-  }
-  .bg-purple-100 {
-    background-color: #f3e8ff;
-  }
-  .bg-purple-200 {
-    background-color: #e9d5ff;
-  }
-  .text-purple-600 {
-    color: #9333ea;
-  }
-  .text-purple-800 {
-    color: #6b21a8;
-  }
-
-  .bg-pink-50 {
-    background-color: #fdf2f8;
-  }
-  .bg-pink-100 {
-    background-color: #fce7f3;
-  }
-  .bg-pink-200 {
-    background-color: #fbcfe8;
-  }
-
-  .bg-indigo-50 {
-    background-color: #eef2ff;
-  }
-  .bg-indigo-100 {
-    background-color: #e0e7ff;
-  }
-  .bg-indigo-200 {
-    background-color: #c7d2fe;
-  }
-
-  .bg-yellow-50 {
-    background-color: #fefce8;
-  }
-  .bg-yellow-100 {
-    background-color: #fef3c7;
-  }
-  .bg-yellow-200 {
-    background-color: #fde68a;
-  }
-  .bg-yellow-300 {
-    background-color: #fcd34d;
-  }
-  .text-yellow-600 {
-    color: #d97706;
-  }
-  .text-yellow-800 {
-    color: #92400e;
-  }
-
-  .bg-red-50 {
-    background-color: #fef2f2;
-  }
-  .bg-red-100 {
-    background-color: #fee2e2;
-  }
-  .bg-red-200 {
-    background-color: #fecaca;
-  }
-
-  .bg-teal-50 {
-    background-color: #f0fdfa;
-  }
-  .bg-teal-100 {
-    background-color: #ccfbf1;
-  }
-  .bg-teal-200 {
-    background-color: #99f6e4;
-  }
-  .text-teal-600 {
-    color: #0d9488;
-  }
-
-  .bg-orange-100 {
-    background-color: #fed7aa;
-  }
-  .bg-orange-200 {
-    background-color: #fecaca;
-  }
-  .bg-orange-300 {
-    background-color: #fdba74;
-  }
-  .text-orange-600 {
-    color: #ea580c;
-  }
-  .text-orange-800 {
-    color: #9a3412;
-  }
-
-  .bg-gray-200 {
-    background-color: #e5e7eb;
-  }
-  .bg-gray-300 {
-    background-color: #d1d5db;
-  }
-  .text-gray-800 {
-    color: #1f2937;
-  }
-</style>
 {% endblock %}

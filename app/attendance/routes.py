@@ -1,13 +1,25 @@
 from app.utils.voice import announce
-from flask import render_template, request, jsonify, redirect, url_for, flash
+from flask import render_template, request, jsonify, redirect, url_for, flash, send_file
 from flask_login import login_required, current_user
+from flask_wtf.csrf import generate_csrf
 from app.decorators import role_required
 from app import db
-from app.models import User, Student, Class, Attendance, HallPass, Teacher
+from app.models import (
+    User,
+    Student,
+    Class,
+    Attendance,
+    HallPass,
+    Teacher,
+    TeacherSubjectClass,
+    AttendanceAudit,
+)
 from app.attendance import bp
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, timezone
 import json
-from sqlalchemy import func, extract
+import csv
+import io
+from sqlalchemy import func, extract, case
 
 
 # Routes for attendance dashboard
@@ -15,23 +27,28 @@ from sqlalchemy import func, extract
 @login_required
 @role_required(["admin", "headteacher", "teacher"])
 def attendance_dashboard():
-    """Attendance dashboard showing overview and recent records"""
-    # Getting classes the user has access to
+    """Enhanced attendance dashboard with overview and analytics"""
+    # Get classes the user has access to
     if current_user.role in ["admin", "headteacher"]:
         classes = Class.query.all()
     else:
-        # Only showing classes assigned to, for teachers.
         teacher = Teacher.query.filter_by(email=current_user.email).first()
+        classes = teacher.classes if teacher else []
 
-        if teacher:
-            classes = teacher.classes
-        else:
-            classes = []
+    # Get current date and term info
+    today = date.today()
+    current_month = today.month
+    current_year = today.year
 
-    # Getting current date
-    today = datetime.now().date()
+    # Determine current term based on month
+    if current_month >= 9 and current_month <= 12:
+        current_term = "Term 1"
+    elif current_month >= 1 and current_month <= 4:
+        current_term = "Term 2"
+    else:
+        current_term = "Term 3"
 
-    # Getting attendance summary for today
+    # Get today's attendance summary for each class
     today_attendance = {}
     for class_ in classes:
         attendance_count = Attendance.query.filter_by(
@@ -42,41 +59,584 @@ def attendance_dashboard():
             class_id=class_.id, date=today, status="present"
         ).count()
 
+        absent_count = Attendance.query.filter_by(
+            class_id=class_.id, date=today, status="absent"
+        ).count()
+
+        late_count = Attendance.query.filter_by(
+            class_id=class_.id, date=today, status="late"
+        ).count()
+
+        excused_count = Attendance.query.filter_by(
+            class_id=class_.id, date=today, status="excused"
+        ).count()
+
         today_attendance[class_.id] = {
             "total": attendance_count,
             "present": present_count,
-            "absent": attendance_count - present_count if attendance_count > 0 else 0,
+            "absent": absent_count,
+            "late": late_count,
+            "excused": excused_count,
+            "attendance_rate": (
+                (present_count / class_.students.count() * 100)
+                if class_.students.count() > 0
+                else 0
+            ),
         }
+
+    # Get monthly attendance trends
+    monthly_trends = {}
+    for class_ in classes:
+        # Get attendance data for the last 30 days
+        start_date = today - timedelta(days=30)
+
+        daily_data = (
+            db.session.query(
+                Attendance.date,
+                func.count(case((Attendance.status == "present", 1))).label("present"),
+                func.count(Attendance.id).label("total"),
+            )
+            .filter(Attendance.class_id == class_.id, Attendance.date >= start_date)
+            .group_by(Attendance.date)
+            .order_by(Attendance.date)
+            .all()
+        )
+
+        monthly_trends[class_.id] = [
+            {
+                "date": data.date.strftime("%Y-%m-%d"),
+                "rate": (data.present / data.total * 100) if data.total > 0 else 0,
+            }
+            for data in daily_data
+        ]
+
+    # Get chronic absenteeism alerts
+    chronic_absenteeism = []
+    for class_ in classes:
+        # Students with less than 80% attendance in the current term
+        students = class_.students
+        for student in students:
+            present_count = Attendance.query.filter_by(
+                student_id=student.id,
+                class_id=class_.id,
+                term=current_term,
+                year=str(current_year),
+                status="present",
+            ).count()
+
+            total_days = Attendance.query.filter_by(
+                student_id=student.id,
+                class_id=class_.id,
+                term=current_term,
+                year=str(current_year),
+            ).count()
+
+            if total_days > 10:  # Only consider students with enough data
+                attendance_rate = present_count / total_days * 100
+                if attendance_rate < 80:
+                    chronic_absenteeism.append(
+                        {
+                            "student": student,
+                            "class": class_,
+                            "attendance_rate": attendance_rate,
+                            "absent_days": total_days - present_count,
+                        }
+                    )
+
+    # Get recent attendance activity
+    recent_activity = (
+        Attendance.query.join(Student)
+        .join(Class)
+        .filter(Attendance.date >= today - timedelta(days=7))
+        .order_by(Attendance.created_at.desc())
+        .limit(10)
+        .all()
+    )
 
     return render_template(
         "attendance/dashboard.html",
         classes=classes,
         today_attendance=today_attendance,
+        monthly_trends=monthly_trends,
+        chronic_absenteeism=chronic_absenteeism,
+        recent_activity=recent_activity,
         today=today,
+        current_term=current_term,
+        current_year=current_year,
+    )
+
+
+# Routes for attendance analysis
+@bp.route("/attendance-analytics/<int:class_id>")
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def attendance_analytics(class_id):
+    """Attendance analytics and trends"""
+    class_ = Class.query.get_or_404(class_id)
+
+    if not has_attendance_access(current_user, class_id):
+        flash("Access denied!", "danger")
+        return redirect(url_for("attendance.attendance_dashboard"))
+
+    # Getting attendance data for analysis
+    attendance_data = (
+        db.session.query(
+            Attendance.date,
+            func.count(case((Attendance.status == "present", 1))).label("present"),
+            func.count(case((Attendance.status == "absent", 1))).label("absent"),
+            func.count(case((Attendance.status == "late", 1))).label("late"),
+            func.count(case((Attendance.status == "excused", 1))).label("excused"),
+        )
+        .filter(
+            Attendance.class_id == class_id,
+            Attendance.date >= date.today() - timedelta(days=30),
+        )
+        .group_by(Attendance.date)
+        .order_by(Attendance.date)
+        .all()
+    )
+
+    # Student attendance summary
+    student_attendance = (
+        db.session.query(
+            Student.id,
+            Student.full_name,
+            func.count(case((Attendance.status == "present", 1))).label("present_days"),
+            func.count(Attendance.id).label("total_days"),
+        )
+        .join(Attendance, Student.id == Attendance.student_id)
+        .filter(
+            Attendance.class_id == class_id,
+            Attendance.date >= date.today() - timedelta(days=30),
+        )
+        .group_by(Student.id, Student.full_name)
+        .all()
+    )
+
+    # Metrics for ascertaining chronic absenteeism (missing 20%+ of attendance days)
+    chronic_absenteeism = []
+    for student in student_attendance:
+        attendance_rate = (
+            ((student.present_days / student.total_days) * 100)
+            if student.total_days > 0
+            else 0
+        )
+        if attendance_rate < 80:
+            chronic_absenteeism.append(
+                {
+                    "student": student.full_name,
+                    "attendance_rate": attendance_rate,
+                    "absent_days": student.total_days - student.present_days,
+                }
+            )
+    return render_template(
+        "attendance/analytics.html",
+        class_=class_,
+        attendance_data=attendance_data,
+        chronic_absenteeism=chronic_absenteeism,
+    )
+
+
+# Route to export attendance
+@bp.route("/export-attendance/<int:class_id>/<term>/<year>")
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def export_attendance(class_id, term, year):
+    """Export attendancce data to CSV"""
+    class_ = Class.query.get_or_404(class_id)
+
+    if not has_attendance_access(current_user, class_id):
+        flash("Accessed denied", "danger")
+        return redirect(url_for("attendance.attendance_dashboard"))
+
+    # Getting attendance data
+    attendance_records = (
+        Attendance.query.filter_by(class_id=class_id, term=term, year=year)
+        .order_by(Attendance.date, Student.surname)
+        .all()
+    )
+
+    # Creating CSV
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Write header
+    writer.writerow(["Date", "Student", "Status", "Excuse Reason", "Marked By", "Time"])
+
+    # Write Data
+    for record in attendance_records:
+        writer.writerow(
+            [
+                record.date.strftime("%Y-%m-%d"),
+                record.student.full_name,
+                record.status,
+                record.excuse_reason or "",
+                record.marker.username if record.marker else "System",
+                record.created_at.strftime("%H:%M:%S"),
+            ]
+        )
+
+    # Preparing response
+    output.seek(0)
+    return send_file(
+        io.BytesIO(output.getvalue().encode("utf-8")),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name=f"attendance_{class_.name}_{term}_{year}.csv",
+    )
+
+
+# ROute for absence with excuse
+@bp.route("/excuse-absence/<int:attendance_id>", methods=["POST"])
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def excuse_absence(attendance_id):
+    """Mark an absence as excused with a reason"""
+    attendance = Attendance.query.get_or_404(attendance_id)
+
+    if not has_attendance_access(current_user, attendance.class_id):
+        flash("Access denied!", "danger")
+        return jsonify({"success": False, "message": "Access denied"}), 403
+
+    excuse_reason = request.form.get("excuse_reason")
+    if not excuse_reason:
+        return jsonify({"success": False, "message": "Excuse reason required"}), 400
+
+    # Creating audit trail
+    audit = AttendanceAudit(
+        attendance_id=attendance.id,
+        changed_by=current_user.id,
+        change_type="update",
+        old_status=attendance.status,
+        new_status="excused",
+        change_reason=f"Excused: {excuse_reason}",
+    )
+    db.session.add(audit)
+
+    # Updating attendance
+    attendance.status = "excused"
+    attendance.excuse_reason = excuse_reason
+    attendance.marked_by = current_user.id
+    attendance.updated_at = datetime.now(timezone.utc)
+
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Absence excused successfully!"})
+
+
+# Route for bulk attendance
+@bp.route("/bulk-attendance", methods=["POST"])
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def bulk_attendance():
+    """Bulk update attendance status"""
+    data = request.get_json()
+    class_id = data.get("class_id")
+    date_str = data.get("date")
+    term = data.get("term")
+    year = data.get("year")
+    status = data.get("status")
+    student_ids = data.get("student_ids", [])
+
+    if not all([class_id, date_str, term, year, status]):
+        return (
+            jsonify({"success": False, "message": "Missing required parameters"}),
+            400,
+        )
+
+    try:
+        attendance_date = datetime.strptime(date_str, "Y%-%m-%d").date()
+
+    except ValueError:
+        return jsonify({"success": False, "message": "Invalid date format"}), 400
+
+    if not has_attendance_access(current_user, class_id):
+        return jsonify({"success": False, "message": "Access denied!"}), 403
+
+    # Processing each student
+    for student_id in student_ids:
+        # Find existing records or create new one
+        attendance = Attendance.query.filter_by(
+            student_id=student_id,
+            class_id=class_id,
+            date=attendance_date,
+            term=term,
+            year=year,
+        ).first()
+
+        if attendance:
+            # Create audit trail for update
+            audit = AttendanceAudit(
+                attendance_id=attendance.id,
+                changed_by=current_user.id,
+                change_type="update",
+                old_status=attendance.status,
+                new_status=status,
+                change_reason="Bulk update",
+            )
+            db.session.add(audit)
+
+            attendance.status = status
+            attendance.marked_by = (current_user.id,)
+            attendance.updated_at = datetime.now(timezone.utc)
+        else:
+            # Create new attendance record
+            attendance = Attendance(
+                student_id=student_id,
+                class_id=class_id,
+                date=attendance_date,
+                term=term,
+                year=year,
+                status=status,
+                method="manual",
+                marked_by=current_user.id,
+            )
+            db.session.add(attendance)
+
+            # Create audit trail for new creation
+            audit = AttendanceAudit(
+                attendance_id=attendance.id,
+                changed_by=current_user.id,
+                change_type="create",
+                new_status=status,
+                change_reason="Bulk update",
+            )
+            db.session.add(audit)
+
+    db.session.commit()
+
+    return jsonify(
+        {
+            "success": True,
+            "message": f"Attendance updated for {len(student_ids)} students",
+        }
+    )
+
+
+# Route for attendance audit
+@bp.route("/attendance-audit/<int:attendance_id>")
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def attendance_audit(attendance_id):
+    """View audit trail for an attendance record"""
+    attendance = Attendance.query.get_or_404(attendance_id)
+    audit_trail = (
+        AttendanceAudit.query.filter_by(attendance_id=attendance_id)
+        .order_by(AttendanceAudit.changed_at.desc())
+        .all()
+    )
+
+    return render_template(
+        "attendance/audit_trail.html", attendance=attendance, audit_trail=audit_trail
+    )
+
+
+# Route for selecting attendance date
+@bp.route("/select-attendance-date", methods=["GET", "POST"])
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def select_attendance_date():
+    """Select term, year, and date for attendance marking"""
+    if request.method == "POST":
+        term = request.form.get("term")
+        year = request.form.get("year")
+        attendance_date = request.form.get("attendance_date")
+        class_id = request.form.get("class_id")
+
+        if not all([term, year, attendance_date, class_id]):
+            flash("Please fill all fields", "danger")
+            return redirect(request.url)
+
+        # Validating date
+        selected_date = datetime.strptime(attendance_date, "%Y-%m-%d").date()  # type: ignore
+        today = date.today()
+
+        if selected_date > today:
+            flash("You cannot mark attendance for future dates", "warning")
+            return redirect(request.url)
+
+        return redirect(
+            url_for(
+                "attendance.mark_attendance",
+                class_id=class_id,
+                term=term,
+                year=year,
+                date_str=attendance_date,
+            )
+        )
+
+    # Get classes the user has access to
+    if current_user.role in ["admin", "headteacher"]:
+        classes = Class.query.all()
+    else:
+        teacher = Teacher.query.filter_by(email=current_user.email).first()
+        classes = teacher.classes if teacher else []
+
+    return render_template(
+        "attendance/select_date.html",
+        classes=classes,
+        today=date.today(),
+        current_year=datetime.now().year,
     )
 
 
 # Route for term attendance
+@bp.route("/term-attendance/", methods=["GET", "POST"])
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def term_attendance():
+    """View term attendance summary for a class"""
+    if request.method == "POST":
+        class_id = request.form.get("class_id")
+        term = request.form.get("term")
+        year = request.form.get("year")
+
+        if not all([class_id, term, year]):
+            flash("Please select class, term, and year.", "danger")
+            return redirect(request.url)
+
+        return redirect(
+            url_for(
+                "attendance.term_attendance_report",
+                class_id=class_id,
+                term=term,
+                year=year,
+                now=datetime.now,
+                today=date.today(),
+                current_year=datetime.now().year,
+            )
+        )
+    # Getting classes the user has access to
+    if current_user.role in ["admin", "headteacher"]:
+        classes = Class.query.all()
+    else:
+        teacher = Teacher.query.filter_by(email=current_user.email).first()
+        classes = teacher.classes if teacher else []
+
+    return render_template(
+        "attendance/select_term.html",
+        classes=classes,
+        today=date.today(),
+        current_year=datetime.now().year,
+    )
+
+
+# Route to mark attendance
+@bp.route(
+    "/mark-attendance/<int:class_id>/<term>/<year>/<date_str>", methods=["GET", "POST"]
+)
+@login_required
+def mark_attendance(class_id, term, year, date_str):
+    """Mark attendance for a class with authorization"""
+    class_ = Class.query.get_or_404(class_id)
+
+    # Checking if user has access to mark attendance for this class
+    if not has_attendance_access(current_user, class_id):
+        flash("You do not have permission to mark attendance for this class!", "danger")
+        return redirect(url_for("attendance.dashboard"))
+
+    # Parsing data
+    try:
+        attendance_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        flash("Invalid date format", "danger")
+        return redirect(url_for("attendance.select_attendance_date"))
+
+    # Checking if date is in the future
+    today = date.today()
+    if attendance_date > today:
+        flash("You cannot mark attendance for future dates!", "warning")
+        return redirect(url_for("attendance.select_attendance_date"))
+
+    # Getting existing attendance records for this date
+    attendance_records = Attendance.query.filter_by(
+        class_id=class_id, term=term, year=year, date=attendance_date
+    ).all()
+
+    attendance_dict = {r.student_id: r for r in attendance_records}
+
+    if request.method == "POST":
+        # Verifying CSRF token
+        if not validate_csrf(request.form.get("csrf_token")):
+            flash("Invalid CSRF token", "danger")
+            return redirect(
+                url_for(
+                    "attendance.mark_attendance",
+                    class_id=class_id,
+                    term=term,
+                    year=year,
+                    date_str=date_str,
+                    now=datetime.now,
+                )
+            )
+
+        for student in class_.students:
+            status = request.form.get(f"status_{student.id}", "absent")
+
+            if student.id in attendance_dict:
+                # Update existing records
+                record = attendance_dict[student.id]
+                if record.status != status:
+                    record.status = status
+                    record.method = "manual"
+            else:
+                # Create new record
+                attendance = Attendance(
+                    student_id=student.id,
+                    class_id=class_id,
+                    date=attendance_date,
+                    term=term,
+                    year=year,
+                    status=status,
+                    method="manual",
+                )
+                db.session.add(attendance)
+
+        db.session.commit()
+        flash("Attendance saved successfully!", "success")
+        return redirect(
+            url_for(
+                "attendance.mark_attendance",
+                class_id=class_id,
+                term=term,
+                year=year,
+                date_str=date_str,
+            )
+        )
+
+    return render_template(
+        "attendance/mark_attendance.html",
+        class_=class_,
+        attendance_dict=attendance_dict,
+        attendance_date=attendance_date,
+        term=term,
+        year=year,
+        date_str=date_str,
+        now=datetime.now,
+    )
+
+
+# Route for term attendance report
 @bp.route("/term-attendance/<int:class_id>/<term>/<year>")
 @login_required
 @role_required(["admin", "headteacher", "teacher"])
-def term_attendance(class_id, term, year):
-    """View term attendance for a class"""
+def term_attendance_report(class_id, term, year):
+    """Generate term attendance report for selected class, term and year"""
     class_ = Class.query.get_or_404(class_id)
 
-    # Checking if user has access to this class
+    # Check if user has access to view this class' attendance
     if not has_attendance_access(current_user, class_id):
-        flash("You don't have permission to view attendance for this class", "danger")
-        return redirect(url_for("attendance.dashboard"))
+        flash("You do not have permission to view attendance for this class!", "danger")
+        return redirect(url_for("attendance.term_attendance"))
 
-    # Getting students in the class
+    # Getting all students in the class
     students = (
         Student.query.filter_by(class_id=class_id)
         .order_by(Student.surname, Student.first_name)
         .all()
     )
 
-    # Getting all school days in the term (Might be good if I create a Term model for this)
+    # Getting all attendance for this term and year
     attendance_days = (
         db.session.query(Attendance.date)
         .filter(
@@ -91,7 +651,7 @@ def term_attendance(class_id, term, year):
 
     attendance_days = [day[0] for day in attendance_days]
 
-    # Getting attendance records for each student
+    # Getting attendance record for each student
     attendance_records = {}
     for student in students:
         records = Attendance.query.filter_by(
@@ -102,26 +662,26 @@ def term_attendance(class_id, term, year):
             record.date: record.status for record in records
         }
 
-    # Calculating summary stats
+    # Calculating summary statistics
     summary = {"total_days": len(attendance_days), "student_stats": {}}
 
     for student in students:
         present_count = sum(
             1
-            for date in attendance_days
-            if attendance_records.get(student.id, {}).get(date) == "present"
+            for day in attendance_days
+            if attendance_records.get(student.id, {}).get(day) == "present"
         )
 
         summary["student_stats"][student.id] = {
             "present": present_count,
-            "absent": len(attendance_days) - present_count,
+            "absent": len(attendance_days) - present_count if attendance_days else 0,
             "percentage": (
-                (present_count) / len(attendance_days) * 100 if attendance_days else 0
+                (present_count / len(attendance_days) * 100) if attendance_days else 0
             ),
         }
 
     return render_template(
-        "attendance/term_attendance.html",
+        "attendance/term_attendance_report.html",
         class_=class_,
         students=students,
         attendance_days=attendance_days,
@@ -132,79 +692,33 @@ def term_attendance(class_id, term, year):
     )
 
 
-# Route to mark attendance
-@bp.route("/mark-attendance/<int:class_id>", methods=["GET", "POST"])
-@login_required
-def mark_attendance(class_id):
-    """Mark attendance for a class with authorization"""
-    class_ = Class.query.get_or_404(class_id)
-
-    # Checking if user has access to mark attendance for this class
-    if not has_attendance_access(current_user, class_id):
-        flash("You do not have permission to mark attendance for this class!", "danger")
-        return redirect(url_for("attendance.dashboard"))
-
-    # Getting current date and term/year
-    today = datetime.now().date()
-    term = "Term 1"  # THis would be dynamically determined based on date
-    year = str(datetime.now().year)
-
-    # getting existing attendance records for today
-    attendance_records = Attendance.query.filter_by(class_id=class_id, date=today).all()
-
-    attendance_dict = {r.student_id: r for r in attendance_records}
-
-    if request.method == "POST":
-        for student in class_.students:
-            status = request.form.get(f"status_{student.id}", "absent")
-
-            if student.id in attendance_dict:
-                # Update existing record
-                record = attendance_dict[student.id]
-                if record.status != status:
-                    record.status = status
-                    record.method = "manual"
-            else:
-                # Create a new record
-                attendance = Attendance(
-                    student_id=student.id,
-                    class_id=class_id,
-                    date=today,
-                    term=term,
-                    year=year,
-                    status=status,
-                    method="manual",
-                )
-                db.session.commit()
-                flash("Attendance saved successfully!", "success")
-                return redirect(
-                    url_for("attendance.mark_attendance", class_id=class_id)
-                )
-
-    return render_template(
-        "attendance/mark_attendance.html",
-        class_=class_,
-        attendance_dict=attendance_dict,
-        today=today,
-    )
-
-
 # Helper function for attendance access
 def has_attendance_access(user, class_id):
-    """Checking if user has permission to
-    mark/view attendance for a class,
-    and form teachers have access
+    """
+    Check if user has permission to mark/view attendance for a class
+    Admin, headteacher, and form teachers have access
     """
     if user.role in ["admin", "headteacher"]:
         return True
 
     if user.role == "teacher":
-        # Check if teacher is the form teacher for this class
+        # Check if this teacher is a form teacher for this class
         teacher = Teacher.query.filter_by(email=user.email).first()
         if teacher and class_id in [c.id for c in teacher.classes]:
             return True
 
     return False
+
+
+def validate_csrf(token):
+    """Validate CSRF token"""
+    from flask_wtf.csrf import validate_csrf as validate
+
+    try:
+        validate(token)
+        return True
+    except:
+        return False
 
 
 @bp.route("/scanner")

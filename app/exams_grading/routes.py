@@ -17,10 +17,19 @@ from app.models import (
     Teacher,
     Student,
     TermScore,
+    Attendance,
+    User,
+    SchoolInfo,
+    StudentRemarks,
+    TermDates,
 )
 from app.exams_grading import bp
+from app.exams_grading.forms import SchoolInfoForm, TermDatesForm, StudentRemarksForm
+from datetime import datetime, timezone
 from app.decorators import role_required
 from sqlalchemy import and_, or_
+from werkzeug.utils import secure_filename
+import os
 
 
 @bp.route("/", methods=["GET"])
@@ -48,6 +57,7 @@ def index():
         classes=classes,
         subjects=subjects,
         recent_assignments=recent_assignments,
+        now=datetime.now,
     )
 
 
@@ -213,6 +223,7 @@ def grading_page(class_id, subject_id, term, year):
         term_scores=term_scores,
         term=term,
         year=year,
+        now=datetime.now(),
     )
 
 
@@ -567,12 +578,16 @@ def select_grading_period(class_id, subject_id):
     subject = Subject.query.get_or_404(subject_id)
 
     return render_template(
-        "exams_grading/select_period.html", class_=class_, subject=subject
+        "exams_grading/select_period.html",
+        class_=class_,
+        subject=subject,
+        now=datetime.now,
+        current_month=datetime.now().month,
     )
 
 
 # Route for student's academic report
-@bp.route("/student-report/<int:student_id>/term/<year>")
+@bp.route("/student-report/<int:student_id>/<term>/<year>")
 @login_required
 @role_required(["admin", "headteacher", "teacher"])
 def student_term_report(student_id, term, year):
@@ -619,13 +634,364 @@ def student_term_report(student_id, term, year):
     )
 
 
+# Route for student report cards
+@bp.route("/student-report-card/<int:student_id>/<term>/<year>")
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def student_report_card(student_id, term, year):
+    """Generating a comprehensive student report card for the term"""
+    # Getting student information
+    student = Student.query.get_or_404(student_id)
+
+    # Get class information
+    class_ = Class.query.get(student.class_id) if student.class_id else None
+
+    # Getting all term score student for a specific term and year
+    term_scores = TermScore.query.filter_by(
+        student_id=student_id, term=term, year=year
+    ).all()
+
+    # GEtting subjects
+    subjects = (
+        Subject.query.join(TeacherSubjectClass)
+        .filter(
+            TeacherSubjectClass.class_id == student.class_id,
+            TeacherSubjectClass.is_active == True,
+        )
+        .distinct()
+        .all()
+    )
+
+    # Calculating overall performance metrics
+    total_marks_obtained = sum(
+        score.total_score for score in term_scores if score.total_score
+    )
+    total_possible_marks = len(subjects) * 100
+    percentage = (
+        (total_marks_obtained / total_possible_marks * 100)
+        if total_possible_marks > 0
+        else 0
+    )
+
+    # Calculating class position
+    # Getting all students in the same class
+    class_students = Student.query.filter_by(class_id=student.class_id).all()
+
+    # Calculating total scores for all students in the class
+    student_totals = {}
+    for class_student in class_students:
+        student_scores = TermScore.query.filter_by(
+            student_id=class_student.id, term=term, year=year
+        ).all()
+        total_score = sum(
+            score.total_score for score in student_scores if score.total_score
+        )
+        student_totals[class_student.id] = total_score
+
+    # Sorting students by total score to determing position
+    sorted_totals = sorted(student_totals.items(), key=lambda x: x[1], reverse=True)
+    positions = {}
+    rank = 0
+    prev_score = None
+    for idx, (student_id, score) in enumerate(sorted_totals, start=1):
+        if prev_score is None:
+            rank = 1
+            positions[student_id] = rank
+            prev_score = score
+        else:
+            if score == prev_score:
+                positions[student_id] = rank
+            else:
+                rank = idx
+                positions[student_id] = rank
+                prev_score = score
+
+    class_position = positions.get(student.id, 0)
+
+    # Getting attendance data
+    attendance_present = Attendance.query.filter_by(
+        student_id=student_id,
+        class_id=student.class_id,
+        term=term,
+        year=year,
+        status="present",
+    ).count()
+
+    attendance_absent = Attendance.query.filter_by(
+        student_id=student_id,
+        class_id=student.class_id,
+        term=term,
+        year=year,
+        status="absent",
+    ).count()
+
+    # Getting class teacher (first teacher assigned to the class)
+    class_teacher = None
+    if class_ and class_.teachers:
+        class_teacher = class_.teachers[0]
+
+    # Getting the headteacher (first admin user)
+    headteacher = User.query.filter_by(role="admin").first()
+
+    # Calculating subject positions
+    subject_positions = {}
+    for subject in subjects:
+        # Get all scores for this subject in the same class
+        subject_scores = (
+            TermScore.query.filter_by(
+                subject_id=subject.id, class_id=student.class_id, term=term, year=year
+            )
+            .order_by(TermScore.total_score.desc())  # type: ignore
+            .all()
+        )
+
+        # Find student's position
+        for idx, subject_score in enumerate(subject_scores, 1):
+            if subject_score.student_id == student_id:
+                subject_positions[subject.id] = f"{idx}/{len(subject_scores)}"
+                break
+
+    # Determining promotion status
+    if TermScore.term == "Term 3":
+        promotion_status = "PROMOTED" if percentage >= 40 else "REPEAT"
+    else:
+        promotion_status = "N/A"
+
+    # Geting school information
+    school_info = SchoolInfo.query.first()
+
+    if not school_info:
+        # Creating a default school info if non exists
+        school_info = SchoolInfo(
+            name="EduSync Code Academy",
+            motto="Teaching coding the right way!",
+            address="P.O. Box OFN 123, Offinso.",
+            phone="0503176199",
+            email="web4adu@gmail.com",
+        )
+        db.session.add(school_info)
+        db.session.commit()
+
+    # Getting term dates
+    term_dates = TermDates.query.filter_by(academic_year=year, term=term).first()
+
+    # Getting student remarks if available
+    student_remarks = StudentRemarks.query.filter_by(
+        student_id=student_id, term=term, year=year
+    ).first()
+
+    # Getting number on roll
+    number_on_roll = Student.query.filter_by(class_id=student.class_id).count()
+
+    # Getting highest score in class
+    highest_score = max(student_totals.values()) if student_totals else 0
+
+    # Get class average
+    class_average = (
+        sum(student_totals.values()) / len(student_totals) if student_totals else 0
+    )
+
+    return render_template(
+        "exams_grading/student_report_card.html",
+        student=student,
+        class_=class_,
+        term_scores=term_scores,
+        subjects=subjects,
+        subject_positions=subject_positions,
+        term=term,
+        year=year,
+        total_marks_obtained=total_marks_obtained,
+        total_possible_marks=total_possible_marks,
+        percentage=percentage,
+        class_position=class_position,
+        number_on_roll=number_on_roll,
+        attendance_present=attendance_present,
+        attendance_absent=attendance_absent,
+        promotion_status=promotion_status,
+        class_teacher=class_teacher,
+        headteacher=headteacher,
+        highest_score=highest_score,
+        class_average=class_average,
+        school_info=school_info,
+        term_dates=term_dates,
+        student_remarks=student_remarks,
+        now=datetime.now(),
+    )
+
+
+# Route for admin/headteacher's interface for managing school information and term dates
+@bp.route("/school-info", methods=["GET", "POST"])
+@login_required
+@role_required(["admin", "headteacher"])
+def school_info():
+    """Manage school information"""
+    school = SchoolInfo.query.first()
+    form = SchoolInfoForm(obj=school)
+
+    if form.validate_on_submit():
+        if not school:
+            school = SchoolInfo()
+
+        form.populate_obj(school)
+
+        # Handle logo upload
+        if "logo" in request.files:
+            logo = request.files["logo"]
+            if logo and logo.filename != "":
+                filename = secure_filename(logo.filename)  # type: ignore
+                logo_path = os.path.join(current_app.config["DOCUMENT_DIR"], filename)
+                logo.save(logo_path)
+                school.logo_path = filename
+
+        if not SchoolInfo.query.first():
+            db.session.add(school)
+
+        db.session.commit()
+        flash("School information updated successfully!", "success")
+        return redirect(url_for("exams_grading.school_info"))
+
+    return render_template("exams_grading/school_info.html", form=form, school=school)
+
+
+# ---Term Dates---
+@bp.route("/term-dates", methods=["GET", "POST"])
+@login_required
+@role_required(["admin", "headteacher"])
+def term_dates():
+    """Manage term dates"""
+    term_dates_list = TermDates.query.all()
+    form = TermDatesForm()
+
+    if form.validate_on_submit():
+        # Check if this term already exists
+        existing = TermDates.query.filter_by(
+            academic_year=form.academic_year.data, term=form.term.data
+        ).first()
+
+        if existing:
+            flash(
+                "Term dates for this academic year and term already exist!", "warning"
+            )
+            return redirect(url_for("exams_grading.term_dates"))
+
+        term_date = TermDates(
+            academic_year=form.academic_year.data,
+            term=form.term.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            vacation_date=form.vacation_date.data,
+            reopening_date=form.reopening_date.data,
+        )
+
+        db.session.add(term_date)
+        db.session.commit()
+        flash("Term dates added successfully!", "success")
+        return redirect(url_for("exams_grading.term_dates"))
+
+    return render_template(
+        "exams_grading/term_dates.html", form=form, term_dates=term_dates_list
+    )
+
+
+# ---Delete term date---
+@bp.route("/term-dates/<int:id>/delete", methods=["POST"])
+@login_required
+@role_required(["admin", "headteacher"])
+def delete_term_dates(id):
+    """Delete term dates"""
+    term_date = TermDates.query.get_or_404(id)
+    db.session.delete(term_date)
+    db.session.commit()
+    flash("Term dates deleted successfully!", "success")
+
+    return redirect(url_for("exams_grading.term_dates"))
+
+
+# ---Helper Functions---
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in {
+        "png",
+        "jpg",
+        "jpeg",
+        "gif",
+    }
+
+
+def save_file(file, upload_folder):
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+        return filename
+    return None
+
+
+# Route for Teacher remarks interface
+@bp.route("/student-remarks/<int:student_id>/<term>/<year>", methods=["GET", "POST"])
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def student_remarks(student_id, term, year):
+    """Add or edit student remarks"""
+    student = Student.query.get_or_404(student_id)
+
+    # Checking if the current user is the class teacher or has higher privileges
+    if current_user.role in ["teacher"]:
+        teacher = Teacher.query.filter_by(email=current_user.email).first()
+        if not teacher or student.class_id not in [c.id for c in teacher.classes]:
+            flash("You are not authorized to add remarks for this student!", "danger")
+            return redirect(url_for("exams_grading.index"))
+
+    remarks = StudentRemarks.query.filter_by(
+        student_id=student_id, term=term, year=year
+    ).first()
+
+    form = StudentRemarksForm(obj=remarks)
+
+    if form.validate_on_submit():
+        if remarks:
+            form.populate_obj(remarks)
+            remarks.updated_at = datetime.now(timezone.utc)
+        else:
+            teacher = Teacher.query.filter_by(email=current_user.email).first()
+            if not teacher:
+                flash("Teacher profile not found!", "danger")
+                return redirect(url_for("exams_grading.index"))
+
+            remarks = StudentRemarks(
+                student_id=student_id, teacher_id=teacher.id, term=term, year=year
+            )
+            form.populate_obj(remarks)
+            db.session.add(remarks)
+
+        db.session.commit()
+        flash("Remarks saved successfully!", "success")
+        return redirect(
+            url_for(
+                "exams_grading.student_report_card",
+                student_id=student_id,
+                term=term,
+                year=year,
+            )
+        )
+
+    return render_template(
+        "exams_grading/student_remarks.html",
+        form=form,
+        student=student,
+        remarks=remarks,
+        term=term,
+        year=year,
+    )
+
+
 @bp.route("/class-reports/<int:class_id>/<term>/<year>")
 @login_required
 @role_required(["admin", "headteacher", "teacher"])
-def class_term_report(class_id, term, year):
+def class_term_report(class_id, term, year, student_id):
     """Generating term reports for all students in a class"""
     class_ = Class.query.get_or_404(class_id)
     students = Student.query.filter_by(class_id=class_id).all()
+    term_scores = TermScore.query.filter_by(student_id=student_id).all()
 
     return render_template(
         "exams_grading/class_term_report.html",
@@ -633,6 +999,7 @@ def class_term_report(class_id, term, year):
         students=students,
         term=term,
         year=year,
+        term_scores=term_scores,
     )
 
 
@@ -666,7 +1033,7 @@ def student_performance(student_id):
 
     # Calculating averages and trends for student
     for subject_id, data in performance_data.items():
-        scores = [score["total_score"] for score in data["score"].values()]
+        scores = [score["total_score"] for score in data["scores"].values()]
         if scores:
             data["average"] = sum(scores) / len(scores)
             data["trend"] = (
@@ -683,7 +1050,9 @@ def student_performance(student_id):
             data["trend"] = "no data"
 
     return render_template(
-        "exams_grading/student_performance.html", performance_data=performance_data
+        "exams_grading/student_performance.html",
+        student=student,
+        performance_data=performance_data,
     )
 
 
