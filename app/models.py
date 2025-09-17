@@ -229,6 +229,77 @@ class Student(db.Model):
         return self.full_name
 
 
+# ---Model for tracking student's Graduation Status---
+class GraduationStatus(db.Model):
+    """Track student graduation status"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    graduation_year = db.Column(db.String(10), nullable=False)
+    graduation_date = db.Column(db.Date)
+    status = db.Column(
+        db.String(20), default="completed"
+    )  # completed, transferred, dropped-out
+    final_grade = db.Column(db.String(5))
+    remarks = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationships
+    student = db.relationship("Student", backref="graduation_records")
+
+    def __repr__(self) -> str:
+        return f"<GraduationStatus {self.student_id} {self.graduation_year}>"
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+# ---Alumni---
+class Alumni(db.Model):
+    """Archive for graduated students"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    original_student_id = db.Column(db.Integer, nullable=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    middle_name = db.Column(db.String(50))
+    surname = db.Column(db.String(50), nullable=False)
+    gender = db.Column(db.String(10), nullable=False)
+    date_of_birth = db.Column(db.Date, nullable=False)
+    admission_date = db.Column(db.Date, nullable=False)
+    graduation_year = db.Column(db.String(10), nullable=False)
+    graduation_date = db.Column(db.Date, nullable=False)
+    hometown = db.Column(db.String(100))
+    father_name = db.Column(db.String(100))
+    mother_name = db.Column(db.String(100))
+    guardian_name = db.Column(db.String(100))
+    guardian_contact = db.Column(db.String(10))
+    religion = db.Column(db.String(100), nullable=True)
+    medical_records = db.Column(db.Text)
+    photo_path = db.Column(db.String(200))
+    final_class = db.Column(db.String(50))  # class of 2024 etc.
+    archived_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    def __repr__(self) -> str:
+        return f"<Alumni {self.first_name} {self.surname} ({self.graduation_year})>"
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @hybrid_property
+    def full_name(self):  # type: ignore
+        return f"{self.first_name or ''} {self.middle_name or ''} {self.surname or ''}".strip()
+
+    @property
+    def age(self):
+        today = date.today()
+        born = self.date_of_birth
+        return (
+            today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        )
+
+
 # Teacher Class Model
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
