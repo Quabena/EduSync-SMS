@@ -124,7 +124,7 @@ def edit(teacher_id):
 
     # Populate dropdowns
     form.specialization_id.choices = [
-        (s.id, s.name) for s in Subject.query.order_by(Subject.name).all()
+        (s.id, s.name) for s in Subject.query.order_by(Subject.name).all()  # type: ignore
     ]
     form.assigned_classes.choices = [
         (c.id, c.name) for c in Class.query.order_by(Class.name).all()

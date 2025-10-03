@@ -87,6 +87,14 @@ def create_app(config_class=Config):
 
     app.register_blueprint(exams_grading_bp)
 
+    from app.graduation import bp as alumni_bp
+
+    app.register_blueprint(alumni_bp)
+
+    from app.search.routes import bp as search_bp
+
+    app.register_blueprint(search_bp)
+
     csrf.init_app(app)
 
     return app

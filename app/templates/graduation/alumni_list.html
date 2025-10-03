@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Alumni Records{% endblock %}
+
+{% block head %}
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                animation: {
+                    'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                    'float': 'float 3s ease-in-out infinite',
+                    'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                }
+            }
+        }
+    }
+</script>
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-5px);
+        }
+    }
+
+    .alumni-row {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+
+    .alumni-row.animate {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .alumni-row:hover {
+        transform: translateY(-2px);
+    }
+
+    .avatar-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .status-indicator {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 12px;
+        height: 12px;
+        background-color: #10b981;
+        border: 2px solid white;
+        border-radius: 50%;
+    }
+
+    .card-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-hover {
+        transition: all 0.3s ease;
+    }
+
+    .btn-hover:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div>
+                    <h1
+                        class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent">
+                        Alumni Records</h1>
+                    <p class="text-lg text-gray-600">Manage and view all graduated students</p>
+                </div>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div class="w-full sm:w-auto">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Year</label>
+                        <select
+                            class="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
+                            id="yearFilter" onchange="filterByYear()">
+                            <option value="">All Years</option>
+                            {% for year in years %}
+                            <option value="{{ year }}" {% if selected_year==year %}selected{% endif %}>{{ year }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pt-6">
+                        <a href="{{ url_for('graduation.graduation_management') }}"
+                            class="inline-flex items-center px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg border border-blue-200 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 btn-hover shadow-sm">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back to Management
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Card -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover">
+            {% if alumni %}
+            <!-- Statistics Bar -->
+            <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-6 border-b border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-1">{{ alumni|length }}</div>
+                        <div class="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Alumni</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-emerald-600 mb-1">{{ years|length }}</div>
+                        <div class="text-sm font-medium text-gray-600 uppercase tracking-wide">Graduation Years</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-indigo-600 mb-1">
+                            {% if selected_year %}{{ selected_year }}{% else %}All{% endif %}
+                        </div>
+                        <div class="text-sm font-medium text-gray-600 uppercase tracking-wide">Current Filter</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alumni Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                                Student</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                                Year</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                                Final Class</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                                Gender</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for alum in alumni %}
+                        <tr class="alumni-row hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-6">
+                                <div class="flex items-center">
+                                    <div class="relative mr-4">
+                                        {% if alum.photo_path %}
+                                        <img src="{{ url_for('students.student_photo', filename=alum.photo_path) }}"
+                                            class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
+                                            alt="{{ alum.full_name }}">
+                                        {% else %}
+                                        <div
+                                            class="w-12 h-12 rounded-full avatar-gradient flex items-center justify-center border-2 border-white shadow-lg">
+                                            <i class="fas fa-user text-white text-lg"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="status-indicator"></div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ alum.full_name }}</h3>
+                                        <p class="text-sm text-gray-500 flex items-center">
+                                            <i class="fas fa-calendar-alt mr-2 text-gray-400"></i>
+                                            Born {{ alum.date_of_birth.strftime('%B %d, %Y') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span
+                                    class="inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
+                                    {{ alum.graduation_year }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span
+                                    class="inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-800">
+                                    {{ alum.final_class }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="text-gray-700 font-medium">{{ alum.gender }}</span>
+                            </td>
+                            <td class="px-6 py-6 text-center">
+                                <a href="{{ url_for('graduation.alumni_detail', alumni_id=alum.id) }}"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 btn-hover shadow-md">
+                                    <i class="fas fa-eye mr-2"></i>
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-16 px-6">
+                <div class="mb-6">
+                    <div
+                        class="inline-flex items-center justify-center w-24 h-24 bg-gray-100 rounded-full mb-4 animate-float">
+                        <i class="fas fa-graduation-cap text-gray-400 text-4xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-3">No Alumni Records Found</h3>
+                <p class="text-lg text-gray-600 mb-8 max-w-md mx-auto">
+                    {% if selected_year %}
+                    No alumni found for the selected year {{ selected_year }}.
+                    {% else %}
+                    There are no alumni records in the system yet.
+                    {% endif %}
+                </p>
+                {% if selected_year %}
+                <button onclick="clearFilter()"
+                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 btn-hover shadow-lg">
+                    <i class="fas fa-times mr-2"></i>
+                    Clear Filter
+                </button>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Additional Info Card -->
+        {% if alumni %}
+        <div
+            class="mt-8 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl p-8 text-center shadow-xl">
+            <div class="text-white">
+                <div
+                    class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4 animate-pulse-slow">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Alumni Analytics</h3>
+                <p class="text-blue-100 mb-6 max-w-2xl mx-auto">
+                    Track graduation trends, monitor student success rates, and generate comprehensive reports for
+                    institutional planning.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                        class="inline-flex items-center px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300 btn-hover shadow-lg">
+                        <i class="fas fa-download mr-2"></i>
+                        Export Data
+                    </button>
+                    <a href="{{url_for('graduation.graduation_statistics')}}">
+                        <button
+                            class="inline-flex items-center px-6 py-3 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-all duration-300 btn-hover border border-white/20">
+                            <i class="fas fa-chart-bar mr-2"></i>
+                            View Analytics
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function filterByYear() {
+        const year = document.getElementById('yearFilter').value;
+        if (year) {
+            window.location.href = "{{ url_for('graduation.alumni_list') }}?year=" + year;
+        } else {
+            window.location.href = "{{ url_for('graduation.alumni_list') }}";
+        }
+    }
+
+    function clearFilter() {
+        window.location.href = "{{ url_for('graduation.alumni_list') }}";
+    }
+
+    // Add smooth animations on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = document.querySelectorAll('.alumni-row');
+        rows.forEach((row, index) => {
+            setTimeout(() => {
+                row.classList.add('animate');
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}

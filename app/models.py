@@ -38,8 +38,17 @@ class Class(db.Model):
     level = db.Column(db.String(20))
     section = db.Column(db.String(1))
     master_class = db.Column(db.String(50))  # For grouping classes
+    is_alumni_class = db.Column(
+        db.Boolean, default=False
+    )  # Flag to identify alumni classes
 
-    students = db.relationship("Student", backref="classroom", lazy="dynamic")
+    students = db.relationship(
+        "Student",
+        back_populates="classroom",
+        foreign_keys="Student.class_id",
+        lazy="dynamic",
+    )
+
     teachers = db.relationship(
         "Teacher", secondary=teacher_class, back_populates="classes"
     )
@@ -53,6 +62,36 @@ class Class(db.Model):
     def __init__(self, **kwargs) -> None:
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def get_active_students(self):
+        """Get only active students (non-alumni)"""
+        return self.students.filter(Student.status == "active").all()
+
+    @classmethod
+    def get_alumni_class(cls, graduation_year):
+        """Get or create alumni class for a specific graduation year"""
+        alumni_class_name = f"Alumni - Class of {graduation_year}"
+        alumni_class = cls.query.filter_by(
+            name=alumni_class_name, is_alumni_class=True
+        ).first()
+
+        if not alumni_class:
+            alumni_class = cls(
+                name=alumni_class_name,
+                level="Alumni",
+                section="A",
+                master_class="Alumni",
+                is_alumni_class=True,
+            )
+            db.session.add(alumni_class)
+            db.session.commit()
+
+        return alumni_class
+
+    @classmethod
+    def get_active_classes(cls):
+        """Get all non-alumni classes"""
+        return cls.query.filter_by(is_alumni_class=False).order_by(cls.name).all()
 
 
 # Subject Class Model
@@ -194,9 +233,11 @@ class Student(db.Model):
     weight = db.Column(db.Integer, nullable=True)
     photo_path = db.Column(db.String(200))
     class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
+    status = db.Column(db.String(20), default="active")
     learning_style = db.Column(
         db.String(20)
     )  # Will be used for creating the learning style assessment engine
+    original_class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
 
     # Relationships
     subjects = db.relationship(
@@ -204,6 +245,12 @@ class Student(db.Model):
     )
     academic_records = db.relationship("AcademicRecord", back_populates="student")
     term_scores = db.relationship("TermScore", back_populates="student")
+    classroom = db.relationship(
+        "Class", foreign_keys=[class_id], back_populates="students"
+    )
+    original_class = db.relationship(
+        "Class", foreign_keys=[original_class_id], backref="former_students"
+    )
 
     def __init__(self, **kwargs) -> None:
         for key, value in kwargs.items():
@@ -224,6 +271,10 @@ class Student(db.Model):
     @full_name.expression
     def full_name(cls):
         return func.concat(cls.first_name, " ", cls.middle_name, " ", cls.surname)
+
+    def is_active(self):
+        """Check if student is currently active (not graduated)"""
+        return self.status == "active" and not self.classroom.name.startswith("Alumni")
 
     def __repr__(self) -> str:
         return self.full_name

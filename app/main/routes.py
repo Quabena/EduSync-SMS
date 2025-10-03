@@ -44,3 +44,10 @@ def index():
         return render_template("main/teacher_dashboard.html", title="Teacher Dashboard")
 
     return render_template("main/index.html", title="Dashboard")
+
+
+@bp.route("/contact-developer")
+@login_required
+@role_required(["admin", "headteacher"])
+def contact_developer():
+    return render_template("main/contact_developer.html")

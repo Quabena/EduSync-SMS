@@ -68,7 +68,14 @@ def generate_student_qr(student_id):
 @login_required
 @role_required(["admin", "headteacher", "teacher"])
 def index():
-    students = Student.query.all()
+    """Active students"""
+    active_classes = Class.get_active_classes()
+    active_class_ids = [c.id for c in active_classes]
+
+    students = Student.query.filter(
+        Student.class_id.in_(active_class_ids), Student.status == "active"
+    ).all()
+
     return render_template("students/list.html", students=students)
 
 
@@ -78,8 +85,9 @@ def index():
 @role_required(["admin", "headteacher"])
 def create():
     form = StudentForm()
-    # if not form:
-    #     return render_template("students/create.html", form=form)
+
+    # Update class to only show active classes
+    form.class_id.choices = [(c.id, c.name) for c in Class.get_active_classes()]
 
     # Allowed types / extensions
     ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
@@ -227,9 +235,13 @@ def detail(student_id):
 def edit(student_id):
     student = Student.query.get_or_404(student_id)
     form = StudentForm(obj=student)
-    form.class_id.choices = [
-        (c.id, c.name) for c in Class.query.order_by(Class.name).all()
-    ]
+
+    # Only allowing editing of active students in active classes
+    if student.status == "graduated":
+        flash("Cannot edit graduated students. Revert graduation first!", "warning")
+        return redirect(url_for("students.details", student_id=student_id))
+
+    form.class_id.choices = [(c.id, c.name) for c in Class.get_active_classes()]
 
     if form.validate_on_submit():
         if form.photo.data:

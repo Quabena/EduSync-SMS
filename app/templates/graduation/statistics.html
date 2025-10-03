@@ -1,0 +1,409 @@
+{% extends "base.html" %} {% block title %}Graduation Statistics{% endblock %}
+{% block head %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          primary: {
+            50: "#eff6ff",
+            100: "#dbeafe",
+            200: "#bfdbfe",
+            300: "#93c5fd",
+            400: "#60a5fa",
+            500: "#3b82f6",
+            600: "#2563eb",
+            700: "#1d4ed8",
+            800: "#1e40af",
+            900: "#1e3a8a",
+          },
+          secondary: {
+            50: "#f8fafc",
+            100: "#f1f5f9",
+            200: "#e2e8f0",
+            300: "#cbd5e1",
+            400: "#94a3b8",
+            500: "#64748b",
+            600: "#475569",
+            700: "#334155",
+            800: "#1e293b",
+            900: "#0f172a",
+          },
+        },
+      },
+    },
+  };
+</script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+<style>
+  .gradient-bg {
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+  }
+  .dark .gradient-bg {
+    background: linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%);
+  }
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  .dark .card-hover:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3),
+      0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+  .progress-bar {
+    transition: width 1s ease-in-out;
+  }
+  .stat-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+  }
+  .dark .stat-card {
+    background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  }
+</style>
+{% endblock %} {% block content %}
+<div
+  class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-800 py-8"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700"
+      >
+        <div class="gradient-bg px-8 py-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-white">
+                Graduation Statistics
+              </h1>
+              <p class="text-white/80 mt-1">
+                Comprehensive analytics and insights
+              </p>
+            </div>
+            <div class="hidden md:block">
+              <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                <p class="text-white font-semibold flex items-center">
+                  <i class="fas fa-chart-bar mr-2"></i>
+                  Analytics Dashboard
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Graduates by Year -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden card-hover border border-gray-200 dark:border-gray-700"
+      >
+        <div
+          class="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-blue-600 dark:to-blue-700 px-6 py-4"
+        >
+          <h3 class="text-xl font-bold text-white flex items-center">
+            <i class="fas fa-calendar-alt mr-3"></i>
+            Graduates by Year
+          </h3>
+        </div>
+        <div class="p-6">
+          {# Ensure any generator/iterator is evaluated to a real list (safe if
+          None) #} {% set year_counts = year_counts|default([])|list %} {% if
+          year_counts %}
+          <div class="space-y-4">
+            {% for year, count in year_counts %}
+            <div
+              class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:bg-blue-900/20 rounded-xl border border-indigo-200 dark:border-blue-800 shadow-sm"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 dark:bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-4 shadow-lg"
+                >
+                  {{ year|string|slice(-2) }}
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-900 dark:text-white">
+                    {{ year }}
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Academic Year
+                  </p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p
+                  class="text-2xl font-bold text-indigo-600 dark:text-blue-400"
+                >
+                  {{ count }}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Graduates
+                </p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-12">
+            <i
+              class="fas fa-chart-line text-6xl text-gray-300 dark:text-gray-600 mb-4"
+            ></i>
+            <p class="text-gray-500 dark:text-gray-400 text-lg">
+              No graduation data available
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Gender Distribution -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden card-hover border border-gray-200 dark:border-gray-700"
+      >
+        <div
+          class="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-600 dark:to-emerald-700 px-6 py-4"
+        >
+          <h3 class="text-xl font-bold text-white flex items-center">
+            <i class="fas fa-venus-mars mr-3"></i>
+            Gender Distribution {% if latest_year %}({{ latest_year }}){% endif
+            %}
+          </h3>
+        </div>
+        <div class="p-6">
+          {% if gender_distribution %} {% set total =
+          gender_distribution|sum(attribute='1') %}
+          <div class="space-y-4">
+            {% for gender, count in gender_distribution %} {% set percentage =
+            (count / total) * 100 %}
+            <div
+              class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800 shadow-sm"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center">
+                  <i
+                    class="fas fa-{% if gender == 'Male' %}mars{% elif gender == 'Female' %}venus{% else %}genderless{% endif %} text-emerald-700 dark:text-emerald-400 mr-3 text-lg"
+                  ></i>
+                  <span class="font-semibold text-gray-900 dark:text-white"
+                    >{{ gender }}</span
+                  >
+                </div>
+                <div class="text-right">
+                  <span
+                    class="text-lg font-bold text-emerald-700 dark:text-emerald-400"
+                    >{{ count }}</span
+                  >
+                  <span class="text-sm text-gray-500 dark:text-gray-400 ml-2"
+                    >({{ "%.1f"|format(percentage) }}%)</span
+                  >
+                </div>
+              </div>
+              <div
+                class="w-full bg-emerald-200 dark:bg-emerald-800 rounded-full h-3 shadow-inner"
+              >
+                <div
+                  class="bg-gradient-to-r from-emerald-500 to-teal-500 dark:bg-emerald-400 h-3 rounded-full progress-bar shadow-sm"
+                  style="width: {{ percentage }}%"
+                ></div>
+              </div>
+            </div>
+            {% endfor %}
+
+            <!-- Total -->
+            <div
+              class="bg-gradient-to-r from-emerald-100 to-teal-100 dark:bg-emerald-900/40 rounded-xl p-4 border-2 border-emerald-300 dark:border-emerald-700 shadow-md"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <i
+                    class="fas fa-users text-emerald-800 dark:text-emerald-300 mr-3 text-lg"
+                  ></i>
+                  <span class="font-bold text-emerald-900 dark:text-emerald-100"
+                    >Total</span
+                  >
+                </div>
+                <div class="text-right">
+                  <span
+                    class="text-xl font-bold text-emerald-800 dark:text-emerald-300"
+                    >{{ total }}</span
+                  >
+                  <span
+                    class="text-sm text-emerald-700 dark:text-emerald-400 ml-2"
+                    >(100%)</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="text-center py-12">
+            <i
+              class="fas fa-venus-mars text-6xl text-gray-300 dark:text-gray-600 mb-4"
+            ></i>
+            <p class="text-gray-500 dark:text-gray-400 text-lg">
+              No gender distribution data available
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Class Distribution - Full Width -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden card-hover mb-8 border border-gray-200 dark:border-gray-700"
+    >
+      <div
+        class="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-600 dark:to-purple-700 px-6 py-4"
+      >
+        <h3 class="text-xl font-bold text-white flex items-center">
+          <i class="fas fa-graduation-cap mr-3"></i>
+          Class Distribution {% if latest_year %}({{ latest_year }}){% endif %}
+        </h3>
+      </div>
+      <div class="p-6">
+        {% if class_distribution %} {% set total =
+        class_distribution|sum(attribute='1') %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for class_name, count in class_distribution %} {% set percentage =
+          (count / total) * 100 %}
+          <div
+            class="stat-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 dark:bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-4 shadow-lg"
+              >
+                {{ class_name[:2] }}
+              </div>
+              <h4 class="font-bold text-gray-900 dark:text-white text-lg mb-2">
+                {{ class_name }}
+              </h4>
+              <div
+                class="text-3xl font-bold text-purple-700 dark:text-purple-400 mb-1"
+              >
+                {{ count }}
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                {{ "%.1f"|format(percentage) }}% of total
+              </div>
+
+              <!-- Progress Ring -->
+              <div class="relative w-20 h-20 mx-auto">
+                <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    class="text-purple-300 dark:text-purple-800"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  ></path>
+                  <path
+                    class="text-purple-600 dark:text-purple-400"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    fill="none"
+                    stroke-dasharray="{{ percentage }}, 100"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  ></path>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span
+                    class="text-sm font-semibold text-purple-700 dark:text-purple-400"
+                    >{{ "%.0f"|format(percentage) }}%</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Summary Card -->
+        <div
+          class="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-300 dark:border-purple-800 shadow-lg"
+        >
+          <div class="flex items-center justify-center">
+            <div class="text-center">
+              <i
+                class="fas fa-users text-purple-700 dark:text-purple-400 text-3xl mb-2"
+              ></i>
+              <h4
+                class="font-bold text-purple-900 dark:text-purple-100 text-lg"
+              >
+                Total Graduates
+              </h4>
+              <div
+                class="text-4xl font-bold text-purple-700 dark:text-purple-400"
+              >
+                {{ total }}
+              </div>
+              <p class="text-purple-800 dark:text-purple-300 text-sm mt-1">
+                Across all classes
+              </p>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+          <i
+            class="fas fa-graduation-cap text-6xl text-gray-300 dark:text-gray-600 mb-4"
+          ></i>
+          <p class="text-gray-500 dark:text-gray-400 text-lg">
+            No class distribution data available
+          </p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Action Button -->
+    <div class="text-center">
+      <a
+        href="{{ url_for('graduation.graduation_management') }}"
+        class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-primary-700 dark:to-primary-800 hover:from-indigo-700 hover:to-purple-700 dark:hover:from-primary-800 dark:hover:to-primary-900 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+      >
+        <i class="fas fa-arrow-left mr-3"></i>
+        Back to Management
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add smooth animations when page loads
+  document.addEventListener("DOMContentLoaded", function () {
+    // Animate progress bars
+    const progressBars = document.querySelectorAll(".progress-bar");
+    progressBars.forEach((bar) => {
+      const width = bar.style.width;
+      bar.style.width = "0%";
+      setTimeout(() => {
+        bar.style.width = width;
+      }, 500);
+    });
+
+    // Add stagger animation to cards
+    const cards = document.querySelectorAll(".card-hover");
+    cards.forEach((card, index) => {
+      card.style.opacity = "0";
+      card.style.transform = "translateY(20px)";
+      setTimeout(() => {
+        card.style.transition = "all 0.6s ease";
+        card.style.opacity = "1";
+        card.style.transform = "translateY(0)";
+      }, index * 100);
+    });
+  });
+</script>
+{% endblock %}
