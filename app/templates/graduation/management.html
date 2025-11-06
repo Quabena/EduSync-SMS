@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}Graduation Management{% endblock %}
-{% block head %}
+{% extends "base.html" %} {% block title %}Graduation Management - Namong SDA
+JHS{% endblock %} {% block head %}
 <script src="https://cdn.tailwindcss.com"></script>
 <link
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -146,7 +146,9 @@
         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
       >
         <div class="animate-item">
-          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          <h1
+            class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
+          >
             Graduation Management
           </h1>
           <p class="text-lg text-gray-600">
@@ -191,7 +193,7 @@
               Candidates
             </p>
             <p class="text-2xl font-bold text-gray-900">
-              {{ candidates|length if candidates else 0 }}
+              {{ candidates|length }}
             </p>
           </div>
         </div>
@@ -214,7 +216,7 @@
               Recent Grads
             </p>
             <p class="text-2xl font-bold text-gray-900">
-              {{ recent_graduations|length if recent_graduations else 0 }}
+              {{ recent_graduations|length }}
             </p>
           </div>
         </div>
@@ -234,10 +236,14 @@
             <p
               class="text-sm font-medium text-gray-600 uppercase tracking-wide"
             >
-              This Month
+              Final Year Classes
             </p>
             <p class="text-2xl font-bold text-gray-900">
-              {{ recent_graduations|length if recent_graduations else 0 }}
+              {% set final_year_classes = [] %} {% for candidate in candidates
+              %} {% if candidate.classroom and candidate.classroom.name not in
+              final_year_classes %} {% set _ =
+              final_year_classes.append(candidate.classroom.name) %} {% endif %}
+              {% endfor %} {{ final_year_classes|length }}
             </p>
           </div>
         </div>
@@ -268,21 +274,22 @@
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
       <!-- Graduation Candidates Section -->
-      <div class="animate-item" style="animation-delay: 0.6s">
+      <div class="animate-item transition-all" style="animation-delay: 0.6s">
         <div
-          class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover"
+          class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md"
         >
+          <!-- Header Section -->
           <div
-            class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-6 border-b border-gray-200"
+            class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-100"
           >
             <div class="flex items-center justify-between">
-              <div class="flex items-center">
+              <div class="flex items-center space-x-4">
                 <div
-                  class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4"
+                  class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm"
                 >
                   <svg
-                    width="18"
-                    height="18"
+                    width="20"
+                    height="20"
                     viewBox="0 0 24 24"
                     fill="none"
                     class="text-white"
@@ -292,56 +299,50 @@
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-xl font-bold text-gray-900">
+                  <h3 class="text-lg font-semibold text-gray-900">
                     Graduation Candidates
                   </h3>
-                  <p class="text-gray-600">Students eligible for graduation</p>
+                  <p class="text-sm text-gray-600 mt-1">
+                    Students eligible for graduation
+                  </p>
                 </div>
               </div>
 
-              {# Show total-ready badge if candidates exist #} {% set candidates
-              = candidates|default([])|list %} {% set total_candidates =
-              candidates|length %} {% if total_candidates %}
+              {% if candidates %}
               <div
-                class="inline-flex items-center px-3 py-1 bg-blue-100 rounded-full"
+                class="inline-flex items-center px-3 py-1.5 bg-white rounded-full border border-blue-200 shadow-xs"
               >
-                <span class="text-blue-800 font-semibold text-sm"
-                  >{{ total_candidates }} Ready</span
+                <span class="text-blue-700 font-medium text-sm"
+                  >{{ candidates|length }} Ready</span
                 >
               </div>
               {% endif %}
             </div>
           </div>
 
-          <div class="p-6">
-            {# --- Pagination logic (10 per page) --- #} {% set page =
-            (request.args.get('page', 1) | int) if request.args is defined else
-            1 %} {% if page < 1 %}{% set page = 1 %}{% endif %} {% set per_page
-            = 10 %} {% set total_pages = ((total_candidates + per_page - 1) //
-            per_page) if total_candidates else 1 %} {% if page > total_pages
-            %}{% set page = total_pages %}{% endif %} {% set start = (page - 1)
-            * per_page %} {% set end = start + per_page %} {% set page_items =
-            candidates[start:end] %} {% if page_items %}
-            <div class="space-y-4">
-              {% for student in page_items %}
+          <!-- Content Section -->
+          <div class="p-5">
+            {% if candidates %}
+            <div class="space-y-3">
+              {% for student in candidates %}
               <div
-                class="table-row flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 transition-all p-2"
+                class="flex items-center justify-between p-4 rounded-lg border border-gray-150 bg-gray-50/50 hover:bg-white hover:border-gray-200 transition-all duration-200 group"
               >
-                <div class="flex items-center">
-                  <div class="relative mr-4">
+                <div class="flex items-center space-x-4">
+                  <div class="relative">
                     {% if student.photo_path %}
                     <img
                       src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
-                      class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
+                      class="w-11 h-11 rounded-lg object-cover border-2 border-white shadow-xs"
                       alt="{{ student.full_name }}"
                     />
                     {% else %}
                     <div
-                      class="w-12 h-12 rounded-full avatar-gradient flex items-center justify-center border-2 border-white shadow-lg"
+                      class="w-11 h-11 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center border-2 border-white shadow-xs"
                     >
                       <svg
-                        width="20"
-                        height="20"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
                         fill="none"
                         class="text-white"
@@ -358,32 +359,37 @@
                       </svg>
                     </div>
                     {% endif %}
-                    <div class="status-indicator animate-pulse-slow"></div>
+                    <div
+                      class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"
+                    ></div>
                   </div>
                   <div>
-                    <h4 class="font-semibold text-gray-900">
+                    <h4 class="font-semibold text-gray-900 text-sm">
                       {{ student.full_name }}
                     </h4>
-                    <div class="flex items-center mt-1">
+                    <div class="flex items-center space-x-2 mt-1">
                       <span
-                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+                        class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
                       >
                         {{ student.classroom.name if student.classroom else
                         'N/A' }}
                       </span>
+                      <span class="text-xs text-gray-500"
+                        >{{ student.gender }}</span
+                      >
                     </div>
                   </div>
                 </div>
                 <a
                   href="{{ url_for('graduation.graduate_students', student_id=student.id) }}"
-                  class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 btn-hover shadow-md"
+                  class="inline-flex items-center px-3.5 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-xs hover:shadow-sm transform hover:-translate-y-0.5"
                 >
                   <svg
-                    width="16"
-                    height="16"
+                    width="14"
+                    height="14"
                     viewBox="0 0 24 24"
                     fill="none"
-                    class="mr-2"
+                    class="mr-1.5"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
@@ -397,85 +403,23 @@
               {% endfor %}
             </div>
 
-            {# --- Pagination controls --- #}
-            <div class="mt-6 flex items-center justify-center space-x-2">
-              {# Previous button #} {% if page > 1 %}
-              <a
-                href="{{ request.path }}?page={{ page - 1 }}"
-                class="inline-flex items-center px-3 py-1 rounded-lg border border-gray-200 bg-white text-gray-700"
-              >
-                &larr; Prev
-              </a>
-              {% else %}
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-lg border border-gray-100 bg-gray-50 text-gray-300"
-              >
-                &larr; Prev
-              </span>
-              {% endif %} {# Page numbers (show a window if many pages) #} {%
-              set start_page = (page - 2) if (page - 2) > 1 else 1 %} {% set
-              end_page = (page + 2) if (page + 2) < total_pages else total_pages
-              %} {% if start_page > 1 %}
-              <a
-                href="{{ request.path }}?page=1"
-                class="px-3 py-1 rounded-lg border border-gray-200 bg-white text-gray-700"
-                >1</a
-              >
-              {% if start_page > 2 %}
-              <span class="px-2 text-gray-400">…</span>
-              {% endif %} {% endif %} {% for p in range(start_page, end_page +
-              1) %} {% if p == page %}
-              <span
-                class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-semibold"
-                >{{ p }}</span
-              >
-              {% else %}
-              <a
-                href="{{ request.path }}?page={{ p }}"
-                class="px-3 py-1 rounded-lg border border-gray-200 bg-white text-gray-700"
-                >{{ p }}</a
-              >
-              {% endif %} {% endfor %} {% if end_page < total_pages %} {% if
-              end_page < total_pages - 1 %}
-              <span class="px-2 text-gray-400">…</span>
-              {% endif %}
-              <a
-                href="{{ request.path }}?page={{ total_pages }}"
-                class="px-3 py-1 rounded-lg border border-gray-200 bg-white text-gray-700"
-                >{{ total_pages }}</a
-              >
-              {% endif %} {# Next button #} {% if page < total_pages %}
-              <a
-                href="{{ request.path }}?page={{ page + 1 }}"
-                class="inline-flex items-center px-3 py-1 rounded-lg border border-gray-200 bg-white text-gray-700"
-              >
-                Next &rarr;
-              </a>
-              {% else %}
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-lg border border-gray-100 bg-gray-50 text-gray-300"
-              >
-                Next &rarr;
-              </span>
-              {% endif %}
-            </div>
-
             {% else %}
-            <div class="text-center py-12">
+            <!-- Empty State -->
+            <div class="text-center py-10">
               <div
-                class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4 animate-float"
+                class="inline-flex items-center justify-center w-14 h-14 bg-blue-50 rounded-xl mb-4 border border-blue-100"
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 2L3 7v7c0 3 4 5 9 5s9-2 9-5V7l-9-5z"
                     fill="#2563EB"
                   />
                 </svg>
               </div>
-              <h4 class="text-lg font-semibold text-gray-900 mb-2">
+              <h4 class="text-base font-semibold text-gray-900 mb-1">
                 No Graduation Candidates
               </h4>
-              <p class="text-gray-600">
+              <p class="text-sm text-gray-600 max-w-xs mx-auto">
                 There are currently no students eligible for graduation.
               </p>
             </div>
@@ -487,30 +431,45 @@
       <!-- Recent Graduations Section -->
       <div class="animate-item" style="animation-delay: 0.7s">
         <div
-          class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover"
+          class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md"
         >
+          <!-- Header Section -->
           <div
-            class="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-6 border-b border-gray-200"
+            class="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-5 border-b border-gray-100"
           >
             <div class="flex items-center justify-between">
-              <div class="flex items-center">
+              <div class="flex items-center space-x-4">
                 <div
-                  class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center mr-4"
+                  class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-sm"
                 >
-                  <i class="fas fa-graduation-cap text-white"></i>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    class="text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 2L3 7v7c0 3 4 5 9 5s9-2 9-5V7l-9-5z"
+                      fill="currentColor"
+                    />
+                  </svg>
                 </div>
                 <div>
-                  <h3 class="text-xl font-bold text-gray-900">
+                  <h3 class="text-lg font-semibold text-gray-900">
                     Recent Graduations
                   </h3>
-                  <p class="text-gray-600">Recently graduated students</p>
+                  <p class="text-sm text-gray-600 mt-1">
+                    Recently graduated students
+                  </p>
                 </div>
               </div>
               {% if recent_graduations %}
               <div
-                class="inline-flex items-center px-3 py-1 bg-emerald-100 rounded-full"
+                class="inline-flex items-center px-3 py-1.5 bg-white rounded-full border border-emerald-200 shadow-xs"
               >
-                <span class="text-emerald-800 font-semibold text-sm"
+                <span class="text-emerald-700 font-medium text-sm"
                   >{{ recent_graduations|length }} Completed</span
                 >
               </div>
@@ -518,41 +477,72 @@
             </div>
           </div>
 
-          <div class="p-6">
+          <!-- Content Section -->
+          <div class="p-5">
             {% if recent_graduations %}
-            <div class="space-y-4 mb-6">
+            <div class="space-y-3 mb-5">
               {% for grad in recent_graduations %}
               <div
-                class="table-row flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100"
+                class="flex items-center justify-between p-4 rounded-lg border border-gray-150 bg-gray-50/50 hover:bg-white hover:border-gray-200 transition-all duration-200 group"
               >
-                <div class="flex items-center">
-                  <div class="relative mr-4">
+                <div class="flex items-center space-x-4">
+                  <div class="relative">
                     {% if grad.student.photo_path %}
                     <img
-                      src="{{ url_for('static', filename='uploads/' + grad.student.photo_path) }}"
-                      class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
+                      src="{{ url_for('students.student_photo', filename=grad.student.photo_path) }}"
+                      class="w-11 h-11 rounded-lg object-cover border-2 border-white shadow-xs"
                       alt="{{ grad.student.full_name }}"
                     />
                     {% else %}
                     <div
-                      class="w-12 h-12 rounded-full avatar-gradient flex items-center justify-center border-2 border-white shadow-lg"
+                      class="w-11 h-11 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center border-2 border-white shadow-xs"
                     >
-                      <i class="fas fa-user text-white"></i>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        class="text-white"
+                      >
+                        <path
+                          d="M12 12a5 5 0 100-10 5 5 0 000 10z"
+                          fill="currentColor"
+                        />
+                        <path
+                          d="M2 20a10 10 0 0120 0v1H2v-1z"
+                          fill="currentColor"
+                          opacity="0.85"
+                        />
+                      </svg>
                     </div>
                     {% endif %}
                     <div
-                      class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white"
+                      class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white"
                     >
-                      <i class="fas fa-check text-white text-xs"></i>
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        class="text-white"
+                      >
+                        <path
+                          d="M20 6L9 17l-5-5"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
                     </div>
                   </div>
                   <div>
-                    <h4 class="font-semibold text-gray-900">
+                    <h4 class="font-semibold text-gray-900 text-sm">
                       {{ grad.student.full_name }}
                     </h4>
-                    <div class="flex items-center mt-1 space-x-2">
+                    <div class="flex items-center space-x-2 mt-1">
                       <span
-                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                        class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
                       >
                         {{ grad.graduation_year }}
                       </span>
@@ -564,50 +554,89 @@
                     </div>
                   </div>
                 </div>
-                <div class="text-right">
-                  <div
-                    class="inline-flex items-center px-2 py-1 bg-green-100 rounded-full"
+                <div
+                  class="inline-flex items-center px-2.5 py-1 bg-emerald-50 rounded-lg border border-emerald-200"
+                >
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="text-emerald-600 mr-1.5"
                   >
-                    <i class="fas fa-medal text-green-600 text-xs mr-1"></i>
-                    <span class="text-green-800 font-medium text-xs"
-                      >Graduated</span
-                    >
-                  </div>
+                    <path d="M12 2L3 7v7c0 3 4 5 9 5s9-2 9-5V7l-9-5z" />
+                  </svg>
+                  <span class="text-emerald-700 font-medium text-xs"
+                    >Graduated</span
+                  >
                 </div>
               </div>
               {% endfor %}
             </div>
             {% else %}
-            <div class="text-center py-12">
+            <!-- Empty State -->
+            <div class="text-center py-10">
               <div
-                class="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4 animate-float"
+                class="inline-flex items-center justify-center w-14 h-14 bg-emerald-50 rounded-xl mb-4 border border-emerald-100"
               >
-                <i class="fas fa-graduation-cap text-emerald-600 text-2xl"></i>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 2L3 7v7c0 3 4 5 9 5s9-2 9-5V7l-9-5z"
+                    fill="#059669"
+                  />
+                </svg>
               </div>
-              <h4 class="text-lg font-semibold text-gray-900 mb-2">
+              <h4 class="text-base font-semibold text-gray-900 mb-1">
                 No Recent Graduations
               </h4>
-              <p class="text-gray-600">No students have graduated recently.</p>
+              <p class="text-sm text-gray-600 max-w-xs mx-auto">
+                No students have graduated recently.
+              </p>
             </div>
             {% endif %}
 
             <!-- Action Buttons -->
             <div
-              class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200"
+              class="flex flex-col sm:flex-row gap-3 pt-5 border-t border-gray-150"
             >
               <a
                 href="{{ url_for('graduation.alumni_list') }}"
-                class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 btn-hover shadow-lg"
+                class="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-xs hover:shadow-sm transform hover:-translate-y-0.5"
               >
-                <i class="fas fa-users mr-2"></i>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  class="mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 5.5V7H9V5.5L3 7V9L9 10.5V12L5 13V15L9 13.5V22H15V13.5L19 15V13L15 12V10.5L21 9Z"
+                    fill="currentColor"
+                  />
+                </svg>
                 View All Alumni
               </a>
-              <button
-                class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-all duration-300 btn-hover"
+              <a
+                href="{{ url_for('graduation.alumni_classes') }}"
+                class="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-all duration-200 shadow-xs hover:shadow-sm"
               >
-                <i class="fas fa-download mr-2"></i>
-                Export Records
-              </button>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  class="mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2L3 7v7c0 3 4 5 9 5s9-2 9-5V7l-9-5z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Alumni Classes
+              </a>
             </div>
           </div>
         </div>
@@ -633,18 +662,20 @@
           system.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
+          <a
+            href="{{ url_for('graduation.graduation_statistics') }}"
             class="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300 btn-hover shadow-lg"
           >
-            <i class="fas fa-cog mr-2"></i>
-            System Settings
-          </button>
-          <button
+            <i class="fas fa-chart-line mr-2"></i>
+            View Analytics
+          </a>
+          <a
+            href="{{ url_for('graduation.alumni_list') }}"
             class="inline-flex items-center px-8 py-4 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-all duration-300 btn-hover border border-white/20"
           >
-            <i class="fas fa-question-circle mr-2"></i>
-            Help & Support
-          </button>
+            <i class="fas fa-user-graduate mr-2"></i>
+            Browse Alumni
+          </a>
         </div>
       </div>
     </div>

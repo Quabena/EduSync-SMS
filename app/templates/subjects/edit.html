@@ -1,67 +1,407 @@
-{% extends "base.html" %} {% block content %}
-<div class="container mx-auto px-4">
-  <h1 class="text-2xl font-bold mb-6">Edit Subject: {{ subject.name }}</h1>
+{% extends 'base.html' %} {% block title %}Edit Subject{% endblock %} {% block
+content %}
+<div
+  class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50/30 to-cyan-50"
+>
+  <div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="mb-6">
+      <a
+        href="{{ url_for('subjects.index') }}"
+        class="inline-flex items-center text-slate-600 hover:text-sky-600 transition-colors duration-200 group"
+      >
+        <svg
+          class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+        Back to Subjects
+      </a>
+    </div>
 
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-    <form method="POST">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <!-- Subject Information -->
-        <div class="md:col-span-2">
-          <h2 class="text-lg font-semibold mb-3">Subject Information</h2>
+    <div class="relative mb-8">
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-sky-300/40 to-cyan-300/40 rounded-3xl blur-xl opacity-60"
+      ></div>
+
+      <div
+        class="relative bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-white/60 shadow-2xl"
+      >
+        <div class="flex items-center mb-6">
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-2xl flex items-center justify-center mr-5 shadow-lg"
+          >
+            <svg
+              class="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              ></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-slate-800 mb-1">Edit Subject</h1>
+            <p class="text-slate-600">Update subject information and details</p>
+          </div>
         </div>
 
-        <div>
-          <label
-            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-            for="name"
-          >
-            Subject Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value="{{ subject.name }}"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="e.g., Mathematics"
-            required
-          />
+        <div class="grid grid-cols-2 gap-4 mb-8">
+          <div class="relative group">
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-sky-300/30 to-blue-300/30 rounded-2xl blur opacity-50 group-hover:opacity-70 transition-opacity duration-300"
+            ></div>
+            <div
+              class="relative bg-white/50 backdrop-blur-md rounded-2xl p-5 border border-white/60 shadow-lg"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-slate-500 font-medium mb-1">
+                    Enrolled Students
+                  </p>
+                  <!-- <p class="text-3xl font-bold text-sky-600">
+                    {{ subject.students|length }}
+                  </p> -->
+                  <p class="text-3xl font-bold text-sky-600">
+                    {{ active_students_count }}
+                  </p>
+                </div>
+                <div
+                  class="w-12 h-12 bg-gradient-to-br from-sky-400 to-blue-500 rounded-xl flex items-center justify-center"
+                >
+                  <svg
+                    class="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative group">
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-cyan-300/30 to-blue-300/30 rounded-2xl blur opacity-50 group-hover:opacity-70 transition-opacity duration-300"
+            ></div>
+            <div
+              class="relative bg-white/50 backdrop-blur-md rounded-2xl p-5 border border-white/60 shadow-lg"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-slate-500 font-medium mb-1">
+                    Assigned Teachers
+                  </p>
+                  <p class="text-3xl font-bold text-cyan-600">
+                    {{ subject.teachers|length }}
+                  </p>
+                </div>
+                <div
+                  class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center"
+                >
+                  <svg
+                    class="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label
-            class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-            for="code"
+        <form method="POST" class="space-y-6">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+          <div>
+            <label
+              for="name"
+              class="block text-sm font-semibold text-slate-700 mb-2 flex items-center"
+            >
+              Subject Name
+              <span class="ml-1 text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+              >
+                <svg
+                  class="w-5 h-5 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{ subject.name }}"
+                required
+                class="w-full pl-12 pr-4 py-3.5 bg-white/60 backdrop-blur-sm border-2 border-white/80 rounded-xl focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition-all duration-200 placeholder-slate-400 shadow-inner"
+                placeholder="e.g., Mathematics, English Literature, Physics"
+              />
+            </div>
+            <p class="mt-2 text-sm text-slate-500">
+              The full name of the subject
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="code"
+              class="block text-sm font-semibold text-slate-700 mb-2 flex items-center"
+            >
+              Subject Code
+              <span class="ml-2 text-xs text-slate-500 font-normal"
+                >(Optional)</span
+              >
+            </label>
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+              >
+                <svg
+                  class="w-5 h-5 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="code"
+                name="code"
+                value="{{ subject.code or '' }}"
+                class="w-full pl-12 pr-4 py-3.5 bg-white/60 backdrop-blur-sm border-2 border-white/80 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-200 placeholder-slate-400 shadow-inner"
+                placeholder="e.g., MATH101, ENG201, PHY301"
+              />
+            </div>
+            <p class="mt-2 text-sm text-slate-500">
+              A unique identifier or abbreviation for the subject
+            </p>
+          </div>
+
+          <div class="relative">
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-sky-200/30 to-cyan-200/30 rounded-2xl blur"
+            ></div>
+            <div
+              class="relative bg-gradient-to-r from-sky-50/80 to-cyan-50/80 backdrop-blur-sm border-l-4 border-sky-400 p-5 rounded-r-2xl"
+            >
+              <div class="flex items-start">
+                <svg
+                  class="w-5 h-5 text-sky-500 mr-3 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <div>
+                  <h3 class="font-semibold text-sky-900 text-sm mb-1">
+                    Update Information
+                  </h3>
+                  <p class="text-sky-800 text-sm">
+                    Changes will be saved immediately and reflected across all
+                    related records. Student and teacher assignments remain
+                    unchanged.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-end space-x-4 pt-8 border-t border-white/50"
           >
-            Subject Code
-          </label>
-          <input
-            type="text"
-            id="code"
-            name="code"
-            value="{{ subject.code }}"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="e.g., MATH101"
-            required
-          />
+            <a
+              href="{{ url_for('subjects.index') }}"
+              class="px-6 py-3 bg-white/70 backdrop-blur-sm text-slate-700 font-medium rounded-xl border-2 border-white/80 hover:bg-white/90 hover:border-slate-300 transition-all duration-200 shadow-lg"
+            >
+              Cancel
+            </a>
+            <button
+              type="submit"
+              class="px-8 py-3 bg-gradient-to-r from-sky-500 to-cyan-600 text-white font-semibold rounded-xl hover:from-sky-600 hover:to-cyan-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center group"
+            >
+              <svg
+                class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-200"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+              Update Subject
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="relative group">
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-sky-300/30 to-blue-300/30 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-opacity duration-300"
+        ></div>
+        <div
+          class="relative bg-white/40 backdrop-blur-lg rounded-2xl p-5 border border-white/60 shadow-lg hover:shadow-xl transition-shadow duration-300"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-sky-400 to-blue-500 rounded-xl flex items-center justify-center mr-4"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 font-medium">Manage Students</p>
+              <p class="text-slate-700 font-semibold">Add or remove students</p>
+            </div>
+            <svg
+              class="w-5 h-5 text-slate-400 ml-auto group-hover:translate-x-1 transition-transform duration-200"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              ></path>
+            </svg>
+          </div>
         </div>
       </div>
 
-      <div class="flex items-center justify-end mt-6">
-        <button
-          type="submit"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      <div class="relative group">
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-cyan-300/30 to-blue-300/30 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-opacity duration-300"
+        ></div>
+        <div
+          class="relative bg-white/40 backdrop-blur-lg rounded-2xl p-5 border border-white/60 shadow-lg hover:shadow-xl transition-shadow duration-300"
         >
-          Update Subject
-        </button>
-        <a
-          href="{{ url_for('subjects.index') }}"
-          class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
-        >
-          Cancel
-        </a>
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center mr-4"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 font-medium">Manage Teachers</p>
+              <p class="text-slate-700 font-semibold">
+                Assign or update teachers
+              </p>
+            </div>
+            <svg
+              class="w-5 h-5 text-slate-400 ml-auto group-hover:translate-x-1 transition-transform duration-200"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              ></path>
+            </svg>
+          </div>
+        </div>
       </div>
-    </form>
+    </div>
   </div>
 </div>
+
+<style>
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  .group:hover .absolute.inset-0 {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+</style>
 {% endblock %}

@@ -35,6 +35,8 @@ class StudentForm(FlaskForm):
         validators=[DataRequired()],
     )
     hometown = StringField("Hometown", validators=[Optional()])
+    live_at = StringField("Live at", validators=[Optional()])
+    digital_address = StringField("Digital Address", validators=[Optional()])
     father_name = StringField("Father's Name", validators=[Optional()])
     mother_name = StringField("Mother's Name", validators=[Optional()])
     guardian_name = StringField(
@@ -48,13 +50,14 @@ class StudentForm(FlaskForm):
     weight = IntegerField("Weight (kg)", validators=[Optional()])  # Added unit label
     photo = FileField("Student Photo", validators=[Optional()])
     class_id = SelectField("Class", coerce=int, validators=[DataRequired()])
-    learning_style = SelectField(
-        "Learning Style",
+    interest = SelectField(
+        "Interest",
         choices=[
-            ("", "Not Assessed"),
-            ("Visual", "Visual"),
-            ("Auditory", "Auditory"),
-            ("Kinesthetic", "Kinesthetic"),
+            ("", "Not Specified"),
+            ("Sports", "Sports"),
+            ("Drama", "Drama"),
+            ("Technical", "Technical"),
+            ("Mathematics", "Mathematics"),
             ("Reading/Writing", "Reading/Writing"),
         ],
         validators=[Optional()],

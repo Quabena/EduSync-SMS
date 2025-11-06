@@ -350,6 +350,7 @@ Settings{% endblock %} {% block content %}
       opacity: 0;
       transform: translateY(-30px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -361,6 +362,7 @@ Settings{% endblock %} {% block content %}
       opacity: 0;
       transform: translateY(30px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -371,6 +373,7 @@ Settings{% endblock %} {% block content %}
     0% {
       transform: translateX(-100%) rotate(45deg);
     }
+
     100% {
       transform: translateX(100%) rotate(45deg);
     }
@@ -430,6 +433,7 @@ Settings{% endblock %} {% block content %}
     <!-- School Information Form -->
     <div class="form-card">
       <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         {{ form.hidden_tag() }}
 
         <!-- Basic Information Section -->
@@ -523,7 +527,7 @@ Settings{% endblock %} {% block content %}
                 id="phone"
                 name="phone"
                 value="{{ school.phone if school else '' }}"
-                placeholder="+1 (555) 123-4567"
+                placeholder="0244123456"
               />
             </div>
 
@@ -599,7 +603,7 @@ Settings{% endblock %} {% block content %}
             <div class="logo-preview">
               <div class="logo-preview-text">Current Logo:</div>
               <img
-                src="{{ url_for('static', filename='uploads/' + school.logo_path) }}"
+                src="{{ url_for('static', filename='images/sda_logo-2.png') }}"
                 alt="School Logo"
               />
             </div>

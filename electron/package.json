@@ -1,0 +1,60 @@
+{
+  "name": "edusync",
+  "author": "Evans Adu",
+  "description": "EduSync SMS Desktop Wrapper",
+  "version": "1.0.0",
+  "main": "main.js",
+  "build": {
+    "appId": "com.eadev.edusync",
+    "productName": "EduSync SMS",
+    "directories": {
+      "output": "../build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "assets/**",
+      "package.json",
+      "node_modules/**"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "../app/static/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "EduSync SMS"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "backend/**"
+    ]
+  },
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "axios": "^1.12.2"
+  },
+  "license": "ISC"
+}

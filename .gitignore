@@ -44,11 +44,23 @@ dmypy.json
 # PyInstaller
 *.manifest
 *.spec
+build/
+dist/
+*.exe
+*.dll
+*.pkg
+*.dmg
+
+# Bundled output (if using one-file mode)
+output/
+release/
+*.app/
+*.bin
 
 # Jupyter
 .ipynb_checkpoints
 
-# PyCharm / VSCode
+# Editors / IDEs
 .idea/
 *.iml
 .vscode/
@@ -70,13 +82,18 @@ package-lock.json
 dist/
 build/
 
+# Electron packaging (e.g., electron-builder / forge)
+out/
+release/
+*.asar
+
 # Frontend environment variables
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# --- Docker (not used for this project) ---
+# --- Docker (if unused) ---
 *.pid
 *.tar
 *.bak
@@ -85,4 +102,3 @@ docker-compose.override.yml
 # --- Logs ---
 logs/
 *.log
-

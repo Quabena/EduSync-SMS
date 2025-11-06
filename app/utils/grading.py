@@ -57,3 +57,24 @@ def generate_feedback(score, subject_id):
         return f"Needs improvement. Please review the core concepts of {subject_name} and seek help if needed."
     else:
         return f"Significant improvement needed. See teacher in charge to review the fundamentals of {subject_name}."
+
+
+def get_grade(score):
+    if score >= 85:
+        return "1"
+    elif score >= 75:
+        return "2"
+    elif score >= 70:
+        return "3"
+    elif score >= 65:
+        return "4"
+    elif score >= 60:
+        return "5"
+    elif score >= 55:
+        return "6"
+    elif score >= 50:
+        return "7"
+    elif score >= 40:
+        return "8"
+    else:
+        return "9"

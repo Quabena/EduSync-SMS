@@ -29,7 +29,7 @@ def backup_database():
         return False, str(e)
 
 
-def restore_database(backup_name):
+def perform_restore(backup_name):
     """Restoring database from backup"""
     try:
         db_path = Path(

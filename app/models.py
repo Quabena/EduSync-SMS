@@ -223,6 +223,8 @@ class Student(db.Model):
     date_of_birth = db.Column(db.Date, nullable=False)
     admission_date = db.Column(db.Date, nullable=True)
     hometown = db.Column(db.String(100))
+    live_at = db.Column(db.String(100))
+    digital_address = db.Column(db.String(12))
     father_name = db.Column(db.String(100))
     mother_name = db.Column(db.String(100))
     guardian_name = db.Column(db.String(100))
@@ -234,7 +236,7 @@ class Student(db.Model):
     photo_path = db.Column(db.String(200))
     class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
     status = db.Column(db.String(20), default="active")
-    learning_style = db.Column(
+    interest = db.Column(
         db.String(20)
     )  # Will be used for creating the learning style assessment engine
     original_class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
@@ -359,7 +361,12 @@ class Teacher(db.Model):
     surname = db.Column(db.String(50), nullable=False)
     gender = db.Column(db.String(10), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
+    date_posted_to_present_station = db.Column(db.Date)
+    first_appointment_date = db.Column(db.Date)
+    last_promotion_date = db.Column(db.Date)
     hometown = db.Column(db.String(100))
+    live_at = db.Column(db.String(100))
+    digital_address = db.Column(db.String(12))
     college_attended = db.Column(db.String(100))
     area_of_specialization = db.Column(db.String(100))
     academic_certificate = db.Column(db.String(100))
@@ -374,10 +381,16 @@ class Teacher(db.Model):
     ssnit_number = db.Column(db.String(20), unique=True)
     phone_number = db.Column(db.String(10), unique=True)
     email = db.Column(db.String(120), unique=True)
+    current_rank = db.Column(db.String(100))
+    salary_grade = db.Column(db.String(5))
+    salary_grade_type = db.Column(db.String(3))
     emergency_contact_name = db.Column(db.String(100))
     emergency_contact_number = db.Column(db.String(10))
     photo_path = db.Column(db.String(200))
     certificate_paths = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(20), default="Active")
+    staff_role = db.Column(db.String(20))
+    marital_status = db.Column(db.String(20))
 
     # Relationships
     specialization_id = db.Column(db.Integer, db.ForeignKey("subject.id"))
@@ -454,7 +467,7 @@ class TermScore(db.Model):
         scaled_class = (self.class_total / 60) * 50 if self.class_total else 0
 
         # Scaling exam score to 50%
-        scaled_exam = (self.class_total / 100) * 50 if self.exam_score else 0
+        scaled_exam = (self.exam_score / 100) * 50 if self.exam_score else 0
 
         # Calculating total score (100%)
         self.total_score = scaled_class + scaled_exam

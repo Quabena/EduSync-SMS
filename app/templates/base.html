@@ -484,16 +484,29 @@
           <div class="relative">
 
             <div
-              class="relative flex-shrink-0 p-3 bg-gradient-to-r bg-gradient-to-r from-gray-500 to-gray-100 rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300">
-              <a href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='images/sda_logo-2.png') }}" alt="Logo" width="40" height="70">
+              class="relative">
+              <a href="{{ url_for('main.index') }}" class="rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  width="40"
+                  height="70"
+                  class="rounded-xl object-contain"
+                >
+                  <source src="{{ url_for('static', filename='videos/EduSync_Logo_Animated.mp4') }}" type="video/mp4">
+                  <!-- fallback image for older browsers -->
+                  <img src="{{ url_for('static', filename='images/EduSync-Logo.jpg') }}" alt="Logo">
+                </video>
               </a>
+
 
             </div>
           </div>
           <div>
             <h1 class="text-lg font-bold gradient-text leading-tight">
-              Namong SDA JHS
+              EduSync
             </h1>
             <p class="text-xs text-white/60 font-medium">School Management System</p>
           </div>
@@ -503,7 +516,7 @@
       <!-- Navigation Menu -->
       <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
         <a href="{{ url_for('main.index') }}"
-          class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('main.index') %} active text-white {% else %} text-slate-300 hover:text-white {% endif %}">
+          class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('main.index') %} active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -516,7 +529,7 @@
         </a>
 
         <a href="{{ url_for('students.index') }}"
-          class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('students.index') %} active text-white {% else %} text-slate-300 hover:text-white {% endif %}">
+          class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('students.index') %} active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -528,7 +541,7 @@
         </a>
 
         <a href="{{ url_for('teachers.index') }}" class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('teachers.index') %} active
-          text-white {% else %} text-slate-300 hover:text-white {% endif %}">
+          text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -539,7 +552,7 @@
         </a>
 
         <a href="{{ url_for('classes.index') }}" class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('classes.index') %} active
-          text-white {% else %} text-slate-300 hover:text-white {% endif %}">
+          text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -547,11 +560,11 @@
               </path>
             </svg>
           </div>
-          <span class="font-medium">Classes</span>
+          <span class="font-medium">Classes & Subjects</span>
         </a>
 
         <a href="{{ url_for('attendance.attendance_dashboard') }}" class="sidebar-item flex items-center space-x-3
-        {% if request.path == url_for('attendance.attendance_dashboard') %} active text-white {% else %} text-slate-300 hover:text-white {% endif
+        {% if request.path == url_for('attendance.attendance_dashboard') %} active text-white {% else %} text-slate-500 hover:text-white {% endif
           %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -564,7 +577,7 @@
         </a>
 
         <a href="{{ url_for('exams_grading.index') }}" class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('exams_grading.index') %}
-          active text-white {% else %} text-slate-300 hover:text-white {% endif %}">
+          active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -576,7 +589,7 @@
         </a>
 
         <a href="{{ url_for('graduation.graduation_management') }}" class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('graduation.alumni_list') %}
-          active text-white {% else %} text-slate-300 hover:text-white {% endif %}">
+          active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L1 7l11 5 9-4.09V17a1 1 0 0 0 2 0V7L12 2z" />
@@ -591,20 +604,9 @@
         <div class="my-6 border-t border-white/10"></div>
 
         <!-- Additional Menu Items -->
-        <a href="{{ url_for('students.export_csv') }}"
-          class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('students.export_csv') %} active text-white {% else %} text-slate-300 hover:text-white {% endif %}">
-          <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-              </path>
-            </svg>
-          </div>
-          <span class="font-medium">Student Reports</span>
-        </a>
 
         <a href="{{ url_for('exams_grading.school_info') }}" class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('exams_grading.school_info') %}
-          active text-white {% else %} text-slate-300 hover:text-white {% endif %}">
+          active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -616,6 +618,20 @@
           </div>
           <span class="font-medium">School Info</span>
         </a>
+
+        <a href="{{url_for('main.contact_developer')}}"
+          class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('students.export_csv') %} active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
+          <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+            <div class="fas fa-user w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></div>
+          </div>
+          <span class="font-medium">Contact Developer</span>
+        </a>
+
+        <!-- In your navigation template -->
+      <a href="{{ url_for('main.backup_dashboard') }}" class="flex items-center px-4 py-2 text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+        <div class="fas fa-hard-drive w-5 h-5 mr-3"></div>
+        Database Backup
+      </a>
       </nav>
 
       <!-- Sidebar Footer -->
@@ -653,7 +669,7 @@
                 {% block page_title %}Dashboard{% endblock %}
               </h1>
               <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">
-                {% block page_description %}Welcome to your management
+                {% block page_description %}Welcome to the management
                 dashboard{% endblock %}
               </p>
             </div>
@@ -867,7 +883,7 @@
               </svg>
             </div>
             <h2 class="text-4xl font-bold text-slate-800 dark:text-white mb-4">
-              Welcome to <span class="gradient-text">Namong SDA JHS</span>
+              Welcome to <span class="gradient-text">EduSync SMS</span>
             </h2>
             <p class="text-slate-600 dark:text-slate-300 text-xl max-w-2xl mx-auto leading-relaxed">
               Professional School Management System designed for excellence in
@@ -907,7 +923,7 @@
             <!-- Brand Section -->
             <div class="md:col-span-2">
               <div class="flex items-center space-x-3 mb-4">
-                <div class="p-2 bg-gradient-to-r from-gray-500 to-gray-100 rounded-lg">
+                <div class="p-2 bg-gradient-to-r from-gray-200 to-gray-100 rounded-lg">
                   <a href="{{ url_for('main.index') }}">
                     <img src="{{ url_for('static', filename='images/sda_logo-2.png') }}" alt="Logo" width="30"
                       height="60">
@@ -918,15 +934,10 @@
                     Namong SDA JHS
                   </h3>
                   <p class="text-slate-600 dark:text-slate-400 text-xs">
-                    Professional School Management
+                    Professional Administrative Tool
                   </p>
                 </div>
               </div>
-              <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed max-w-md">
-                Transforming education through innovative technology solutions
-                that enhance learning experiences and streamline
-                administrative processes.
-              </p>
             </div>
 
             <!-- Quick Links -->
@@ -969,7 +980,7 @@
           <!-- Bottom Section -->
           <div class="mt-8 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center">
             <p class="text-slate-500 dark:text-slate-400 text-sm">
-              © 2025 Namong SDA JHS. All rights reserved.
+              © EduSync. All rights reserved.
             </p>
             <div class="flex items-center space-x-4 mt-4 md:mt-0">
               <span class="font-extrabold text-slate-500 dark:text-slate-400 text-xs code-font mr-2">

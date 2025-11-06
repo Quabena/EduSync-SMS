@@ -2,18 +2,37 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required
 from app import db
 from app.decorators import role_required
-from app.models import Class, Teacher
+from app.models import Class, Teacher, Student
 from app.classes.forms import ClassForm
 from app.classes import bp
 from app.utils.storage import backup_database
+import math
 
 
 @bp.route("/")
 @login_required
 @role_required(["admin", "headteacher", "teacher"])
 def index():
-    classes = Class.query.all()
-    return render_template("classes/list.html", classes=classes)
+    classes = Class.query.filter(
+        Class.is_alumni_class == False, Class.name.like("JHS%")
+    ).all()
+
+    active_students_count = Student.query.filter_by(status="active").count()
+
+    total_teachers = Teacher.query.join(Teacher.classes).count()  # type: ignore
+
+    if active_students_count == 0:
+        average_students = 0
+    else:
+        average_students = math.ceil(active_students_count / len(classes))
+
+    return render_template(
+        "classes/list.html",
+        classes=classes,
+        active_students_count=active_students_count,
+        total_teachers=total_teachers,
+        average_students=average_students,
+    )
 
 
 @bp.route("/create", methods=["GET", "POST"])

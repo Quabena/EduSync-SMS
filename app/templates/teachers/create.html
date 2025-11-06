@@ -170,6 +170,38 @@ endblock %} {% block content %}
             duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
           </div>
 
+          <!-- Marital Status -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="specialization_id"
+            >
+              Marital Status
+            </label>
+            {{ form.marital_status(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white focus:outline-none
+            focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 hover:bg-gray-100/50
+            dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Residence -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="live_at"
+            >
+              Residence
+            </label>
+            {{ form.live_at(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
           <!-- Phone Number -->
           <div class="space-y-2">
             <label
@@ -195,6 +227,22 @@ endblock %} {% block content %}
               Email Address <span class="text-red-500">*</span>
             </label>
             {{ form.email(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Digital Address -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="live_at"
+            >
+              Digital Address
+            </label>
+            {{ form.digital_address(class="w-full px-4 py-3 bg-gray-50/50
             dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
             rounded-xl text-gray-900 dark:text-white placeholder-gray-500
             dark:placeholder-gray-400 focus:outline-none focus:ring-2
@@ -316,6 +364,102 @@ endblock %} {% block content %}
             duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
           </div>
 
+          <!-- Date Post To Present Station -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="date_posted_to_present_station"
+            >
+              Date Posted Here <span class="text-red-500">*</span>
+            </label>
+            {{ form.date_posted_to_present_station(class="w-full px-4 py-3
+            bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200
+            dark:border-gray-600 rounded-xl text-gray-900 dark:text-white
+            focus:outline-none focus:ring-2 focus:ring-indigo-500
+            focus:border-transparent transition-all duration-200
+            hover:bg-gray-100/50 dark:hover:bg-gray-700/50", type="date") }}
+          </div>
+
+          <!-- Date of First Appointment -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="first_appointment_date"
+            >
+              First Appointment Date <span class="text-red-500">*</span>
+            </label>
+            {{ form.first_appointment_date(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white focus:outline-none
+            focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 hover:bg-gray-100/50
+            dark:hover:bg-gray-700/50", type="date") }}
+          </div>
+
+          <!-- Current Rank -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="current_rank"
+            >
+              Current Rank
+            </label>
+            {{ form.current_rank(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Last Promotion Date -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="last_promotion_date"
+            >
+              Last Promotion Date <span class="text-red-500">*</span>
+            </label>
+            {{ form.last_promotion_date(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white focus:outline-none
+            focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 hover:bg-gray-100/50
+            dark:hover:bg-gray-700/50", type="date") }}
+          </div>
+
+          <!-- Salary Grade Type -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="salary_grade_type"
+            >
+              Salary Grade Type
+            </label>
+            {{ form.salary_grade_type(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Salary Grade -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="salary_grade"
+            >
+              Salary Grade
+            </label>
+            {{ form.salary_grade(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
           <!-- SSNIT Number -->
           <div class="space-y-2">
             <label
@@ -338,7 +482,7 @@ endblock %} {% block content %}
               class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
               for="specialization_id"
             >
-              Specialization Subject <span class="text-red-500">*</span>
+              Subject Teaching <span class="text-red-500">*</span>
             </label>
             {{ form.specialization_id(class="w-full px-4 py-3 bg-gray-50/50
             dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
@@ -357,6 +501,38 @@ endblock %} {% block content %}
               Area of Specialization
             </label>
             {{ form.area_of_specialization(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Teacher Status -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="specialization_id"
+            >
+              Teacher Status
+            </label>
+            {{ form.status(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white focus:outline-none
+            focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 hover:bg-gray-100/50
+            dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Staff Role -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="staff_role"
+            >
+              Role
+            </label>
+            {{ form.staff_role(class="w-full px-4 py-3 bg-gray-50/50
             dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
             rounded-xl text-gray-900 dark:text-white placeholder-gray-500
             dark:placeholder-gray-400 focus:outline-none focus:ring-2

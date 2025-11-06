@@ -7,6 +7,9 @@ from flask import (
     redirect,
     url_for,
     current_app,
+    Response,
+    make_response,
+    abort,
 )
 from flask_login import login_required, current_user
 from app import db
@@ -22,14 +25,19 @@ from app.models import (
     SchoolInfo,
     StudentRemarks,
     TermDates,
+    SchoolCalendar,
 )
 from app.exams_grading import bp
 from app.exams_grading.forms import SchoolInfoForm, TermDatesForm, StudentRemarksForm
 from datetime import datetime, timezone
 from app.decorators import role_required
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, distinct, func
 from werkzeug.utils import secure_filename
+from collections import defaultdict
 import os
+import re
+import math
+import pdfkit
 
 
 @bp.route("/", methods=["GET"])
@@ -37,14 +45,67 @@ import os
 @role_required(["admin", "headteacher", "teacher"])
 def index():
     """
-    Grading dashboard. Shows shortcuts and summary data.
-    Admin/headteacher sees full dashboard; teachers see only their assignments.
+    Grading dashboard. Prefer using Class.master_class_canonical if present.
     """
-    # Supply classes/subjects for quick jump form
-    classes = Class.query.order_by(Class.name).all()
+    # Base class filter: non-alumni, JHS classes
+    base_filter = (Class.is_alumni_class == False, Class.name.like("JHS%"))
+
+    # If the DB model has master_class_canonical, get distinct non-null values directly from DB
+    master_groups = []
+    if hasattr(Class, "master_class_canonical"):
+        # Query distinct canonical values (skip null/empty)
+        rows = (
+            Class.query.with_entities(distinct(Class.master_class_canonical))  # type: ignore
+            .filter(*base_filter)
+            .filter(Class.master_class_canonical.isnot(None))  # type: ignore
+            .all()
+        )
+        # rows is list of 1-tuples like [('JHS 1',), ('JHS 2',), ...]
+        master_groups = [r[0] for r in rows if r[0]]
+        # Ensure canonical normalization just in case (defensive)
+        master_groups = sorted(
+            {normalize_class_group(m) for m in master_groups}, key=lambda x: x
+        )
+    else:
+        # Fallback: load classes and build canonical set in Python
+        classes = Class.query.filter(*base_filter).order_by(Class.name).all()
+
+        master_set = set()
+        for class_ in classes:
+            # Prefer master_class if present, else try name
+            raw = getattr(class_, "master_class", None) or getattr(class_, "name", None)
+            if raw:
+                master_set.add(normalize_class_group(raw))
+
+        # always include "all"
+        master_set.add("all")
+
+        def sort_key(val):
+            if val == "all":
+                return (0, 0, "")
+            m = re.match(r"^JHS\s*([1-9]+)$", val, flags=re.I)
+            if m:
+                return (1, int(m.group(1)), "")
+            return (2, 999, val.lower())
+
+        master_groups = sorted(master_set, key=sort_key)
+
+    # Ensure "all" is first and unique
+    if "all" not in master_groups:
+        master_groups.insert(0, "all")
+    else:
+        # put "all" at index 0
+        master_groups = ["all"] + [g for g in master_groups if g != "all"]
+
+    # Query classes for other parts of the page
+    classes = (
+        Class.query.filter(Class.is_alumni_class == False, Class.name.like("JHS%"))
+        .order_by(Class.name)
+        .all()
+    )
+
     subjects = Subject.query.order_by(Subject.name).all()  # type: ignore
 
-    # Fix the query to work with the new schema
     recent_assignments = (
         TeacherSubjectClass.query.join(Class, TeacherSubjectClass.class_id == Class.id)
         .order_by(Class.name.desc())
@@ -52,11 +113,14 @@ def index():
         .all()
     )
 
+    current_app.logger.debug("master_groups: %s", master_groups)
+
     return render_template(
         "exams_grading/index.html",
         classes=classes,
         subjects=subjects,
         recent_assignments=recent_assignments,
+        master_groups=master_groups,
         now=datetime.now,
     )
 
@@ -118,7 +182,11 @@ def assign_teacher_subject():
 
     teachers = Teacher.query.order_by(Teacher.surname, Teacher.first_name).all()
     subjects = Subject.query.order_by(Subject.name).all()  # type: ignore
-    classes = Class.query.order_by(Class.name).all()
+    classes = (
+        Class.query.filter(Class.is_alumni_class == False, Class.name.like("JHS%"))
+        .order_by(Class.name)
+        .all()
+    )
 
     return render_template(
         "exams_grading/assign_teacher_subject.html",
@@ -323,53 +391,200 @@ def save_grades():
     return jsonify({"status": "success", "message": "Scores saved successfully"})
 
 
+# normalize helper for class_group input
+def normalize_class_group(raw):
+    """
+    Normalize incoming class_group values into canonical master_class names
+    or the sentinel "all". Handles variants like:
+      - "all", "All"
+      - "1", "2", "3"
+      - "JHS1", "JHS 1", "jhs 1a", "JHS1A" -> "JHS 1"
+      - "JHS 2", "jhs2b", etc.
+    Returns either "all" or canonical master_class (e.g. "JHS 1").
+    """
+    if raw is None:
+        return "all"
+
+    s = str(raw).strip()
+    if not s:
+        return "all"
+
+    lower = s.lower()
+
+    # Accept explicit 'all'
+    if lower == "all":
+        return "all"
+
+    # If purely numeric like "1", "2", "3"
+    if lower.isdigit():
+        return f"JHS {int(lower)}"
+
+    # If something like "jhs1", "jhs 1", "jhs1a", "jhs 1 b"
+    m = re.match(r"^jhs[\s\-]*([1-3])", lower)
+    if m:
+        level = int(m.group(1))
+        return f"JHS {level}"
+
+    # If user passed "1a" or "2b" (without JHS) treat as JHS <n>
+    m2 = re.match(r"^([1-3])[ab]?$", lower)
+    if m2:
+        return f"JHS {int(m2.group(1))}"
+
+    # If input already looks like "jhs 1" or "jhs 2" etc. be safe and normalize spacing/casing
+    m3 = re.match(r"^(jhs)\s*([1-3])", lower)
+    if m3:
+        return f"JHS {int(m3.group(2))}"
+
+    # Fallback: try to return the original trimmed string capitalized like stored in DB.
+    # Many DB values for master_class are like "JHS 1" so attempt to make that form:
+    # If raw contains a number 1-3, try to build "JHS <n>"
+    m4 = re.search(r"([1-3])", lower)
+    if m4:
+        return f"JHS {int(m4.group(1))}"
+
+    # last resort: return original trimmed (title-cased) so query can try matching it
+    return s.title()
+
+
 @bp.route("/master/<class_group>/<term>/<year>", methods=["GET"])
 @login_required
 @role_required(["admin", "headteacher", "teacher"])
 def master_sheet(class_group, term, year):
     """
     Render the master sheet. class_group can be 'all' or specific master_class name.
+    Uses master_class_canonical if available, falls back safely.
     """
-    if class_group == "all":
-        classes = Class.query.order_by(Class.name).all()
+
+    # Normalize incoming group right away (defensive)
+    group = normalize_class_group(class_group)
+
+    # Select classes depending on "all" or specific group.
+    # Prefer canonical column if present.
+    base_filters = (Class.is_alumni_class == False,)
+    classes = []
+
+    if group == "all":
+        classes = (
+            Class.query.filter(Class.is_alumni_class == False)
+            .filter(Class.name.ilike("JHS%"))
+            .order_by(Class.name)
+            .all()
+        )
     else:
-        classes = Class.query.filter_by(master_class=class_group).all()
+        if hasattr(Class, "master_class_canonical"):
+            # exact match against canonical column (fast & reliable)
+            classes = (
+                Class.query.filter(Class.is_alumni_class == False)
+                .filter(Class.master_class_canonical == group)  # type: ignore
+                .order_by(Class.name)
+                .all()
+            )
+        else:
+            # fallback: match start-with (handles "JHS 1A", "JHS 1 B", etc.)
+            m = re.match(r"^JHS\s*([1-9]+)$", group, flags=re.I)
+            if m:
+                level = m.group(1)
+                classes = (
+                    Class.query.filter(Class.is_alumni_class == False)
+                    .filter(
+                        or_(
+                            Class.master_class.ilike(f"JHS {level}%"),
+                            Class.master_class.ilike(f"%{level}%"),
+                            Class.name.ilike(f"% {level}%"),
+                        )
+                    )
+                    .order_by(Class.name)
+                    .all()
+                )
+            else:
+                classes = (
+                    Class.query.filter(Class.is_alumni_class == False)
+                    .filter(Class.master_class.ilike(f"{group}%"))
+                    .order_by(Class.name)
+                    .all()
+                )
 
     class_ids = [c.id for c in classes]
-    students = (
-        Student.query.filter(Student.class_id.in_(class_ids))
-        .order_by(Student.surname, Student.first_name)
-        .all()
+    current_app.logger.debug(
+        "master_sheet: requested group=%r normalized=%r -> classes_found=%d class_ids=%s",
+        class_group,
+        group,
+        len(classes),
+        class_ids,
     )
 
-    subjects = (
-        Subject.query.join(TeacherSubjectClass)
-        .filter(TeacherSubjectClass.class_id.in_(class_ids))
-        .filter(TeacherSubjectClass.is_active == True)
-        .distinct()
-        .all()
-    )
+    # Students: only if we have classes
+    if class_ids:
+        students = (
+            Student.query.filter(Student.class_id.in_(class_ids))
+            .order_by(Student.surname, Student.first_name)
+            .all()
+        )
+    else:
+        students = []
 
-    # build term_scores and totals
-    term_scores = {}
-    for student in students:
-        term_scores[student.id] = {}
-        for subject in subjects:
-            score = TermScore.query.filter_by(
-                student_id=student.id, subject_id=subject.id, term=term, year=year
-            ).first()
-            term_scores[student.id][subject.id] = score
+    current_app.logger.debug("students found: %d", len(students))
 
+    # Subjects: teacher assignments for these classes (active)
+    if class_ids:
+        subjects = (
+            Subject.query.join(TeacherSubjectClass)
+            .filter(TeacherSubjectClass.class_id.in_(class_ids))
+            .filter(TeacherSubjectClass.is_active == True)
+            .distinct()
+            .all()
+        )
+    else:
+        subjects = []
+
+    current_app.logger.debug("subjects found: %d", len(subjects))
+
+    # Build term_scores using a single bulk query to avoid N*M queries
+    term_scores = {}  # mapping student_id -> subject_id -> TermScore or None
+    if students and subjects:
+        student_ids = [s.id for s in students]
+        subject_ids = [sub.id for sub in subjects]
+
+        # bulk fetch all TermScore rows for these students/subjects/term/year
+        scores = TermScore.query.filter(
+            TermScore.student_id.in_(student_ids),
+            TermScore.subject_id.in_(subject_ids),
+            TermScore.term == term,
+            TermScore.year == year,
+        ).all()
+
+        # Map into dict for O(1) lookups
+        score_map = {(sc.student_id, sc.subject_id): sc for sc in scores}
+
+        # Initialize term_scores structure and populate
+        for student in students:
+            term_scores[student.id] = {}
+            for subject in subjects:
+                term_scores[student.id][subject.id] = score_map.get(
+                    (student.id, subject.id)
+                )
+    else:
+        # initialize empty mappings for template compatibility
+        for student in students:
+            term_scores[student.id] = {}
+            for subject in subjects:
+                term_scores[student.id][subject.id] = None
+
+    # Totals & positions (same logic, but safe for empty sets)
     student_totals = {}
     for student in students:
         total = 0.0
         for subject in subjects:
             s = term_scores[student.id].get(subject.id)
-            if s and s.total_score:
-                total += s.total_score
+            if s and getattr(s, "total_score", None):
+                try:
+                    total += float(s.total_score)
+                except Exception:
+                    # defensive: if total_score isn't numeric, ignore it
+                    continue
         student_totals[student.id] = total
 
-    # compute positions
+    # compute positions (handle ties)
     sorted_totals = sorted(student_totals.items(), key=lambda x: x[1], reverse=True)
     positions = {}
     rank = 0
@@ -387,9 +602,16 @@ def master_sheet(class_group, term, year):
                 positions[student_id] = rank
                 prev_score = score
 
+    current_app.logger.debug(
+        "master_sheet debug: classes=%d students=%d subjects=%d term_score_rows=%d",
+        len(classes),
+        len(students),
+        len(subjects),
+    )
+
     return render_template(
         "exams_grading/master_sheet.html",
-        class_group=class_group,
+        class_group=group,
         classes=classes,
         students=students,
         subjects=subjects,
@@ -410,7 +632,11 @@ def master_sheet_print(class_group, term, year):
     """
     # reuse logic from master_sheet
     if class_group == "all":
-        classes = Class.query.order_by(Class.name).all()
+        classes = (
+            Class.query.filter(Class.is_alumni_class == False, Class.name.like("JHS%"))
+            .order_by(Class.name)
+            .all()
+        )
     else:
         classes = Class.query.filter_by(master_class=class_group).all()
 
@@ -587,236 +813,601 @@ def select_grading_period(class_id, subject_id):
 
 
 # Route for student's academic report
-@bp.route("/student-report/<int:student_id>/<term>/<year>")
-@login_required
-@role_required(["admin", "headteacher", "teacher"])
-def student_term_report(student_id, term, year):
-    """Generating a termly report a specific student"""
-    student = Student.query.get_or_404(student_id)
+# @bp.route("/student-report/<int:student_id>/<term>/<year>")
+# @login_required
+# @role_required(["admin", "headteacher", "teacher"])
+# def student_term_report(student_id, term, year):
+#     """Generating a termly report for a specific student."""
+#     # fetch student (404 if missing)
+#     student = Student.query.get_or_404(student_id)
 
-    # Getting all term scores for this student for the specified term and year
-    term_scores = TermScore.query.filter_by(
-        student_id=student_id, term=term, year=year
-    ).all()
+#     # Fetch this student's term scores for the term/year
+#     term_scores = TermScore.query.filter_by(
+#         student_id=student_id, term=term, year=year
+#     ).all()
 
-    # Getting class information
-    class_ = Class.query.get(student.class_id) if student.class_id else None
+#     # Ensure totals are calculated for display (does not commit to DB)
+#     for s in term_scores:
+#         try:
+#             s.calculate_totals()
+#         except Exception:
+#             current_app.logger.exception(
+#                 "Failed to calculate totals for TermScore id=%s", getattr(s, "id", None)
+#             )
 
-    # Calculating subject positions
-    subject_positions = {}
-    for score in term_scores:
-        # Getting all scores for this subject in the same class
-        subject_scores = (
-            TermScore.query.filter_by(
-                subject_id=score.subject_id,
-                class_id=score.class_id,
-                term=term,
-                year=year,
-            )
-            .order_by(TermScore.total_score.desc())  # type: ignore
-            .all()
-        )
+#     # Class information (may be None)
+#     class_ = Class.query.get(student.class_id) if student.class_id else None
 
-        # Finding student's position
-        for idx, subject_score in enumerate(subject_scores, 1):
-            if subject_score.student_id == student_id:
-                subject_positions[score.subject_id] = idx
-                break
+#     # Calculating subject positions
+#     subject_positions = {}
+#     for score in term_scores:
+#         subject_scores = (
+#             TermScore.query.filter_by(
+#                 subject_id=score.subject_id,
+#                 class_id=score.class_id,
+#                 term=term,
+#                 year=year,
+#             )
+#             .order_by(TermScore.total_score.desc())  # type: ignore
+#             .all()
+#         )
 
-    return render_template(
-        "exams_grading/student_term_report.html",
-        student=student,
-        class_=class_,
-        term_scores=term_scores,
-        subject_positions=subject_positions,
-        term=term,
-        year=year,
-    )
+#         for idx, subject_score in enumerate(subject_scores, start=1):
+#             if subject_score.student_id == student_id:
+#                 subject_positions[score.subject_id] = idx
+#                 break
+
+#     # --- compute totals & percentage for the report ---
+#     # total_score is scaled to 100 per subject in calculate_totals()
+#     total_marks_obtained = sum((s.total_score or 0.0) for s in term_scores)
+#     subjects_count = len(term_scores)
+#     total_possible = subjects_count * 100  # 100 per subject after scaling
+
+#     percentage = (
+#         (total_marks_obtained / total_possible * 100.0) if total_possible else 0.0
+#     )
+#     average_marks = (total_marks_obtained / subjects_count) if subjects_count else 0.0
+#     average_percent_per_subject = (
+#         (percentage / subjects_count) if subjects_count else 0.0
+#     )
+
+#     # --- ATTENDANCE: use Attendance.status field (present/absent) ---
+#     attendance_present = 0
+#     attendance_absent = 0
+#     attendance_percentage = 0.0
+
+#     try:
+#         attendance_records = Attendance.query.filter_by(
+#             student_id=student_id, term=term, year=year
+#         ).all()
+
+#         for rec in attendance_records:
+#             status = getattr(rec, "status", None)
+#             if isinstance(status, str) and status.strip():
+#                 s = status.strip().lower()
+#                 if s in ("present", "p", "1", "yes", "true"):
+#                     attendance_present += 1
+#                 elif s in ("absent", "a", "0", "no", "false"):
+#                     attendance_absent += 1
+#                 else:
+#                     # Unknown status — treat as absent (safe default)
+#                     attendance_absent += 1
+#             else:
+#                 # Non-string or missing status — treat as absent (safe default)
+#                 attendance_absent += 1
+
+#         total_attendance = attendance_present + attendance_absent
+#         if total_attendance:
+#             attendance_percentage = (attendance_present / total_attendance) * 100.0
+#         else:
+#             attendance_percentage = 0.0
+
+#     except Exception:
+#         # Log but don't break page render
+#         current_app.logger.exception(
+#             "Error computing attendance for student_id=%s term=%s year=%s",
+#             student_id,
+#             term,
+#             year,
+#         )
+#         attendance_present = attendance_absent = 0
+#         attendance_percentage = 0.0
+
+#     # Debug log for computed values
+#     current_app.logger.debug(
+#         "student_term_report: student_id=%s term=%s year=%s total=%r possible=%r percentage=%.2f "
+#         "attendance_present=%s attendance_absent=%s attendance_pct=%.2f",
+#         student_id,
+#         term,
+#         year,
+#         total_marks_obtained,
+#         total_possible,
+#         percentage,
+#         attendance_present,
+#         attendance_absent,
+#         attendance_percentage,
+#     )
+
+#     # Render template with all required and helpful context
+#     return render_template(
+#         "exams_grading/student_term_report.html",
+#         student=student,
+#         class_=class_,
+#         term_scores=term_scores,
+#         subject_positions=subject_positions,
+#         term=term,
+#         year=year,
+#         total_marks_obtained=total_marks_obtained,
+#         percentage=percentage,
+#         subjects_count=subjects_count,
+#         average_marks=average_marks,
+#         average_percent_per_subject=average_percent_per_subject,
+#         attendance_present=attendance_present,
+#         attendance_absent=attendance_absent,
+#         attendance_percentage=attendance_percentage,
+#         now=datetime.now(),
+#     )
+
+
+# --- New Term REport
 
 
 # Route for student report cards
-@bp.route("/student-report-card/<int:student_id>/<term>/<year>")
+def grade_and_remark(percent: float):
+    """
+    Return (grade, remark) based on percentage.
+    Adjust thresholds to match school policy.
+    """
+    if percent is None:
+        return ("--", "No score")
+    p = percent
+    if p >= 80:
+        return ("1", "Excellent")
+    if p >= 70:
+        return ("2", "Very Good")
+    if p >= 60:
+        return ("3", "Good")
+    if p >= 50:
+        return ("4", "Satisfactory")
+    if p >= 40:
+        return ("5", "Pass")
+    return ("9", "Fail")
+
+
+@bp.route("/student-report/<int:student_id>/<term>/<year>", methods=["GET"])
 @login_required
 @role_required(["admin", "headteacher", "teacher"])
-def student_report_card(student_id, term, year):
-    """Generating a comprehensive student report card for the term"""
-    # Getting student information
+def student_term_report(student_id, term, year):
+    # 1) Basic fetches
     student = Student.query.get_or_404(student_id)
+    klass = student.classroom  # relationship defined on Student.classroom
 
-    # Get class information
-    class_ = Class.query.get(student.class_id) if student.class_id else None
+    # School info (single row expected)
+    school_info = SchoolInfo.query.first()
 
-    # Getting all term score student for a specific term and year
-    term_scores = TermScore.query.filter_by(
-        student_id=student_id, term=term, year=year
-    ).all()
-
-    # GEtting subjects
-    subjects = (
-        Subject.query.join(TeacherSubjectClass)
-        .filter(
-            TeacherSubjectClass.class_id == student.class_id,
-            TeacherSubjectClass.is_active == True,
-        )
-        .distinct()
+    # 2) Subjects & term scores — bulk fetch
+    # Get all TermScore rows for the student for the given term/year
+    scores = (
+        TermScore.query.filter_by(student_id=student.id, term=term, year=year)
+        .join(Subject)
         .all()
     )
 
-    # Calculating overall performance metrics
-    total_marks_obtained = sum(
-        score.total_score for score in term_scores if score.total_score
-    )
-    total_possible_marks = len(subjects) * 100
-    percentage = (
-        (total_marks_obtained / total_possible_marks * 100)
-        if total_possible_marks > 0
-        else 0
-    )
-
-    # Calculating class position
-    # Getting all students in the same class
-    class_students = Student.query.filter_by(class_id=student.class_id).all()
-
-    # Calculating total scores for all students in the class
-    student_totals = {}
-    for class_student in class_students:
-        student_scores = TermScore.query.filter_by(
-            student_id=class_student.id, term=term, year=year
-        ).all()
-        total_score = sum(
-            score.total_score for score in student_scores if score.total_score
+    # Also find which subjects are assigned to the class (teacher assignments)
+    class_subjects = (
+        Subject.query.join(TeacherSubjectClass)
+        .filter(
+            TeacherSubjectClass.class_id == klass.id,
+            TeacherSubjectClass.is_active == True,
         )
-        student_totals[class_student.id] = total_score
+        .distinct()
+        .order_by(Subject.name)  # type: ignore
+        .all()
+    )
 
-    # Sorting students by total score to determing position
-    sorted_totals = sorted(student_totals.items(), key=lambda x: x[1], reverse=True)
-    positions = {}
-    rank = 0
-    prev_score = None
-    for idx, (student_id, score) in enumerate(sorted_totals, start=1):
-        if prev_score is None:
-            rank = 1
-            positions[student_id] = rank
-            prev_score = score
-        else:
-            if score == prev_score:
-                positions[student_id] = rank
-            else:
-                rank = idx
-                positions[student_id] = rank
-                prev_score = score
+    # Build subject list: union of class_subjects and subjects present in scores
+    subject_ids = set([s.id for s in class_subjects] + [sc.subject_id for sc in scores])
+    subjects = (
+        Subject.query.filter(Subject.id.in_(subject_ids)).order_by(Subject.name).all()  # type: ignore
+    )
 
-    class_position = positions.get(student.id, 0)
+    # Map term score by subject for quick access
+    score_map = {(sc.subject_id): sc for sc in scores}
 
-    # Getting attendance data
-    attendance_present = Attendance.query.filter_by(
-        student_id=student_id,
-        class_id=student.class_id,
-        term=term,
-        year=year,
-        status="present",
-    ).count()
+    # 3) Compute per-subject totals, grade, remarks
+    subject_rows = []
+    total_marks = 0.0
+    counted_subjects = 0
 
-    attendance_absent = Attendance.query.filter_by(
-        student_id=student_id,
-        class_id=student.class_id,
-        term=term,
-        year=year,
-        status="absent",
-    ).count()
-
-    # Getting class teacher (first teacher assigned to the class)
-    class_teacher = None
-    if class_ and class_.teachers:
-        class_teacher = class_.teachers[0]
-
-    # Getting the headteacher (first admin user)
-    headteacher = User.query.filter_by(role="admin").first()
-
-    # Calculating subject positions
-    subject_positions = {}
     for subject in subjects:
-        # Get all scores for this subject in the same class
-        subject_scores = (
-            TermScore.query.filter_by(
-                subject_id=subject.id, class_id=student.class_id, term=term, year=year
-            )
-            .order_by(TermScore.total_score.desc())  # type: ignore
-            .all()
+        sc = score_map.get(subject.id)
+        if sc:
+            components = {
+                "individual_test": sc.individual_test or 0,
+                "group_work": sc.group_work or 0,
+                "class_test": sc.class_test or 0,
+                "project": sc.project or 0,
+                "class_total": sc.class_total or 0,
+                "exam_score": sc.exam_score or 0,
+                "total_score": sc.total_score or 0,
+            }
+            pct = float(components["total_score"])
+        else:
+            components = {
+                k: None
+                for k in (
+                    "individual_test",
+                    "group_work",
+                    "class_test",
+                    "project",
+                    "class_total",
+                    "exam_score",
+                    "total_score",
+                )
+            }
+            pct = None
+
+        grade, remark = grade_and_remark(pct if pct is not None else 0.0)
+
+        subject_rows.append(
+            {
+                "subject": subject,
+                "components": components,
+                "total": components.get("total_score"),
+                "grade": grade,
+                "remark": remark,
+                "teacher": None,
+            }
         )
 
-        # Find student's position
-        for idx, subject_score in enumerate(subject_scores, 1):
-            if subject_score.student_id == student_id:
-                subject_positions[subject.id] = f"{idx}/{len(subject_scores)}"
-                break
+        score_val = components.get("total_score")
+        if isinstance(score_val, (int, float)):
+            total_marks += float(score_val)
+            counted_subjects += 1
 
-    # Determining promotion status
-    if TermScore.term == "Term 3":
-        promotion_status = "PROMOTED" if percentage >= 40 else "REPEAT"
-    else:
-        promotion_status = "N/A"
+    overall_percentage = (total_marks / counted_subjects) if counted_subjects else None
+    overall_grade, overall_remark = (
+        grade_and_remark(overall_percentage or 0.0)
+        if overall_percentage is not None
+        else ("--", "No score")
+    )
 
-    # Geting school information
-    school_info = SchoolInfo.query.first()
+    # 4) Attendance summary for the term/year
+    total_attendance = Attendance.query.filter_by(
+        student_id=student.id, term=term, year=year
+    ).count()
+    # Optionally compute total possible days using SchoolCalendar (if populated)
+    possible_days = SchoolCalendar.query.filter_by(
+        term=term, year=year, day_type="school_day"
+    ).count()
+    attendance_pct = (
+        (total_attendance / possible_days * 100.0) if possible_days else None
+    )
 
-    if not school_info:
-        # Creating a default school info if non exists
-        school_info = SchoolInfo(
-            name="EduSync Code Academy",
-            motto="Teaching coding the right way!",
-            address="P.O. Box OFN 123, Offinso.",
-            phone="0503176199",
-            email="web4adu@gmail.com",
-        )
-        db.session.add(school_info)
-        db.session.commit()
-
-    # Getting term dates
-    term_dates = TermDates.query.filter_by(academic_year=year, term=term).first()
-
-    # Getting student remarks if available
-    student_remarks = StudentRemarks.query.filter_by(
-        student_id=student_id, term=term, year=year
+    # 5) Teacher/headteacher remarks (StudentRemarks)
+    remarks_obj = StudentRemarks.query.filter_by(
+        student_id=student.id, term=term, year=year
     ).first()
 
-    # Getting number on roll
-    number_on_roll = Student.query.filter_by(class_id=student.class_id).count()
-
-    # Getting highest score in class
-    highest_score = max(student_totals.values()) if student_totals else 0
-
-    # Get class average
-    class_average = (
-        sum(student_totals.values()) / len(student_totals) if student_totals else 0
+    # 6) Class statistics and positions
+    # Compute total_score for all students in the same class for given term/year
+    # We'll compute sum(total_score) per student across subjects that belong to that class/term
+    # Use TermScore.class_id == klass.id to ensure we only pick scores recorded for this class.
+    class_totals_query = (
+        db.session.query(
+            TermScore.student_id, func.sum(TermScore.total_score).label("sum_total")
+        )
+        .filter(
+            TermScore.class_id == klass.id,
+            TermScore.term == term,
+            TermScore.year == year,
+        )
+        .group_by(TermScore.student_id)
+        .order_by(func.sum(TermScore.total_score).desc())
     )
 
+    class_totals = class_totals_query.all()  # list of tuples (student_id, sum_total)
+
+    # Build positions mapping with ties handled
+    positions = {}
+    prev = None
+    rank = 0
+    for idx, (s_id, sum_total) in enumerate(class_totals, start=1):
+        if prev is None:
+            rank = 1
+            positions[s_id] = rank
+            prev = sum_total
+        else:
+            if sum_total == prev:
+                positions[s_id] = rank
+            else:
+                rank = idx
+                positions[s_id] = rank
+                prev = sum_total
+
+    student_position = positions.get(student.id)
+
+    # 7) Number on roll for the class (active only)
+    number_on_roll = Student.query.filter_by(class_id=klass.id, status="active").count()
+
+    # 8) Prepare teacher mapping for subjects (optional): who teaches subject for this class
+    tsc_rows = TeacherSubjectClass.query.filter(
+        TeacherSubjectClass.class_id == klass.id,
+        TeacherSubjectClass.subject_id.in_(subject_ids),
+    ).all()
+    teacher_map = {
+        (tsc.subject_id): (tsc.teacher.full_name if tsc.teacher else None)
+        for tsc in tsc_rows
+    }
+
+    # inject teacher names into rows
+    for row in subject_rows:
+        row["teacher"] = teacher_map.get(row["subject"].id)
+
+    # 9) Render template
     return render_template(
-        "exams_grading/student_report_card.html",
+        "exams_grading/student_term_report.html",
+        school=school_info,
         student=student,
-        class_=class_,
-        term_scores=term_scores,
-        subjects=subjects,
-        subject_positions=subject_positions,
+        class_room=klass,
+        subject_rows=subject_rows,
+        total_marks=total_marks,
+        overall_percentage=overall_percentage,
+        overall_grade=overall_grade,
+        overall_remark=overall_remark,
+        attendance_count=total_attendance,
+        possible_days=possible_days,
+        attendance_pct=attendance_pct,
+        remarks_obj=remarks_obj,
+        position=student_position,
+        number_on_roll=number_on_roll,
+        term=term,
+        year=datetime.now().year,
+    )
+
+
+# --- COntext for building a report card ---
+def build_report_card_context(student_id: int, term: str, year: str):
+    """
+    Build and return the context dict needed to render the report card page.
+    This is the logic we used earlier (bulk queries, totals, positions, attendance, etc).
+    Returns a dict suitable for passing as **context to render_template.
+    Raises 404 if student/class not found.
+    """
+
+    student = Student.query.get_or_404(student_id)
+    klass = student.classroom  # adjust if your relationship name differs
+
+    school_info = SchoolInfo.query.first()
+
+    # Bulk fetch scores and class subjects
+    scores = TermScore.query.filter_by(
+        student_id=student.id, term=term, year=year
+    ).all()
+    class_subjects = (
+        Subject.query.join(TeacherSubjectClass)
+        .filter(
+            TeacherSubjectClass.class_id == klass.id,
+            TeacherSubjectClass.is_active == True,
+        )
+        .distinct()
+        .order_by(Subject.name)  # type: ignore
+        .all()
+    )
+
+    subject_ids = set([s.id for s in class_subjects] + [sc.subject_id for sc in scores])
+    subjects = (
+        Subject.query.filter(Subject.id.in_(subject_ids)).order_by(Subject.name).all()  # type: ignore
+    )
+
+    score_map = {sc.subject_id: sc for sc in scores}
+
+    # grade helper (same as before)
+    def grade_and_remark(percent: float):
+        if percent is None:
+            return ("--", "No score")
+        if percent >= 80:
+            return ("A", "Excellent")
+        if percent >= 70:
+            return ("B", "Very Good")
+        if percent >= 60:
+            return ("C", "Good")
+        if percent >= 50:
+            return ("D", "Pass")
+        if percent >= 40:
+            return ("E", "Marginal")
+        return ("F", "Fail")
+
+    subject_rows = []
+    total_marks = 0.0
+    counted_subjects = 0
+
+    for subject in subjects:
+        sc = score_map.get(subject.id)
+        if sc:
+            # coerce numeric components defensively (None -> 0)
+            comp = {
+                "individual_test": (
+                    sc.individual_test if sc.individual_test is not None else 0
+                ),
+                "group_work": sc.group_work if sc.group_work is not None else 0,
+                "class_test": sc.class_test if sc.class_test is not None else 0,
+                "project": sc.project if sc.project is not None else 0,
+                "class_total": sc.class_total if sc.class_total is not None else 0,
+                "exam_score": sc.exam_score if sc.exam_score is not None else 0,
+                "total_score": sc.total_score if sc.total_score is not None else None,
+            }
+            pct = (
+                float(comp["total_score"]) if comp["total_score"] is not None else None
+            )
+        else:
+            comp = {
+                k: None
+                for k in (
+                    "individual_test",
+                    "group_work",
+                    "class_test",
+                    "project",
+                    "class_total",
+                    "exam_score",
+                    "total_score",
+                )
+            }
+            pct = None
+
+        grade, remark = grade_and_remark(pct if pct is not None else None)  # type: ignore
+        subject_rows.append(
+            {
+                "subject": subject,
+                "components": comp,
+                "total": comp.get("total_score"),
+                "grade": grade,
+                "remark": remark,
+                "teacher": None,
+            }
+        )
+
+        score_val = comp.get("total_score")
+        if isinstance(score_val, (int, float)):
+            total_marks += float(score_val)
+            counted_subjects += 1
+
+    overall_percentage = (total_marks / counted_subjects) if counted_subjects else None
+    overall_grade, overall_remark = (
+        grade_and_remark(overall_percentage)
+        if overall_percentage is not None
+        else ("--", "No score")
+    )
+
+    # Attendance
+    total_attendance = Attendance.query.filter_by(
+        student_id=student.id, term=term, year=year
+    ).count()
+    possible_days = SchoolCalendar.query.filter_by(
+        term=term, year=year, day_type="school_day"
+    ).count()
+    attendance_pct = (
+        (total_attendance / possible_days * 100.0) if possible_days else None
+    )
+
+    # Remarks
+    remarks_obj = StudentRemarks.query.filter_by(
+        student_id=student.id, term=term, year=year
+    ).first()
+
+    # Class totals & positions (use TermScore.class_id to restrict)
+    class_totals_query = (
+        db.session.query(
+            TermScore.student_id, func.sum(TermScore.total_score).label("sum_total")
+        )
+        .filter(
+            TermScore.class_id == klass.id,
+            TermScore.term == term,
+            TermScore.year == year,
+        )
+        .group_by(TermScore.student_id)
+        .order_by(func.sum(TermScore.total_score).desc())
+    )
+    class_totals = class_totals_query.all()
+
+    positions = {}
+    prev = None
+    rank = 0
+    for idx, (s_id, sum_total) in enumerate(class_totals, start=1):
+        if prev is None:
+            rank = 1
+            positions[s_id] = rank
+            prev = sum_total
+        else:
+            if sum_total == prev:
+                positions[s_id] = rank
+            else:
+                rank = idx
+                positions[s_id] = rank
+                prev = sum_total
+
+    student_position = positions.get(student.id)
+    number_on_roll = Student.query.filter_by(class_id=klass.id, status="active").count()
+
+    # Teacher mapping
+    tsc_rows = TeacherSubjectClass.query.filter(
+        TeacherSubjectClass.class_id == klass.id,
+        TeacherSubjectClass.subject_id.in_(subject_ids),
+    ).all()
+    teacher_map = {
+        (tsc.subject_id): (tsc.teacher.full_name if tsc.teacher else None)
+        for tsc in tsc_rows
+    }
+    for row in subject_rows:
+        row["teacher"] = teacher_map.get(row["subject"].id)
+
+    context = dict(
+        school=school_info,
+        student=student,
+        class_room=klass,
+        subject_rows=subject_rows,
+        total_marks=total_marks,
+        overall_percentage=overall_percentage,
+        overall_grade=overall_grade,
+        overall_remark=overall_remark,
+        attendance_count=total_attendance,
+        possible_days=possible_days,
+        attendance_pct=attendance_pct,
+        remarks_obj=remarks_obj,
+        position=student_position,
+        number_on_roll=number_on_roll,
         term=term,
         year=year,
-        total_marks_obtained=total_marks_obtained,
-        total_possible_marks=total_possible_marks,
-        percentage=percentage,
-        class_position=class_position,
-        number_on_roll=number_on_roll,
-        attendance_present=attendance_present,
-        attendance_absent=attendance_absent,
-        promotion_status=promotion_status,
-        class_teacher=class_teacher,
-        headteacher=headteacher,
-        highest_score=highest_score,
-        class_average=class_average,
-        school_info=school_info,
-        term_dates=term_dates,
-        student_remarks=student_remarks,
-        now=datetime.now(),
     )
+
+    return context
+
+
+# HTML route (uses helper)
+@bp.route("/report-card/<int:student_id>/<term>/<year>", methods=["GET"])
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def report_card(student_id, term, year):
+    context = build_report_card_context(student_id, term, year)
+    return render_template("exams_grading/report_card.html", **context)
+
+
+# PDF route (uses helper)
+@bp.route("/report-card/<int:student_id>/<term>/<year>/pdf", methods=["GET"])
+@login_required
+@role_required(["admin", "headteacher", "teacher"])
+def report_card_pdf(student_id, term, year):
+    context = build_report_card_context(student_id, term, year)
+
+    # Render HTML string
+    html = render_template("exams_grading/report_card.html", **context)
+
+    # Optional: configure pdfkit if wkhtmltopdf is not on PATH
+    # config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+    # pdf = pdfkit.from_string(html, False, configuration=config)
+
+    pdf = pdfkit.from_string(html, False)
+
+    # Defensively coerce to bytes (some pdfkit setups might return True on success writing to file)
+    if isinstance(pdf, bool):
+        current_app.logger.error(
+            "pdfkit.from_string returned boolean True; expected bytes. Check pdfkit config."
+        )
+        abort(500, "PDF generation failed")
+    if not isinstance(pdf, (bytes, bytearray)):
+        try:
+            pdf = bytes(pdf)
+        except Exception:
+            current_app.logger.exception("Unable to coerce pdf output to bytes")
+            abort(500, "PDF generation returned unexpected type")
+
+    response = make_response(pdf)
+    response.headers.set("Content-Type", "application/pdf")
+    response.headers.set(
+        "Content-Disposition",
+        f"attachment; filename=report_{student_id}_{term}_{year}.pdf",
+    )
+    return response
 
 
 # Route for admin/headteacher's interface for managing school information and term dates
@@ -1053,6 +1644,7 @@ def student_performance(student_id):
         "exams_grading/student_performance.html",
         student=student,
         performance_data=performance_data,
+        year=datetime.now().year,
     )
 
 
@@ -1128,3 +1720,6 @@ def has_grading_access(user, class_id, subject_id):
         return assignment is not None
 
     return False
+
+
+# Breaking curses

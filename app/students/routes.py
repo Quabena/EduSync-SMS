@@ -13,6 +13,7 @@ from flask import (
     abort,
     send_from_directory,
     make_response,
+    jsonify,
 )
 import csv
 from pathlib import Path
@@ -26,7 +27,7 @@ import qrcode.constants
 from werkzeug.utils import secure_filename
 from app import db
 from app.decorators import role_required
-from app.models import Student, Class
+from app.models import Student, Class, Subject, TermScore
 from app.students.forms import StudentForm
 from app.students import bp
 from app.utils.storage import backup_database
@@ -35,14 +36,15 @@ from datetime import date
 
 # Generating student QR code
 def generate_student_qr(student_id):
+    """Generate a QR image file for a student and return the filename (or None)."""
     student = Student.query.get(student_id)
     if not student:
         return None
 
-    # Creating QR Code data
+    # Create QR payload (you can adjust format)
     qr_data = f"STUDENT:{student.id}:{student.full_name.replace(' ', '_')}"
 
-    # Generating QR Code
+    # Create QR image
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -53,14 +55,66 @@ def generate_student_qr(student_id):
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
 
-    # Saving to file
-    qr_filename = f"student_{student.full_name}.png"
-    qr_path = os.path.join(current_app.config["QR_DIR"], qr_filename)
-    img.save(qr_path)  # type: ignore
+    # Prepare filename safely
+    basename = f"student_{student.id}_{student.full_name}"
+    filename = secure_filename(basename) + ".png"
 
-    # Updating student with QR path
-    student.qr_path = qr_filename
+    # Ensure QR_DIR exists and is a Path or str
+    qr_dir = current_app.config.get("QR_DIR")
+    # If QR_DIR is a Path, convert to str
+    if hasattr(qr_dir, "as_posix"):
+        qr_dir = str(qr_dir)
+
+    os.makedirs(qr_dir, exist_ok=True)  # type: ignore
+
+    qr_path = os.path.join(qr_dir, filename)  # type: ignore
+
+    # Save image
+    try:
+        img.save(qr_path)  # PIL image save
+    except Exception as e:
+        current_app.logger.error(f"Failed to save QR for student {student.id}: {e}")
+        return None
+
+    # Save filename to student (store only filename, not full path)
+    student.qr_path = filename
     db.session.commit()
+
+    return filename
+
+
+# Route to generate student qr
+@bp.route("/<int:student_id>/generate_qr", methods=["POST"])
+@login_required
+@role_required(["admin", "headteacher"])
+def generate_qr_for_student(student_id):
+    """API endpoint to generate QR code for a student"""
+    filename = generate_student_qr(student_id)
+    if not filename:
+        return (
+            jsonify({"success": False, "message": "Failed to get generate QR code"}),
+            500,
+        )
+
+    return jsonify({"success": True, "filename": filename})
+
+
+@bp.route("/qr/<filename>")
+@login_required
+def student_qr(filename):
+    """Serve QR code images"""
+    try:
+        qr_dir = current_app.config.get("QR_DIR")
+        if not qr_dir:
+            return "QR directory not configured", 404
+
+        # Convert Path object to string if needed
+        # if hasattr(qr_dir, "as_posix"):
+        #     qr_dir = str(qr_dir)
+
+        return send_from_directory(qr_dir, filename)
+    except FileNotFoundError:
+        abort(404)
 
 
 # Root route for students (lists)
@@ -69,14 +123,21 @@ def generate_student_qr(student_id):
 @role_required(["admin", "headteacher", "teacher"])
 def index():
     """Active students"""
-    active_classes = Class.get_active_classes()
+    active_classes = (
+        Class.query.filter(Class.is_alumni_class == False, Class.name.like("JHS%"))
+        .order_by(Class.name)
+        .all()
+    )
+
     active_class_ids = [c.id for c in active_classes]
 
     students = Student.query.filter(
         Student.class_id.in_(active_class_ids), Student.status == "active"
     ).all()
 
-    return render_template("students/list.html", students=students)
+    return render_template(
+        "students/list.html", students=students, active_classes=active_classes
+    )
 
 
 # Route to add student
@@ -169,6 +230,8 @@ def create():
             gender=form.gender.data,
             date_of_birth=form.date_of_birth.data,
             hometown=form.hometown.data,
+            live_at=form.live_at.data,
+            digital_address=form.digital_address.data,
             father_name=form.father_name.data,
             mother_name=form.mother_name.data,
             guardian_name=form.guardian_name.data,
@@ -196,7 +259,7 @@ def create():
             flash("Failed to create student. Try again.", "danger")
             return render_template("students/create.html", form=form)
 
-        # 4) post-commit tasks (QR generation, backups) — keep them non-blocking if possible
+        # post-commit tasks (QR generation, backups)
         try:
             generate_student_qr(student.id)
         except Exception:
@@ -223,8 +286,21 @@ def create():
 @role_required(["admin", "headteacher", "teacher"])
 def detail(student_id):
     student = Student.query.get_or_404(student_id)
+    subjects = Subject.query.order_by(Subject.name).all()  # type: ignore
+
+    # existing term scores map
+    term_scores = {}
+    if student:
+        scores = TermScore.query.filter(TermScore.student_id).all()
+        for s in scores:
+            term_scores[s.student_id] = s
+
     return render_template(
-        "students/detail.html", student=student, current_date=date.today()
+        "students/detail.html",
+        student=student,
+        subjects=subjects,
+        term_scores=term_scores,
+        current_date=date.today(),
     )
 
 
@@ -274,6 +350,8 @@ def edit(student_id):
         student.gender = form.gender.data
         student.date_of_birth = form.date_of_birth.data
         student.hometown = form.hometown.data
+        student.live_at = form.live_at.data
+        student.digital_address = form.digital_address.data
         student.father_name = form.father_name.data
         student.mother_name = form.mother_name.data
         student.guardian_name = form.guardian_name.data
@@ -408,6 +486,8 @@ def export_csv():
             "gender",
             "date_of_birth",
             "hometown",
+            "live_at",
+            "digital_address",
             "father_name",
             "mother_name",
             "guardian_name",
@@ -429,6 +509,8 @@ def export_csv():
                 s.gender,
                 s.date_of_birth.strftime("%Y-%m-%d"),
                 s.hometown or "",
+                s.live_at or "",
+                s.digital_address or "",
                 s.father_name or "",
                 s.mother_name or "",
                 s.guardian_name or "",
@@ -477,6 +559,8 @@ def import_csv():
                     gender=row["gender"],
                     date_of_birth=row["date_of_birth"],
                     hometown=row["hometown"] or None,
+                    live_at=row["live_at"] or None,
+                    digital_address=row["digital_address"] or None,
                     father_name=row["father_name"] or None,
                     mother_name=row["mother_name"] or None,
                     guardian_name=row["guardian_name"] or None,

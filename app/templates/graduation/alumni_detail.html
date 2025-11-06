@@ -29,7 +29,8 @@
           <div class="flex items-center justify-between">
             <div>
               <h1
-                class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent">
+                class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
+              >
                 Alumni Profile
               </h1>
               <p class="text-primary-100 mt-1">
@@ -51,38 +52,51 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Profile Card - Sticky on Desktop -->
       <div class="lg:col-span-1">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden sticky top-8">
-          <div class="bg-gradient-to-br from-primary-500 to-primary-600 px-6 py-8 text-center">
+        <div
+          class="bg-white rounded-2xl shadow-xl overflow-hidden sticky top-8"
+        >
+          <div
+            class="bg-gradient-to-br from-primary-500 to-primary-600 px-6 py-8 text-center"
+          >
             {% if alumni.photo_path %}
             <div class="relative inline-block">
-              <img src="{{ url_for('students.student_photo', filename=alumni.photo_path) }}"
+              <img
+                src="{{ url_for('students.student_photo', filename=alumni.photo_path) }}"
                 class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover mx-auto"
-                alt="{{ alumni.full_name }}" />
+                alt="{{ alumni.full_name }}"
+              />
               <div
-                class="absolute -bottom-2 -right-2 bg-green-500 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center">
+                class="absolute -bottom-2 -right-2 bg-green-500 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center"
+              >
                 <i class="fas fa-check text-white text-xs"></i>
               </div>
             </div>
             {% else %}
             <div class="relative inline-block">
               <div
-                class="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-full border-4 border-white shadow-lg flex items-center justify-center mx-auto">
+                class="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-full border-4 border-white shadow-lg flex items-center justify-center mx-auto"
+              >
                 <i class="fas fa-user text-white text-4xl"></i>
               </div>
               <div
-                class="absolute -bottom-2 -right-2 bg-gray-400 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center">
+                class="absolute -bottom-2 -right-2 bg-gray-400 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center"
+              >
                 <i class="fas fa-camera text-white text-xs"></i>
               </div>
             </div>
             {% endif %}
 
-            <h2 class="text-2xl font-bold text-white mt-4">
+            <h2 class="text-2xl font-bold text-gray-700 mt-4">
               {{ alumni.full_name }}
             </h2>
             <p class="text-primary-100 font-medium">{{ alumni.final_class }}</p>
-            <div class="mt-4 inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-              <i class="fas fa-graduation-cap text-white mr-2"></i>
-              <span class="text-white font-semibold">{{ alumni.graduation_year }}</span>
+            <div
+              class="mt-4 inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-4 py-2"
+            >
+              <i class="fas fa-graduation-cap text-gray-500 mr-2"></i>
+              <span class="text-gray-500 font-semibold"
+                >{{ alumni.graduation_year }}</span
+              >
             </div>
           </div>
 
@@ -94,7 +108,9 @@
               </div>
               <div class="flex items-center text-gray-600">
                 <i class="fas fa-map-marker-alt w-5 text-primary-500 mr-3"></i>
-                <span class="text-sm">{{ alumni.hometown or 'Hometown not specified' }}</span>
+                <span class="text-sm"
+                  >{{ alumni.hometown or 'Hometown not specified' }}</span
+                >
               </div>
               <div class="flex items-center text-gray-600">
                 <i class="fas fa-venus-mars w-5 text-primary-500 mr-3"></i>
@@ -119,13 +135,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-4">
                 <div class="bg-gray-50 rounded-lg p-4">
-                  <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Date of Birth</label>
+                  <label
+                    class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
+                    >Date of Birth</label
+                  >
                   <p class="text-lg font-medium text-gray-900 mt-1">
                     {{ alumni.date_of_birth.strftime('%B %d, %Y') }}
                   </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-4">
-                  <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Religion</label>
+                  <label
+                    class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
+                    >Religion</label
+                  >
                   <p class="text-lg font-medium text-gray-900 mt-1">
                     {{ alumni.religion or 'Not specified' }}
                   </p>
@@ -133,14 +155,20 @@
               </div>
               <div class="space-y-4">
                 <div class="bg-gray-50 rounded-lg p-4">
-                  <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Admission Date</label>
+                  <label
+                    class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
+                    >Admission Date</label
+                  >
                   <p class="text-lg font-medium text-gray-900 mt-1">
                     {{ alumni.admission_date.strftime('%B %d, %Y') if
                     alumni.admission_date else 'Not available' }}
                   </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-4">
-                  <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Graduation Date</label>
+                  <label
+                    class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
+                    >Graduation Date</label
+                  >
                   <p class="text-lg font-medium text-gray-900 mt-1">
                     {{ alumni.graduation_date.strftime('%B %d, %Y') if
                     alumni.graduation_date else 'Not available' }}
@@ -153,7 +181,9 @@
 
         <!-- Family Information -->
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4">
+          <div
+            class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4"
+          >
             <h3 class="text-xl font-bold text-white flex items-center">
               <i class="fas fa-users mr-3"></i>
               Family Information
@@ -162,8 +192,12 @@
           <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-4">
-                <div class="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
-                  <label class="text-sm font-semibold text-emerald-700 uppercase tracking-wide flex items-center">
+                <div
+                  class="bg-emerald-50 rounded-lg p-4 border border-emerald-100"
+                >
+                  <label
+                    class="text-sm font-semibold text-emerald-700 uppercase tracking-wide flex items-center"
+                  >
                     <i class="fas fa-male mr-2"></i>Father's Name
                   </label>
                   <p class="text-lg font-medium text-gray-900 mt-1">
@@ -171,7 +205,9 @@
                   </p>
                 </div>
                 <div class="bg-pink-50 rounded-lg p-4 border border-pink-100">
-                  <label class="text-sm font-semibold text-pink-700 uppercase tracking-wide flex items-center">
+                  <label
+                    class="text-sm font-semibold text-pink-700 uppercase tracking-wide flex items-center"
+                  >
                     <i class="fas fa-female mr-2"></i>Mother's Name
                   </label>
                   <p class="text-lg font-medium text-gray-900 mt-1">
@@ -181,7 +217,9 @@
               </div>
               <div class="space-y-4">
                 <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                  <label class="text-sm font-semibold text-blue-700 uppercase tracking-wide flex items-center">
+                  <label
+                    class="text-sm font-semibold text-blue-700 uppercase tracking-wide flex items-center"
+                  >
                     <i class="fas fa-user-shield mr-2"></i>Guardian's Name
                   </label>
                   <p class="text-lg font-medium text-gray-900 mt-1">
@@ -189,7 +227,9 @@
                   </p>
                 </div>
                 <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                  <label class="text-sm font-semibold text-blue-700 uppercase tracking-wide flex items-center">
+                  <label
+                    class="text-sm font-semibold text-blue-700 uppercase tracking-wide flex items-center"
+                  >
                     <i class="fas fa-phone mr-2"></i>Guardian's Contact
                   </label>
                   <p class="text-lg font-medium text-gray-900 mt-1">
@@ -212,16 +252,22 @@
           </div>
           <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+              <div
+                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200"
+              >
                 <div class="flex items-center justify-between">
                   <div>
-                    <label class="text-sm font-semibold text-purple-700 uppercase tracking-wide">Final Grade</label>
+                    <label
+                      class="text-sm font-semibold text-purple-700 uppercase tracking-wide"
+                      >Final Grade</label
+                    >
                     <div class="mt-2">
                       {% set grade_colors = { 'A': 'bg-green-500 text-white',
                       'B': 'bg-blue-500 text-white', 'C': 'bg-yellow-500
                       text-white', 'D': 'bg-orange-500 text-white' } %}
                       <span
-                        class="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold {{ grade_colors.get(graduation_record.final_grade, 'bg-gray-500 text-white') }}">
+                        class="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold {{ grade_colors.get(graduation_record.final_grade, 'bg-gray-500 text-white') }}"
+                      >
                         {{ graduation_record.final_grade or 'N/A' }}
                       </span>
                     </div>
@@ -232,15 +278,22 @@
                 </div>
               </div>
 
-              <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-6 border border-indigo-200">
+              <div
+                class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-6 border border-indigo-200"
+              >
                 <div class="flex items-center justify-between">
                   <div>
-                    <label class="text-sm font-semibold text-indigo-700 uppercase tracking-wide">Status</label>
+                    <label
+                      class="text-sm font-semibold text-indigo-700 uppercase tracking-wide"
+                      >Status</label
+                    >
                     <div class="mt-2">
                       <span
-                        class="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold {% if graduation_record.status == 'completed' %}bg-green-500 text-white{% else %}bg-yellow-500 text-white{% endif %}">
+                        class="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold {% if graduation_record.status == 'completed' %}bg-green-500 text-white{% else %}bg-yellow-500 text-white{% endif %}"
+                      >
                         <i
-                          class="fas fa-{% if graduation_record.status == 'completed' %}check-circle{% else %}clock{% endif %} mr-2"></i>
+                          class="fas fa-{% if graduation_record.status == 'completed' %}check-circle{% else %}clock{% endif %} mr-2"
+                        ></i>
                         {{ graduation_record.status|title }}
                       </span>
                     </div>
@@ -254,7 +307,9 @@
 
             {% if graduation_record.remarks %}
             <div class="mt-6 bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <label class="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center">
+              <label
+                class="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center"
+              >
                 <i class="fas fa-comment-alt mr-2"></i>Remarks
               </label>
               <p class="text-gray-900 mt-2 leading-relaxed">
@@ -294,20 +349,24 @@
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div class="p-6">
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="{{ url_for('graduation.alumni_list') }}"
-                class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-sm hover:shadow-md">
+              <a
+                href="{{ url_for('graduation.alumni_list') }}"
+                class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-sm hover:shadow-md"
+              >
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to Alumni List
               </a>
 
               <button
-                class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-sm hover:shadow-md">
+                class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-base font-medium text-gray-700 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-sm hover:shadow-md"
+              >
                 <i class="fas fa-edit mr-2"></i>
                 Edit Profile
               </button>
 
               <button
-                class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md">
+                class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md"
+              >
                 <i class="fas fa-download mr-2"></i>
                 Export PDF
               </button>

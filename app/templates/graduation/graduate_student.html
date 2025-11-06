@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}Graduate Student{% endblock %} {%
-block head %}
+{% extends "base.html" %} {% block title %}Graduate {{ student.full_name }} -
+Namong SDA JHS{% endblock %} {% block head %}
 <script src="https://cdn.tailwindcss.com"></script>
 <link
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -14,6 +14,9 @@ block head %}
           float: "float 3s ease-in-out infinite",
           "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
           "bounce-slow": "bounce 2s infinite",
+          "slide-in-right": "slideInRight 0.5s ease-out forwards",
+          "scale-in": "scaleIn 0.4s ease-out forwards",
+          glow: "glow 2s ease-in-out infinite alternate",
         },
       },
     },
@@ -38,6 +41,37 @@ block head %}
     }
     50% {
       transform: translateY(-5px);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    }
+    to {
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
     }
   }
 
@@ -96,6 +130,29 @@ block head %}
   .info-card {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   }
+
+  .glow-card {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .progress-ring {
+    transform: rotate(-90deg);
+  }
+
+  .progress-ring-circle {
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 251.2;
+    transition: stroke-dashoffset 0.5s ease-in-out;
+  }
+
+  .animate-item {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .animate-item.show {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
 </style>
 {% endblock %} {% block content %}
 <div
@@ -104,20 +161,127 @@ block head %}
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header Section -->
     <div class="mb-8">
-      <div class="flex items-center justify-between">
-        <div>
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+      >
+        <div class="animate-item">
           <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             Graduate Student
           </h1>
           <p class="text-lg text-gray-600">
-            Complete the graduation process for {{ student.full_name }}
+            Complete the graduation process for
+            <span class="font-semibold text-blue-600"
+              >{{ student.full_name }}</span
+            >
           </p>
         </div>
-        <div class="hidden md:flex items-center space-x-2">
-          <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-          <span class="text-sm font-medium text-gray-600"
-            >Ready for Graduation</span
+        <div
+          class="animate-item flex items-center space-x-4"
+          style="animation-delay: 0.1s"
+        >
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="text-sm font-medium text-gray-600"
+              >Ready for Graduation</span
+            >
+          </div>
+          <a
+            href="{{ url_for('graduation.graduation_management') }}"
+            class="inline-flex items-center px-4 py-2 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-all duration-300 btn-hover"
           >
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Management
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div
+        class="animate-item stats-card rounded-2xl p-6 shadow-lg border border-gray-200"
+        style="animation-delay: 0.2s"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-user-graduate text-blue-600 text-xl"></i>
+          </div>
+          <div>
+            <p
+              class="text-sm font-medium text-gray-600 uppercase tracking-wide"
+            >
+              Student ID
+            </p>
+            <p class="text-2xl font-bold text-gray-900">{{ student.id }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="animate-item stats-card rounded-2xl p-6 shadow-lg border border-gray-200"
+        style="animation-delay: 0.3s"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-clock text-green-600 text-xl"></i>
+          </div>
+          <div>
+            <p
+              class="text-sm font-medium text-gray-600 uppercase tracking-wide"
+            >
+              Years at School
+            </p>
+            <p class="text-2xl font-bold text-gray-900">
+              {% if student.admission_date %} {{ (now().date().year -
+              student.admission_date.year) }} {% else %} N/A {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="animate-item stats-card rounded-2xl p-6 shadow-lg border border-gray-200"
+        style="animation-delay: 0.4s"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+          </div>
+          <div>
+            <p
+              class="text-sm font-medium text-gray-600 uppercase tracking-wide"
+            >
+              Academic Status
+            </p>
+            <p class="text-2xl font-bold text-gray-900">Ready</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="animate-item stats-card rounded-2xl p-6 shadow-lg border border-gray-200"
+        style="animation-delay: 0.5s"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-trophy text-orange-600 text-xl"></i>
+          </div>
+          <div>
+            <p
+              class="text-sm font-medium text-gray-600 uppercase tracking-wide"
+            >
+              Graduation Year
+            </p>
+            <p class="text-2xl font-bold text-gray-900">{{ current_year }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -125,239 +289,451 @@ block head %}
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Student Profile Card -->
-      <div class="lg:col-span-1">
-        <div
-          class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover"
-        >
+      <div class="lg:col-span-1 space-y-6">
+        <div class="animate-item" style="animation-delay: 0.6s">
           <div
-            class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 text-center"
+            class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover"
           >
-            <div class="relative inline-block mb-4">
-              {% if student.photo_path %}
-              <img
-                src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
-                class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
-                alt="{{ student.full_name }}"
-              />
-              {% else %}
+            <div
+              class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 text-center relative"
+            >
+              <!-- Decorative elements -->
               <div
-                class="w-32 h-32 rounded-full avatar-gradient flex items-center justify-center border-4 border-white shadow-lg"
-              >
-                <i class="fas fa-user text-white text-4xl"></i>
-              </div>
-              {% endif %}
-              <div class="status-indicator animate-pulse-slow"></div>
-            </div>
-            <h2 class="text-2xl font-bold text-white mb-2">
-              {{ student.full_name }}
-            </h2>
-            <div
-              class="inline-flex items-center px-3 py-1 bg-white/20 rounded-full"
-            >
-              <i class="fas fa-graduation-cap text-white mr-2"></i>
-              <span class="text-white font-medium">Graduating Student</span>
-            </div>
-          </div>
+                class="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full animate-pulse-slow"
+              ></div>
+              <div
+                class="absolute bottom-4 left-4 w-6 h-6 bg-white/20 rounded-full animate-pulse-slow"
+                style="animation-delay: 1s"
+              ></div>
 
-          <div class="p-6 space-y-4">
-            <div
-              class="flex items-center justify-between py-3 border-b border-gray-100"
-            >
-              <span class="text-gray-600 font-medium">Class</span>
-              <span class="text-gray-900 font-semibold"
-                >{{ student.classroom.name if student.classroom else 'N/A'
-                }}</span
+              <div class="relative inline-block mb-4">
+                {% if student.photo_path %}
+                <img
+                  src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
+                  class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                  alt="{{ student.full_name }}"
+                />
+                {% else %}
+                <div
+                  class="w-32 h-32 rounded-full avatar-gradient flex items-center justify-center border-4 border-white shadow-lg"
+                >
+                  <span class="text-white text-2xl font-bold"
+                    >{{ student.first_name[0] }}{{ student.surname[0] }}</span
+                  >
+                </div>
+                {% endif %}
+                <div class="status-indicator animate-pulse-slow"></div>
+              </div>
+              <h2 class="text-2xl font-bold text-white mb-2">
+                {{ student.full_name }}
+              </h2>
+              <div
+                class="inline-flex items-center px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm"
               >
+                <i class="fas fa-graduation-cap text-white mr-2"></i>
+                <span class="text-white font-medium">Graduation Candidate</span>
+              </div>
             </div>
-            <div
-              class="flex items-center justify-between py-3 border-b border-gray-100"
-            >
-              <span class="text-gray-600 font-medium">Gender</span>
-              <span class="text-gray-900 font-semibold"
-                >{{ student.gender }}</span
+
+            <div class="p-6 space-y-4">
+              <div
+                class="flex items-center justify-between py-3 border-b border-gray-100"
               >
-            </div>
-            <div class="flex items-center justify-between py-3">
-              <span class="text-gray-600 font-medium">Age</span>
-              <span class="text-gray-900 font-semibold"
-                >{{ student.age }} years</span
+                <span class="text-gray-600 font-medium flex items-center">
+                  <i class="fas fa-school mr-2 text-blue-500"></i>
+                  Class
+                </span>
+                <span
+                  class="text-gray-900 font-semibold bg-blue-50 px-3 py-1 rounded-full text-sm"
+                >
+                  {{ student.classroom.name if student.classroom else 'N/A' }}
+                </span>
+              </div>
+              <div
+                class="flex items-center justify-between py-3 border-b border-gray-100"
               >
+                <span class="text-gray-600 font-medium flex items-center">
+                  <i class="fas fa-venus-mars mr-2 text-pink-500"></i>
+                  Gender
+                </span>
+                <span
+                  class="text-gray-900 font-semibold {% if student.gender == 'Male' %}bg-blue-100 text-blue-800{% else %}bg-pink-100 text-pink-800{% endif %} px-3 py-1 rounded-full text-sm"
+                >
+                  {{ student.gender }}
+                </span>
+              </div>
+              <div
+                class="flex items-center justify-between py-3 border-b border-gray-100"
+              >
+                <span class="text-gray-600 font-medium flex items-center">
+                  <i class="fas fa-birthday-cake mr-2 text-green-500"></i>
+                  Age
+                </span>
+                <span
+                  class="text-gray-900 font-semibold bg-green-50 px-3 py-1 rounded-full text-sm"
+                >
+                  {{ student.age }} years
+                </span>
+              </div>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-gray-600 font-medium flex items-center">
+                  <i class="fas fa-calendar-day mr-2 text-purple-500"></i>
+                  Admission
+                </span>
+                <span
+                  class="text-gray-900 font-semibold bg-purple-50 px-3 py-1 rounded-full text-sm"
+                >
+                  {% if student.admission_date %} {{
+                  student.admission_date.strftime('%Y') }} {% else %} N/A {%
+                  endif %}
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Quick Stats Card -->
-        <div
-          class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-center shadow-xl"
-        >
+        <!-- Progress Card -->
+        <div class="animate-item" style="animation-delay: 0.7s">
           <div
-            class="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-full mb-4 animate-float"
+            class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-center shadow-xl relative overflow-hidden"
           >
-            <i class="fas fa-award text-white text-xl"></i>
+            <!-- Background pattern -->
+            <div class="absolute inset-0 opacity-10">
+              <div
+                class="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"
+              ></div>
+              <div
+                class="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"
+              ></div>
+            </div>
+
+            <div class="relative">
+              <div
+                class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4 animate-float"
+              >
+                <i class="fas fa-award text-white text-2xl"></i>
+              </div>
+              <h3 class="text-white font-bold text-lg mb-2">
+                Ready to Graduate
+              </h3>
+              <p class="text-emerald-100 text-sm mb-4">
+                All academic requirements have been met
+              </p>
+              <div class="w-full bg-white/20 rounded-full h-2">
+                <div
+                  class="bg-white h-2 rounded-full w-full animate-pulse"
+                ></div>
+              </div>
+            </div>
           </div>
-          <h3 class="text-white font-bold text-lg mb-2">Ready to Graduate</h3>
-          <p class="text-emerald-100 text-sm">
-            All requirements completed successfully
-          </p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="animate-item" style="animation-delay: 0.8s">
+          <div
+            class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6"
+          >
+            <h4 class="font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+              Quick Actions
+            </h4>
+            <div class="space-y-3">
+              <a
+                href="{{ url_for('students.detail', student_id=student.id) }}"
+                class="flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200 group"
+              >
+                <i
+                  class="fas fa-eye text-blue-600 mr-3 group-hover:scale-110 transition-transform duration-200"
+                ></i>
+                <span class="text-sm font-medium text-gray-700"
+                  >View Full Profile</span
+                >
+              </a>
+              <a
+                href="#"
+                class="flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors duration-200 group"
+              >
+                <i
+                  class="fas fa-print text-green-600 mr-3 group-hover:scale-110 transition-transform duration-200"
+                ></i>
+                <span class="text-sm font-medium text-gray-700"
+                  >Print Records</span
+                >
+              </a>
+              <a
+                href="#"
+                class="flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200 group"
+              >
+                <i
+                  class="fas fa-download text-purple-600 mr-3 group-hover:scale-110 transition-transform duration-200"
+                ></i>
+                <span class="text-sm font-medium text-gray-700"
+                  >Export Data</span
+                >
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Graduation Form -->
-      <div class="lg:col-span-2">
-        <div
-          class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover"
-        >
+      <div class="lg:col-span-2 space-y-6">
+        <div class="animate-item" style="animation-delay: 0.6s">
           <div
-            class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-6 border-b border-gray-200"
+            class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover glow-card"
           >
-            <div class="flex items-center">
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4"
-              >
-                <i class="fas fa-clipboard-list text-white"></i>
-              </div>
-              <div>
-                <h3 class="text-xl font-bold text-gray-900">
-                  Graduation Details
-                </h3>
-                <p class="text-gray-600">
-                  Fill in the graduation information below
-                </p>
+            <div
+              class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-6 border-b border-gray-200"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div
+                    class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4"
+                  >
+                    <i class="fas fa-clipboard-list text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold text-gray-900">
+                      Graduation Details
+                    </h3>
+                    <p class="text-gray-600">
+                      Complete the graduation information below
+                    </p>
+                  </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-2">
+                  <div
+                    class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
+                  ></div>
+                  <span class="text-sm font-medium text-blue-600"
+                    >Required Fields</span
+                  >
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="p-6">
-            <form method="POST" class="space-y-6">
-              <input
-                type="hidden"
-                name="csrf_token"
-                value="{{ csrf_token() }}"
-              />
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Graduation Year -->
-                <div class="form-animate" style="animation-delay: 0.1s">
-                  <label
-                    for="graduation_year"
-                    class="block text-sm font-semibold text-gray-700 mb-2"
-                  >
-                    <i class="fas fa-calendar-alt mr-2 text-blue-600"></i
-                    >Graduation Year
-                  </label>
-                  <input
-                    type="text"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 form-focus"
-                    id="graduation_year"
-                    name="graduation_year"
-                    value="{{ current_year }}"
-                    required
-                  />
-                </div>
-
-                <!-- Graduation Date -->
-                <div class="form-animate" style="animation-delay: 0.2s">
-                  <label
-                    for="graduation_date"
-                    class="block text-sm font-semibold text-gray-700 mb-2"
-                  >
-                    <i class="fas fa-calendar mr-2 text-blue-600"></i>Graduation
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 form-focus"
-                    id="graduation_date"
-                    name="graduation_date"
-                  />
-                </div>
-              </div>
-
-              <!-- Final Grade -->
-              <div class="form-animate" style="animation-delay: 0.3s">
-                <label
-                  for="final_grade"
-                  class="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  <i class="fas fa-star mr-2 text-blue-600"></i>Final Grade
-                </label>
+            <div class="p-6">
+              <form method="POST" class="space-y-6">
                 <input
-                  type="text"
-                  id="final_grade"
-                  name="final_grade"
-                  placeholder="Eg. Aggregate 6, 17, etc"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 form-focus bg-white"
+                  type="hidden"
+                  name="csrf_token"
+                  value="{{ csrf_token() }}"
                 />
-              </div>
 
-              <!-- Remarks -->
-              <div class="form-animate" style="animation-delay: 0.4s">
-                <label
-                  for="remarks"
-                  class="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  <i class="fas fa-comment-alt mr-2 text-blue-600"></i>Remarks
-                </label>
-                <textarea
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 form-focus resize-none"
-                  id="remarks"
-                  name="remarks"
-                  rows="4"
-                  placeholder="Any additional remarks about this graduation..."
-                ></textarea>
-              </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Graduation Year -->
+                  <div class="form-animate" style="animation-delay: 0.1s">
+                    <label
+                      for="graduation_year"
+                      class="block text-sm font-semibold text-gray-700 mb-2 flex items-center"
+                    >
+                      <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>
+                      Graduation Year
+                      <span class="text-red-500 ml-1">*</span>
+                    </label>
+                    <div class="relative">
+                      <input
+                        type="text"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 form-focus bg-white"
+                        id="graduation_year"
+                        name="graduation_year"
+                        value="{{ current_year }}"
+                        required
+                      />
+                      <div
+                        class="absolute inset-y-0 right-0 flex items-center pr-3"
+                      >
+                        <i class="fas fa-asterisk text-blue-500 text-xs"></i>
+                      </div>
+                    </div>
+                  </div>
 
-              <!-- Action Buttons -->
-              <div
-                class="form-animate flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200"
-                style="animation-delay: 0.5s"
-              >
-                <button
-                  type="submit"
-                  class="flex-1 sm:flex-none inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 btn-hover shadow-lg"
+                  <!-- Graduation Date -->
+                  <div class="form-animate" style="animation-delay: 0.2s">
+                    <label
+                      for="graduation_date"
+                      class="block text-sm font-semibold text-gray-700 mb-2 flex items-center"
+                    >
+                      <i class="fas fa-calendar-day mr-2 text-blue-600"></i>
+                      Graduation Date
+                    </label>
+                    <div class="relative">
+                      <input
+                        type="date"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 form-focus bg-white"
+                        id="graduation_date"
+                        name="graduation_date"
+                        value="{{ now().strftime('%Y-%m-%d') }}"
+                      />
+                      <div
+                        class="absolute inset-y-0 right-0 flex items-center pr-3"
+                      >
+                        <i class="fas fa-calendar text-gray-400"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Final Grade -->
+                <div class="form-animate" style="animation-delay: 0.3s">
+                  <label
+                    for="final_grade"
+                    class="block text-sm font-semibold text-gray-700 mb-2 flex items-center"
+                  >
+                    <i class="fas fa-star mr-2 text-yellow-500"></i>
+                    Final Grade/Aggregate
+                  </label>
+                  <div class="relative">
+                    <input
+                      type="text"
+                      id="final_grade"
+                      name="final_grade"
+                      placeholder="Aggregate 6, 9, 11, ..."
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 form-focus bg-white"
+                    />
+                    <div
+                      class="absolute inset-y-0 right-0 flex items-center pr-3"
+                    >
+                      <i class="fas fa-graduation-cap text-gray-400"></i>
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">
+                    Enter the final grade or aggregate score
+                  </p>
+                </div>
+
+                <!-- Remarks -->
+                <div class="form-animate" style="animation-delay: 0.4s">
+                  <label
+                    for="remarks"
+                    class="block text-sm font-semibold text-gray-700 mb-2 flex items-center"
+                  >
+                    <i class="fas fa-comment-alt mr-2 text-green-600"></i>
+                    Remarks & Notes
+                  </label>
+                  <textarea
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 form-focus resize-none"
+                    id="remarks"
+                    name="remarks"
+                    rows="4"
+                    placeholder="Any additional remarks, achievements, or special notes about this student..."
+                  ></textarea>
+                  <div class="flex justify-between items-center mt-1">
+                    <p class="text-xs text-gray-500">
+                      Optional: Add any special recognition or notes
+                    </p>
+                    <span class="text-xs text-gray-400">0/500 characters</span>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div
+                  class="form-animate flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200"
+                  style="animation-delay: 0.5s"
                 >
-                  <i class="fas fa-graduation-cap mr-2"></i>
-                  Confirm Graduation
-                </button>
-                <a
-                  href="{{ url_for('graduation.graduation_management') }}"
-                  class="flex-1 sm:flex-none inline-flex items-center justify-center px-8 py-4 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-all duration-300 btn-hover border border-gray-300"
-                >
-                  <i class="fas fa-times mr-2"></i>
-                  Cancel
-                </a>
-              </div>
-            </form>
+                  <button
+                    type="submit"
+                    class="flex-1 inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 btn-hover shadow-lg relative overflow-hidden group"
+                    onclick="return confirmGraduation()"
+                  >
+                    <div
+                      class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
+                    ></div>
+                    <i class="fas fa-graduation-cap mr-2 relative z-10"></i>
+                    <span class="relative z-10">Confirm Graduation</span>
+                  </button>
+                  <a
+                    href="{{ url_for('graduation.graduation_management') }}"
+                    class="flex-1 inline-flex items-center justify-center px-8 py-4 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-all duration-300 btn-hover border border-gray-300"
+                  >
+                    <i class="fas fa-times mr-2"></i>
+                    Cancel Process
+                  </a>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
 
-        <!-- Information Card -->
-        <div
-          class="mt-6 info-card rounded-2xl p-6 shadow-lg border border-gray-200"
-        >
-          <div class="flex items-start">
+        <!-- Information & Warning Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Information Card -->
+          <div class="animate-item" style="animation-delay: 0.7s">
             <div
-              class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0"
+              class="info-card rounded-2xl p-6 shadow-lg border border-gray-200 h-full"
             >
-              <i class="fas fa-info-circle text-blue-600"></i>
+              <div class="flex items-start">
+                <div
+                  class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0"
+                >
+                  <i class="fas fa-info-circle text-blue-600"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-3">
+                    Graduation Process
+                  </h4>
+                  <ul class="text-sm text-gray-600 space-y-2">
+                    <li class="flex items-start">
+                      <i
+                        class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                      ></i>
+                      <span>Student will be moved to alumni records</span>
+                    </li>
+                    <li class="flex items-start">
+                      <i
+                        class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                      ></i>
+                      <span>All academic records will be preserved</span>
+                    </li>
+                    <li class="flex items-start">
+                      <i
+                        class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                      ></i>
+                      <span>Student status will change to "Graduated"</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 class="font-semibold text-gray-900 mb-2">
-                Graduation Process Information
-              </h4>
-              <ul class="text-sm text-gray-600 space-y-1">
-                <li class="flex items-center">
-                  <i class="fas fa-check text-green-500 mr-2"></i>
-                  Student will be moved to alumni records upon confirmation
-                </li>
-                <li class="flex items-center">
-                  <i class="fas fa-check text-green-500 mr-2"></i>
-                  All academic records will be preserved
-                </li>
-                <li class="flex items-center">
-                  <i class="fas fa-check text-green-500 mr-2"></i>
-                  Graduation certificate can be generated after processing
-                </li>
-              </ul>
+          </div>
+
+          <!-- Warning Card -->
+          <div class="animate-item" style="animation-delay: 0.8s">
+            <div
+              class="bg-orange-50 border border-orange-200 rounded-2xl p-6 shadow-lg h-full"
+            >
+              <div class="flex items-start">
+                <div
+                  class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0"
+                >
+                  <i class="fas fa-exclamation-triangle text-orange-600"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-orange-900 mb-3">
+                    Important Notice
+                  </h4>
+                  <ul class="text-sm text-orange-700 space-y-2">
+                    <li class="flex items-start">
+                      <i
+                        class="fas fa-shield-alt text-orange-500 mr-2 mt-0.5 flex-shrink-0"
+                      ></i>
+                      <span>This action cannot be easily reversed</span>
+                    </li>
+                    <li class="flex items-start">
+                      <i
+                        class="fas fa-database text-orange-500 mr-2 mt-0.5 flex-shrink-0"
+                      ></i>
+                      <span>Student data will be archived in alumni</span>
+                    </li>
+                    <li class="flex items-start">
+                      <i
+                        class="fas fa-sync-alt text-orange-500 mr-2 mt-0.5 flex-shrink-0"
+                      ></i>
+                      <span>Reverting requires administrative access</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -369,7 +745,16 @@ block head %}
 <script>
   // Add smooth animations on page load
   document.addEventListener("DOMContentLoaded", function () {
+    const animateItems = document.querySelectorAll(".animate-item");
     const formElements = document.querySelectorAll(".form-animate");
+
+    // Trigger animations with staggered delays
+    animateItems.forEach((item, index) => {
+      setTimeout(() => {
+        item.classList.add("show");
+      }, index * 100);
+    });
+
     formElements.forEach((element, index) => {
       setTimeout(() => {
         element.style.opacity = "1";
@@ -377,42 +762,82 @@ block head %}
       }, index * 100);
     });
 
+    // Form validation and character counter
+    const remarksTextarea = document.getElementById("remarks");
+    const charCounter =
+      remarksTextarea.nextElementSibling.querySelector("span");
+
+    remarksTextarea.addEventListener("input", function () {
+      const length = this.value.length;
+      charCounter.textContent = `${length}/500 characters`;
+
+      if (length > 500) {
+        charCounter.classList.add("text-red-500");
+      } else {
+        charCounter.classList.remove("text-red-500");
+      }
+    });
+
     // Add form validation feedback
     const form = document.querySelector("form");
-    const inputs = form.querySelectorAll("input, select, textarea");
+    const inputs = form.querySelectorAll("input, textarea");
 
     inputs.forEach((input) => {
       input.addEventListener("focus", function () {
-        this.parentElement.classList.add("focused");
+        this.parentElement.classList.add("ring-2", "ring-blue-200");
       });
 
       input.addEventListener("blur", function () {
-        this.parentElement.classList.remove("focused");
+        this.parentElement.classList.remove("ring-2", "ring-blue-200");
         if (this.value) {
-          this.classList.add("has-value");
+          this.classList.add("border-green-300");
         } else {
-          this.classList.remove("has-value");
+          this.classList.remove("border-green-300");
         }
       });
     });
 
-    // Form submission with loading state
-    form.addEventListener("submit", function (e) {
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
+    // Auto-fill current date if not set
+    const graduationDate = document.getElementById("graduation_date");
+    if (graduationDate && !graduationDate.value) {
+      graduationDate.value = new Date().toISOString().split("T")[0];
+    }
+  });
 
-      submitBtn.innerHTML =
-        '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-      submitBtn.disabled = true;
+  function confirmGraduation() {
+    const studentName = "{{ student.full_name }}";
+    const graduationYear = document.getElementById("graduation_year").value;
 
-      // Re-enable after 3 seconds if form doesn't submit (for demo purposes)
-      setTimeout(() => {
-        if (submitBtn.disabled) {
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-        }
-      }, 3000);
-    });
+    return confirm(
+      `Are you sure you want to graduate ${studentName} in ${graduationYear}?\n\nThis action will:\n• Move the student to alumni records\n• Change status to "Graduated"\n• Archive all academic data\n\nThis action cannot be easily undone.`
+    );
+  }
+
+  // Form submission with enhanced loading state
+  const form = document.querySelector("form");
+  form.addEventListener("submit", function (e) {
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+
+    submitBtn.innerHTML = `
+      <div class="flex items-center justify-center">
+        <i class="fas fa-spinner fa-spin mr-2"></i>
+        <span>Processing Graduation...</span>
+      </div>
+    `;
+    submitBtn.disabled = true;
+
+    // Add a small delay to show the loading state
+    setTimeout(() => {
+      if (submitBtn.disabled) {
+        submitBtn.innerHTML = `
+          <div class="flex items-center justify-center">
+            <i class="fas fa-spinner fa-spin mr-2"></i>
+            <span>Finalizing Records...</span>
+          </div>
+        `;
+      }
+    }, 2000);
   });
 </script>
 {% endblock %}

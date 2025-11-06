@@ -27,7 +27,18 @@ class TeacherForm(FlaskForm):
     date_of_birth = DateField(
         "Date of Birth", format="%Y-%m-%d", validators=[DataRequired()]
     )
+    date_posted_to_present_station = DateField(
+        "Date Posted Here", format="%Y-%m-%d", validators=[DataRequired()]
+    )
+    last_promotion_date = DateField(
+        "Last Promotion Date", format="%Y-%m-%d", validators=[DataRequired()]
+    )
+    first_appointment_date = DateField(
+        "Date of First Appointment", format="%Y-%m-%d", validators=[DataRequired()]
+    )
     hometown = StringField("Hometown", validators=[Optional()])
+    live_at = StringField("Residence", validators=[Optional()])
+    digital_address = StringField("Residence", validators=[Optional()])
     college_attended = StringField("College Attended", validators=[Optional()])
     area_of_specialization = StringField(
         "Area of Specialization", validators=[Optional()]
@@ -45,11 +56,49 @@ class TeacherForm(FlaskForm):
     )
     professional_college = StringField("Professional College", validators=[Optional()])
     staff_id = StringField("Staff ID", validators=[DataRequired()])
+    salary_grade = StringField("Salary Grade", validators=[DataRequired()])
+    salary_grade_type = SelectField(
+        "Salary Grade Type",
+        choices=[("PSH", "PSH"), ("PSL", "PSL")],
+        validators=[Optional()],
+    )
+    current_rank = StringField("Current Rank", validators=[DataRequired()])
     registered_number = StringField("Registered Number", validators=[Optional()])
     ntc_number = StringField("NTC Number", validators=[Optional()])
     ssnit_number = StringField("SSNIT Number", validators=[Optional()])
     phone_number = TelField("Phone Number", validators=[DataRequired()])
     email = EmailField("Email", validators=[Optional(), Email()])
+    status = SelectField(
+        "Status",
+        choices=[
+            ("", "Not Specified"),
+            ("Active", "Active"),
+            ("Transferred", "Transferred"),
+            ("Retired", "Retired"),
+            ("Deceased", "Deceased"),
+        ],
+        validators=[Optional()],
+    )
+    marital_status = SelectField(
+        "Marital Status",
+        choices=[
+            ("", "Not Specified"),
+            ("Single", "Single"),
+            ("Married", "Married"),
+            ("Divorced", "Divorced"),
+            ("Widowed", "Widowed"),
+        ],
+        validators=[Optional()],
+    )
+    staff_role = SelectField(
+        "Role",
+        choices=[
+            ("Headteacher", "Headteacher"),
+            ("Ass. Headteacher", "Ass. Headteacher"),
+            ("Staff", "Staff"),
+        ],
+        validators=[Optional()],
+    )
     emergency_contact_name = StringField(
         "Emergency Contact Name", validators=[DataRequired()]
     )
@@ -75,5 +124,5 @@ class TeacherForm(FlaskForm):
             (s.id, s.name) for s in Subject.query.order_by(Subject.name).all()  # type: ignore
         ]
         self.assigned_classes.choices = [
-            (c.id, c.name) for c in Class.query.order_by(Class.name).all()
+            (c.id, c.name) for c in Class.get_active_classes()
         ]

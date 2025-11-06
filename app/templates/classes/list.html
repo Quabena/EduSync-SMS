@@ -68,7 +68,7 @@
             </div>
             <div>
               <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ classes|length }}
+                {% if classes | length %} {{ classes|length }} {% else %} -- {% endif %}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
                 Total Classes
@@ -97,9 +97,8 @@
               </svg>
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">--</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                Total Students
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ active_students_count or '--' }}</p>              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                Active Students
               </p>
             </div>
           </div>
@@ -125,7 +124,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">--</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_teachers or '--'}}</p>
               <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
                 Assigned Teachers
               </p>
@@ -153,7 +152,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">--</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ average_students or '--' }}</p>
               <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
                 Avg Students
               </p>
@@ -206,26 +205,17 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex space-x-4">
-        <button
-          id="exportBtn"
-          class="group inline-flex items-center px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/30"
-        >
-          <svg
-            class="h-5 w-5 mr-3 group-hover:rotate-12 transition-transform duration-300"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          Export Data
-        </button>
+       <a href="{{ url_for('subjects.index') }}">
+         <div class="flex space-x-4">
+           <button
+             class="group inline-flex items-center px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/30"
+           >
+             <div
+               class="fas fa-chevron-circle-down h-5 w-5 mr-3 group-hover:rotate-12 transition-transform duration-300"
+             ></div>
+             List Subjects
+           </button>
+       </a>
 
         <a
           href="{{ url_for('classes.create') }}"

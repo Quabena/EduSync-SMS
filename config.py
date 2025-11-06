@@ -1,8 +1,17 @@
 import os
 from pathlib import Path
 
+APP_NAME = "EduSync SMS"
 
-BASE_DIR = Path.home() / "Documents" / "EduSync-SMS" / "Local_Storage"
+# Cross-platform app data directory
+if os.name == "nt":  # Windows
+    BASE_DIR = Path(os.getenv("APPDATA")) / APP_NAME  # type:ignore
+elif os.name == "posix":
+    BASE_DIR = Path.home() / ".config" / APP_NAME
+else:
+    BASE_DIR = Path.home() / APP_NAME
+
+BASE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class Config:
@@ -11,19 +20,16 @@ class Config:
         or "43cba8188f13db93ab9b2f57d569b7c3b6ca59a6b2fcb623c6988be6e527a9b3"
     )
 
-    SQLALCHEMY_DATABASE_URI = (
-        os.environ.get("DATABASE_URL") or f"sqlite:///{(BASE_DIR / 'namongsdajhs.db')}"
-    )
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{BASE_DIR / 'edusync.db'}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # storage locations (Path objects — code will accept strings too)
+    HOST = "127.0.0.1"
+    PORT = 5000
+    DEBUG = False
+
     BACKUP_DIR = BASE_DIR / "backups"
-    DOCUMENT_DIR = BASE_DIR / "student_photos"  # where student photos live
-    TEACHER_PHOTOS_DIR = BASE_DIR / "teacher_photos"  # where teacher photos live
-    TEACHER_CERTS_DIR = BASE_DIR / "teacher_certificates"  # where teacher photos live
+    DOCUMENT_DIR = BASE_DIR / "student_photos"
+    TEACHER_PHOTOS_DIR = BASE_DIR / "teacher_photos"
+    TEACHER_CERTS_DIR = BASE_DIR / "teacher_certificates"
     QR_DIR = BASE_DIR / "qr_storage"
     REPORT_DIR = BASE_DIR / "reports"
-
-    # convenience for URL prefix if you ever want to mount images under a route
-    STATIC_IMAGE_URL = "/photos"
-    STATIC_IMAGE_PATH = DOCUMENT_DIR

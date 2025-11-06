@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.models import Student, GraduationStatus, Alumni, Class
 from app.decorators import role_required
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import extract
 from app.graduation import bp
 
@@ -131,6 +131,7 @@ def graduate_students(student_id):
         "graduation/graduate_student.html",
         student=student,
         current_year=current_year,
+        now=lambda: datetime.now(timezone.utc),
     )
 
 
@@ -194,6 +195,7 @@ def alumni_list():
         alumni=all_alumni,
         years=years,
         selected_year=year,
+        now=lambda: datetime.now(timezone.utc),
     )
 
 

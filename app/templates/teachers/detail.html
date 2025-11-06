@@ -18,15 +18,23 @@
     <div class="relative px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="text-center mb-8">
         <div class="inline-flex items-center px-4 py-2 mb-4 text-sm font-medium text-indigo-700 bg-indigo-100 dark:bg-indigo-900/50 dark:text-indigo-300 rounded-full">
+          {% if teacher.status=='Active'%}
           <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-          Active Faculty Member
+          {% endif %}
+          Status: {{ teacher.status }}
         </div>
         <h1 class="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 dark:from-indigo-400 dark:via-purple-400 dark:to-blue-400 bg-clip-text text-transparent mb-4">
           {{ teacher.full_name }}
         </h1>
+        {% if teacher.staff_role == 'Headteacher' %}
         <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          {{ teacher.specialization.name if teacher.specialization else 'General Education Specialist' }} • Staff ID: {{ teacher.staff_id }}
+          {{ teacher.staff_role }} • Reg. No: {{ teacher.registered_number }}
         </p>
+        {% else %}
+        <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          {{ teacher.specialization.name if teacher.specialization else 'General Education Specialist' }} • Reg. No: {{ teacher.registered_number }}
+        </p>
+        {% endif %}
       </div>
 
       <!-- Teacher Photo and Quick Stats -->
@@ -59,8 +67,8 @@
         <!-- Quick Stats Grid -->
         <div class="grid grid-cols-2 gap-6">
           <div class="text-center p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-            <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">{{ teacher.classes|length }}</div>
-            <div class="text-sm font-medium text-gray-600 dark:text-gray-300">Classes Teaching</div>
+            <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">{{ teacher.staff_id}}</div>
+            <div class="text-sm font-medium text-gray-600 dark:text-gray-300">Staff ID</div>
           </div>
           
           <div class="text-center p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
@@ -149,6 +157,29 @@
               <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.hometown or 'Not specified' }}</div>
             </div>
           </div>
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
+              <svg class="h-5 w-5 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <!-- Residence -->
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Residence</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.live_at or 'Not specified' }}</div>
+            </div>
+          </div>
+          <!-- Digital Address -->
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+              <div class="fas fa-location h-5 w-5 text-cyan-500 dark:text-cyan-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Digital Address</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.digital_address or 'Not specified' }}</div>
+            </div>
+          </div>
 
           <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
             <div class="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
@@ -172,6 +203,19 @@
             <div class="flex-1">
               <div class="text-sm font-semibold text-gray-900 dark:text-white">Email Address</div>
               <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.email }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Marital Status -->
+          {% if teacher.marital_status %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-green-100 dark:bg-green-900/50 rounded-lg">
+              <div class="fas fa-user-group h-5 w-5 text-green-600 dark:text-indigo-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Marital Status</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.marital_status }}</div>
             </div>
           </div>
           {% endif %}
@@ -247,6 +291,84 @@
             <div class="flex-1">
               <div class="text-sm font-semibold text-gray-900 dark:text-white">SSNIT Number</div>
               <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.ssnit_number }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Date Posted To Present Station -->
+          {% if teacher.date_posted_to_present_station %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+              <div class="fas fa-calendar-day h-5 w-5 text-blue-600 dark:text-amber-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Date Posted Here</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.date_posted_to_present_station }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- First Appointment Date -->
+          {% if teacher.first_appointment_date %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
+              <div class="fas fa-calendar-day h-5 w-5 text-red-600 dark:text-amber-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">First Appointment Date</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.first_appointment_date }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Current Rank -->
+          {% if teacher.current_rank %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-green-100 dark:bg-green-900/50 rounded-lg">
+              <div class="fas fa-ranking-star h-5 w-5 text-green-600 dark:text-amber-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Current Rank</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.current_rank }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Last Promotion Date -->
+          {% if teacher.last_promotion_date %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-cyan-100 dark:bg-cyan-900/50 rounded-lg">
+              <div class="fas fa-calendar-check h-5 w-5 text-cyan-600 dark:text-amber-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Last Promotion Date</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.last_promotion_date }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Salary Grade Type -->
+          {% if teacher.salary_grade_type %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg">
+              <div class="fas fa-money-bill-trend-up h-5 w-5 text-yellow-600 dark:text-amber-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Salary Grade Type</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.salary_grade_type }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Salary Grade -->
+          {% if teacher.salary_grade %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
+              <div class="fas fa-money-bill-transfer h-5 w-5 text-red-600 dark:text-amber-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Salary Grade</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.salary_grade }}</div>
             </div>
           </div>
           {% endif %}

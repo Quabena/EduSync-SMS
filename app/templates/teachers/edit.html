@@ -256,6 +256,51 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
               </div>
               {% endif %}
             </div>
+            <!-- Residence -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-teal-500 rounded-full mr-3"></div>
+                Residence
+              </label>
+              {{ form.live_at(class="w-full px-4 py-3 bg-gray-50/50
+              dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
+              focus:ring-2 focus:ring-teal-500 focus:border-transparent
+              transition-all duration-300 hover:bg-gray-100/50
+              dark:hover:bg-gray-700/50") }} {% if form.live_at.errors %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.live_at.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <!-- Digital Address -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-teal-500 rounded-full mr-3"></div>
+                Digital Address
+              </label>
+              {{ form.digital_address(class="w-full px-4 py-3 bg-gray-50/50
+              dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
+              focus:ring-2 focus:ring-teal-500 focus:border-transparent
+              transition-all duration-300 hover:bg-gray-100/50
+              dark:hover:bg-gray-700/50") }} {% if form.digital_address.errors
+              %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.digital_address.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
 
             <!-- Phone Number -->
             <div class="form-group">
@@ -301,6 +346,39 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
                 {% endfor %}
               </div>
               {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label
+                for="{{ form.status.id }}"
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                Status
+              </label>
+              {{ form.status(class="block w-full px-4 py-3 rounded-lg border
+              border-gray-300 dark:border-gray-600 bg-white/50
+              dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500
+              focus:border-transparent transition-all duration-200") }} {% for
+              error in form.status.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+            <!-- Marital Status -->
+            <div class="form-group">
+              <label
+                for="{{ form.status.id }}"
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                Marital Status
+              </label>
+              {{ form.marital_status(class="block w-full px-4 py-3 rounded-lg
+              border border-gray-300 dark:border-gray-600 bg-white/50
+              dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500
+              focus:border-transparent transition-all duration-200") }} {% for
+              error in form.marital_status.errors %}
+              <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+              {% endfor %}
             </div>
           </div>
         </div>
@@ -413,6 +491,145 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
               {% endif %}
             </div>
 
+            <!-- Date Posted To Present Station -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                Date Posted Here
+              </label>
+              {{ form.date_posted_to_present_station(class="w-full px-4 py-3
+              bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              focus:outline-none focus:ring-2 focus:ring-emerald-500
+              focus:border-transparent transition-all duration-300
+              hover:bg-gray-100/50 dark:hover:bg-gray-700/50", type="date") }}
+              {% if form.date_posted_to_present_station.errors %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.date_posted_to_present_station.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- First Appointment Date -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                First Appointment Date
+              </label>
+              {{ form.first_appointment_date(class="w-full px-4 py-3
+              bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              focus:outline-none focus:ring-2 focus:ring-emerald-500
+              focus:border-transparent transition-all duration-300
+              hover:bg-gray-100/50 dark:hover:bg-gray-700/50", type="date") }}
+              {% if form.first_appointment_date.errors %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.first_appointment_date.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Last Promotion Date -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                Last Promotion Date
+              </label>
+              {{ form.last_promotion_date(class="w-full px-4 py-3 bg-gray-50/50
+              dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              focus:outline-none focus:ring-2 focus:ring-emerald-500
+              focus:border-transparent transition-all duration-300
+              hover:bg-gray-100/50 dark:hover:bg-gray-700/50", type="date") }}
+              {% if form.last_promotion_date.errors %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.last_promotion_date.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Current Rank -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                Current Rank
+              </label>
+              {{ form.current_rank(class="w-full px-4 py-3 bg-gray-50/50
+              dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
+              focus:ring-2 focus:ring-amber-500 focus:border-transparent
+              transition-all duration-300 hover:bg-gray-100/50
+              dark:hover:bg-gray-700/50") }} {% if form.current_rank.errors %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.current_rank.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Salary Grade Type -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                Salary Grade Type
+              </label>
+              {{ form.salary_grade_type(class="w-full px-4 py-3 bg-gray-50/50
+              dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
+              focus:ring-2 focus:ring-amber-500 focus:border-transparent
+              transition-all duration-300 hover:bg-gray-100/50
+              dark:hover:bg-gray-700/50") }} {% if form.salary_grade_type.errors
+              %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.salary_grade_type.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Salary Grade -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                Salary Grade
+              </label>
+              {{ form.salary_grade(class="w-full px-4 py-3 bg-gray-50/50
+              dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
+              focus:ring-2 focus:ring-amber-500 focus:border-transparent
+              transition-all duration-300 hover:bg-gray-100/50
+              dark:hover:bg-gray-700/50") }} {% if form.salary_grade.errors %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.salary_grade.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
             <!-- SSNIT Number -->
             <div class="form-group">
               <label
@@ -436,13 +653,36 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
               {% endif %}
             </div>
 
+            <!-- Role -->
+            <div class="form-group">
+              <label
+                class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+              >
+                <div class="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                Role
+              </label>
+              {{ form.staff_role(class="w-full px-4 py-3 bg-gray-50/50
+              dark:bg-gray-800/50 border border-gray-200/50
+              dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white
+              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
+              focus:ring-2 focus:ring-amber-500 focus:border-transparent
+              transition-all duration-300 hover:bg-gray-100/50
+              dark:hover:bg-gray-700/50") }} {% if form.staff_role.errors %}
+              <div class="text-red-500 text-sm mt-2">
+                {% for error in form.staff_role.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
             <!-- Specialization Subject -->
             <div class="form-group">
               <label
                 class="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
               >
                 <div class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
-                Specialization Subject
+                Subject Teaching
               </label>
               {{ form.specialization_id(class="w-full px-4 py-3 bg-gray-50/50
               dark:bg-gray-800/50 border border-gray-200/50

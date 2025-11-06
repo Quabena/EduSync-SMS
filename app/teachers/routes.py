@@ -67,6 +67,9 @@ def create():
             surname=form.surname.data,
             gender=form.gender.data,
             date_of_birth=form.date_of_birth.data,
+            date_posted_to_present_station=form.date_posted_to_present_station.data,
+            first_appointment_date=form.first_appointment_date.data,
+            last_promotion_date=form.last_promotion_date.data,
             hometown=form.hometown.data,
             college_attended=form.college_attended.data,
             area_of_specialization=form.area_of_specialization.data,
@@ -80,6 +83,9 @@ def create():
             registered_number=form.registered_number.data,
             ntc_number=form.ntc_number.data,
             ssnit_number=form.ssnit_number.data,
+            salary_grade=form.salary_grade.data,
+            salary_grade_type=form.salary_grade_type.data,
+            current_rank=form.current_rank.data,
             phone_number=form.phone_number.data,
             email=form.email.data,
             emergency_contact_name=form.emergency_contact_name.data,
@@ -126,9 +132,7 @@ def edit(teacher_id):
     form.specialization_id.choices = [
         (s.id, s.name) for s in Subject.query.order_by(Subject.name).all()  # type: ignore
     ]
-    form.assigned_classes.choices = [
-        (c.id, c.name) for c in Class.query.order_by(Class.name).all()
-    ]
+    form.assigned_classes.choices = [(c.id, c.name) for c in Class.get_active_classes()]
 
     # Pre-select assigned classes for GET requests
     if request.method == "GET":
