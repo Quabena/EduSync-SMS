@@ -1,0 +1,758 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Analytics • Staff Portal{% endblock %}
+
+{% block head %}
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes pulseSubtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+  }
+  
+  .animate-pulse-subtle {
+    animation: pulseSubtle 2s infinite;
+  }
+  
+  .glass-morphism {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .gradient-border {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2px;
+    border-radius: 16px;
+  }
+  
+  .gradient-border-inner {
+    background: white;
+    border-radius: 14px;
+    padding: 1.5rem;
+  }
+  
+  .progress-ring {
+    transform: rotate(-90deg);
+  }
+  
+  .progress-ring-circle {
+    transition: stroke-dashoffset 0.5s ease;
+    transform: rotate(90deg);
+    transform-origin: 50% 50%;
+  }
+  
+  .stat-card {
+    transition: all 0.3s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .trend-up {
+    color: #10b981;
+  }
+  
+  .trend-down {
+    color: #ef4444;
+  }
+  
+  .trend-neutral {
+    color: #6b7280;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Background Elements -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+  <div class="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle"></div>
+  <div class="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle" style="animation-delay: 1s;"></div>
+  <div class="absolute bottom-0 left-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle" style="animation-delay: 2s;"></div>
+</div>
+
+<!-- Navigation -->
+<nav class="glass-morphism sticky top-0 z-50 mb-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+          <i class="fas fa-chalkboard-teacher text-white text-lg"></i>
+        </div>
+        <a href="{{ url_for('teacher_attendance.index') }}">
+        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Staff Attendance
+        </span>
+        </a>
+      </div>
+      <div class="flex space-x-1">
+        <a href="{{ url_for('teacher_attendance.mark_teacher_attendance') }}" 
+           class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center">
+          <i class="fas fa-edit mr-2"></i>
+          Mark Attendance
+        </a>
+        <a href="{{ url_for('teacher_attendance.teacher_attendance_records') }}" 
+           class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center">
+          <i class="fas fa-database mr-2"></i>
+          Records
+        </a>
+        <a href="{{ url_for('teacher_attendance.teacher_attendance_analytics') }}" 
+           class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium text-sm shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex items-center">
+          <i class="fas fa-chart-bar mr-2"></i>
+          Analytics
+        </a>
+        <a href="{{ url_for('teacher_attendance.attendance_settings') }}" 
+           class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center">
+          <i class="fas fa-cog mr-2"></i>
+          Settings
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 pb-12">
+  <!-- Header Section -->
+  <div class="text-center mb-12 animate-fade-in-up">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-2xl mb-6">
+      <i class="fas fa-chart-line text-white text-2xl"></i>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+      Attendance Analytics
+    </h1>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+      Deep insights and trends analysis for teacher attendance patterns
+    </p>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="gradient-border animate-fade-in-up mb-8">
+    <div class="gradient-border-inner">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+          <i class="fas fa-chart-pie mr-3 text-purple-500"></i>
+          Report Configuration
+        </h2>
+        <div class="flex items-center space-x-2 text-sm text-gray-500">
+          <i class="fas fa-calendar-alt text-blue-500"></i>
+          <span>Custom analytics reporting</span>
+        </div>
+      </div>
+
+      <form method="GET" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Teacher Filter -->
+          <div>
+            <label for="teacher_id" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+              <i class="fas fa-user-tie mr-2 text-blue-500"></i>
+              Teacher
+            </label>
+            <select id="teacher_id" name="teacher_id" 
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer">
+              <option value="">All Teachers</option>
+              {% for t in teachers %}
+              <option value="{{ t.id }}" {% if teacher_id == t.id %}selected{% endif %}>{{ t.full_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Period Filter -->
+          <div>
+            <label for="period" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+              <i class="fas fa-clock mr-2 text-purple-500"></i>
+              Time Period
+            </label>
+            <select id="period" name="period" 
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer">
+              <option value="week" {% if period == 'week' %}selected{% endif %}>Last 7 Days</option>
+              <option value="month" {% if period == 'month' %}selected{% endif %}>Last 30 Days</option>
+              <option value="term" {% if period == 'term' %}selected{% endif %}>Current Term</option>
+              <option value="year" {% if period == 'year' %}selected{% endif %}>Last Year</option>
+              <option value="custom" {% if period == 'custom' %}selected{% endif %}>Custom Range</option>
+            </select>
+          </div>
+
+          <!-- Custom Date Range -->
+          <div id="custom-range" class="{% if period != 'custom' %}hidden{% endif %} lg:col-span-2 space-y-4 lg:space-y-0 lg:space-x-4 lg:flex lg:items-end">
+            <div class="flex-1">
+              <label for="custom_start" class="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+              <input type="date" id="custom_start" name="custom_start" value="{{ custom_start or '' }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer">
+            </div>
+            <div class="flex-1">
+              <label for="custom_end" class="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
+              <input type="date" id="custom_end" name="custom_end" value="{{ custom_end or '' }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer">
+            </div>
+          </div>
+
+          <!-- Generate Button -->
+          <div class="flex items-end">
+            <button type="submit" 
+                    class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center cursor-pointer">
+              <i class="fas fa-chart-bar mr-2"></i>
+              Generate Report
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Period Filters -->
+        <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+          <button type="button" onclick="setPeriod('week')" 
+                  class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
+            <i class="fas fa-calendar-week mr-2"></i>
+            Last 7 Days
+          </button>
+          <button type="button" onclick="setPeriod('month')" 
+                  class="px-4 py-2 bg-green-50 text-green-700 rounded-lg font-medium hover:bg-green-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
+            <i class="fas fa-calendar-alt mr-2"></i>
+            Last 30 Days
+          </button>
+          <button type="button" onclick="setPeriod('term')" 
+                  class="px-4 py-2 bg-purple-50 text-purple-700 rounded-lg font-medium hover:bg-purple-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
+            <i class="fas fa-graduation-cap mr-2"></i>
+            Current Term
+          </button>
+          <button type="button" onclick="setPeriod('year')" 
+                  class="px-4 py-2 bg-yellow-50 text-yellow-700 rounded-lg font-medium hover:bg-yellow-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
+            <i class="fas fa-calendar mr-2"></i>
+            Last Year
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Analytics Content -->
+  <div class="space-y-8">
+    <!-- Individual Teacher Summary -->
+    {% if teacher %}
+    <div class="gradient-border animate-fade-in-up" style="animation-delay: 0.2s;">
+      <div class="gradient-border-inner">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+              <i class="fas fa-user-tie mr-3 text-blue-500"></i>
+              {{ teacher.full_name }}
+            </h2>
+            <p class="text-gray-600 mt-2">
+              Period: <span class="font-semibold text-purple-600">{{ start_date.strftime('%d-%m-%Y') }} to {{ end_date.strftime('%d-%m-%Y') }}</span>
+            </p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="text-right">
+              <div class="text-sm text-gray-500">Staff ID</div>
+              <div class="text-lg font-bold text-gray-800">{{ teacher.staff_id }}</div>
+            </div>
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-chart-line text-blue-600"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Present Rate -->
+          <div class="stat-card bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <div class="text-3xl font-bold text-green-600">{{ stats[teacher.id].present_percentage }}%</div>
+                <div class="text-sm font-semibold text-green-700">Present Rate</div>
+              </div>
+              <div class="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+              </div>
+            </div>
+            <div class="text-xs text-green-600 bg-green-200/50 rounded-full px-3 py-1 inline-block">
+              {{ stats[teacher.id].present }} days present
+            </div>
+          </div>
+
+          <!-- Absent Rate -->
+          <div class="stat-card bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-6 border border-red-200">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <div class="text-3xl font-bold text-red-600">{{ stats[teacher.id].absent_percentage }}%</div>
+                <div class="text-sm font-semibold text-red-700">Absent Rate</div>
+              </div>
+              <div class="w-12 h-12 bg-red-200 rounded-xl flex items-center justify-center">
+                <i class="fas fa-times-circle text-red-600 text-xl"></i>
+              </div>
+            </div>
+            <div class="text-xs text-red-600 bg-red-200/50 rounded-full px-3 py-1 inline-block">
+              {{ stats[teacher.id].absent }} days absent
+            </div>
+          </div>
+
+          <!-- Late Rate -->
+          <div class="stat-card bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-6 border border-yellow-200">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <div class="text-3xl font-bold text-yellow-600">{{ stats[teacher.id].late_percentage }}%</div>
+                <div class="text-sm font-semibold text-yellow-700">Late Rate</div>
+              </div>
+              <div class="w-12 h-12 bg-yellow-200 rounded-xl flex items-center justify-center">
+                <i class="fas fa-clock text-yellow-600 text-xl"></i>
+              </div>
+            </div>
+            <div class="text-xs text-yellow-600 bg-yellow-200/50 rounded-full px-3 py-1 inline-block">
+              {{ stats[teacher.id].late }} days late
+            </div>
+          </div>
+
+          <!-- Overall Attendance -->
+          <div class="stat-card bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <div class="text-3xl font-bold text-blue-600">{{ stats[teacher.id].attendance_rate }}%</div>
+                <div class="text-sm font-semibold text-blue-700">Overall Attendance</div>
+              </div>
+              <div class="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center">
+                <i class="fas fa-chart-pie text-blue-600 text-xl"></i>
+              </div>
+            </div>
+            <div class="text-xs text-blue-600 bg-blue-200/50 rounded-full px-3 py-1 inline-block">
+              {{ stats[teacher.id].total }} total days
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Indicators -->
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-gray-50 rounded-2xl p-6">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-trend-up mr-2 text-green-500"></i>
+              Performance Score
+            </h4>
+            <div class="text-4xl font-bold text-gray-800 text-center py-4">
+              {{ stats[teacher.id].attendance_rate }}%
+            </div>
+            <div class="text-sm text-gray-600 text-center">
+              Overall attendance performance
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-2xl p-6">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-calendar-check mr-2 text-blue-500"></i>
+              Consistency
+            </h4>
+            <div class="text-4xl font-bold text-gray-800 text-center py-4">
+              {% set consistency = 100 - stats[teacher.id].absent_percentage - stats[teacher.id].late_percentage %}
+              {{ consistency|round(1) }}%
+            </div>
+            <div class="text-sm text-gray-600 text-center">
+              Regular on-time attendance
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-2xl p-6">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-star mr-2 text-yellow-500"></i>
+              Reliability Index
+            </h4>
+            <div class="text-4xl font-bold text-gray-800 text-center py-4">
+              {% set reliability = (stats[teacher.id].present_percentage * 0.8 + stats[teacher.id].attendance_rate * 0.2) %}
+              {{ reliability|round(1) }}%
+            </div>
+            <div class="text-sm text-gray-600 text-center">
+              Overall reliability score
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Weekly Trend Analysis -->
+    {% if weekly_trend %}
+    <div class="gradient-border animate-fade-in-up" style="animation-delay: 0.4s;">
+      <div class="gradient-border-inner">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+            <i class="fas fa-chart-bar mr-3 text-purple-500"></i>
+            Weekly Trend Analysis
+          </h2>
+          <div class="flex items-center space-x-2 text-sm text-gray-500">
+            <i class="fas fa-wave-square text-blue-500"></i>
+            <span>Attendance patterns over time</span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-calendar-week mr-2"></i>
+                  Week
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-check-circle mr-2 text-green-500"></i>
+                  Present
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-times-circle mr-2 text-red-500"></i>
+                  Absent
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-clock mr-2 text-yellow-500"></i>
+                  Late
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-calendar-check mr-2 text-blue-500"></i>
+                  Excused
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-percentage mr-2 text-purple-500"></i>
+                  Attendance Rate
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for week, data in weekly_trend.items() %}
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-semibold text-gray-900">{{ week }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="text-sm font-semibold text-green-600">{{ data.present }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="text-sm font-semibold text-red-600">{{ data.absent }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="text-sm font-semibold text-yellow-600">{{ data.late }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="text-sm font-semibold text-blue-600">{{ data.excused }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  {% set total = data.present + data.absent + data.late + data.excused %}
+                  {% if total > 0 %}
+                    {% set rate = (((data.present + data.late) / total) * 100)|round(1) %}
+                    <div class="flex items-center space-x-3">
+                      <div class="w-20 bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ rate }}%"></div>
+                      </div>
+                      <span class="text-sm font-bold {% if rate >= 90 %}text-green-600{% elif rate >= 80 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                        {{ rate }}%
+                      </span>
+                    </div>
+                  {% else %}
+                    <span class="text-sm text-gray-400">0%</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- All Teachers Summary -->
+    {% if not teacher_id %}
+    <div class="gradient-border animate-fade-in-up" style="animation-delay: 0.6s;">
+      <div class="gradient-border-inner">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+            <i class="fas fa-users mr-3 text-blue-500"></i>
+            All Teachers Summary
+          </h2>
+          <div class="flex items-center space-x-4">
+            <div class="text-sm text-gray-500 flex items-center">
+              <i class="fas fa-sort-amount-down mr-2"></i>
+              <span>Sorted by Attendance Rate</span>
+            </div>
+            <button onclick="exportAnalytics()" 
+                    class="px-4 py-2 bg-green-50 text-green-700 rounded-lg font-medium hover:bg-green-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
+              <i class="fas fa-download mr-2"></i>
+              Export Report
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Teacher
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Present
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Absent
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Late
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Excused
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Attendance Rate
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Performance
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for teacher in teachers %}
+              {% if teacher.id in stats %}
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center shadow-sm">
+                      <i class="fas fa-user-tie text-blue-600 text-sm"></i>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-semibold text-gray-900">{{ teacher.full_name }}</div>
+                      <div class="text-sm text-gray-500">{{ teacher.staff_id }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-semibold text-green-600">{{ stats[teacher.id].present }}</div>
+                  <div class="text-xs text-gray-500">{{ stats[teacher.id].present_percentage }}%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-semibold text-red-600">{{ stats[teacher.id].absent }}</div>
+                  <div class="text-xs text-gray-500">{{ stats[teacher.id].absent_percentage }}%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-semibold text-yellow-600">{{ stats[teacher.id].late }}</div>
+                  <div class="text-xs text-gray-500">{{ stats[teacher.id].late_percentage }}%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-semibold text-blue-600">{{ stats[teacher.id].excused }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-20 bg-gray-200 rounded-full h-2">
+                      <div class="h-2 rounded-full {% if stats[teacher.id].attendance_rate >= 90 %}bg-green-500{% elif stats[teacher.id].attendance_rate >= 80 %}bg-yellow-500{% else %}bg-red-500{% endif %}" 
+                           style="width: {{ stats[teacher.id].attendance_rate }}%"></div>
+                    </div>
+                    <span class="text-sm font-bold {% if stats[teacher.id].attendance_rate >= 90 %}text-green-600{% elif stats[teacher.id].attendance_rate >= 80 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                      {{ stats[teacher.id].attendance_rate }}%
+                    </span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  {% if stats[teacher.id].attendance_rate >= 95 %}
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                    <i class="fas fa-star mr-1"></i>Excellent
+                  </span>
+                  {% elif stats[teacher.id].attendance_rate >= 85 %}
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
+                    <i class="fas fa-check-circle mr-1"></i>Good
+                  </span>
+                  {% elif stats[teacher.id].attendance_rate >= 75 %}
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800">
+                    <i class="fas fa-exclamation-circle mr-1"></i>Fair
+                  </span>
+                  {% else %}
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">
+                    <i class="fas fa-times-circle mr-1"></i>Needs Improvement
+                  </span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Summary Statistics -->
+    {% if records %}
+    <div class="glass-morphism rounded-2xl p-6 shadow-lg animate-fade-in-up" style="animation-delay: 0.8s;">
+      <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+        <i class="fas fa-chart-pie mr-2 text-purple-500"></i>
+        Analytics Summary
+      </h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
+          <div class="text-2xl font-bold text-blue-600">{{ records|length }}</div>
+          <div class="text-sm text-blue-600 font-medium">Total Records</div>
+        </div>
+        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200">
+          <div class="text-2xl font-bold text-green-600">
+            {{ records|selectattr('status', 'equalto', 'present')|list|length }}
+          </div>
+          <div class="text-sm text-green-600 font-medium">Present Days</div>
+        </div>
+        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 text-center border border-yellow-200">
+          <div class="text-2xl font-bold text-yellow-600">
+            {{ records|selectattr('status', 'equalto', 'late')|list|length }}
+          </div>
+          <div class="text-sm text-yellow-600 font-medium">Late Arrivals</div>
+        </div>
+        <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 text-center border border-red-200">
+          <div class="text-2xl font-bold text-red-600">
+            {{ records|selectattr('status', 'equalto', 'absent')|list|length }}
+          </div>
+          <div class="text-sm text-red-600 font-medium">Absent Days</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// Initialize interactive elements
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Analytics dashboard loaded');
+  
+  // Handle period selector change
+  const periodSelect = document.getElementById('period');
+  const customRange = document.getElementById('custom-range');
+  
+  if (periodSelect) {
+    periodSelect.addEventListener('change', function() {
+      if (this.value === 'custom') {
+        customRange.classList.remove('hidden');
+        customRange.classList.add('lg:col-span-2', 'space-y-4', 'lg:space-y-0', 'lg:space-x-4', 'lg:flex', 'lg:items-end');
+      } else {
+        customRange.classList.add('hidden');
+        customRange.classList.remove('lg:col-span-2', 'space-y-4', 'lg:space-y-0', 'lg:space-x-4', 'lg:flex', 'lg:items-end');
+      }
+    });
+  }
+  
+  // Add animation delays for staggered effects
+  const cards = document.querySelectorAll('.gradient-border, .glass-morphism');
+  cards.forEach((card, index) => {
+    card.style.animationDelay = `${index * 0.1}s`;
+  });
+});
+
+// Quick period functions
+function setPeriod(period) {
+  document.getElementById('period').value = period;
+  
+  // Hide custom range if not selected
+  if (period !== 'custom') {
+    document.getElementById('custom-range').classList.add('hidden');
+  }
+  
+  showNotification(`Period set to ${getPeriodName(period)}`, 'info');
+}
+
+function getPeriodName(period) {
+  const periods = {
+    'week': 'Last 7 Days',
+    'month': 'Last 30 Days', 
+    'term': 'Current Term',
+    'year': 'Last Year',
+    'custom': 'Custom Range'
+  };
+  return periods[period] || period;
+}
+
+function exportAnalytics() {
+  // In a real implementation, this would generate and download an analytics report
+  showNotification('Analytics report export would generate PDF/CSV in production', 'info');
+}
+
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 translate-x-full ${
+    type === 'success' ? 'bg-green-500 text-white' : 
+    type === 'error' ? 'bg-red-500 text-white' : 
+    'bg-blue-500 text-white'
+  }`;
+  notification.innerHTML = `
+    <div class="flex items-center">
+      <i class="fas ${
+        type === 'success' ? 'fa-check-circle' : 
+        type === 'error' ? 'fa-exclamation-circle' : 
+        'fa-info-circle'
+      } mr-2"></i>
+      <span>${message}</span>
+    </div>
+  `;
+  
+  // Add to page
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => {
+    notification.style.transform = 'translateX(0)';
+  }, 10);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  // Ctrl + R to generate report
+  if (e.ctrlKey && e.key === 'r') {
+    e.preventDefault();
+    document.querySelector('form').submit();
+  }
+});
+
+console.log('Analytics dashboard ready!');
+</script>
+{% endblock %}

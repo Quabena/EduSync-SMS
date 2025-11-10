@@ -122,6 +122,10 @@ def create_app(config_class=Config):
 
     app.register_blueprint(teachers_bp)
 
+    from app.teacher_attendance import bp as teacher_attendance_bp
+
+    app.register_blueprint(teacher_attendance_bp)
+
     from app.attendance import bp as attendance_bp
 
     app.register_blueprint(attendance_bp)

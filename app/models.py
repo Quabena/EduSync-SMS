@@ -1,7 +1,7 @@
 from app import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, date, timezone
+from datetime import datetime, date, timezone, time
 from sqlalchemy import event, func
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -92,6 +92,33 @@ class Class(db.Model):
     def get_active_classes(cls):
         """Get all non-alumni classes"""
         return cls.query.filter_by(is_alumni_class=False).order_by(cls.name).all()
+
+    def get_promotion_paths(self):
+        """Getting available promotion paths from this class"""
+        return (
+            PromotionPath.query.filter_by(from_class_id=self.id, is_active=True)
+            .order_by(PromotionPath.order)
+            .all()
+        )
+
+    def get_students_eligible_for_promotion(self):
+        """Getting students who can be promoted (active students)"""
+        return self.students.filter(Student.status == "active").all()
+
+    @classmethod
+    def get_promotion_hierarchy(cls):
+        """Getting the promotion hierarchy"""
+        paths = (
+            PromotionPath.query.filter_by(is_active=True)
+            .order_by(PromotionPath.order)
+            .all()
+        )
+        hierarchy = {}
+        for path in paths:
+            if path.from_class_id not in hierarchy:
+                hierarchy[path.from_class_id] = []
+            hierarchy[path.from_class_id].append(path.to_class)
+        return hierarchy
 
 
 # Subject Class Model
@@ -281,6 +308,24 @@ class Student(db.Model):
     def __repr__(self) -> str:
         return self.full_name
 
+    def promote_student(self, to_class_id, promoted_by_user, notes=None):
+        """Promoting a student to another class"""
+        from_class_id = self.class_id
+        self.class_id = to_class_id
+
+        # Creating promotion record
+        promotion = PromotionRecord(
+            student_id=self.id,
+            from_class_id=from_class_id,
+            to_class_id=to_class_id,
+            promoted_by=promoted_by_user.id,
+            notes=notes,
+        )
+        db.session.add(promotion)
+        db.session.commit()
+
+        return promotion
+
 
 # ---Model for tracking student's Graduation Status---
 class GraduationStatus(db.Model):
@@ -302,6 +347,57 @@ class GraduationStatus(db.Model):
 
     def __repr__(self) -> str:
         return f"<GraduationStatus {self.student_id} {self.graduation_year}>"
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+# --- Student Promotion Model ---
+class PromotionPath(db.Model):
+    """Path for student promotion between classes"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    from_class_id = db.Column(db.Integer, db.ForeignKey("class.id"), nullable=False)
+    to_class_id = db.Column(db.Integer, db.ForeignKey("class.id"), nullable=False)
+    order = db.Column(db.Integer, default=0)  # For ordering multiple paths
+    is_active = db.Column(db.Boolean, default=True)
+
+    # RElationships
+    from_class = db.relationship(
+        "Class", foreign_keys=[from_class_id], backref="promotion_paths_from"
+    )
+    to_class = db.relationship(
+        "Class", foreign_keys=[to_class_id], backref="promotion_paths_to"
+    )
+
+    def __repr__(self) -> str:
+        return f"<PromotionPath {self.from_class.name} -> {self.to_class.name}>"
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+class PromotionRecord(db.Model):
+    """Tracking student promotion history"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    from_class_id = db.Column(db.Integer, db.ForeignKey("class.id"), nullable=False)
+    to_class_id = db.Column(db.Integer, db.ForeignKey("class.id"), nullable=False)
+    promoted_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    promotion_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    notes = db.Column(db.Text)
+
+    # Relationships
+    student = db.relationship("Student", backref="promotion_history")
+    from_class = db.relationship("Class", foreign_keys=[from_class_id])
+    to_class = db.relationship("Class", foreign_keys=[to_class_id])
+    promoter = db.relationship("User", foreign_keys=[promoted_by])
+
+    def __repr__(self) -> str:
+        return f"<PromotionRecord {self.student.full_name} {self.from_class.name}->{self.to_class.name}>"
 
     def __init__(self, **kwargs) -> None:
         for key, value in kwargs.items():
@@ -559,6 +655,87 @@ class AttendanceAudit(db.Model):
     # Relationships
     attendance = db.relationship("Attendance", backref="audit_trail")
     user = db.relationship("User", foreign_keys=[changed_by])
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+# Teachers Attendance Model
+class TeacherAttendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    status = db.Column(
+        db.String(20), nullable=False
+    )  # will have present, absent, excused, late
+    check_in_time = db.Column(db.Time, nullable=True)
+    check_out_time = db.Column(db.Time, nullable=True)
+    late_minutes = db.Column(db.Integer, default=0)
+    excuse_reason = db.Column(db.Text, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    marked_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
+
+    # Relationships
+    teacher = db.relationship("Teacher", backref="attendance_records")
+    marker_user = db.relationship("User", foreign_keys=[marked_by])
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @property
+    def is_late(self):
+        return self.status == "late" or self.late_minutes > 0
+
+    def __repr__(self) -> str:
+        return f"<TeacherAttendance {self.teacher_id} {self.date} {self.status}>"
+
+
+class TeacherAttendanceAudit(db.Model):
+
+    __tablename__ = "teacher_attendance_audit"
+
+    """Track changes to teacher attendance records"""
+    id = db.Column(db.Integer, primary_key=True)
+    attendance_id = db.Column(
+        db.Integer, db.ForeignKey("teacher_attendance.id"), nullable=False
+    )
+    changed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    change_type = db.Column(db.String(10), nullable=False)  # create, update, delete
+    old_status = db.Column(db.String(20), nullable=True)
+    new_status = db.Column(db.String(20), nullable=True)
+    old_check_in = db.Column(db.Time, nullable=False)
+    new_check_in = db.Column(db.Time, nullable=False)
+    change_reason = db.Column(db.Text, nullable=True)
+    changed_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationships
+    attendance = db.relationship("TeacherAttendance", backref="audit_trail")
+    user = db.relationship("User", foreign_keys=[changed_by])
+
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+class AttendanceSettings(db.Model):
+    """Store attendance settings [working hours, late thresholds, etc.]"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    school_start_time = db.Column(db.Time, default=time(8, 0))  # 8:00 AM
+    school_end_time = db.Column(db.Time, default=time(14, 0))  # 2:00 PM
+    late_threshold_minutes = db.Column(db.Integer, default=15)  # 15 minutes late
+    half_day_threshold_hours = db.Column(db.Integer, default=4)  # 4 hours for half day
+    auto_mark_absent = db.Column(db.Boolean, default=True)
+    updated_by = db.Column(db.Integer, db.ForeignKey("user.id"))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     def __init__(self, **kwargs) -> None:
         for key, value in kwargs.items():

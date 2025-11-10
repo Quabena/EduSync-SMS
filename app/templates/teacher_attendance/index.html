@@ -1,0 +1,553 @@
+{% extends 'base.html' %} {% block title %}Teacher Attendance System{% endblock
+%} {% block head %}
+<!-- Font Awesome Icons -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/font-awesome.min.css') }}"
+/>
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes pulse-subtle {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-slideInRight {
+    animation: slideInRight 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 3s ease-in-out infinite;
+  }
+
+  /* Stagger animation delays */
+  .delay-1 {
+    animation-delay: 0.1s;
+  }
+  .delay-2 {
+    animation-delay: 0.2s;
+  }
+  .delay-3 {
+    animation-delay: 0.3s;
+  }
+  .delay-4 {
+    animation-delay: 0.4s;
+  }
+
+  /* Card styles */
+  .feature-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.6s ease;
+  }
+
+  .feature-card:hover::before {
+    left: 100%;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  }
+
+  .feature-icon {
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .feature-card:hover .feature-icon {
+    transform: scale(1.15) rotateY(10deg);
+  }
+
+  /* Status indicator pulse */
+  .status-pulse {
+    position: relative;
+  }
+
+  .status-pulse::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+
+  /* Header accent line */
+  .header-accent {
+    position: relative;
+    display: inline-block;
+  }
+
+  .header-accent::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #1e40af);
+    border-radius: 2px;
+  }
+
+  /* Button animations */
+  .btn-primary {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn-primary:hover::after {
+    width: 300px;
+    height: 300px;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #1e40af 0%, #0369a1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Accent divider */
+  .accent-divider {
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #06b6d4, transparent);
+    border-radius: 2px;
+  }
+
+  /* Floating elements */
+  .float-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  /* Feature card corner accent */
+  .card-accent-top {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, currentColor 0%, transparent 70%);
+    opacity: 0.05;
+    border-radius: 0 100% 0 100%;
+  }
+
+  /* Smooth transitions */
+  a {
+    transition: all 0.3s ease;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="min-h-screen relative bg-white overflow-hidden">
+  <!-- Header with navigation background -->
+  <div
+    class="relative z-10 bg-gradient-to-b from-blue-50 via-white to-transparent pt-12 pb-20"
+  >
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Logo and Title -->
+      <div class="text-center mb-16 animate-fadeInUp">
+        <div
+          class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl mb-8 animate-fadeInUp delay-1"
+        >
+          <i class="fas fa-chalkboard-teacher text-4xl text-white"></i>
+        </div>
+
+        <h1
+          class="text-5xl md:text-6xl font-black text-gray-900 mb-4 animate-fadeInUp delay-2"
+        >
+          <span class="header-accent">Teacher Attendance</span>
+        </h1>
+
+        <div
+          class="accent-divider mx-auto mt-6 mb-8"
+          style="width: 100px"
+        ></div>
+
+        <p
+          class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed animate-fadeInUp delay-3"
+        >
+          Modern attendance management platform designed for educational
+          institutions. Track, analyze, and optimize teacher attendance with
+          ease.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Feature Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+      <!-- Mark Attendance Card -->
+      <a
+        href="{{ url_for('teacher_attendance.mark_teacher_attendance') }}"
+        class="group block animate-fadeInUp delay-1"
+      >
+        <div
+          class="feature-card bg-white rounded-2xl p-8 shadow-lg border border-gray-100 relative h-full flex flex-col items-center text-center hover:border-blue-200 group/card"
+        >
+          <div class="card-accent-top text-blue-500"></div>
+
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mb-6 feature-icon group-hover:from-blue-500 group-hover:to-blue-600 group-hover:shadow-lg transition-all"
+          >
+            <i
+              class="fas fa-clipboard-check text-3xl text-blue-600 group-hover:text-white"
+            ></i>
+          </div>
+
+          <h3
+            class="text-2xl font-bold text-gray-900 mb-3 transition-colors group-hover:text-blue-600"
+          >
+            Mark Attendance
+          </h3>
+
+          <p class="text-gray-600 text-sm leading-relaxed flex-grow mb-6">
+            Efficiently record daily attendance, monitor late arrivals, and
+            track teacher status in real-time
+          </p>
+
+          <div
+            class="w-full pt-4 border-t border-gray-100 flex items-center justify-center"
+          >
+            <span class="status-pulse text-green-500 text-sm font-medium ml-2">
+              <i class="fas fa-circle text-xs mr-2"></i>Active
+            </span>
+          </div>
+
+          <div
+            class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <span
+              class="text-blue-600 text-sm font-semibold flex items-center justify-center"
+            >
+              Start Recording <i class="fas fa-arrow-right ml-2"></i>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Records Card -->
+      <a
+        href="{{ url_for('teacher_attendance.teacher_attendance_records') }}"
+        class="group block animate-fadeInUp delay-2"
+      >
+        <div
+          class="feature-card bg-white rounded-2xl p-8 shadow-lg border border-gray-100 relative h-full flex flex-col items-center text-center hover:border-green-200 group/card"
+        >
+          <div class="card-accent-top text-green-500"></div>
+
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center mb-6 feature-icon group-hover:from-green-500 group-hover:to-green-600 group-hover:shadow-lg transition-all"
+          >
+            <i
+              class="fas fa-history text-3xl text-green-600 group-hover:text-white"
+            ></i>
+          </div>
+
+          <h3
+            class="text-2xl font-bold text-gray-900 mb-3 transition-colors group-hover:text-green-600"
+          >
+            Attendance Records
+          </h3>
+
+          <p class="text-gray-600 text-sm leading-relaxed flex-grow mb-6">
+            Browse detailed and complete attendance records for informed
+            administrative decisions
+          </p>
+
+          <div
+            class="w-full pt-4 border-t border-gray-100 flex items-center justify-center"
+          >
+            <span class="text-gray-600 text-sm font-medium">
+              <i class="fas fa-database mr-2 text-green-600"></i>Complete
+              History
+            </span>
+          </div>
+
+          <div
+            class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <span
+              class="text-green-600 text-sm font-semibold flex items-center justify-center"
+            >
+              View Records <i class="fas fa-arrow-right ml-2"></i>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Analytics Card -->
+      <a
+        href="{{ url_for('teacher_attendance.teacher_attendance_analytics') }}"
+        class="group block animate-fadeInUp delay-3"
+      >
+        <div
+          class="feature-card bg-white rounded-2xl p-8 shadow-lg border border-gray-100 relative h-full flex flex-col items-center text-center hover:border-purple-200 group/card"
+        >
+          <div class="card-accent-top text-purple-500"></div>
+
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center mb-6 feature-icon group-hover:from-purple-500 group-hover:to-purple-600 group-hover:shadow-lg transition-all"
+          >
+            <i
+              class="fas fa-chart-bar text-3xl text-purple-600 group-hover:text-white"
+            ></i>
+          </div>
+
+          <h3
+            class="text-2xl font-bold text-gray-900 mb-3 transition-colors group-hover:text-purple-600"
+          >
+            Analytics & Insights
+          </h3>
+
+          <p class="text-gray-600 text-sm leading-relaxed flex-grow mb-6">
+            Visualize trends, generate comprehensive reports, and gain
+            actionable insights from attendance data
+          </p>
+
+          <div
+            class="w-full pt-4 border-t border-gray-100 flex items-center justify-center"
+          >
+            <span class="text-gray-600 text-sm font-medium">
+              <i class="fas fa-chart-line mr-2 text-purple-600"></i>Trend
+              Analysis
+            </span>
+          </div>
+
+          <div
+            class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <span
+              class="text-purple-600 text-sm font-semibold flex items-center justify-center"
+            >
+              Explore Analytics <i class="fas fa-arrow-right ml-2"></i>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Settings Card -->
+      <a
+        href="{{ url_for('teacher_attendance.attendance_settings') }}"
+        class="group block animate-fadeInUp delay-4"
+      >
+        <div
+          class="feature-card bg-white rounded-2xl p-8 shadow-lg border border-gray-100 relative h-full flex flex-col items-center text-center hover:border-orange-200 group/card"
+        >
+          <div class="card-accent-top text-orange-500"></div>
+
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl flex items-center justify-center mb-6 feature-icon group-hover:from-orange-500 group-hover:to-orange-600 group-hover:shadow-lg transition-all"
+          >
+            <i
+              class="fas fa-cogs text-3xl text-orange-600 group-hover:text-white"
+            ></i>
+          </div>
+
+          <h3
+            class="text-2xl font-bold text-gray-900 mb-3 transition-colors group-hover:text-orange-600"
+          >
+            System Settings
+          </h3>
+
+          <p class="text-gray-600 text-sm leading-relaxed flex-grow mb-6">
+            Configure working hours, attendance rules, holidays, and customize
+            system preferences
+          </p>
+
+          <div
+            class="w-full pt-4 border-t border-gray-100 flex items-center justify-center"
+          >
+            <span class="text-gray-600 text-sm font-medium">
+              <i class="fas fa-sliders-h mr-2 text-orange-600"></i>Configuration
+            </span>
+          </div>
+
+          <div
+            class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <span
+              class="text-orange-600 text-sm font-semibold flex items-center justify-center"
+            >
+              Configure <i class="fas fa-arrow-right ml-2"></i>
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- CTA Section -->
+    <div
+      class="bg-gradient-to-r from-blue-50 via-white to-cyan-50 rounded-2xl border border-blue-100 px-8 py-12 mb-12"
+    >
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl font-bold text-gray-900 mb-3">
+          Ready to Get Started?
+        </h2>
+        <p class="text-lg text-gray-600 mb-8">
+          Begin tracking attendance today and streamline your institution's
+          attendance management process.
+        </p>
+
+        <div class="accent-divider mx-auto mb-8" style="width: 60px"></div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="{{ url_for('teacher_attendance.mark_teacher_attendance') }}"
+            class="btn-primary inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:-translate-y-0.5"
+          >
+            <i class="fas fa-play-circle mr-3 text-lg"></i>
+            Start Marking Attendance
+          </a>
+          <a
+            href="{{ url_for('teacher_attendance.teacher_attendance_analytics') }}"
+            class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-xl font-bold border-2 border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300"
+          >
+            <i class="fas fa-chart-pie mr-3 text-lg"></i>
+            View Analytics
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div
+        class="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg text-center"
+      >
+        <div class="text-4xl font-bold text-blue-600 mb-2">
+          <i class="fas fa-users text-3xl mr-2"></i>
+        </div>
+        <p class="text-gray-600 text-sm font-medium">
+          Comprehensive Teacher Management
+        </p>
+        <p class="text-gray-500 text-xs mt-2">
+          Track all staff attendance efficiently
+        </p>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg text-center"
+      >
+        <div class="text-4xl font-bold text-green-600 mb-2">
+          <i class="fas fa-calendar-check text-3xl mr-2"></i>
+        </div>
+        <p class="text-gray-600 text-sm font-medium">Real-Time Recording</p>
+        <p class="text-gray-500 text-xs mt-2">Update attendance instantly</p>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg text-center"
+      >
+        <div class="text-4xl font-bold text-purple-600 mb-2">
+          <i class="fas fa-file-export text-3xl mr-2"></i>
+        </div>
+        <p class="text-gray-600 text-sm font-medium">Advanced Reporting</p>
+        <p class="text-gray-500 text-xs mt-2">
+          Generate detailed insights and reports
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Smooth scroll behavior
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute("href"));
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
+
+    // Add interaction tracking for cards
+    const cards = document.querySelectorAll(".feature-card");
+    cards.forEach((card) => {
+      card.addEventListener("mouseenter", function () {
+        this.style.zIndex = "10";
+      });
+
+      card.addEventListener("mouseleave", function () {
+        this.style.zIndex = "1";
+      });
+    });
+  });
+</script>
+{% endblock %} {% block scripts %}{% endblock %}

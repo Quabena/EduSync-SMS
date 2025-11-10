@@ -17,7 +17,11 @@ import mimetypes
 from pathlib import Path
 from PIL import Image
 from app.decorators import role_required
-from app.models import Teacher, Subject, Class
+from app.models import (
+    Teacher,
+    Subject,
+    Class,
+)
 from app.teachers.forms import TeacherForm
 from app.teachers import bp
 from app.utils.storage import backup_database

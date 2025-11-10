@@ -753,7 +753,9 @@ def view_assignments():
 
     # Return HTML for regular browser requests
     return render_template(
-        "exams_grading/view_assignments.html", assignments=assignments
+        "exams_grading/view_assignments.html",
+        assignments=assignments,
+        year=datetime.now().year,
     )
 
 
