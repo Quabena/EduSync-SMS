@@ -1,11 +1,7 @@
-{% extends 'base.html' %} {% block title %}Teacher Attendance System{% endblock
-%} {% block head %}
-<!-- Font Awesome Icons -->
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/font-awesome.min.css') }}"
-/>
-
+{% extends "base.html" %} {% block title %}Teacher Attendance Management -
+EduSync SMS{% endblock %} {% block page_title %}Teachers Attendance Management{%
+endblock %} {% block page_description %}Manage teacher attendance - mark
+teachers attendance and view trends{% endblock %} {% block head %}
 <style>
   @keyframes fadeInUp {
     from {
@@ -225,7 +221,7 @@
         </div>
 
         <h1
-          class="text-5xl md:text-6xl font-black text-gray-900 mb-4 animate-fadeInUp delay-2"
+          class="text-4xl font-bold text-slate-800 dark:text-white animate-fadeInUp delay-2"
         >
           <span class="header-accent">Teacher Attendance</span>
         </h1>

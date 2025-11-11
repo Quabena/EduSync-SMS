@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Promotion History - EduSync SMS{% endblock %}
+
+{% block page_title %}Promotion History{% endblock %}
+
+{% block page_description %}Track and review all student promotion records{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  <!-- Filters -->
+  <div class="professional-card p-6 mb-6">
+    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Filter Records</h3>
+    
+    <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Student</label>
+        <select name="student_id" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="">All Students</option>
+          {% for student in students %}
+          <option value="{{ student.id }}" {% if student_id == student.id %}selected{% endif %}>
+            {{ student.full_name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Class</label>
+        <select name="class_id" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="">All Classes</option>
+          {% for class in classes %}
+          <option value="{{ class.id }}" {% if class_id == class.id %}selected{% endif %}>
+            {{ class.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Start Date</label>
+        <input type="date" name="start_date" value="{{ start_date }}" 
+               class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">End Date</label>
+        <input type="date" name="end_date" value="{{ end_date }}" 
+               class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      
+      <div class="flex items-end">
+        <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium">
+          Apply Filters
+        </button>
+      </div>
+    </form>
+    
+    {% if student_id or class_id or start_date or end_date %}
+    <div class="mt-4 flex items-center justify-between">
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Showing filtered results
+        {% if student_id %}(Student ID: {{ student_id }}){% endif %}
+        {% if class_id %}(Class ID: {{ class_id }}){% endif %}
+      </p>
+      <a href="{{ url_for('student_promotion.promotion_history') }}" 
+         class="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300">
+        Clear filters
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Promotion Records -->
+  <div class="professional-card p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-semibold text-slate-800 dark:text-white">Promotion Records</h3>
+      <div class="text-sm text-slate-600 dark:text-slate-400">
+        {{ records|length }} record{% if records|length != 1 %}s{% endif %} found
+      </div>
+    </div>
+
+    {% if records %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th class="pb-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Student</th>
+            <th class="pb-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">From Class</th>
+            <th class="pb-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">To Class</th>
+            <th class="pb-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Promoted By</th>
+            <th class="pb-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Date</th>
+            <th class="pb-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Notes</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+          {% for record in records %}
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-150">
+            <td class="py-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                  {{ record.student.first_name[0] }}{{ record.student.surname[0] }}
+                </div>
+                <div>
+                  <p class="font-medium text-slate-800 dark:text-white">{{ record.student.full_name }}</p>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">ID: {{ record.student.id }}</p>
+                </div>
+              </div>
+            </td>
+            <td class="py-4">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-sign-out-alt text-slate-500 text-xs"></i>
+                </div>
+                <span class="font-medium text-slate-800 dark:text-white">{{ record.from_class.name }}</span>
+              </div>
+            </td>
+            <td class="py-4">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-sign-in-alt text-green-600 dark:text-green-400 text-xs"></i>
+                </div>
+                <span class="font-medium text-slate-800 dark:text-white">{{ record.to_class.name }}</span>
+              </div>
+            </td>
+            <td class="py-4">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 text-xs font-semibold flex-shrink-0">
+                  {{ record.promoter.username[0]|upper }}
+                </div>
+                <span class="text-slate-700 dark:text-slate-300">{{ record.promoter.username }}</span>
+              </div>
+            </td>
+            <td class="py-4">
+              <div class="text-slate-700 dark:text-slate-300">
+                <p class="font-medium">{{ record.promotion_date.strftime('%b %d, %Y') }}</p>
+                <p class="text-sm text-slate-500 dark:text-slate-500">{{ record.promotion_date.strftime('%I:%M %p') }}</p>
+              </div>
+            </td>
+            <td class="py-4">
+              {% if record.notes %}
+              <button onclick="showNotes('{{ record.notes }}')" 
+                      class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium">
+                View Notes
+              </button>
+              {% else %}
+              <span class="text-slate-400 dark:text-slate-600 text-sm">No notes</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Export Options -->
+    <div class="mt-6 flex justify-between items-center pt-6 border-t border-slate-200 dark:border-slate-700">
+      <div class="text-sm text-slate-600 dark:text-slate-400">
+        Showing {{ records|length }} promotion record{% if records|length != 1 %}s{% endif %}
+      </div>
+      <div class="flex space-x-3">
+        <button class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 text-sm font-medium flex items-center space-x-2">
+          <i class="fas fa-download"></i>
+          <span>Export CSV</span>
+        </button>
+        <button class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 text-sm font-medium flex items-center space-x-2">
+          <i class="fas fa-print"></i>
+          <span>Print</span>
+        </button>
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <i class="fas fa-history text-4xl text-slate-300 dark:text-slate-600 mb-4"></i>
+      <h4 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">No Promotion Records Found</h4>
+      <p class="text-slate-500 dark:text-slate-400 mb-6">
+        {% if student_id or class_id or start_date or end_date %}
+        Try adjusting your filters to see more results
+        {% else %}
+        No promotion records have been created yet
+        {% endif %}
+      </p>
+      <a href="{{ url_for('student_promotion.bulk_promotion') }}" 
+         class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Start Promoting Students</span>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Notes Modal -->
+<div id="notesModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 mx-4 max-w-md w-full">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Promotion Notes</h3>
+      <button onclick="closeNotes()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <p id="notesContent" class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap"></p>
+    <div class="mt-6 flex justify-end">
+      <button onclick="closeNotes()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors duration-200">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showNotes(notes) {
+    document.getElementById('notesContent').textContent = notes;
+    document.getElementById('notesModal').classList.remove('hidden');
+  }
+  
+  function closeNotes() {
+    document.getElementById('notesModal').classList.add('hidden');
+  }
+</script>
+{% endblock %}

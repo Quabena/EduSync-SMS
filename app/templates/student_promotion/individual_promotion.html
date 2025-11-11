@@ -1,0 +1,319 @@
+{% extends 'base.html' %} {% block title %}Individual Promotion - EduSync SMS{%
+endblock %} {% block page_title %}Individual Student Promotion{% endblock %} {%
+block page_description %}Promote individual students with precision and track
+their progress{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto">
+  <!-- Student Search and Selection -->
+  <div class="professional-card p-6 mb-6">
+    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
+      Find Student
+    </h3>
+
+    <form method="GET" class="flex flex-col md:flex-row gap-4">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div class="flex-1">
+        <div class="relative">
+          <input
+            type="text"
+            name="search"
+            value="{{ search_query }}"
+            placeholder="Search by student name..."
+            class="w-full px-4 py-2 pl-10 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <i
+            class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+          ></i>
+        </div>
+      </div>
+      <button
+        type="submit"
+        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium"
+      >
+        Search
+      </button>
+    </form>
+
+    <!-- Search Results -->
+    {% if search_query and students %}
+    <div class="mt-4 border-t border-slate-200 dark:border-slate-700 pt-4">
+      <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+        Search Results
+      </h4>
+      <div class="space-y-2 max-h-60 overflow-y-auto">
+        {% for student in students %}
+        <a
+          href="?student_id={{ student.id }}"
+          class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 {% if student.id == student.id %}bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800{% endif %}"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+          >
+            {{ student.first_name[0] }}{{ student.surname[0] }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-slate-800 dark:text-white truncate">
+              {{ student.full_name }}
+            </p>
+            <p class="text-sm text-slate-600 dark:text-slate-400 truncate">
+              {{ student.classroom.name if student.classroom else 'No class
+              assigned' }}
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <span
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200"
+            >
+              {{ student.classroom.level if student.classroom else 'N/A' }}
+            </span>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% elif search_query and not students %}
+    <div
+      class="mt-4 border-t border-slate-200 dark:border-slate-700 pt-4 text-center py-6"
+    >
+      <i
+        class="fas fa-search text-2xl text-slate-300 dark:text-slate-600 mb-2"
+      ></i>
+      <p class="text-slate-600 dark:text-slate-400">
+        No students found matching "{{ search_query }}"
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if student %}
+  <!-- Student Promotion Form -->
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input type="hidden" name="student_id" value="{{ student.id }}" />
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Student Information -->
+      <div class="professional-card p-6 lg:col-span-1">
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
+          Student Information
+        </h3>
+
+        <div class="text-center mb-4">
+          {% if student.photo_path %}
+          <img
+            src="{{ url_for('static', filename=student.photo_path) }}"
+            alt="{{ student.full_name }}"
+            class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-white dark:border-slate-800 shadow-lg"
+          />
+          {% else %}
+          <div
+            class="w-24 h-24 rounded-full mx-auto mb-3 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-2xl border-4 border-white dark:border-slate-800 shadow-lg"
+          >
+            {{ student.first_name[0] }}{{ student.surname[0] }}
+          </div>
+          {% endif %}
+          <h4 class="text-xl font-bold text-slate-800 dark:text-white">
+            {{ student.full_name }}
+          </h4>
+          <p class="text-slate-600 dark:text-slate-400">
+            {{ student.classroom.name if student.classroom else 'No class' }}
+          </p>
+        </div>
+
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-600 dark:text-slate-400">Gender:</span>
+            <span class="font-medium text-slate-800 dark:text-white"
+              >{{ student.gender }}</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600 dark:text-slate-400">Age:</span>
+            <span class="font-medium text-slate-800 dark:text-white"
+              >{{ student.age }} years</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600 dark:text-slate-400">Guardian:</span>
+            <span class="font-medium text-slate-800 dark:text-white text-right">
+              {{ student.guardian_name if student.guardian_name else 'Not
+              specified' }}
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600 dark:text-slate-400">Status:</span>
+            <span
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
+            >
+              {{ student.status|title }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Promotion Details -->
+      <div class="professional-card p-6 lg:col-span-2">
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
+          Promotion Details
+        </h3>
+
+        <!-- Current Class -->
+        <div
+          class="mb-6 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
+        >
+          <label
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+            >Current Class</label
+          >
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0"
+            >
+              <i class="fas fa-chalkboard text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-800 dark:text-white">
+                {{ student.classroom.name if student.classroom else 'Not
+                assigned' }}
+              </p>
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                {{ student.classroom.level if student.classroom else 'N/A' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Target Class Selection -->
+        <div class="mb-6">
+          <label
+            for="target_class_id"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+            >Target Class</label
+          >
+
+          {% if promotion_paths %}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for path in promotion_paths %}
+            <div class="relative">
+              <input
+                type="radio"
+                name="target_class_id"
+                value="{{ path.to_class_id }}"
+                id="target_class_{{ path.to_class_id }}"
+                class="hidden peer"
+                required
+              />
+              <label
+                for="target_class_{{ path.to_class_id }}"
+                class="block p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-500 peer-checked:border-blue-500 dark:peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 cursor-pointer transition-all duration-200"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0"
+                  >
+                    <i
+                      class="fas fa-arrow-up text-green-600 dark:text-green-400"
+                    ></i>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800 dark:text-white">
+                      {{ path.to_class.name }}
+                    </p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                      {{ path.to_class.level }}
+                    </p>
+                  </div>
+                </div>
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div
+            class="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
+          >
+            <div class="flex items-center space-x-3">
+              <i class="fas fa-exclamation-triangle text-amber-500"></i>
+              <div>
+                <p class="font-medium text-amber-800 dark:text-amber-200">
+                  No promotion paths available
+                </p>
+                <p class="text-sm text-amber-700 dark:text-amber-300">
+                  Configure promotion paths for this class first
+                </p>
+              </div>
+            </div>
+            <a
+              href="{{ url_for('student_promotion.manage_promotion_paths') }}"
+              class="inline-block mt-3 text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 font-medium text-sm"
+            >
+              Manage Promotion Paths →
+            </a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Promotion Notes -->
+        <div class="mb-6">
+          <label
+            for="promotion_notes"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+          >
+            Promotion Notes (Optional)
+          </label>
+          <textarea
+            name="promotion_notes"
+            id="promotion_notes"
+            rows="4"
+            class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Add any notes or comments about this promotion..."
+          ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div
+          class="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700"
+        >
+          <a
+            href="{{ url_for('student_promotion.individual_promotion') }}"
+            class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 font-medium"
+          >
+            Cancel
+          </a>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            {%
+            if
+            not
+            promotion_paths
+            %}disabled{%
+            endif
+            %}
+          >
+            <i class="fas fa-graduation-cap"></i>
+            <span>Promote Student</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+  {% else %}
+  <!-- No Student Selected State -->
+  <div class="professional-card p-8 text-center">
+    <i
+      class="fas fa-user-graduate text-4xl text-slate-300 dark:text-slate-600 mb-4"
+    ></i>
+    <h4 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+      Select a Student
+    </h4>
+    <p class="text-slate-500 dark:text-slate-400 mb-4">
+      Search for a student to begin the promotion process
+    </p>
+    <div class="w-64 mx-auto bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
+      <p class="text-sm text-slate-600 dark:text-slate-400 text-center">
+        Use the search bar above to find students by name
+      </p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

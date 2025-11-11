@@ -138,6 +138,10 @@ def create_app(config_class=Config):
 
     app.register_blueprint(exams_grading_bp)
 
+    from app.student_promotion import bp as student_promotion_bp
+
+    app.register_blueprint(student_promotion_bp)
+
     from app.graduation import bp as alumni_bp
 
     app.register_blueprint(alumni_bp)

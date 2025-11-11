@@ -12,6 +12,13 @@ import _json
 from app.student_promotion import bp
 
 
+@bp.route("/", methods=["GET", "POST"])
+@login_required
+@role_required(["admin", "headteacher"])
+def index():
+    return render_template("student_promotion/index.html")
+
+
 @bp.route("/dashboard", methods=["GET", "POST"])
 @login_required
 @role_required(["admin", "headteacher"])
@@ -28,7 +35,7 @@ def promotion_dashboard():
     classes_with_students = []
 
     for class_ in classes:
-        student_count = class_.get_students_eligible_for_promotion().count()
+        student_count = len(class_.get_students_eligible_for_promotion())
         promotion_paths = class_.get_promotion_paths()
 
         if student_count > 0:

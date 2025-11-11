@@ -593,6 +593,14 @@
           <span class="font-medium">Exams & Grading</span>
         </a>
 
+        <a href="{{ url_for('student_promotion.index') }}" class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('student_promotion.index') %}
+          active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
+          <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+            <div class="fas fa-sort-up w-5 h-5"></div>
+          </div>
+          <span class="font-medium">Promotions</span>
+        </a>
+
         <a href="{{ url_for('graduation.graduation_management') }}" class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('graduation.alumni_list') %}
           active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
@@ -624,18 +632,18 @@
           <span class="font-medium">School Info</span>
         </a>
 
-        <a href="{{url_for('main.contact_developer')}}"
+        <a href="{{url_for('main.backup_dashboard')}}"
           class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('students.export_csv') %} active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-            <div class="fas fa-user w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></div>
+            <div class="fas fa-hard-drive w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></div>
           </div>
-          <span class="font-medium">Contact Developer</span>
+          <span class="font-medium">Database Backup</span>
         </a>
 
         <!-- In your navigation template -->
-      <a href="{{ url_for('main.backup_dashboard') }}" class="flex items-center px-4 py-2 text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-        <div class="fas fa-hard-drive w-5 h-5 mr-3"></div>
-        Database Backup
+      <a href="{{ url_for('main.contact_developer') }}" class="flex items-center px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+        <div class="fas fa-user w-5 h-5 mr-1"></div>
+        Contact Developer
       </a>
       </nav>
 
