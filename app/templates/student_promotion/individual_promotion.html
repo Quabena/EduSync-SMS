@@ -99,7 +99,7 @@ their progress{% endblock %} {% block content %}
         <div class="text-center mb-4">
           {% if student.photo_path %}
           <img
-            src="{{ url_for('static', filename=student.photo_path) }}"
+            src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
             alt="{{ student.full_name }}"
             class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-white dark:border-slate-800 shadow-lg"
           />

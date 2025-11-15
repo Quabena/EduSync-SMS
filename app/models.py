@@ -263,6 +263,11 @@ class Student(db.Model):
     photo_path = db.Column(db.String(200))
     class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
     status = db.Column(db.String(20), default="active")
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
     interest = db.Column(
         db.String(20)
     )  # Will be used for creating the learning style assessment engine

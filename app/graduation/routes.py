@@ -33,10 +33,16 @@ def graduation_management():
         .all()
     )
 
+    # Read query parameters (default = 1)
+    candidates_page = request.args.get("candidates_page", 1, type=int)
+    recent_page = request.args.get("recent_page", 1, type=int)
+
     return render_template(
         "graduation/management.html",
         candidates=graduation_candidates,
         recent_graduations=recent_graduations,
+        candidates_page=candidates_page,
+        recent_page=recent_page,
     )
 
 

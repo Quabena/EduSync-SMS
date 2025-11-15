@@ -32,7 +32,7 @@ from app.models import (
 fake = Faker()
 
 # Constants for controlled data generation
-NUM_CLASSES = 5
+NUM_CLASSES = 6
 NUM_SUBJECTS = 10
 NUM_TEACHERS = 15
 NUM_STUDENTS = 50

@@ -22,6 +22,7 @@ import csv
 import io
 from sqlalchemy import func, extract, case
 from sqlalchemy.orm import joinedload
+from werkzeug.routing import BuildError
 
 
 # Routes for attendance dashboard
@@ -35,7 +36,6 @@ def attendance_dashboard():
         classes = Class.query.filter(
             Class.is_alumni_class == False, Class.name.like("JHS%")
         ).all()
-
     else:
         teacher = Teacher.query.filter_by(email=current_user.email).first()
         classes = teacher.classes if teacher else []
@@ -53,7 +53,7 @@ def attendance_dashboard():
     else:
         current_term = "Term 3"
 
-    # Get today's attendance summary for each class
+    # ====== Today's attendance summary for each class (existing) ======
     today_attendance = {}
     for class_ in classes:
         attendance_count = Attendance.query.filter_by(
@@ -93,14 +93,43 @@ def attendance_dashboard():
                 if total_students_in_class > 0
                 else 0
             ),
+            "students_count": total_students_in_class,
         }
 
-    # Get monthly attendance trends
+    # ====== Aggregate overall trend for last 30 days (server-side) ======
+    start_date = today - timedelta(days=30)
+    class_ids = [c.id for c in classes] if classes else []
+
+    q = (
+        db.session.query(
+            Attendance.date,
+            func.count(case((Attendance.status == "present", 1))).label("present"),
+            func.count(Attendance.id).label("total"),
+        )
+        .filter(Attendance.date >= start_date)
+        .group_by(Attendance.date)
+        .order_by(Attendance.date)
+    )
+    if class_ids:
+        q = q.filter(Attendance.class_id.in_(class_ids))
+
+    overall_daily = q.all()
+    # Build a date -> rate map (ensures contiguous dates when rendering)
+    date_to_rate = {
+        row.date: (row.present / row.total * 100 if row.total > 0 else 0)
+        for row in overall_daily
+    }
+
+    # ensure we have one entry per day in the last 30 days (server-side) to keep chart predictable
+    overall_trend = []
+    for i in range(30, -1, -1):  # 30 days ago -> today (31 data points)
+        d = start_date + timedelta(days=i)
+        rate = date_to_rate.get(d, 0)
+        overall_trend.append({"date": d.strftime("%Y-%m-%d"), "rate": round(rate, 2)})
+
+    # ====== Monthly trends per class (existing functionality kept) ======
     monthly_trends = {}
     for class_ in classes:
-        # Get attendance data for the last 30 days
-        start_date = today - timedelta(days=30)
-
         daily_data = (
             db.session.query(
                 Attendance.date,
@@ -121,10 +150,33 @@ def attendance_dashboard():
             for data in daily_data
         ]
 
-    # Get chronic absenteeism alerts
+    # ====== Top classes (last 30 days average) ======
+    top_classes = []
+    for class_ in classes:
+        # use monthly_trends computed above
+        rates = [d["rate"] for d in monthly_trends.get(class_.id, [])]
+        avg_rate = sum(rates) / len(rates) if rates else 0
+        try:
+            students_count = class_.students.count()
+        except Exception:
+            students_count = len(list(class_.students))
+
+        top_classes.append(
+            {
+                "id": class_.id,
+                "name": class_.name or class_.id,
+                "display_name": f"{class_.name}",
+                "students": students_count,
+                "avg_rate": round(avg_rate, 1),
+                # change is not trivial to compute reliably here; set None for template to hide if missing
+                "change": None,
+            }
+        )
+    top_classes = sorted(top_classes, key=lambda x: x["avg_rate"], reverse=True)[:3]
+
+    # ====== Chronic absenteeism (existing) ======
     chronic_absenteeism = []
     for class_ in classes:
-        # Students with less than 80% attendance in the current term
         students = class_.students
         try:
             iterator = students.all()
@@ -147,7 +199,7 @@ def attendance_dashboard():
                 year=str(current_year),
             ).count()
 
-            if total_days > 10:  # Only consider students with enough data
+            if total_days > 10:
                 attendance_rate = present_count / total_days * 100
                 if attendance_rate < 80:
                     chronic_absenteeism.append(
@@ -159,7 +211,7 @@ def attendance_dashboard():
                         }
                     )
 
-    # Get recent attendance activity (Attendance objects, with related Student & Class eager-loaded)
+    # ====== Recent activity (existing) ======
     recent_activity = (
         Attendance.query.options(
             joinedload(Attendance.student), joinedload(Attendance.classroom)  # type: ignore
@@ -172,6 +224,87 @@ def attendance_dashboard():
         .all()
     )
 
+    # ====== Top-level metrics (dynamic) ======
+    # Total students (sum of students in classes visible to user)
+    total_students = 0
+    for c in classes:
+        try:
+            total_students += c.students.count()
+        except Exception:
+            total_students += len(list(c.students))
+
+    active_classes = len(classes)
+    teaching_staff_count = Teacher.query.count() if Teacher else 0
+
+    # today's overall attendance rate
+    q_today = db.session.query(
+        func.count(case((Attendance.status == "present", 1))).label("present"),
+        func.count(Attendance.id).label("total"),
+    ).filter(Attendance.date == today)
+    if class_ids:
+        q_today = q_today.filter(Attendance.class_id.in_(class_ids))
+    today_row = q_today.one()
+    today_present = today_row.present or 0
+    today_total = today_row.total or 0
+    attendance_rate_today = round(
+        (today_present / today_total * 100) if today_total > 0 else 0, 2
+    )
+
+    # compare with yesterday if available
+    yesterday = today - timedelta(days=1)
+    q_yesterday = db.session.query(
+        func.count(case((Attendance.status == "present", 1))).label("present"),
+        func.count(Attendance.id).label("total"),
+    ).filter(Attendance.date == yesterday)
+    if class_ids:
+        q_yesterday = q_yesterday.filter(Attendance.class_id.in_(class_ids))
+    yesterday_row = q_yesterday.one()
+    yesterday_present = yesterday_row.present or 0
+    yesterday_total = yesterday_row.total or 0
+    yesterday_rate = (
+        (yesterday_present / yesterday_total * 100) if yesterday_total > 0 else None
+    )
+
+    attendance_change = None
+    if yesterday_rate is not None and yesterday_total > 0:
+        attendance_change = round(attendance_rate_today - yesterday_rate, 2)
+
+    # ====== Prepare action links safely (only if endpoint exists) ======
+    action_links = {}
+    try:
+        action_links["mark_attendance"] = url_for("attendance.select_attendance_date")
+    except BuildError:
+        action_links["mark_attendance"] = None
+
+    try:
+        action_links["term_attendance"] = url_for("attendance.term_attendance")
+    except BuildError:
+        action_links["term_attendance"] = None
+
+    try:
+        action_links["manual_attendance"] = (
+            url_for("attendance.manual_attendance", class_id=classes[0].id)
+            if classes
+            else None
+        )
+    except Exception:
+        action_links["manual_attendance"] = None
+
+    try:
+        action_links["scanner"] = url_for("attendance.scanner")
+    except BuildError:
+        action_links["scanner"] = None
+
+    try:
+        action_links["view_activity"] = (
+            url_for("attendance.attendance_analytics", class_id=classes[0].id)
+            if classes
+            else url_for("attendance.attendance_dashboard")
+        )
+    except Exception:
+        action_links["view_activity"] = url_for("attendance.attendance_dashboard")
+
+    # Render template with dynamic data
     return render_template(
         "attendance/dashboard.html",
         classes=classes,
@@ -182,6 +315,16 @@ def attendance_dashboard():
         today=today,
         current_term=current_term,
         current_year=current_year,
+        overall_trend=overall_trend,
+        top_classes=top_classes,
+        metrics={
+            "total_students": total_students,
+            "active_classes": active_classes,
+            "teaching_staff": teaching_staff_count,
+            "attendance_rate_today": attendance_rate_today,
+            "attendance_change": attendance_change,
+        },
+        action_links=action_links,
     )
 
 

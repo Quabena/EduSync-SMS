@@ -5,9 +5,7 @@ endblock %} {% block content %}
 
 <div class="min-h-screen">
   <!-- Header Section -->
-  <div
-    class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50 dark:border-gray-700/50"
-  >
+  <div class="glass-strong border-b border-white/20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div
         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
@@ -15,10 +13,10 @@ endblock %} {% block content %}
         <!-- Title and Description -->
         <div class="flex items-center space-x-4">
           <div
-            class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg"
+            class="w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-800 gradient-text rounded-2xl flex items-center justify-center shadow-lg"
           >
             <svg
-              class="w-8 h-8 text-white"
+              class="w-8 h-8 text-slate-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -32,12 +30,8 @@ endblock %} {% block content %}
             </svg>
           </div>
           <div>
-            <h1
-              class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
-            >
-              Faculty
-            </h1>
-            <p class="text-gray-600 dark:text-gray-300 mt-1">
+            <h1 class="text-4xl font-bold gradient-text">Faculty</h1>
+            <p class="text-slate-600 dark:text-slate-300 mt-1">
               Manage teaching staff and subject assignments
             </p>
           </div>
@@ -45,44 +39,36 @@ endblock %} {% block content %}
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700"
-          >
-            <div
-              class="text-2xl font-bold text-indigo-600 dark:text-indigo-400"
-            >
+          <div class="glass rounded-xl p-4">
+            <div class="text-2xl font-bold gradient-text">
               {{ teachers|length }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">
+            <div class="text-sm text-slate-600 dark:text-slate-400">
               Total Faculty
             </div>
           </div>
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700"
-          >
+          <div class="glass rounded-xl p-4">
             <div
-              class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+              class="text-2xl font-bold text-primary-600 dark:text-primary-400"
             >
               {{ specializations|length }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Subjects</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400">
+              Subjects
+            </div>
           </div>
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700"
-          >
+          <div class="glass rounded-xl p-4">
             <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {{ teachers|selectattr('gender', 'equalto', 'Male')|list|length }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Male</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400">Male</div>
           </div>
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700"
-          >
+          <div class="glass rounded-xl p-4">
             <div class="text-2xl font-bold text-pink-600 dark:text-pink-400">
               {{ teachers|selectattr('gender', 'equalto', 'Female')|list|length
               }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Female</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400">Female</div>
           </div>
         </div>
       </div>
@@ -91,9 +77,7 @@ endblock %} {% block content %}
 
   <!-- Controls Section -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div
-      class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6"
-    >
+    <div class="glass-strong rounded-2xl p-6">
       <div
         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
       >
@@ -105,7 +89,7 @@ endblock %} {% block content %}
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
               <svg
-                class="h-5 w-5 text-gray-400"
+                class="h-5 w-5 text-slate-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -122,7 +106,7 @@ endblock %} {% block content %}
               type="text"
               id="searchInput"
               placeholder="Search faculty..."
-              class="block w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              class="block w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl glass text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
 
@@ -130,7 +114,7 @@ endblock %} {% block content %}
           <div class="flex gap-3">
             <select
               id="specializationFilter"
-              class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              class="px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl glass text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="">All Subjects</option>
               {% for specialization in specializations %}
@@ -142,7 +126,7 @@ endblock %} {% block content %}
 
             <select
               id="genderFilter"
-              class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              class="px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl glass text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="">All Genders</option>
               <option value="Male">Male</option>
@@ -154,10 +138,10 @@ endblock %} {% block content %}
         <!-- Action Buttons -->
         <div class="flex gap-3">
           <!-- View Toggle -->
-          <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-1 flex">
+          <div class="glass rounded-xl p-1 flex">
             <button
               id="gridViewBtn"
-              class="flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white shadow-sm transition-all duration-200"
+              class="flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white shadow-sm transition-all duration-200"
             >
               <svg
                 class="w-4 h-4 mr-2"
@@ -176,7 +160,7 @@ endblock %} {% block content %}
             </button>
             <button
               id="tableViewBtn"
-              class="flex items-center px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
+              class="flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/20 transition-all duration-200"
             >
               <svg
                 class="w-4 h-4 mr-2"
@@ -197,7 +181,7 @@ endblock %} {% block content %}
 
           <button
             id="exportBtn"
-            class="flex items-center px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
+            class="flex items-center px-4 py-3 bg-accent-emerald hover:bg-emerald-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
           >
             <svg
               class="w-4 w-4 mr-2"
@@ -217,7 +201,7 @@ endblock %} {% block content %}
 
           <a
             href="{{ url_for('teachers.create') }}"
-            class="flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg font-medium"
+            class="flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg font-medium"
           >
             <svg
               class="w-4 h-4 mr-2"
@@ -238,8 +222,10 @@ endblock %} {% block content %}
       </div>
 
       <!-- Results Counter -->
-      <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+      <div class="mt-4 pt-4 border-t border-white/10">
+        <div
+          class="flex items-center text-sm text-slate-600 dark:text-slate-400"
+        >
           <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
           <span id="resultCount">{{ teachers|length }}</span>
           <span class="ml-1">faculty members found</span>
@@ -268,7 +254,7 @@ endblock %} {% block content %}
         >
           <!-- Front Side -->
           <div
-            class="absolute w-full h-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 backface-hidden flex flex-col"
+            class="absolute w-full h-full professional-card rounded-2xl p-6 backface-hidden flex flex-col"
           >
             <!-- Teacher Avatar with Badge -->
             <div class="flex justify-center mb-6 relative">
@@ -276,18 +262,18 @@ endblock %} {% block content %}
               <img
                 src="{{ url_for('teachers.teacher_photo', filename=teacher.photo_path) }}"
                 alt="{{ teacher.full_name }}"
-                class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg"
+                class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-slate-700 shadow-lg"
               />
               {% else %}
               <div
-                class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-3xl shadow-lg"
+                class="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-slate-600 font-bold text-3xl shadow-lg"
               >
                 {{ teacher.first_name[0] }}{{ teacher.surname[0] }}
               </div>
               {% endif %}
               <!-- Verification Badge -->
               <div
-                class="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center shadow-md"
+                class="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center shadow-md"
               >
                 <svg
                   class="h-4 w-4 text-white"
@@ -307,34 +293,30 @@ endblock %} {% block content %}
 
             <!-- Teacher Info -->
             <div class="text-center mb-4">
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">
                 {{ teacher.full_name }}
               </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
+              <p class="text-sm text-slate-500 dark:text-slate-400">
                 ID: {{ teacher.staff_id }}
               </p>
             </div>
 
             <!-- Quick Stats -->
             <div class="grid grid-cols-2 gap-3 mb-6">
-              <div
-                class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"
-              >
-                <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <div class="glass rounded-lg p-3 text-center">
+                <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">
                   Subject
                 </div>
-                <div class="font-medium text-gray-900 dark:text-white">
+                <div class="font-medium text-slate-900 dark:text-white">
                   {{ teacher.specialization.name if teacher.specialization else
                   'General' }}
                 </div>
               </div>
-              <div
-                class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"
-              >
-                <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <div class="glass rounded-lg p-3 text-center">
+                <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">
                   Classes
                 </div>
-                <div class="font-medium text-gray-900 dark:text-white">
+                <div class="font-medium text-slate-900 dark:text-white">
                   {{ teacher.classes|length }}
                 </div>
               </div>
@@ -343,7 +325,7 @@ endblock %} {% block content %}
             <!-- Hover Indicator -->
             <div class="mt-auto text-center">
               <div
-                class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400"
+                class="inline-flex items-center text-sm text-slate-600 dark:text-slate-800"
               >
                 <span>View Credentials</span>
                 <svg
@@ -365,15 +347,15 @@ endblock %} {% block content %}
 
           <!-- Back Side - Professional Credentials -->
           <div
-            class="absolute w-full h-full bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg border border-indigo-200 dark:border-gray-700 p-6 backface-hidden transform rotate-y-180 flex flex-col"
+            class="absolute w-full h-full bg-gradient-to-br from-primary-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl shadow-lg border border-primary-200 dark:border-slate-700 p-6 backface-hidden transform rotate-y-180 flex flex-col"
           >
             <!-- Detailed Info -->
             <div class="mb-4">
-              <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
                 {{ teacher.full_name }}
               </h3>
               <div
-                class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-1"
+                class="flex items-center text-sm text-slate-600 dark:text-slate-400 mb-1"
               >
                 <svg
                   class="w-4 h-4 mr-2"
@@ -391,7 +373,7 @@ endblock %} {% block content %}
                 {{ teacher.staff_id }}
               </div>
               <div
-                class="flex items-center text-sm text-gray-600 dark:text-gray-400"
+                class="flex items-center text-sm text-slate-600 dark:text-slate-400"
               >
                 <svg
                   class="w-4 h-4 mr-2"
@@ -414,11 +396,11 @@ endblock %} {% block content %}
             <!-- Qualifications -->
             <div class="mb-4">
               <h4
-                class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
               >
                 Qualifications
               </h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+              <p class="text-sm text-slate-600 dark:text-slate-400">
                 {{ teacher.academic_certificate if teacher.academic_certificate
                 else 'No qualifications listed' }}
               </p>
@@ -428,14 +410,14 @@ endblock %} {% block content %}
             {% if teacher.classes %}
             <div class="mb-4">
               <h4
-                class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
               >
                 Teaching
               </h4>
               <div class="flex flex-wrap gap-1">
                 {% for class in teacher.classes %}
                 <span
-                  class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200"
+                  class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-slate-600 dark:text-slate-800"
                 >
                   {{ class.name }}
                 </span>
@@ -448,7 +430,7 @@ endblock %} {% block content %}
             <div class="mt-auto flex space-x-2">
               <a
                 href="{{ url_for('teachers.detail', teacher_id=teacher.id) }}"
-                class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+                class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-primary-600 hover:bg-primary-700 text-blue-500 text-sm font-medium rounded-lg transition-colors duration-200"
               >
                 Full Profile
               </a>
@@ -480,51 +462,53 @@ endblock %} {% block content %}
     <!-- Table View -->
     <div
       id="tableView"
-      class="hidden bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+      class="hidden professional-card rounded-2xl overflow-hidden"
     >
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-800">
+        <table
+          class="min-w-full divide-y divide-slate-200 dark:divide-slate-700"
+        >
+          <thead class="glass">
             <tr>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
               >
                 Faculty Member
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
               >
                 Staff ID
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
               >
                 Specialization
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
               >
                 Classes
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
               >
                 Contact
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
               >
                 Actions
               </th>
             </tr>
           </thead>
           <tbody
-            class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700"
+            class="divide-y divide-slate-200 dark:divide-slate-700"
             id="teachersTable"
           >
             {% for teacher in teachers %}
             <tr
-              class="teacher-row hover:bg-gray-50 dark:hover:bg-gray-800"
+              class="teacher-row hover:bg-white/10"
               data-name="{{ teacher.full_name|lower }}"
               data-specialization="{{ teacher.specialization.name if teacher.specialization else 'none' }}"
               data-gender="{{ teacher.gender|lower }}"
@@ -539,18 +523,18 @@ endblock %} {% block content %}
                   />
                   {% else %}
                   <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm"
+                    class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm"
                   >
                     {{ teacher.first_name[0] }}{{ teacher.surname[0] }}
                   </div>
                   {% endif %}
                   <div>
                     <div
-                      class="text-sm font-medium text-gray-900 dark:text-white"
+                      class="text-sm font-medium text-slate-900 dark:text-white"
                     >
                       {{ teacher.full_name }}
                     </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                    <div class="text-sm text-slate-500 dark:text-slate-400">
                       {{ teacher.email if teacher.email else 'No email' }}
                     </div>
                   </div>
@@ -559,7 +543,7 @@ endblock %} {% block content %}
 
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200"
                 >
                   {{ teacher.staff_id }}
                 </span>
@@ -568,13 +552,13 @@ endblock %} {% block content %}
               <td class="px-6 py-4 whitespace-nowrap">
                 {% if teacher.specialization %}
                 <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200"
                 >
                   {{ teacher.specialization.name }}
                 </span>
                 {% else %}
                 <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
                 >
                   General
                 </span>
@@ -590,7 +574,7 @@ endblock %} {% block content %}
                     {{ class.name }}
                   </span>
                   {% else %}
-                  <span class="text-gray-400 dark:text-gray-500 text-xs"
+                  <span class="text-slate-400 dark:text-slate-500 text-xs"
                     >No classes assigned</span
                   >
                   {% endfor %}
@@ -602,13 +586,13 @@ endblock %} {% block content %}
                 <div>
                   <div class="font-medium">{{ teacher.phone_number }}</div>
                   {% if teacher.email %}
-                  <div class="text-gray-500 dark:text-gray-400 text-xs">
+                  <div class="text-slate-500 dark:text-slate-400 text-xs">
                     {{ teacher.email }}
                   </div>
                   {% endif %}
                 </div>
                 {% else %}
-                <span class="text-gray-400 dark:text-gray-500"
+                <span class="text-slate-400 dark:text-slate-500"
                   >No contact info</span
                 >
                 {% endif %}
@@ -619,13 +603,13 @@ endblock %} {% block content %}
               >
                 <a
                   href="{{ url_for('teachers.detail', teacher_id=teacher.id) }}"
-                  class="inline-flex items-center px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-md transition-colors duration-200"
+                  class="inline-flex items-center px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors duration-200"
                 >
                   View
                 </a>
                 <a
                   href="{{ url_for('teachers.edit', teacher_id=teacher.id) }}"
-                  class="inline-flex items-center px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium rounded-md transition-colors duration-200"
+                  class="inline-flex items-center px-3 py-1.5 bg-accent-amber hover:bg-amber-700 text-white text-xs font-medium rounded-md transition-colors duration-200"
                 >
                   Edit
                 </a>
@@ -639,14 +623,12 @@ endblock %} {% block content %}
 
     <!-- Empty State -->
     {% if not teachers %}
-    <div
-      class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-12 text-center"
-    >
+    <div class="professional-card p-12 text-center">
       <div
-        class="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center"
+        class="w-24 h-24 mx-auto mb-6 glass rounded-full flex items-center justify-center"
       >
         <svg
-          class="w-12 h-12 text-gray-400"
+          class="w-12 h-12 text-slate-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -659,15 +641,15 @@ endblock %} {% block content %}
           />
         </svg>
       </div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">
         No Faculty Members
       </h3>
-      <p class="text-gray-600 dark:text-gray-400 mb-6">
+      <p class="text-slate-600 dark:text-slate-400 mb-6">
         Add your first faculty member to get started
       </p>
       <a
         href="{{ url_for('teachers.create') }}"
-        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium rounded-xl transition-colors duration-200"
+        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium rounded-xl transition-colors duration-200"
       >
         <svg
           class="w-5 h-5 mr-2"
@@ -695,7 +677,7 @@ endblock %} {% block content %}
   class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4"
 >
   <div
-    class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all duration-300 scale-95 opacity-0"
+    class="glass-strong rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all duration-300 scale-95 opacity-0"
     id="deleteModalContent"
   >
     <div class="flex items-center mb-4">
@@ -717,17 +699,17 @@ endblock %} {% block content %}
         </svg>
       </div>
       <div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
           Delete Faculty Member
         </h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p class="text-sm text-slate-500 dark:text-slate-400">
           This action cannot be undone
         </p>
       </div>
     </div>
 
     <div class="mb-6">
-      <p class="text-gray-700 dark:text-gray-300">
+      <p class="text-slate-700 dark:text-slate-300">
         Are you sure you want to delete
         <span
           id="deleteTeacherName"
@@ -740,7 +722,7 @@ endblock %} {% block content %}
     <div class="flex space-x-3">
       <button
         onclick="closeDeleteModal()"
-        class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors duration-200"
+        class="flex-1 px-4 py-2 glass hover:bg-white/20 text-slate-700 dark:text-slate-300 font-medium rounded-lg transition-colors duration-200"
       >
         Cancel
       </button>
@@ -816,17 +798,17 @@ endblock %} {% block content %}
       tableView.classList.add("hidden");
 
       gridViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white shadow-sm transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white shadow-sm transition-all duration-200";
       tableViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/20 transition-all duration-200";
     } else {
       gridView.classList.add("hidden");
       tableView.classList.remove("hidden");
 
       tableViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white shadow-sm transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white shadow-sm transition-all duration-200";
       gridViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/20 transition-all duration-200";
     }
   }
 

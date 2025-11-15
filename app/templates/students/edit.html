@@ -402,7 +402,7 @@
             <div class="flex items-center space-x-6">
               {% if student.photo_path %}
               <div class="relative">
-                <img src="{{ url_for('students.student_photo', filename=student.photo_path) }}" alt="Current Photo"
+                <img src="{{ url_for('students.student_photo', filename=student.photo_path) }}?v={{ student.updated_at.timestamp() if student.updated_at else student.id }}" alt="Current Photo"
                   class="w-24 h-24 rounded-lg object-cover border border-gray-200 dark:border-gray-600">
                 <button type="button"
                   onclick="document.getElementById('remove_photo').value = '1'; document.getElementById('photo-preview').src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\"

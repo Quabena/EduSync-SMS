@@ -162,13 +162,13 @@ def create():
         if form.photo.data:
             file = form.photo.data
 
-            # 1.a) basic content-type check from upload
+            # content-type check from upload
             content_type = getattr(file, "content_type", None)
             if content_type not in ALLOWED_MIME_TYPES:
                 flash("Unsupported image type. Use JPG/PNG/GIF/WEBP.", "danger")
                 return render_template("students/create.html", form=form)
 
-            # 1.b) secure filename and extension
+            # secure filename and extension
             original_name = secure_filename(file.filename or "")
             if not original_name:
                 flash("Invalid file name.", "danger")
@@ -179,10 +179,10 @@ def create():
                 flash("Unsupported file extension.", "danger")
                 return render_template("students/create.html", form=form)
 
-            # 1.c) generate randomized filename
+            # generate randomized filename
             photo_filename = f"{secrets.token_hex(12)}{ext}"
 
-            # 1.d) prepare save directory (DOCUMENT_DIR should be a Path or str)
+            # prepare save directory
             doc_dir = current_app.config.get("DOCUMENT_DIR")
             if not doc_dir:
                 flash("Server misconfiguration: no DOCUMENT_DIR.", "danger")
@@ -199,16 +199,14 @@ def create():
 
             saved_path = doc_dir / photo_filename
 
-            # 1.e) verify image with Pillow and save safely (resize/normalize)
             try:
-                # Pillow can validate and process the image
                 img = Image.open(file)
-                img.verify()  # raises if broken
-                file.stream.seek(0)  # reset stream after verify
+                img.verify()
+                file.stream.seek(0)
 
-                img = Image.open(file)  # reopen for processing
-                img = img.convert("RGB")  # normalize to RGB (drop alpha)
-                max_size = (1000, 1000)  # tweak as needed
+                img = Image.open(file)
+                img = img.convert("RGB")
+                max_size = (1000, 1000)
                 img.thumbnail(max_size)
                 img.save(saved_path, quality=85)
             except Exception as exc:
@@ -222,7 +220,6 @@ def create():
                 flash("Uploaded file is not a valid image.", "danger")
                 return render_template("students/create.html", form=form)
 
-        # 2) build the Student model; store only filename (photo_filename) or None
         student = Student(
             first_name=form.first_name.data,
             middle_name=form.middle_name.data,
@@ -239,16 +236,19 @@ def create():
             medical_records=form.medical_records.data,
             photo_path=photo_filename,  # store just the filename
             class_id=form.class_id.data,
+            interest=form.interest.data,
+            religion=form.religion.data,
+            weight=form.weight.data,
+            height=form.height.data,
+            admission_date=form.admission_date.data,
         )
 
-        # 3) save to DB with safe commit and cleanup on failure
         try:
             db.session.add(student)
             db.session.commit()
         except Exception as exc:
             db.session.rollback()
             current_app.logger.exception("Failed to create student")
-            # If we saved a file already, remove it because DB failed
             if saved_path and saved_path.exists():
                 try:
                     saved_path.unlink()
@@ -276,7 +276,6 @@ def create():
     else:
         current_app.logger.error("Form validation failed: %s", form.errors)
 
-    # GET or invalid form
     return render_template("students/create.html", form=form)
 
 
@@ -304,7 +303,7 @@ def detail(student_id):
     )
 
 
-# Edit Route
+# --- Edit Route ---
 @bp.route("/<int:student_id>/edit", methods=["GET", "POST"])
 @login_required
 @role_required(["admin", "headteacher"])
@@ -312,31 +311,29 @@ def edit(student_id):
     student = Student.query.get_or_404(student_id)
     form = StudentForm(obj=student)
 
-    # Only allowing editing of active students in active classes
+    # Prevent editing graduated students
     if student.status == "graduated":
         flash("Cannot edit graduated students. Revert graduation first!", "warning")
-        return redirect(url_for("students.details", student_id=student_id))
+        return redirect(url_for("students.detail", student_id=student_id))
 
+    # Restrict to active classes
     form.class_id.choices = [(c.id, c.name) for c in Class.get_active_classes()]
 
     if form.validate_on_submit():
+        # Handle new photo upload
         if form.photo.data:
-            # delete previous photo if present (safe)
+            # Delete previous photo if exists
             if student.photo_path:
                 document_dir = Path(current_app.config["DOCUMENT_DIR"]).resolve()
-                old = (document_dir / student.photo_path).resolve()
+                old_path = (document_dir / student.photo_path).resolve()
                 try:
-                    # ensure old is inside document_dir
-                    old.relative_to(document_dir)
-                    if old.exists():
-                        old.unlink()
+                    old_path.relative_to(document_dir)  # safety check
+                    if old_path.exists():
+                        old_path.unlink()
                 except Exception:
-                    # log/warn but don't crash the edit flow
-                    current_app.logger.warning(
-                        "Tried to delete a photo outside DOCUMENT_DIR or missing"
-                    )
+                    current_app.logger.warning(f"Could not delete old photo {old_path}")
 
-            # Save new photo using helper
+            # Save new photo safely
             try:
                 new_filename = save_student_photo(form.photo.data)
                 student.photo_path = new_filename
@@ -344,6 +341,7 @@ def edit(student_id):
                 flash(str(e), "danger")
                 return redirect(url_for("students.edit", student_id=student.id))
 
+        # Update student fields
         student.first_name = form.first_name.data
         student.middle_name = form.middle_name.data
         student.surname = form.surname.data
@@ -363,9 +361,15 @@ def edit(student_id):
         student.height = form.height.data
         student.weight = form.weight.data
 
-        db.session.commit()
-        flash("Student info successfully updated!", "success")
-        backup_database()
+        try:
+            db.session.commit()
+            flash("Student info successfully updated!", "success")
+            backup_database()
+        except Exception:
+            db.session.rollback()
+            current_app.logger.exception("Error updating student info")
+            flash("An error occurred while updating student info.", "danger")
+
         return redirect(url_for("students.detail", student_id=student.id))
 
     return render_template("students/edit.html", form=form, student=student)

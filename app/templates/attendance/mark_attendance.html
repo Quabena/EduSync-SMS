@@ -1,493 +1,342 @@
 {% extends "base.html" %}
-{% block title %}Mark Attendance - {{ class_.name }}{% endblock %}
+{% block title %}Mark Attendance - {{ class_.name }} - EduSync SMS{% endblock %}
+
+{% block page_title %}Mark Attendance{% endblock %}
+{% block page_description %}Record student attendance for {{ class_.name }} on {{ attendance_date.strftime('%A, %B %d, %Y') }}{% endblock %}
 
 {% block content %}
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-body {
-  font-family: 'Inter', sans-serif;
-}
-
-.glass-effect {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.table-card {
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.table-row {
-  transition: all 0.2s ease;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-}
-
-.table-row:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  transform: translateX(2px);
-}
-
-.status-select {
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(226, 232, 240, 0.6);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 8px;
-}
-
-.status-select:focus {
-  background: rgba(255, 255, 255, 1);
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  transform: translateY(-1px);
-}
-
-.status-present { border-left: 4px solid #10b981; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); }
-.status-absent { border-left: 4px solid #ef4444; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
-.status-late { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); }
-.status-excused { border-left: 4px solid #3b82f6; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); }
-
-.btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-}
-
-.btn-secondary {
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
-}
-
-.btn-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  transition: all 0.3s ease;
-}
-
-.btn-success:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  transition: all 0.3s ease;
-}
-
-.btn-danger:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-}
-
-.btn-warning {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  transition: all 0.3s ease;
-}
-
-.btn-warning:hover {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
-}
-
-.bulk-card {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.selection-counter {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-}
-
-.student-checkbox {
-  width: 18px;
-  height: 18px;
-  accent-color: #3b82f6;
-  cursor: pointer;
-}
-
-.student-row {
-  transition: all 0.2s ease;
-}
-
-.student-row.selected {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-left: 4px solid #3b82f6;
-}
-
-.icon-wrapper {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
-}
-
-.stat-item {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 12px;
-  padding: 16px;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.stat-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.floating-action {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 50;
-}
-
-@media (max-width: 768px) {
-  .floating-action {
-    bottom: 16px;
-    right: 16px;
-  }
-}
-</style>
-
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <!-- Enhanced Header -->
-    <div class="glass-effect rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
-      <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-6 lg:space-y-0">
-        <div class="space-y-3">
-          <div class="flex items-center space-x-3">
-            <div class="icon-wrapper w-12 h-12 rounded-xl flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <div>
-              <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent">
-                Mark Attendance
-              </h1>
-              <p class="text-lg text-gray-600 font-medium">{{ class_.name }}</p>
-            </div>
-          </div>
-          <div class="flex items-center space-x-4 text-sm">
-            <div class="flex items-center space-x-2">
-              <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"/>
-              </svg>
-              <span class="font-medium text-gray-700">{{ attendance_date.strftime('%A, %B %d, %Y') }}</span>
-            </div>
-            <span class="text-gray-300">•</span>
-            <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
+<div class="max-w-7xl mx-auto">
+  <!-- Header Section -->
+  <div class="professional-card p-8 mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex items-center space-x-4 mb-6 lg:mb-0">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+          <i class="fas fa-clipboard-check text-white text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-slate-800 dark:text-white">Mark Attendance</h1>
+          <div class="flex items-center space-x-4 mt-2">
+            <span class="text-slate-600 dark:text-slate-400 font-medium">{{ class_.name }}</span>
+            <span class="text-slate-400">•</span>
+            <span class="text-slate-600 dark:text-slate-400">{{ attendance_date.strftime('%A, %B %d, %Y') }}</span>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200">
               {{ term }} {{ year }}
             </span>
           </div>
         </div>
-        
-        <div class="flex space-x-3">
-          <a href="{{ url_for('attendance.select_attendance_date') }}" 
-             class="btn-secondary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"/>
-            </svg>
-            Change Date
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Enhanced Bulk Operations -->
-    <div class="bulk-card rounded-2xl shadow-lg p-6 mb-8 border">
-      <div class="flex items-center space-x-3 mb-6">
-        <div class="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-        </div>
-        <h2 class="text-xl font-bold text-gray-800">Bulk Operations</h2>
-        <div class="selection-counter" id="selection-counter">
-          <span id="selected-count">0</span> selected
-        </div>
       </div>
       
-      <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <button onclick="markAll('present')" class="btn-success inline-flex items-center justify-center px-4 py-3 text-white rounded-xl font-semibold shadow-lg">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-          All Present
-        </button>
-        <button onclick="markAll('absent')" class="btn-danger inline-flex items-center justify-center px-4 py-3 text-white rounded-xl font-semibold shadow-lg">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-          All Absent
-        </button>
-        <button onclick="markAll('late')" class="btn-warning inline-flex items-center justify-center px-4 py-3 text-white rounded-xl font-semibold shadow-lg">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          All Late
-        </button>
-        <button onclick="markSelected()" class="btn-primary inline-flex items-center justify-center px-4 py-3 text-white rounded-xl font-semibold shadow-lg">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-          </svg>
-          Mark Selected
-        </button>
-        <button onclick="clearSelection()" class="btn-secondary inline-flex items-center justify-center px-4 py-3 text-white rounded-xl font-semibold shadow-lg">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-          Clear
-        </button>
+      <div class="flex space-x-3">
+        <a href="{{ url_for('attendance.select_attendance_date') }}" 
+           class="inline-flex items-center space-x-2 px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 font-medium">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Change Date</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+    <div class="professional-card p-6 text-center">
+      <div class="text-3xl font-bold text-emerald-600" id="present-count">0</div>
+      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">Present</div>
+    </div>
+    <div class="professional-card p-6 text-center">
+      <div class="text-3xl font-bold text-red-600" id="absent-count">0</div>
+      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">Absent</div>
+    </div>
+    <div class="professional-card p-6 text-center">
+      <div class="text-3xl font-bold text-amber-600" id="late-count">0</div>
+      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">Late</div>
+    </div>
+    <div class="professional-card p-6 text-center">
+      <div class="text-3xl font-bold text-blue-600" id="excused-count">0</div>
+      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">Excused</div>
+    </div>
+  </div>
+
+  <!-- Bulk Actions -->
+  <div class="professional-card p-6 mb-8">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+          <i class="fas fa-bolt text-white"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Quick Actions</h3>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span class="text-sm text-slate-600 dark:text-slate-400" id="selected-count">0</span>
+        <span class="text-sm text-slate-600 dark:text-slate-400">selected</span>
       </div>
     </div>
 
-    <!-- Enhanced Attendance Form -->
-    <form method="POST" class="table-card rounded-2xl shadow-xl border">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <button onclick="markAll('present')" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-emerald-500/30 transition-all duration-200">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors duration-200 flex items-center justify-center">
+          <i class="fas fa-check text-emerald-600 dark:text-emerald-400 text-sm"></i>
+        </div>
+        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">All Present</span>
+      </button>
 
+      <button onclick="markAll('absent')" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-red-500/30 transition-all duration-200">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-red-100 dark:bg-red-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-200 flex items-center justify-center">
+          <i class="fas fa-times text-red-600 dark:text-red-400 text-sm"></i>
+        </div>
+        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">All Absent</span>
+      </button>
+
+      <button onclick="markAll('late')" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-amber-500/30 transition-all duration-200">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-amber-100 dark:bg-amber-900/30 group-hover:bg-amber-200 dark:group-hover:bg-amber-800/50 transition-colors duration-200 flex items-center justify-center">
+          <i class="fas fa-clock text-amber-600 dark:text-amber-400 text-sm"></i>
+        </div>
+        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">All Late</span>
+      </button>
+
+      <button onclick="showMarkSelectedModal()" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-blue-500/30 transition-all duration-200">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors duration-200 flex items-center justify-center">
+          <i class="fas fa-edit text-blue-600 dark:text-blue-400 text-sm"></i>
+        </div>
+        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Mark Selected</span>
+      </button>
+
+      <button onclick="clearSelection()" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-slate-500/30 transition-all duration-200">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors duration-200 flex items-center justify-center">
+          <i class="fas fa-undo text-slate-600 dark:text-slate-400 text-sm"></i>
+        </div>
+        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Clear All</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Attendance Form -->
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <div class="professional-card p-0 overflow-hidden">
       <!-- Table Header -->
-      <div class="p-6 border-b border-gray-200/60">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)" class="student-checkbox">
-            <h2 class="text-xl font-bold text-gray-800">Student Attendance</h2>
+            <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)" class="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Student Attendance</h3>
           </div>
-          <div class="stats-grid">
-            <div class="stat-item">
-              <p class="text-2xl font-bold text-emerald-600" id="present-count">0</p>
-              <p class="text-xs text-gray-600 font-semibold">Present</p>
-            </div>
-            <div class="stat-item">
-              <p class="text-2xl font-bold text-red-600" id="absent-count">0</p>
-              <p class="text-xs text-gray-600 font-semibold">Absent</p>
-            </div>
-            <div class="stat-item">
-              <p class="text-2xl font-bold text-yellow-600" id="late-count">0</p>
-              <p class="text-xs text-gray-600 font-semibold">Late</p>
-            </div>
-            <div class="stat-item">
-              <p class="text-2xl font-bold text-blue-600" id="excused-count">0</p>
-              <p class="text-xs text-gray-600 font-semibold">Excused</p>
-            </div>
+          <div class="text-sm text-slate-600 dark:text-slate-400">
+            {{ class_.students.count() }} students
           </div>
         </div>
       </div>
 
-      <!-- Enhanced Table -->
-      <div class="overflow-x-auto">
-        <table class="min-w-full">
-          <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-            <tr>
-              <th class="py-4 pl-6 pr-3 text-left text-sm font-semibold text-gray-900">
-                <div class="flex items-center space-x-2">
-                  <span>Select</span>
-                </div>
-              </th>
-              <th class="py-4 px-3 text-left text-sm font-semibold text-gray-900">Student</th>
-              <th class="py-4 px-3 text-left text-sm font-semibold text-gray-900">Status</th>
-              <th class="py-4 px-3 text-left text-sm font-semibold text-gray-900">Last Marked</th>
-              <th class="py-4 px-3 text-left text-sm font-semibold text-gray-900">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white">
-            {% for student in class_.students %}
-            <tr class="table-row student-row" data-student-id="{{ student.id }}">
-              <td class="py-4 pl-6 pr-3">
-                <input type="checkbox" class="student-checkbox" value="{{ student.id }}" onchange="updateSelection()">
-              </td>
-              <td class="py-4 px-3">
-                <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg">
-                    {{ student.full_name.split()[0][0] }}{{ student.full_name.split()[-1][0] if student.full_name.split()|length > 1 else '' }}
-                  </div>
-                  <div>
-                    <p class="text-sm font-semibold text-gray-900">{{ student.full_name }}</p>
-                    <p class="text-xs text-gray-500">Student ID: {{ student.id }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="py-4 px-3">
-                <select 
-                  name="status_{{ student.id }}" 
-                  class="status-select w-full px-3 py-2 text-sm font-medium focus:outline-none"
-                  onchange="updateStats(); updateRowStyle(this, {{ student.id }})"
-                  data-student-id="{{ student.id }}"
-                >
-                  <option value="present" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'present' %}selected{% endif %}>Present</option>
-                  <option value="absent" {% if not attendance_dict.get(student.id) or attendance_dict[student.id].status == 'absent' %}selected{% endif %}>Absent</option>
-                  <option value="late" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'late' %}selected{% endif %}>Late</option>
-                  <option value="excused" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'excused' %}selected{% endif %}>Excused</option>
-                </select>
-              </td>
-              <td class="py-4 px-3 text-sm text-gray-500">
-                {% if attendance_dict.get(student.id) %}
-                  <div class="flex items-center space-x-2">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span class="font-medium">{{ attendance_dict[student.id].date.strftime('%m/%d/%Y') }}</span>
-                  </div>
-                {% else %}
-                  <span class="text-gray-400 italic">Never marked</span>
-                {% endif %}
-              </td>
-              <td class="py-4 px-3">
-                {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'absent' %}
-                <button 
-                  type="button"
-                  onclick="excuseAbsence({{ student.id }})" 
-                  class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:bg-blue-50 px-2 py-1 rounded-md transition-all"
-                >
-                  Excuse
-                </button>
-                {% else %}
-                <span class="text-gray-400">—</span>
-                {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Enhanced Summary and Submit -->
-      <div class="p-6 border-t border-gray-200/60 bg-gradient-to-r from-gray-50/50 to-white">
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
-          <div class="space-y-2">
-            <div class="flex items-center space-x-4 text-sm">
-              <div class="flex items-center space-x-2">
-                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
-                <span class="font-semibold text-gray-700">Total Students: {{ class_.students.count() }}</span>
+      <!-- Students List -->
+      <div class="divide-y divide-slate-200 dark:divide-slate-700">
+        {% for student in class_.students %}
+        <div class="student-row p-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors duration-150"
+             data-student-id="{{ student.id }}">
+          <div class="flex items-center space-x-4">
+            <!-- Checkbox -->
+            <input type="checkbox" class="student-checkbox w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600"
+                   value="{{ student.id }}" onchange="updateSelection()">
+            
+            <!-- Student Avatar and Info -->
+            <div class="flex-1 flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                {{ student.first_name[0] }}{{ student.surname[0] }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-slate-800 dark:text-white">{{ student.full_name }}</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400">ID: {{ student.id }}</p>
               </div>
             </div>
+
+            <!-- Status Selector -->
+            <div class="w-48">
+              <select name="status_{{ student.id }}" 
+                      class="status-select w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      onchange="updateStats(); updateRowStyle(this, {{ student.id }})"
+                      data-student-id="{{ student.id }}">
+                <option value="present" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'present' %}selected{% endif %}>Present</option>
+                <option value="absent" {% if not attendance_dict.get(student.id) or attendance_dict[student.id].status == 'absent' %}selected{% endif %}>Absent</option>
+                <option value="late" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'late' %}selected{% endif %}>Late</option>
+                <option value="excused" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'excused' %}selected{% endif %}>Excused</option>
+              </select>
+            </div>
+
+            <!-- Last Marked -->
+            <div class="w-32 text-sm text-slate-600 dark:text-slate-400">
+              {% if attendance_dict.get(student.id) %}
+                {{ attendance_dict[student.id].date.strftime('%m/%d/%Y') }}
+              {% else %}
+                Never
+              {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="w-20">
+              {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'absent' %}
+              <button type="button" onclick="excuseAbsence({{ student.id }})" 
+                      class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium">
+                Excuse
+              </button>
+              {% else %}
+              <span class="text-slate-400 text-sm">—</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Form Actions -->
+      <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div class="text-sm text-slate-600 dark:text-slate-400">
             {% if attendance_date < now().date() %}
-            <div class="flex items-center space-x-2 text-sm">
-              <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-              </svg>
-              <span class="text-amber-600 font-medium">You are marking attendance for a past date</span>
+            <div class="flex items-center space-x-2 text-amber-600 dark:text-amber-400">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>You are marking attendance for a past date</span>
             </div>
             {% endif %}
           </div>
           
-          <div class="flex space-x-3 w-full lg:w-auto">
+          <div class="flex space-x-3">
             <a href="{{ url_for('attendance.attendance_dashboard') }}" 
-               class="btn-secondary flex-1 lg:flex-none inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-              </svg>
+               class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 font-medium">
               Cancel
             </a>
-            <button type="submit" class="btn-primary flex-1 lg:flex-none inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              Save Attendance
+            <button type="submit" 
+                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium flex items-center space-x-2">
+              <i class="fas fa-save"></i>
+              <span>Save Attendance</span>
             </button>
           </div>
         </div>
       </div>
-    </form>
+    </div>
+  </form>
+</div>
 
-    <!-- Floating Action Button for Mobile -->
-    <div class="floating-action lg:hidden">
-      <button 
-        type="button"
-        onclick="document.querySelector('form').submit()"
-        class="btn-primary w-14 h-14 rounded-full shadow-2xl flex items-center justify-center"
-      >
-        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
+<!-- Mark Selected Modal -->
+<div id="markSelectedModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 mx-4 max-w-md w-full">
+    <div class="flex items-center space-x-3 mb-4">
+      <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+        <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xl"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Mark Selected Students</h3>
+        <p class="text-slate-600 dark:text-slate-400 text-sm" id="selectedStudentsCount">0 students selected</p>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <button onclick="applyStatusToSelected('present')" class="p-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
+        <i class="fas fa-check"></i>
+        <span>Present</span>
+      </button>
+      <button onclick="applyStatusToSelected('absent')" class="p-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
+        <i class="fas fa-times"></i>
+        <span>Absent</span>
+      </button>
+      <button onclick="applyStatusToSelected('late')" class="p-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
+        <i class="fas fa-clock"></i>
+        <span>Late</span>
+      </button>
+      <button onclick="applyStatusToSelected('excused')" class="p-4 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
+        <i class="fas fa-user-check"></i>
+        <span>Excused</span>
+      </button>
+    </div>
+    
+    <button onclick="closeModal()" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- Excuse Modal -->
+<div id="excuseModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 mx-4 max-w-md w-full">
+    <div class="flex items-center space-x-3 mb-4">
+      <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+        <i class="fas fa-comment-medical text-blue-600 dark:text-blue-400 text-xl"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Excuse Absence</h3>
+        <p class="text-slate-600 dark:text-slate-400 text-sm">Provide a reason for excusing this absence</p>
+      </div>
+    </div>
+    
+    <textarea id="excuseReason" rows="3" 
+              class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+              placeholder="Enter excuse reason..."></textarea>
+    
+    <div class="flex space-x-3">
+      <button onclick="closeModal()" class="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200">
+        Cancel
+      </button>
+      <button onclick="submitExcuse()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+        Excuse
       </button>
     </div>
   </div>
 </div>
 
 <script>
-// Enhanced JavaScript for modern interactions
+let currentStudentId = null;
+let selectedStudents = new Set();
+
+// Selection Management
 function toggleSelectAll(checkbox) {
   const checkboxes = document.querySelectorAll('.student-checkbox');
   checkboxes.forEach(cb => {
     cb.checked = checkbox.checked;
-    updateRowSelection(cb);
+    if (checkbox.checked) {
+      selectedStudents.add(cb.value);
+    } else {
+      selectedStudents.delete(cb.value);
+    }
   });
   updateSelection();
 }
 
 function updateSelection() {
-  const selected = document.querySelectorAll('.student-checkbox:checked');
-  const total = document.querySelectorAll('.student-checkbox').length;
+  const checkboxes = document.querySelectorAll('.student-checkbox');
+  selectedStudents.clear();
   
-  document.getElementById('selected-count').textContent = selected.length;
+  checkboxes.forEach(cb => {
+    if (cb.checked) {
+      selectedStudents.add(cb.value);
+    }
+  });
+  
+  document.getElementById('selected-count').textContent = selectedStudents.size;
   
   // Update select-all checkbox state
   const selectAll = document.getElementById('select-all');
-  selectAll.checked = selected.length === total;
-  selectAll.indeterminate = selected.length > 0 && selected.length < total;
+  selectAll.checked = selectedStudents.size === checkboxes.length;
+  selectAll.indeterminate = selectedStudents.size > 0 && selectedStudents.size < checkboxes.length;
   
-  // Update selection counter visibility
-  const counter = document.getElementById('selection-counter');
-  if (selected.length > 0) {
-    counter.style.opacity = '1';
-    counter.style.transform = 'scale(1)';
-  } else {
-    counter.style.opacity = '0.7';
-    counter.style.transform = 'scale(0.95)';
-  }
-  
-  // Update row selection styles
-  document.querySelectorAll('.student-checkbox').forEach(updateRowSelection);
-}
-
-function updateRowSelection(checkbox) {
-  const row = checkbox.closest('.student-row');
-  if (checkbox.checked) {
-    row.classList.add('selected');
-  } else {
-    row.classList.remove('selected');
-  }
+  // Update row styles
+  document.querySelectorAll('.student-row').forEach(row => {
+    const studentId = row.dataset.studentId;
+    const checkbox = row.querySelector('.student-checkbox');
+    if (checkbox.checked) {
+      row.classList.add('bg-blue-50', 'dark:bg-blue-900/20', 'border-l-4', 'border-blue-500');
+    } else {
+      row.classList.remove('bg-blue-50', 'dark:bg-blue-900/20', 'border-l-4', 'border-blue-500');
+    }
+  });
 }
 
 function clearSelection() {
+  selectedStudents.clear();
   document.querySelectorAll('.student-checkbox').forEach(cb => {
     cb.checked = false;
-    updateRowSelection(cb);
   });
   updateSelection();
 }
 
+// Status Management
 function markAll(status) {
   const selects = document.querySelectorAll('select[name^="status_"]');
   selects.forEach(select => {
@@ -495,38 +344,21 @@ function markAll(status) {
     updateRowStyle(select, select.dataset.studentId);
   });
   updateStats();
+  showNotification(`All students marked as ${status}`, 'success');
 }
 
-function markSelected() {
-  const selected = document.querySelectorAll('.student-checkbox:checked');
-  if (selected.length === 0) {
+function showMarkSelectedModal() {
+  if (selectedStudents.size === 0) {
     showNotification('Please select at least one student', 'warning');
     return;
   }
   
-  // Create a modern modal for status selection
-  const modal = document.createElement('div');
-  modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-  modal.innerHTML = `
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
-      <h3 class="text-xl font-bold text-gray-800 mb-4">Mark Selected Students</h3>
-      <p class="text-gray-600 mb-6">Choose status for ${selected.length} selected students</p>
-      <div class="grid grid-cols-2 gap-3 mb-6">
-        <button onclick="applyStatusToSelected('present')" class="btn-success px-4 py-3 text-white rounded-xl font-semibold">Present</button>
-        <button onclick="applyStatusToSelected('absent')" class="btn-danger px-4 py-3 text-white rounded-xl font-semibold">Absent</button>
-        <button onclick="applyStatusToSelected('late')" class="btn-warning px-4 py-3 text-white rounded-xl font-semibold">Late</button>
-        <button onclick="applyStatusToSelected('excused')" class="btn-primary px-4 py-3 text-white rounded-xl font-semibold">Excused</button>
-      </div>
-      <button onclick="closeModal()" class="w-full btn-secondary px-4 py-2 text-white rounded-xl font-semibold">Cancel</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
+  document.getElementById('selectedStudentsCount').textContent = `${selectedStudents.size} students selected`;
+  document.getElementById('markSelectedModal').classList.remove('hidden');
 }
 
 function applyStatusToSelected(status) {
-  const selected = document.querySelectorAll('.student-checkbox:checked');
-  selected.forEach(checkbox => {
-    const studentId = checkbox.value;
+  selectedStudents.forEach(studentId => {
     const select = document.querySelector(`select[name="status_${studentId}"]`);
     if (select) {
       select.value = status;
@@ -535,97 +367,96 @@ function applyStatusToSelected(status) {
   });
   updateStats();
   closeModal();
-  showNotification(`Marked ${selected.length} students as ${status}`, 'success');
-}
-
-function closeModal() {
-  const modal = document.querySelector('.fixed.inset-0');
-  if (modal) modal.remove();
+  showNotification(`Marked ${selectedStudents.size} students as ${status}`, 'success');
 }
 
 function updateRowStyle(select, studentId) {
-  const row = document.querySelector(`tr[data-student-id="${studentId}"]`);
+  const row = document.querySelector(`.student-row[data-student-id="${studentId}"]`);
   if (!row) return;
   
-  // Remove all status classes
-  row.classList.remove('status-present', 'status-absent', 'status-late', 'status-excused');
+  // Remove existing status borders
+  row.classList.remove('border-emerald-500', 'border-red-500', 'border-amber-500', 'border-blue-500');
   
-  // Add appropriate status class
+  // Add appropriate status border
   const status = select.value;
-  row.classList.add(`status-${status}`);
+  const borderColors = {
+    'present': 'border-emerald-500',
+    'absent': 'border-red-500',
+    'late': 'border-amber-500',
+    'excused': 'border-blue-500'
+  };
+  
+  if (borderColors[status]) {
+    row.classList.add('border-l-4', borderColors[status]);
+  }
 }
 
 function updateStats() {
-  const statuses = ['present', 'absent', 'late', 'excused'];
+  const statusCounts = {
+    present: 0,
+    absent: 0,
+    late: 0,
+    excused: 0
+  };
   
-  statuses.forEach(status => {
-    const count = document.querySelectorAll(`select[name^="status_"]:checked, select[name^="status_"] option[value="${status}"]:checked`).length;
-    const selects = document.querySelectorAll(`select[name^="status_"]`);
-    let actualCount = 0;
-    
-    selects.forEach(select => {
-      if (select.value === status) actualCount++;
-    });
-    
-    const countElement = document.getElementById(`${status}-count`);
-    if (countElement) {
-      countElement.textContent = actualCount;
-      
-      // Add animation for count changes
-      countElement.style.transform = 'scale(1.2)';
+  document.querySelectorAll('select[name^="status_"]').forEach(select => {
+    statusCounts[select.value]++;
+  });
+  
+  // Update counter elements
+  Object.keys(statusCounts).forEach(status => {
+    const element = document.getElementById(`${status}-count`);
+    if (element) {
+      element.textContent = statusCounts[status];
+      // Add animation
+      element.style.transform = 'scale(1.1)';
       setTimeout(() => {
-        countElement.style.transform = 'scale(1)';
-      }, 200);
+        element.style.transform = 'scale(1)';
+      }, 150);
     }
   });
 }
 
+// Excuse Management
 function excuseAbsence(studentId) {
-  const modal = document.createElement('div');
-  modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-  modal.innerHTML = `
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
-      <h3 class="text-xl font-bold text-gray-800 mb-4">Excuse Absence</h3>
-      <p class="text-gray-600 mb-4">Please provide a reason for excusing this absence:</p>
-      <textarea 
-        id="excuse-reason" 
-        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none" 
-        rows="3" 
-        placeholder="Enter excuse reason..."
-      ></textarea>
-      <div class="flex space-x-3 mt-6">
-        <button onclick="closeModal()" class="flex-1 btn-secondary px-4 py-2 text-white rounded-xl font-semibold">Cancel</button>
-        <button onclick="submitExcuse(${studentId})" class="flex-1 btn-primary px-4 py-2 text-white rounded-xl font-semibold">Excuse</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
+  currentStudentId = studentId;
+  document.getElementById('excuseReason').value = '';
+  document.getElementById('excuseModal').classList.remove('hidden');
 }
 
-function submitExcuse(studentId) {
-  const reason = document.getElementById('excuse-reason').value.trim();
+function submitExcuse() {
+  const reason = document.getElementById('excuseReason').value.trim();
   if (!reason) {
-    showNotification('Please enter a reason', 'warning');
+    showNotification('Please enter a reason for the excuse', 'warning');
     return;
   }
   
-  // Update the dropdown to reflect "excused"
-  const select = document.querySelector(`select[name="status_${studentId}"]`);
+  const select = document.querySelector(`select[name="status_${currentStudentId}"]`);
   if (select) {
     select.value = 'excused';
-    updateRowStyle(select, studentId);
+    updateRowStyle(select, currentStudentId);
     updateStats();
   }
   
   closeModal();
   showNotification('Absence excused successfully', 'success');
+  currentStudentId = null;
 }
 
+// Modal Management
+function closeModal() {
+  document.querySelectorAll('#markSelectedModal, #excuseModal').forEach(modal => {
+    modal.classList.add('hidden');
+  });
+  currentStudentId = null;
+}
+
+// Notification System
 function showNotification(message, type = 'info') {
   const notification = document.createElement('div');
   const colors = {
-    success: 'bg-green-500',
-    warning: 'bg-yellow-500',
+    success: 'bg-emerald-500',
+    warning: 'bg-amber-500',
     error: 'bg-red-500',
     info: 'bg-blue-500'
   };
@@ -635,35 +466,71 @@ function showNotification(message, type = 'info') {
   
   document.body.appendChild(notification);
   
-  // Slide in
+  // Animate in
   setTimeout(() => {
     notification.style.transform = 'translateX(0)';
   }, 100);
   
-  // Slide out and remove
+  // Animate out and remove
   setTimeout(() => {
-    notification.style.transform = 'translateX(full)';
+    notification.style.transform = 'translateX(100%)';
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
 
-// Initialize on page load
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
   updateSelection();
   updateStats();
   
-  // Initialize row styles based on current status
+  // Initialize row styles
   document.querySelectorAll('select[name^="status_"]').forEach(select => {
     updateRowStyle(select, select.dataset.studentId);
   });
   
-  // Add smooth transitions to all interactive elements
-  document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      updateRowSelection(this);
-      updateSelection();
+  // Close modals when clicking outside
+  document.querySelectorAll('#markSelectedModal, #excuseModal').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
     });
+  });
+  
+  // Escape key to close modals
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeModal();
+    }
   });
 });
 </script>
+
+<style>
+.student-row {
+  transition: all 0.2s ease-in-out;
+}
+
+.status-select {
+  transition: all 0.2s ease-in-out;
+}
+
+.status-select:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.student-checkbox:checked {
+  accent-color: #3b82f6;
+}
+
+/* Smooth animations */
+.professional-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+</style>
 {% endblock %}

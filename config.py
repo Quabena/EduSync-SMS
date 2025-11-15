@@ -27,6 +27,10 @@ class Config:
     PORT = 5000
     DEBUG = False
 
+    DEFAULT_ADMIN_USER = "Admin"
+    DEFAULT_ADMIN_EMAIL = "admin@edusync.edu"
+    DEFAULT_ADMIN_PASS = "pass@7777"
+
     BACKUP_DIR = BASE_DIR / "backups"
     DOCUMENT_DIR = BASE_DIR / "student_photos"
     TEACHER_PHOTOS_DIR = BASE_DIR / "teacher_photos"

@@ -30,25 +30,25 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    log_dir = Path(app.config.get("BASE_DIR", Path.home() / "EduSyncLogs")) / "logs"
-    log_dir.mkdir(parents=True, exist_ok=True)
-    log_file = log_dir / "backend.log"
+    # log_dir = Path(app.config.get("BASE_DIR", Path.home() / "EduSyncLogs")) / "logs"
+    # log_dir.mkdir(parents=True, exist_ok=True)
+    # log_file = log_dir / "backend.log"
 
-    handler = RotatingFileHandler(
-        str(log_file), maxBytes=5 * 1024 * 1024, backupCount=3
-    )
-    handler.setLevel(logging.INFO)
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
-    )
-    handler.setFormatter(formatter)
-    app.logger.addHandler(handler)
+    # handler = RotatingFileHandler(
+    #     str(log_file), maxBytes=5 * 1024 * 1024, backupCount=3
+    # )
+    # handler.setLevel(logging.INFO)
+    # formatter = logging.Formatter(
+    #     "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
+    # )
+    # handler.setFormatter(formatter)
+    # app.logger.addHandler(handler)
 
-    # Optional: also set werkzeug logger to write into same file
-    import logging as _logging
+    # # Optional: also set werkzeug logger to write into same file
+    # import logging as _logging
 
-    werkzeug_logger = _logging.getLogger("werkzeug")
-    werkzeug_logger.addHandler(handler)
+    # werkzeug_logger = _logging.getLogger("werkzeug")
+    # werkzeug_logger.addHandler(handler)
 
     # Normalize storage config values -> ensure they are Path objects
     storage_keys = (

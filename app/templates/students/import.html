@@ -1,39 +1,425 @@
-{% extends "base.html" %} {% block content %}
-
-<div class="container mx-auto px-4">
-  <div class="text-2xl font-bold mb-6">Import Students</div>
-
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-    <form method="POST" enctype="multipart/form-data">
-      <div class="mb-4">
-        <label
-          class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
-          for="csv_file"
+<!-- import.html -->
+{% extends "base.html" %} {% block title %}Import Students - EduSync SMS{%
+endblock %} {% block page_title %}Import Students{% endblock %} {% block
+page_description %}Bulk import student data from CSV files{% endblock %} {%
+block content %}
+<div class="min-h-screen">
+  <!-- Header Section -->
+  <div class="glass-strong border-b border-white/20">
+    <div class="max-w-4xl mx-auto px-6 py-8">
+      <div class="flex items-center space-x-6">
+        <div
+          class="w-20 h-20 bg-gradient-to-br from-green-600/20 to-emerald-700/20 rounded-3xl flex items-center justify-center shadow-xl backdrop-blur-xl border border-white/10"
         >
-          CSV File
-        </label>
-        <input
-          type="file"
-          name="csv_file"
-          id="csv_file"
-          accept=".csv"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-        <p class="text-sm text-gray-500 dark:gray-400 mt-1">
-          CSV format must match the export format
+          <svg
+            class="w-10 h-10 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1
+            class="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-800 bg-clip-text text-transparent"
+          >
+            Import Students
+          </h1>
+          <p class="text-slate-600 dark:text-slate-300 mt-2 text-lg">
+            Bulk import student records using CSV files
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-4xl mx-auto px-6 py-8">
+    <div class="professional-card p-8">
+      <!-- Upload Section -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+          Upload CSV File
+        </h2>
+        <p class="text-slate-600 dark:text-slate-400 mb-6">
+          Select a CSV file containing student data. The file should follow the
+          standard export format.
         </p>
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+          <!-- File Upload Area -->
+          <div
+            class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 text-center transition-all duration-300 hover:border-blue-500 dark:hover:border-blue-400"
+            id="uploadArea"
+          >
+            <div
+              class="w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-900 rounded-2xl flex items-center justify-center"
+            >
+              <svg
+                class="w-8 h-8 text-blue-600 dark:text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                />
+              </svg>
+            </div>
+            <h3
+              class="text-lg font-semibold text-slate-900 dark:text-white mb-2"
+            >
+              Drop your CSV file here
+            </h3>
+            <p class="text-slate-600 dark:text-slate-400 mb-4">
+              or click to browse
+            </p>
+            <input
+              type="file"
+              name="csv_file"
+              id="csv_file"
+              accept=".csv"
+              class="hidden"
+              required
+            />
+            <button
+              type="button"
+              onclick="document.getElementById('csv_file').click()"
+              class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors duration-200 font-medium"
+            >
+              Choose File
+            </button>
+            <p
+              class="text-sm text-slate-500 dark:text-slate-500 mt-4"
+              id="fileName"
+            >
+              No file selected
+            </p>
+          </div>
+
+          <!-- Import Options -->
+          <div class="glass rounded-2xl p-6">
+            <h3
+              class="text-lg font-semibold text-slate-900 dark:text-white mb-4"
+            >
+              Import Options
+            </h3>
+            <div class="space-y-4">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="update_existing"
+                  class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                />
+                <span class="ml-3 text-sm text-slate-700 dark:text-slate-300"
+                  >Update existing records</span
+                >
+              </label>
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="skip_duplicates"
+                  class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                  checked
+                />
+                <span class="ml-3 text-sm text-slate-700 dark:text-slate-300"
+                  >Skip duplicate entries</span
+                >
+              </label>
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="send_notifications"
+                  class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                />
+                <span class="ml-3 text-sm text-slate-700 dark:text-slate-300"
+                  >Send welcome notifications</span
+                >
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div
+            class="flex items-center justify-between pt-6 border-t border-white/10"
+          >
+            <a
+              href="{{ url_for('students.index') }}"
+              class="px-6 py-3 glass hover:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl transition-colors duration-200 font-medium"
+            >
+              Back to Students
+            </a>
+            <button
+              type="submit"
+              class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg font-medium flex items-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                />
+              </svg>
+              Import Students
+            </button>
+          </div>
+        </form>
       </div>
 
-      <div class="flex items-center">
-        <button
-          type="submit"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Import
-        </button>
+      <!-- CSV Format Guide -->
+      <div class="glass rounded-2xl p-6">
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">
+          CSV Format Requirements
+        </h3>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h4 class="font-semibold text-slate-900 dark:text-white mb-3">
+              Required Fields
+            </h4>
+            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+              <li class="flex items-center">
+                <svg
+                  class="w-4 h-4 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                first_name, surname
+              </li>
+              <li class="flex items-center">
+                <svg
+                  class="w-4 h-4 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                gender, date_of_birth
+              </li>
+              <li class="flex items-center">
+                <svg
+                  class="w-4 h-4 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                guardian_name, guardian_contact
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-slate-900 dark:text-white mb-3">
+              Optional Fields
+            </h4>
+            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+              <li class="flex items-center">
+                <svg
+                  class="w-4 h-4 text-blue-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                email, phone
+              </li>
+              <li class="flex items-center">
+                <svg
+                  class="w-4 h-4 text-blue-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                address, medical_records
+              </li>
+              <li class="flex items-center">
+                <svg
+                  class="w-4 h-4 text-blue-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                emergency_contact
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Sample CSV Preview -->
+        <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto">
+          <pre
+            class="text-sm text-slate-200"
+          ><code>first_name,surname,gender,date_of_birth,guardian_name,guardian_contact,email,phone
+John,Doe,Male,2008-05-15,Jane Doe,+1234567890,john.doe@email.com,+1234567891
+Jane,Smith,Female,2009-03-22,Robert Smith,+1234567892,jane.smith@email.com,+1234567893</code></pre>
+        </div>
+
+        <!-- Download Template -->
+        <div class="mt-6 flex justify-center">
+          <a
+            href="#"
+            class="inline-flex items-center px-6 py-3 glass hover:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl transition-colors duration-200 font-medium"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            Download CSV Template
+          </a>
+        </div>
       </div>
-    </form>
+    </div>
   </div>
 </div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("csv_file");
+    const fileName = document.getElementById("fileName");
+    const uploadArea = document.getElementById("uploadArea");
+
+    // File input change handler
+    fileInput.addEventListener("change", function (e) {
+      if (this.files.length > 0) {
+        fileName.textContent = this.files[0].name;
+        uploadArea.classList.add("border-green-500", "dark:border-green-400");
+        uploadArea.classList.remove(
+          "border-slate-300",
+          "dark:border-slate-600"
+        );
+      } else {
+        fileName.textContent = "No file selected";
+        uploadArea.classList.remove(
+          "border-green-500",
+          "dark:border-green-400"
+        );
+        uploadArea.classList.add("border-slate-300", "dark:border-slate-600");
+      }
+    });
+
+    // Drag and drop functionality
+    uploadArea.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      this.classList.add(
+        "border-blue-500",
+        "dark:border-blue-400",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
+    });
+
+    uploadArea.addEventListener("dragleave", function (e) {
+      e.preventDefault();
+      this.classList.remove(
+        "border-blue-500",
+        "dark:border-blue-400",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
+    });
+
+    uploadArea.addEventListener("drop", function (e) {
+      e.preventDefault();
+      this.classList.remove(
+        "border-blue-500",
+        "dark:border-blue-400",
+        "bg-blue-50",
+        "dark:bg-blue-900/20"
+      );
+
+      if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        fileName.textContent = e.dataTransfer.files[0].name;
+        this.classList.add("border-green-500", "dark:border-green-400");
+      }
+    });
+
+    // Form submission handler
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function (e) {
+      const file = fileInput.files[0];
+      if (!file) {
+        e.preventDefault();
+        alert("Please select a CSV file to import.");
+        return;
+      }
+
+      // Show loading state
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = `
+        <svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Importing...
+      `;
+      submitBtn.disabled = true;
+    });
+  });
+</script>
 {% endblock %}

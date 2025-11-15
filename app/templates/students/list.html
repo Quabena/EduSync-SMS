@@ -5,9 +5,7 @@ information.{% endblock %} {% block content %}
 
 <div class="min-h-screen">
   <!-- Header Section -->
-  <div
-    class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50 dark:border-gray-700/50"
-  >
+  <div class="glass-strong border-b border-white/20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div
         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
@@ -33,11 +31,11 @@ information.{% endblock %} {% block content %}
           </div>
           <div>
             <h1
-              class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
+              class="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
             >
               Students
             </h1>
-            <p class="text-gray-600 dark:text-gray-300 mt-1">
+            <p class="text-slate-600 dark:text-slate-300 mt-1">
               Manage student records and information
             </p>
           </div>
@@ -45,44 +43,36 @@ information.{% endblock %} {% block content %}
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700"
-          >
+          <div class="professional-card p-4 text-center">
             <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {{ students|length }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">
+            <div class="text-sm text-slate-600 dark:text-slate-400">
               Total Students
             </div>
           </div>
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700"
-          >
+          <div class="professional-card p-4 text-center">
             <div class="text-2xl font-bold text-green-600 dark:text-green-400">
               {{ classes|length }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">
+            <div class="text-sm text-slate-600 dark:text-slate-400">
               Active Classes
             </div>
           </div>
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700"
-          >
+          <div class="professional-card p-4 text-center">
             <div
               class="text-2xl font-bold text-purple-600 dark:text-purple-400"
             >
               {{ students|selectattr('gender', 'equalto', 'Male')|list|length }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Male</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400">Male</div>
           </div>
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700"
-          >
+          <div class="professional-card p-4 text-center">
             <div class="text-2xl font-bold text-pink-600 dark:text-pink-400">
               {{ students|selectattr('gender', 'equalto', 'Female')|list|length
               }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Female</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400">Female</div>
           </div>
         </div>
       </div>
@@ -91,9 +81,7 @@ information.{% endblock %} {% block content %}
 
   <!-- Controls Section -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div
-      class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6"
-    >
+    <div class="professional-card p-6">
       <div
         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
       >
@@ -105,7 +93,7 @@ information.{% endblock %} {% block content %}
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
               <svg
-                class="h-5 w-5 text-gray-400"
+                class="h-5 w-5 text-slate-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -122,7 +110,7 @@ information.{% endblock %} {% block content %}
               type="text"
               id="searchInput"
               placeholder="Search students..."
-              class="block w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="block w-full pl-10 pr-4 py-3 glass rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -130,7 +118,7 @@ information.{% endblock %} {% block content %}
           <div class="flex gap-3">
             <select
               id="classFilter"
-              class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="px-4 py-3 glass rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">All Classes</option>
               {% for class in active_classes %}
@@ -140,7 +128,7 @@ information.{% endblock %} {% block content %}
 
             <select
               id="genderFilter"
-              class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="px-4 py-3 glass rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">All Genders</option>
               <option value="Male">Male</option>
@@ -152,7 +140,7 @@ information.{% endblock %} {% block content %}
         <!-- Action Buttons -->
         <div class="flex gap-3">
           <!-- View Toggle -->
-          <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-1 flex">
+          <div class="glass rounded-xl p-1 flex">
             <button
               id="gridViewBtn"
               class="flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white shadow-sm transition-all duration-200"
@@ -174,7 +162,7 @@ information.{% endblock %} {% block content %}
             </button>
             <button
               id="tableViewBtn"
-              class="flex items-center px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
+              class="flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/10 transition-all duration-200"
             >
               <svg
                 class="w-4 h-4 mr-2"
@@ -193,25 +181,32 @@ information.{% endblock %} {% block content %}
             </button>
           </div>
 
-          <button
-            id="exportBtn"
-            class="flex items-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
+          <form
+            action="{{ url_for('students.export_csv') }}"
+            method="post"
+            class="inline"
           >
-            <svg
-              class="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button
+              id="exportBtn"
+              class="flex items-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Export
-          </button>
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Export
+            </button>
+          </form>
 
           <a
             href="{{ url_for('students.create') }}"
@@ -236,8 +231,10 @@ information.{% endblock %} {% block content %}
       </div>
 
       <!-- Results Counter -->
-      <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+      <div class="mt-4 pt-4 border-t border-white/10">
+        <div
+          class="flex items-center text-sm text-slate-600 dark:text-slate-400"
+        >
           <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
           <span id="resultCount">{{ students|length }}</span>
           <span class="ml-1">students found</span>
@@ -266,7 +263,7 @@ information.{% endblock %} {% block content %}
         >
           <!-- Front Side -->
           <div
-            class="absolute w-full h-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 backface-hidden flex flex-col"
+            class="absolute w-full h-full professional-card p-6 backface-hidden flex flex-col"
           >
             <!-- Student Avatar -->
             <div class="flex justify-center mb-6">
@@ -274,7 +271,7 @@ information.{% endblock %} {% block content %}
               <img
                 src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
                 alt="{{ student.full_name }}"
-                class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg"
+                class="w-24 h-24 rounded-full object-cover border-4 border-white/20 shadow-lg"
               />
               {% else %}
               <div
@@ -287,34 +284,30 @@ information.{% endblock %} {% block content %}
 
             <!-- Student Info -->
             <div class="text-center mb-4">
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">
                 {{ student.full_name }}
               </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
+              <p class="text-sm text-slate-600 dark:text-slate-400">
                 ID: {{ student.id }}
               </p>
             </div>
 
             <!-- Quick Stats -->
             <div class="grid grid-cols-2 gap-3 mb-6">
-              <div
-                class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"
-              >
-                <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <div class="glass rounded-lg p-3 text-center">
+                <div class="text-xs text-slate-600 dark:text-slate-400 mb-1">
                   Class
                 </div>
-                <div class="font-medium text-gray-900 dark:text-white">
+                <div class="font-medium text-slate-900 dark:text-white">
                   {{ student.classroom.name if student.classroom else
                   'Unassigned' }}
                 </div>
               </div>
-              <div
-                class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"
-              >
-                <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <div class="glass rounded-lg p-3 text-center">
+                <div class="text-xs text-slate-600 dark:text-slate-400 mb-1">
                   Gender
                 </div>
-                <div class="font-medium text-gray-900 dark:text-white">
+                <div class="font-medium text-slate-900 dark:text-white">
                   {{ student.gender }}
                 </div>
               </div>
@@ -349,11 +342,11 @@ information.{% endblock %} {% block content %}
           >
             <!-- Detailed Info -->
             <div class="mb-4">
-              <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
                 {{ student.full_name }}
               </h3>
               <div
-                class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-1"
+                class="flex items-center text-sm text-slate-600 dark:text-slate-400 mb-1"
               >
                 <svg
                   class="w-4 h-4 mr-2"
@@ -371,7 +364,7 @@ information.{% endblock %} {% block content %}
                 {{ student.email if student.email else 'No email' }}
               </div>
               <div
-                class="flex items-center text-sm text-gray-600 dark:text-gray-400"
+                class="flex items-center text-sm text-slate-600 dark:text-slate-400"
               >
                 <svg
                   class="w-4 h-4 mr-2"
@@ -394,15 +387,15 @@ information.{% endblock %} {% block content %}
             {% if student.guardian_name %}
             <div class="mb-4">
               <h4
-                class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
               >
                 Guardian
               </h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+              <p class="text-sm text-slate-600 dark:text-slate-400">
                 {{ student.guardian_name }}
               </p>
               {% if student.guardian_contact %}
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+              <p class="text-sm text-slate-600 dark:text-slate-400">
                 {{ student.guardian_contact }}
               </p>
               {% endif %}
@@ -413,11 +406,11 @@ information.{% endblock %} {% block content %}
             {% if student.medical_records %}
             <div class="mb-4">
               <h4
-                class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
               >
                 Medical Notes
               </h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
+              <p class="text-sm text-slate-600 dark:text-slate-400 truncate">
                 {{ student.medical_records }}
               </p>
             </div>
@@ -457,53 +450,47 @@ information.{% endblock %} {% block content %}
     </div>
 
     <!-- Table View -->
-    <div
-      id="tableView"
-      class="hidden bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
-    >
+    <div id="tableView" class="hidden professional-card overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-800">
+        <table class="min-w-full divide-y divide-white/10">
+          <thead class="bg-white/5">
             <tr>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider"
               >
                 Student
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider"
               >
                 ID
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider"
               >
                 Class
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider"
               >
                 Gender
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider"
               >
                 Guardian
               </th>
               <th
-                class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider"
               >
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody
-            class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700"
-            id="studentsTable"
-          >
+          <tbody class="divide-y divide-white/10" id="studentsTable">
             {% for student in students %}
             <tr
-              class="student-row hover:bg-gray-50 dark:hover:bg-gray-800"
+              class="student-row hover:bg-white/5 transition-colors duration-200"
               data-name="{{ student.full_name|lower }}"
               data-class="{{ student.classroom.name if student.classroom else 'unassigned' }}"
               data-gender="{{ student.gender|lower }}"
@@ -525,11 +512,11 @@ information.{% endblock %} {% block content %}
                   {% endif %}
                   <div class="ml-4">
                     <div
-                      class="text-sm font-medium text-gray-900 dark:text-white"
+                      class="text-sm font-medium text-slate-900 dark:text-white"
                     >
                       {{ student.full_name }}
                     </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                    <div class="text-sm text-slate-600 dark:text-slate-400">
                       {{ student.email if student.email else 'No email' }}
                     </div>
                   </div>
@@ -538,7 +525,7 @@ information.{% endblock %} {% block content %}
 
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
                 >
                   {{ student.id }}
                 </span>
@@ -553,7 +540,7 @@ information.{% endblock %} {% block content %}
                 </span>
                 {% else %}
                 <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
                 >
                   Unassigned
                 </span>
@@ -572,18 +559,18 @@ information.{% endblock %} {% block content %}
                 {% if student.guardian_name %}
                 <div>
                   <div
-                    class="text-sm font-medium text-gray-900 dark:text-white"
+                    class="text-sm font-medium text-slate-900 dark:text-white"
                   >
                     {{ student.guardian_name }}
                   </div>
                   {% if student.guardian_contact %}
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                  <div class="text-sm text-slate-600 dark:text-slate-400">
                     {{ student.guardian_contact }}
                   </div>
                   {% endif %}
                 </div>
                 {% else %}
-                <span class="text-gray-400 dark:text-gray-500"
+                <span class="text-slate-400 dark:text-slate-500"
                   >No guardian info</span
                 >
                 {% endif %}
@@ -618,14 +605,12 @@ information.{% endblock %} {% block content %}
 
     <!-- Empty State -->
     {% if not students %}
-    <div
-      class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-12 text-center"
-    >
+    <div class="professional-card p-12 text-center">
       <div
-        class="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center"
+        class="w-24 h-24 mx-auto mb-6 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center"
       >
         <svg
-          class="w-12 h-12 text-gray-400"
+          class="w-12 h-12 text-slate-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -638,10 +623,10 @@ information.{% endblock %} {% block content %}
           />
         </svg>
       </div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">
         No Students Found
       </h3>
-      <p class="text-gray-600 dark:text-gray-400 mb-6">
+      <p class="text-slate-600 dark:text-slate-400 mb-6">
         Get started by adding your first student to the system.
       </p>
       <a
@@ -671,10 +656,10 @@ information.{% endblock %} {% block content %}
 <!-- Delete Confirmation Modal -->
 <div
   id="deleteModal"
-  class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4"
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4"
 >
   <div
-    class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all duration-300 scale-95 opacity-0"
+    class="professional-card max-w-md w-full p-6 transform transition-all duration-300 scale-95 opacity-0"
     id="deleteModalContent"
   >
     <div class="flex items-center mb-4">
@@ -696,17 +681,17 @@ information.{% endblock %} {% block content %}
         </svg>
       </div>
       <div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
           Delete Student
         </h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p class="text-sm text-slate-600 dark:text-slate-400">
           This action cannot be undone
         </p>
       </div>
     </div>
 
     <div class="mb-6">
-      <p class="text-gray-700 dark:text-gray-300">
+      <p class="text-slate-700 dark:text-slate-300">
         Are you sure you want to delete
         <span
           id="deleteStudentName"
@@ -719,7 +704,7 @@ information.{% endblock %} {% block content %}
     <div class="flex space-x-3">
       <button
         onclick="closeDeleteModal()"
-        class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors duration-200"
+        class="flex-1 px-4 py-2 glass hover:bg-white/10 text-slate-700 dark:text-slate-300 font-medium rounded-lg transition-colors duration-200"
       >
         Cancel
       </button>
@@ -797,7 +782,7 @@ information.{% endblock %} {% block content %}
       gridViewBtn.className =
         "flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white shadow-sm transition-all duration-200";
       tableViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/10 transition-all duration-200";
     } else {
       gridView.classList.add("hidden");
       tableView.classList.remove("hidden");
@@ -805,7 +790,7 @@ information.{% endblock %} {% block content %}
       tableViewBtn.className =
         "flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white shadow-sm transition-all duration-200";
       gridViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/10 transition-all duration-200";
     }
   }
 
@@ -923,10 +908,19 @@ information.{% endblock %} {% block content %}
     `;
 
     setTimeout(() => {
-      exportBtn.innerHTML = originalHTML;
-      // Here you would typically trigger the actual export functionality
-      alert("Export functionality available in the next version");
+      exportBtn.innerHTML = `
+        <svg class="w-4 h-4 mr-2 inline text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M5 13l4 4L19 7" />
+        </svg>
+        Exported
+      `;
     }, 2000);
+
+    setTimeout(() => {
+      exportBtn.innerHTML = originalHTML;
+      exportBtn.disabled = false;
+    }, 3000);
   }
 
   // Close modal when clicking outside

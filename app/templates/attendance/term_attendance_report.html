@@ -1,206 +1,494 @@
-{% extends "base.html" %} {% block title %}Term Attendance - {{ class_.name }}{%
-endblock %} {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-  <!-- Header -->
-  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-    <div class="flex justify-between items-start">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800">Term Attendance Report</h1>
-        <p class="text-gray-600">{{ class_.name }} - {{ term }} {{ year }}</p>
-        <p class="text-sm text-gray-500">
-          Total School Days: {{ summary.total_days }}
-        </p>
+{% extends "base.html" %} {% block title %}Term Attendance Report - EduSync
+SMS{% endblock %} {% block page_title %}Term Attendance Report{% endblock %} {%
+block page_description %}Detailed term attendance overview for {{ class_.name
+}}{% endblock %} {% block content %}
+<div class="max-w-7xl mx-auto space-y-8">
+  <!-- Header Section -->
+  <div class="professional-card p-8 text-center">
+    <div class="flex justify-center mb-6">
+      <div
+        class="w-20 h-20 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center"
+      >
+        <svg
+          class="w-10 h-10 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
       </div>
-      <div class="flex space-x-3">
-        <a
-          href="{{ url_for('attendance.term_attendance') }}"
-          class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+    </div>
+    <h1 class="text-4xl font-bold gradient-text mb-4">
+      Term Attendance Report
+    </h1>
+    <div class="flex flex-wrap justify-center gap-4 mb-4">
+      <span
+        class="px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold"
+      >
+        {{ class_.name }}
+      </span>
+      <span
+        class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold"
+      >
+        {{ term }} {{ year }}
+      </span>
+    </div>
+    <p class="text-slate-600 dark:text-slate-300 text-lg max-w-2xl mx-auto">
+      Detailed attendance overview with {{ summary.total_days }} school days
+      recorded
+    </p>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <a
+      href="{{ url_for('attendance.export_attendance', class_id=class_.id, term=term, year=year) }}"
+      class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 interactive"
+    >
+      <svg
+        class="w-5 h-5 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+      Export CSV
+    </a>
+    <a
+      href="{{ url_for('attendance.term_attendance') }}"
+      class="inline-flex items-center justify-center px-6 py-3 glass hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl transition-all duration-300 interactive"
+    >
+      <svg
+        class="w-5 h-5 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 19l-7-7m0 0l7-7m-7 7h18"
+        />
+      </svg>
+      Back to Reports
+    </a>
+  </div>
+
+  <!-- Summary Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- Total Students -->
+    <div class="professional-card p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-2xl font-bold text-slate-800 dark:text-white">
+            {{ students | length }}
+          </p>
+          <p class="text-sm text-slate-600 dark:text-slate-300">
+            Total Students
+          </p>
+        </div>
+        <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
+          <svg
+            class="w-6 h-6 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- School Days -->
+    <div class="professional-card p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-2xl font-bold text-slate-800 dark:text-white">
+            {{ summary.total_days }}
+          </p>
+          <p class="text-sm text-slate-600 dark:text-slate-300">School Days</p>
+        </div>
+        <div
+          class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl"
         >
-          Change Term
-        </a>
-        <button
-          onclick="window.print()"
-          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          <svg
+            class="w-6 h-6 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Average Attendance -->
+    <div class="professional-card p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          {% set total_percentage = 0 %} {% for student in students %} {% set
+          stats = summary.student_stats[student.id] %} {% set total_percentage =
+          total_percentage + stats.percentage %} {% endfor %}
+          <p class="text-2xl font-bold text-slate-800 dark:text-white">
+            {% if students %}{{ (total_percentage / students | length) |
+            round(1) }}%{% else %}0%{% endif %}
+          </p>
+          <p class="text-sm text-slate-600 dark:text-slate-300">
+            Average Attendance
+          </p>
+        </div>
+        <div
+          class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl"
         >
-          Print Report
-        </button>
+          <svg
+            class="w-6 h-6 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Below 80% -->
+    <div class="professional-card p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          {% set chronic_count = 0 %} {% for student in students %} {% set stats
+          = summary.student_stats[student.id] %} {% if stats.percentage < 80 %}
+          {% set chronic_count = chronic_count + 1 %} {% endif %} {% endfor %}
+          <p class="text-2xl font-bold text-slate-800 dark:text-white">
+            {{ chronic_count }}
+          </p>
+          <p class="text-sm text-slate-600 dark:text-slate-300">Below 80%</p>
+        </div>
+        <div class="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
+          <svg
+            class="w-6 h-6 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Attendance Summary -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-lg shadow p-4">
-      <p class="text-2xl font-bold text-blue-600">{{ summary.total_days }}</p>
-      <p class="text-sm text-gray-500">Total Days</p>
-    </div>
-    <div class="bg-white rounded-lg shadow p-4">
-      <p class="text-2xl font-bold text-green-600">
-        {{ (summary.student_stats.values() | map(attribute='present') | sum /
-        summary.student_stats.values() | length) | round(1) if
-        summary.student_stats else 0 }}
-      </p>
-      <p class="text-sm text-gray-500">Avg. Present</p>
-    </div>
-    <div class="bg-white rounded-lg shadow p-4">
-      <p class="text-2xl font-bold text-red-600">
-        {{ (summary.student_stats.values() | map(attribute='absent') | sum /
-        summary.student_stats.values() | length) | round(1) if
-        summary.student_stats else 0 }}
-      </p>
-      <p class="text-sm text-gray-500">Avg. Absent</p>
-    </div>
-    <div class="bg-white rounded-lg shadow p-4">
-      <p class="text-2xl font-bold text-purple-600">
-        {{ (summary.student_stats.values() | map(attribute='percentage') | sum /
-        summary.student_stats.values() | length) | round(1) if
-        summary.student_stats else 0 }}%
-      </p>
-      <p class="text-sm text-gray-500">Avg. Attendance</p>
+  <!-- Attendance Legend -->
+  <div class="professional-card p-6">
+    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
+      Attendance Legend
+    </h3>
+    <div class="flex flex-wrap gap-4">
+      <div class="flex items-center space-x-2">
+        <div
+          class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
+        >
+          P
+        </div>
+        <span class="text-sm text-slate-600 dark:text-slate-300">Present</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div
+          class="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
+        >
+          A
+        </div>
+        <span class="text-sm text-slate-600 dark:text-slate-300">Absent</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div
+          class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
+        >
+          L
+        </div>
+        <span class="text-sm text-slate-600 dark:text-slate-300">Late</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div
+          class="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
+        >
+          E
+        </div>
+        <span class="text-sm text-slate-600 dark:text-slate-300">Excused</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div
+          class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center"
+        >
+          <span class="text-xs text-slate-500 dark:text-slate-400">-</span>
+        </div>
+        <span class="text-sm text-slate-600 dark:text-slate-300"
+          >No Record</span
+        >
+      </div>
     </div>
   </div>
 
   <!-- Attendance Table -->
-  <div class="bg-white rounded-xl shadow-md overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="min-w-full">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10"
-            >
-              Student
-            </th>
-            {% for day in attendance_days %}
-            <th
-              class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {{ day.strftime('%m/%d') }}
-            </th>
-            {% endfor %}
-            <th
-              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Present
-            </th>
-            <th
-              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Absent
-            </th>
-            <th
-              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              %
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          {% for student in students %}
-          <tr>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white z-10"
-            >
-              {{ student.full_name }}
-            </td>
-            {% for day in attendance_days %}
-            <td class="px-2 py-4 text-center text-sm">
-              {% set status = attendance_records[student.id].get(day) %}
-              <span
-                class="inline-block w-4 h-4 rounded-full {% if status == 'present' %}bg-green-500{% elif status == 'absent' %}bg-red-500{% else %}bg-gray-300{% endif %}"
-                title="{{ day.strftime('%Y-%m-%d') }}: {{ status if status else 'No record' }}"
-              ></span>
-            </td>
-            {% endfor %}
-            <td
-              class="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600"
-            >
-              {{ summary.student_stats[student.id].present }}
-            </td>
-            <td
-              class="px-4 py-4 whitespace-nowrap text-sm font-medium text-red-600"
-            >
-              {{ summary.student_stats[student.id].absent }}
-            </td>
-            <td
-              class="px-4 py-4 whitespace-nowrap text-sm font-medium {% if summary.student_stats[student.id].percentage >= 90 %}text-green-600{% elif summary.student_stats[student.id].percentage >= 75 %}text-yellow-600{% else %}text-red-600{% endif %}"
-            >
-              {{ summary.student_stats[student.id].percentage | round(1) }}%
-            </td>
-          </tr>
+  <div class="professional-card p-8 overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+          <th
+            class="px-6 py-4 text-left font-semibold sticky left-0 bg-indigo-500 z-10"
+          >
+            Student
+          </th>
+          {% for day in attendance_days %}
+          <th
+            class="px-3 py-4 text-center font-semibold text-sm whitespace-nowrap"
+          >
+            {{ day.strftime('%m/%d') }}
+          </th>
           {% endfor %}
-        </tbody>
-      </table>
-    </div>
+          <th class="px-6 py-4 text-center font-semibold">Present</th>
+          <th class="px-6 py-4 text-center font-semibold">Absent</th>
+          <th class="px-6 py-4 text-center font-semibold">Rate</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+        {% for student in students %}
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <td
+            class="px-6 py-4 font-medium text-slate-900 dark:text-white sticky left-0 bg-white dark:bg-slate-900"
+          >
+            {{ student.surname }}, {{ student.first_name }}
+          </td>
+          {% for day in attendance_days %}
+          <td class="px-3 py-3 text-center">
+            {% set status = attendance_records[student.id].get(day) %} {% if
+            status == 'present' %}
+            <div
+              class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
+              title="Present - {{ day.strftime('%b %d') }}"
+            >
+              P
+            </div>
+            {% elif status == 'absent' %}
+            <div
+              class="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
+              title="Absent - {{ day.strftime('%b %d') }}"
+            >
+              A
+            </div>
+            {% elif status == 'late' %}
+            <div
+              class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
+              title="Late - {{ day.strftime('%b %d') }}"
+            >
+              L
+            </div>
+            {% elif status == 'excused' %}
+            <div
+              class="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
+              title="Excused - {{ day.strftime('%b %d') }}"
+            >
+              E
+            </div>
+            {% else %}
+            <div
+              class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+              title="No record - {{ day.strftime('%b %d') }}"
+            >
+              <span class="text-xs text-slate-500 dark:text-slate-400">-</span>
+            </div>
+            {% endif %}
+          </td>
+          {% endfor %}
+          <td class="px-6 py-4 text-center font-semibold text-emerald-600">
+            {{ summary.student_stats[student.id].present }}
+          </td>
+          <td class="px-6 py-4 text-center font-semibold text-red-600">
+            {{ summary.student_stats[student.id].absent }}
+          </td>
+          <td class="px-6 py-4 text-center">
+            {% set percentage = summary.student_stats[student.id].percentage %}
+            <span
+              class="px-3 py-1 rounded-full text-xs font-bold {% if percentage >= 90 %}bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 {% elif percentage >= 80 %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300 {% else %}bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300{% endif %}"
+            >
+              {{ "%.1f"|format(percentage) }}%
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
-  <!-- Action Buttons -->
-  <div class="mt-6 flex justify-between">
-    <a
-      href="{{ url_for('attendance.attendance_dashboard') }}"
-      class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-    >
-      Back to Dashboard
-    </a>
-    <a
-      href="{{ url_for('attendance.select_attendance_date') }}?class_id={{ class_.id }}&term={{ term }}&year={{ year }}"
-      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-    >
-      Mark Attendance for This Term
-    </a>
+  <!-- Performance Summary -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Top Performers -->
+    <div class="professional-card p-6">
+      <div class="flex items-center space-x-3 mb-6">
+        <div
+          class="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg"
+        >
+          <svg
+            class="w-5 h-5 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+            />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 dark:text-white">
+          Top Performers
+        </h3>
+      </div>
+      <div class="space-y-3">
+        {% set top_performers = [] %} {% for student in students %} {% set stats
+        = summary.student_stats[student.id] %} {% if stats.percentage >= 90 %}
+        {% set _ = top_performers.append((student, stats.percentage)) %} {%
+        endif %} {% endfor %} {% if top_performers %} {% for student, percentage
+        in top_performers[:5] %}
+        <div
+          class="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+        >
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white text-sm font-bold"
+            >
+              {{ student.first_name[0] }}{{ student.surname[0] }}
+            </div>
+            <span class="font-medium text-slate-800 dark:text-white"
+              >{{ student.first_name }} {{ student.surname[0] }}.</span
+            >
+          </div>
+          <span
+            class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full"
+          >
+            {{ "%.1f"|format(percentage) }}%
+          </span>
+        </div>
+        {% endfor %} {% else %}
+        <div class="text-center py-4 text-slate-500 dark:text-slate-400">
+          No students with 90%+ attendance
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Need Attention -->
+    <div class="professional-card p-6">
+      <div class="flex items-center space-x-3 mb-6">
+        <div class="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-lg">
+          <svg
+            class="w-5 h-5 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 dark:text-white">
+          Need Attention
+        </h3>
+      </div>
+      <div class="space-y-3">
+        {% set need_attention = [] %} {% for student in students %} {% set stats
+        = summary.student_stats[student.id] %} {% if stats.percentage < 80 %} {%
+        set _ = need_attention.append((student, stats.percentage)) %} {% endif
+        %} {% endfor %} {% if need_attention %} {% for student, percentage in
+        need_attention[:5] %}
+        <div
+          class="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+        >
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center text-white text-sm font-bold"
+            >
+              {{ student.first_name[0] }}{{ student.surname[0] }}
+            </div>
+            <span class="font-medium text-slate-800 dark:text-white"
+              >{{ student.first_name }} {{ student.surname[0] }}.</span
+            >
+          </div>
+          <span
+            class="px-2 py-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-xs font-bold rounded-full"
+          >
+            {{ "%.1f"|format(percentage) }}%
+          </span>
+        </div>
+        {% endfor %} {% else %}
+        <div class="text-center py-4 text-slate-500 dark:text-slate-400">
+          No students below 80% attendance
+        </div>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </div>
 
-<style>
-  .overflow-x-auto {
-    overflow-x: auto;
-  }
-  .sticky {
-    position: sticky;
-  }
-  .left-0 {
-    left: 0;
-  }
-  .z-10 {
-    z-index: 10;
-  }
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add interactive features to the attendance table
+    const attendanceCells = document.querySelectorAll("[title]");
 
-  @media print {
-    .bg-white {
-      background-color: white !important;
-    }
-    .shadow-md,
-    .shadow {
-      box-shadow: none !important;
-    }
-    .rounded-xl,
-    .rounded-lg {
-      border-radius: 0 !important;
-    }
-    .px-4,
-    .px-6,
-    .px-2 {
-      padding-left: 0.5rem !important;
-      padding-right: 0.5rem !important;
-    }
-    .py-8,
-    .py-6,
-    .py-4,
-    .py-3 {
-      padding-top: 0.5rem !important;
-      padding-bottom: 0.5rem !important;
-    }
-    .mt-6,
-    .mb-6 {
-      margin-top: 1rem !important;
-      margin-bottom: 1rem !important;
-    }
-    .grid {
-      display: block !important;
-    }
-    .flex {
-      display: none !important;
-    }
-  }
-</style>
+    attendanceCells.forEach((cell) => {
+      cell.addEventListener("click", function () {
+        const title = this.getAttribute("title");
+        if (title) {
+          const [status, date] = title.split(" - ");
+          const student = this.closest("tr").querySelector("td").textContent;
+
+          alert(
+            `Attendance Record:\nStudent: ${student}\nDate: ${date}\nStatus: ${status}`
+          );
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}
