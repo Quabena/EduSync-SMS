@@ -1,65 +1,117 @@
-{% extends "base.html" %} {% block title %}Alumni Directory{% endblock %} {%
+{% extends "base.html" %} {% block title %}Alumni Directory - EduSync{% endblock
+%} {% block page_title %}Alumni Directory{% endblock %} {% block
+page_description %}Browse and manage all graduated students{% endblock %} {%
 block content %}
-<div
-  class="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-slate-100"
->
-  <div class="container mx-auto px-4 py-8 max-w-7xl">
+<div class="min-h-screen py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header Section -->
     <div class="mb-8">
-      <div class="flex items-center justify-between flex-wrap gap-4">
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+      >
         <div>
-          <h1 class="text-4xl font-bold text-slate-800 mb-2">
+          <h1 class="text-4xl font-bold gradient-text mb-2">
             Alumni Directory
           </h1>
-          <p class="text-slate-600">Browse and manage all graduated students</p>
+          <p class="text-lg text-slate-600 dark:text-slate-300">
+            Browse and manage all graduated students
+          </p>
         </div>
         <div class="flex items-center space-x-3">
           <a
             href="{{ url_for('graduation.alumni_classes') }}"
-            class="px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 font-medium"
+            class="inline-flex items-center px-6 py-3 glass text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-white/20 transition-all duration-300"
           >
+            <i class="fas fa-users mr-2"></i>
             View by Class
           </a>
           <a
             href="{{ url_for('graduation.graduation_management') }}"
-            class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+            class="inline-flex items-center px-6 py-3 glass-strong text-slate-500 font-medium rounded-xl hover-lift transition-all duration-300"
           >
+            <i class="fas fa-graduation-cap mr-2"></i>
             Graduation Management
           </a>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-lg border border-slate-200 mb-6 p-6">
-      <div class="flex items-center justify-between flex-wrap gap-4">
-        <div class="flex items-center space-x-4">
-          <svg
-            class="w-6 h-6 text-slate-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-            ></path>
-          </svg>
-          <h3 class="text-lg font-semibold text-slate-700">
-            Filter by Graduation Year
-          </h3>
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+      <div class="professional-card p-6 text-center">
+        <div
+          class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
+        >
+          <i class="fas fa-users text-blue-500 text-xl"></i>
         </div>
-        <div class="flex items-center space-x-3">
+        <div class="text-2xl font-bold text-slate-800 dark:text-white">
+          {{ alumni|length }}
+        </div>
+        <div class="text-sm text-slate-600 dark:text-slate-300">
+          Total Alumni
+        </div>
+      </div>
+
+      <div class="professional-card p-6 text-center">
+        <div
+          class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
+        >
+          <i class="fas fa-calendar-alt text-emerald-500 text-xl"></i>
+        </div>
+        <div class="text-2xl font-bold text-slate-800 dark:text-white">
+          {{ years|length }}
+        </div>
+        <div class="text-sm text-slate-600 dark:text-slate-300">
+          Graduation Years
+        </div>
+      </div>
+
+      <div class="professional-card p-6 text-center">
+        <div
+          class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
+        >
+          <i class="fas fa-trophy text-purple-500 text-xl"></i>
+        </div>
+        <div class="text-2xl font-bold text-slate-800 dark:text-white">
+          100%
+        </div>
+        <div class="text-sm text-slate-600 dark:text-slate-300">
+          Success Rate
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="professional-card p-6 mb-6 mt-6">
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+      >
+        <div class="flex items-center space-x-4">
+          <div
+            class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center"
+          >
+            <i class="fas fa-filter text-blue-500"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
+              Filter by Graduation Year
+            </h3>
+            <p class="text-sm text-slate-600 dark:text-slate-300">
+              Browse alumni by their graduation year
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center flex-wrap gap-2">
           <a
             href="{{ url_for('graduation.alumni_list') }}"
-            class="px-4 py-2 {% if not selected_year %}bg-blue-600 text-white{% else %}bg-slate-100 text-slate-700 hover:bg-slate-200{% endif %} rounded-lg transition-colors duration-200 font-medium"
+            class="inline-flex items-center px-4 py-2 {% if not selected_year %}glass-strong text-slate-500{% else %}glass text-slate-700 dark:text-slate-200 hover:bg-white/20{% endif %} rounded-xl transition-all duration-300 font-medium"
           >
             All Years
           </a>
           {% for year in years %}
           <a
             href="{{ url_for('graduation.alumni_list', year=year) }}"
-            class="px-4 py-2 {% if selected_year == year %}bg-blue-600 text-white{% else %}bg-slate-100 text-slate-700 hover:bg-slate-200{% endif %} rounded-lg transition-colors duration-200 font-medium"
+            class="inline-flex items-center px-4 py-2 {% if selected_year == year %}glass-strong text-white{% else %}glass text-slate-700 dark:text-slate-200 hover:bg-white/20{% endif %} rounded-xl transition-all duration-300 font-medium"
           >
             {{ year }}
           </a>
@@ -68,35 +120,37 @@ block content %}
       </div>
     </div>
 
-    <div
-      class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden"
-    >
-      <div class="bg-gradient-to-r from-emerald-700 to-emerald-600 px-6 py-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold text-white">Alumni Records</h2>
-            <p class="text-emerald-100 text-sm mt-1">
-              {% if selected_year %} Class of {{ selected_year }} - {{
-              alumni|length }} alumni {% else %} All alumni - {{ alumni|length
-              }} total {% endif %}
-            </p>
-          </div>
+    <!-- Alumni Records -->
+    <div class="professional-card p-6">
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6"
+      >
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
+            Alumni Records
+          </h2>
+          <p class="text-slate-600 dark:text-slate-300 mt-1">
+            {% if selected_year %} Class of {{ selected_year }} - {{
+            alumni|length }} alumni {% else %} All alumni - {{ alumni|length }}
+            total {% endif %}
+          </p>
         </div>
       </div>
 
-      <div class="p-6">
-        {% if alumni %}
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      {% if alumni %}
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        {% for alum in alumni %}
+        <a
+          href="{{ url_for('graduation.alumni_detail', alumni_id=alum.id) }}"
+          class="professional-card p-6 hover-lift transition-all duration-300 group"
         >
-          {% for alum in alumni %}
-          <a
-            href="{{ url_for('graduation.alumni_detail', alumni_id=alum.id) }}"
-            class="bg-gradient-to-br from-white to-slate-50 rounded-xl border-2 border-slate-200 p-6 hover:border-emerald-500 hover:shadow-xl transition-all duration-300 group"
-          >
-            <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center text-center">
+            <!-- Alumni Photo -->
+            <div class="relative mb-4">
               <div
-                class="w-24 h-24 rounded-full overflow-hidden bg-slate-200 mb-4 ring-4 ring-slate-100 group-hover:ring-emerald-200 transition-all duration-300"
+                class="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600"
               >
                 {% if alum.photo_path %}
                 <img
@@ -106,132 +160,170 @@ block content %}
                 />
                 {% else %}
                 <div class="w-full h-full flex items-center justify-center">
-                  <svg
-                    class="w-12 h-12 text-slate-400"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                    />
-                  </svg>
+                  <i class="fas fa-user-graduate text-white text-2xl"></i>
                 </div>
                 {% endif %}
               </div>
-
-              <h3
-                class="font-bold text-slate-800 text-lg mb-1 group-hover:text-emerald-700 transition-colors duration-200"
-              >
-                {{ alum.full_name }}
-              </h3>
-
-              <div class="space-y-2 w-full mt-3">
-                <div class="flex items-center justify-center space-x-2">
-                  <svg
-                    class="w-4 h-4 text-emerald-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
-                    <path
-                      d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-                    ></path>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
-                    ></path>
-                  </svg>
-                  <span class="text-sm font-semibold text-emerald-700"
-                    >Class of {{ alum.graduation_year }}</span
-                  >
-                </div>
-
-                <div class="px-3 py-1.5 bg-slate-100 rounded-full">
-                  <span class="text-xs font-medium text-slate-600"
-                    >{{ alum.final_class }}</span
-                  >
-                </div>
-
-                <div
-                  class="flex items-center justify-center space-x-4 text-xs text-slate-500 pt-2"
-                >
-                  <span class="flex items-center">
-                    <svg
-                      class="w-3 h-3 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      ></path>
-                    </svg>
-                    {{ alum.gender }}
-                  </span>
-                </div>
-              </div>
             </div>
 
-            <div class="mt-4 pt-4 border-t border-slate-200">
+            <!-- Alumni Info -->
+            <h3
+              class="font-bold text-slate-800 dark:text-white text-lg mb-2 group-hover:text-blue-500 transition-colors duration-200"
+            >
+              {{ alum.full_name }}
+            </h3>
+
+            <div class="space-y-3 w-full mt-3">
+              <!-- Graduation Year -->
+              <div class="flex items-center justify-center space-x-2">
+                <i class="fas fa-graduation-cap text-emerald-500 text-sm"></i>
+                <span
+                  class="text-sm font-semibold text-emerald-600 dark:text-emerald-400"
+                >
+                  Class of {{ alum.graduation_year }}
+                </span>
+              </div>
+
+              <!-- Final Class -->
+              <div class="glass px-3 py-1.5 rounded-lg">
+                <span
+                  class="text-xs font-medium text-slate-700 dark:text-slate-200"
+                >
+                  {{ alum.final_class }}
+                </span>
+              </div>
+
+              <!-- Gender -->
               <div
-                class="flex items-center justify-center text-emerald-600 font-medium text-sm group-hover:text-emerald-700"
+                class="flex items-center justify-center space-x-4 text-xs text-slate-500 dark:text-slate-400 pt-2"
               >
-                View Profile
-                <svg
-                  class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  ></path>
-                </svg>
+                <span class="flex items-center"> {{ alum.gender }} </span>
               </div>
             </div>
-          </a>
-          {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-16">
-          <svg
-            class="w-24 h-24 mx-auto text-slate-300 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
-            <path
-              d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-            ></path>
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
-            ></path>
-          </svg>
-          <h3 class="text-xl font-semibold text-slate-600 mb-2">
-            No Alumni Records Found
-          </h3>
-          <p class="text-slate-500">
-            {% if selected_year %} No alumni found for the class of {{
-            selected_year }}. {% else %} No alumni records available yet. {%
-            endif %}
-          </p>
-        </div>
-        {% endif %}
+          </div>
+
+          <!-- View Profile CTA -->
+          <div class="mt-4 pt-4 border-t border-white/10">
+            <div
+              class="flex items-center justify-center text-blue-500 font-medium text-sm group-hover:text-blue-600 transition-colors duration-200"
+            >
+              View Profile
+              <i
+                class="fas fa-chevron-right ml-2 group-hover:translate-x-1 transition-transform duration-200"
+              ></i>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
       </div>
+
+      <!-- Pagination -->
+      {% if alumni|length > 12 %}
+      <div
+        class="flex items-center justify-between border-t border-white/10 pt-6 mt-6"
+      >
+        <div class="text-sm text-slate-600 dark:text-slate-300">
+          Showing {{ ((page-1)*12)+1 }} to {{ min(page*12, alumni|length) }} of
+          {{ alumni|length }} alumni
+        </div>
+        <div class="flex items-center space-x-2">
+          <a
+            href="?page={{ page-1 }}{% if selected_year %}&year={{ selected_year }}{% endif %}"
+            class="glass px-4 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-white/20 transition-all duration-300 {% if page <= 1 %} opacity-50 cursor-not-allowed {% endif %}"
+            {%
+            if
+            page
+            <="1"
+            %}
+            disabled
+            {%
+            endif
+            %}
+          >
+            <i class="fas fa-chevron-left mr-2"></i>Previous
+          </a>
+          <a
+            href="?page={{ page+1 }}{% if selected_year %}&year={{ selected_year }}{% endif %}"
+            class="glass px-4 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-white/20 transition-all duration-300 {% if page * 12 >= alumni|length %} opacity-50 cursor-not-allowed {% endif %}"
+            {%
+            if
+            page
+            *
+            12
+            >= alumni|length %} disabled {% endif %} > Next<i
+              class="fas fa-chevron-right ml-2"
+            ></i>
+          </a>
+        </div>
+      </div>
+      {% endif %} {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-16">
+        <div
+          class="w-24 h-24 bg-slate-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="fas fa-user-graduate text-slate-500 text-3xl"></i>
+        </div>
+        <h3
+          class="text-2xl font-semibold text-slate-600 dark:text-slate-300 mb-2"
+        >
+          No Alumni Records Found
+        </h3>
+        <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          {% if selected_year %} No alumni found for the class of {{
+          selected_year }}. {% else %} No alumni records available yet. Students
+          will appear here after graduation. {% endif %}
+        </p>
+        <div class="mt-6">
+          <a
+            href="{{ url_for('graduation.graduation_management') }}"
+            class="inline-flex items-center px-6 py-3 glass-strong text-white font-medium rounded-xl hover-lift transition-all duration-300"
+          >
+            <i class="fas fa-graduation-cap mr-2"></i>
+            Manage Graduations
+          </a>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add loading states to filter buttons
+    const filterButtons = document.querySelectorAll(
+      'a[href*="year="], a[href*="page="]'
+    );
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", function (e) {
+        if (!this.getAttribute("disabled")) {
+          const originalContent = this.innerHTML;
+          this.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+          this.style.pointerEvents = "none";
+
+          setTimeout(() => {
+            if (this.innerHTML.includes("Loading...")) {
+              this.innerHTML = originalContent;
+              this.style.pointerEvents = "auto";
+            }
+          }, 3000);
+        }
+      });
+    });
+
+    // Add hover effects to alumni cards
+    const alumniCards = document.querySelectorAll(".professional-card a");
+    alumniCards.forEach((card) => {
+      card.addEventListener("mouseenter", function () {
+        this.style.transform = "translateY(-8px)";
+      });
+
+      card.addEventListener("mouseleave", function () {
+        this.style.transform = "translateY(0)";
+      });
+    });
+  });
+</script>
 {% endblock %}

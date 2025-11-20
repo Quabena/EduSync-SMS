@@ -1,49 +1,27 @@
-{% extends "base.html" %} {% block title %}Alumni Details - {{ alumni.full_name
-}}{% endblock %} {% block head %}
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          primary: {
-            50: "#eff6ff",
-            100: "#dbeafe",
-            500: "#3b82f6",
-            600: "#2563eb",
-            700: "#1d4ed8",
-            900: "#1e3a8a",
-          },
-        },
-      },
-    },
-  };
-</script>
-{% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}{{ alumni.full_name }} - Alumni
+Details - EduSync{% endblock %} {% block page_title %}Alumni Profile{% endblock
+%} {% block page_description %}Detailed information and records for {{
+alumni.full_name }}{% endblock %} {% block content %}
 <div class="min-h-screen py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header Section -->
     <div class="mb-8">
-      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-8 py-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h1
-                class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
-              >
-                Alumni Profile
-              </h1>
-              <p class="text-primary-100 mt-1">
-                Detailed information and records
-              </p>
-            </div>
-            <div class="hidden md:block">
-              <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                <p class="text-white font-semibold">
-                  Class of {{ alumni.graduation_year }}
-                </p>
-              </div>
-            </div>
+      <div class="professional-card p-6">
+        <div
+          class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+        >
+          <div>
+            <h1 class="text-4xl font-bold gradient-text mb-2">
+              Alumni Profile
+            </h1>
+            <p class="text-lg text-slate-600 dark:text-slate-300">
+              Detailed information and records for {{ alumni.full_name }}
+            </p>
+          </div>
+          <div class="glass px-4 py-2 rounded-xl">
+            <p class="text-slate-700 dark:text-slate-200 font-semibold">
+              Class of {{ alumni.graduation_year }}
+            </p>
           </div>
         </div>
       </div>
@@ -52,68 +30,61 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Profile Card - Sticky on Desktop -->
       <div class="lg:col-span-1">
-        <div
-          class="bg-white rounded-2xl shadow-xl overflow-hidden sticky top-8"
-        >
-          <div
-            class="bg-gradient-to-br from-primary-500 to-primary-600 px-6 py-8 text-center"
-          >
-            {% if alumni.photo_path %}
-            <div class="relative inline-block">
+        <div class="professional-card p-6 sticky top-8">
+          <div class="text-center">
+            <!-- Alumni Photo -->
+            <div class="relative inline-block mb-4">
+              {% if alumni.photo_path %}
               <img
                 src="{{ url_for('students.student_photo', filename=alumni.photo_path) }}"
-                class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover mx-auto"
+                class="w-32 h-32 rounded-2xl object-cover border-4 border-white/20 shadow-xl"
                 alt="{{ alumni.full_name }}"
               />
+              {% else %}
               <div
-                class="absolute -bottom-2 -right-2 bg-green-500 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center"
+                class="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center border-4 border-white/20 shadow-xl"
+              >
+                <i class="fas fa-user-graduate text-white text-3xl"></i>
+              </div>
+              {% endif %}
+              <div
+                class="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center"
               >
                 <i class="fas fa-check text-white text-xs"></i>
               </div>
             </div>
-            {% else %}
-            <div class="relative inline-block">
-              <div
-                class="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-full border-4 border-white shadow-lg flex items-center justify-center mx-auto"
-              >
-                <i class="fas fa-user text-white text-4xl"></i>
-              </div>
-              <div
-                class="absolute -bottom-2 -right-2 bg-gray-400 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center"
-              >
-                <i class="fas fa-camera text-white text-xs"></i>
-              </div>
-            </div>
-            {% endif %}
 
-            <h2 class="text-2xl font-bold text-gray-700 mt-4">
+            <!-- Alumni Info -->
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">
               {{ alumni.full_name }}
             </h2>
-            <p class="text-primary-100 font-medium">{{ alumni.final_class }}</p>
-            <div
-              class="mt-4 inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-4 py-2"
-            >
-              <i class="fas fa-graduation-cap text-gray-500 mr-2"></i>
-              <span class="text-gray-500 font-semibold"
-                >{{ alumni.graduation_year }}</span
-              >
-            </div>
-          </div>
+            <p class="text-slate-600 dark:text-slate-300 font-medium mb-4">
+              {{ alumni.final_class }}
+            </p>
 
-          <div class="p-6">
-            <div class="space-y-4">
-              <div class="flex items-center text-gray-600">
-                <i class="fas fa-birthday-cake w-5 text-primary-500 mr-3"></i>
+            <div
+              class="glass px-4 py-2 rounded-xl inline-flex items-center mb-6"
+            >
+              <i class="fas fa-graduation-cap text-blue-500 mr-2"></i>
+              <span class="text-slate-700 dark:text-slate-200 font-semibold">
+                {{ alumni.graduation_year }}
+              </span>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="space-y-4 text-left">
+              <div class="flex items-center text-slate-600 dark:text-slate-300">
+                <i class="fas fa-birthday-cake w-5 text-blue-500 mr-3"></i>
                 <span class="text-sm">{{ alumni.age }} years old</span>
               </div>
-              <div class="flex items-center text-gray-600">
-                <i class="fas fa-map-marker-alt w-5 text-primary-500 mr-3"></i>
+              <div class="flex items-center text-slate-600 dark:text-slate-300">
+                <i class="fas fa-map-marker-alt w-5 text-blue-500 mr-3"></i>
                 <span class="text-sm"
                   >{{ alumni.hometown or 'Hometown not specified' }}</span
                 >
               </div>
-              <div class="flex items-center text-gray-600">
-                <i class="fas fa-venus-mars w-5 text-primary-500 mr-3"></i>
+              <div class="flex items-center text-slate-600 dark:text-slate-300">
+                <i class="fas fa-venus-mars w-5 text-blue-500 mr-3"></i>
                 <span class="text-sm">{{ alumni.gender }}</span>
               </div>
             </div>
@@ -122,223 +93,265 @@
       </div>
 
       <!-- Main Content -->
-      <div class="lg:col-span-2 space-y-8">
+      <div class="lg:col-span-2 space-y-6">
         <!-- Personal Information -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
-            <h3 class="text-xl font-bold text-white flex items-center">
-              <i class="fas fa-user-circle mr-3"></i>
-              Personal Information
-            </h3>
+        <div class="professional-card p-6">
+          <div class="flex items-center mb-6">
+            <div
+              class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-user-circle text-blue-500"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-slate-800 dark:text-white">
+                Personal Information
+              </h3>
+              <p class="text-slate-600 dark:text-slate-300 text-sm">
+                Basic details and admission information
+              </p>
+            </div>
           </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-4">
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <label
-                    class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
-                    >Date of Birth</label
-                  >
-                  <p class="text-lg font-medium text-gray-900 mt-1">
-                    {{ alumni.date_of_birth.strftime('%B %d, %Y') }}
-                  </p>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <label
-                    class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
-                    >Religion</label
-                  >
-                  <p class="text-lg font-medium text-gray-900 mt-1">
-                    {{ alumni.religion or 'Not specified' }}
-                  </p>
-                </div>
-              </div>
-              <div class="space-y-4">
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <label
-                    class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
-                    >Admission Date</label
-                  >
-                  <p class="text-lg font-medium text-gray-900 mt-1">
-                    {{ alumni.admission_date.strftime('%B %d, %Y') if
-                    alumni.admission_date else 'Not available' }}
-                  </p>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <label
-                    class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
-                    >Graduation Date</label
-                  >
-                  <p class="text-lg font-medium text-gray-900 mt-1">
-                    {{ alumni.graduation_date.strftime('%B %d, %Y') if
-                    alumni.graduation_date else 'Not available' }}
-                  </p>
-                </div>
-              </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="glass p-4 rounded-xl">
+              <label
+                class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
+              >
+                Date of Birth
+              </label>
+              <p
+                class="text-lg font-medium text-slate-800 dark:text-white mt-1"
+              >
+                {{ alumni.date_of_birth.strftime('%B %d, %Y') }}
+              </p>
+            </div>
+            <div class="glass p-4 rounded-xl">
+              <label
+                class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
+              >
+                Religion
+              </label>
+              <p
+                class="text-lg font-medium text-slate-800 dark:text-white mt-1"
+              >
+                {{ alumni.religion or 'Not specified' }}
+              </p>
+            </div>
+            <div class="glass p-4 rounded-xl">
+              <label
+                class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
+              >
+                Admission Date
+              </label>
+              <p
+                class="text-lg font-medium text-slate-800 dark:text-white mt-1"
+              >
+                {{ alumni.admission_date.strftime('%B %d, %Y') if
+                alumni.admission_date else 'Not available' }}
+              </p>
+            </div>
+            <div class="glass p-4 rounded-xl">
+              <label
+                class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
+              >
+                Graduation Date
+              </label>
+              <p
+                class="text-lg font-medium text-slate-800 dark:text-white mt-1"
+              >
+                {{ alumni.graduation_date.strftime('%B %d, %Y') if
+                alumni.graduation_date else 'Not available' }}
+              </p>
             </div>
           </div>
         </div>
 
         <!-- Family Information -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div
-            class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4"
-          >
-            <h3 class="text-xl font-bold text-white flex items-center">
-              <i class="fas fa-users mr-3"></i>
-              Family Information
-            </h3>
+        <div class="professional-card p-6">
+          <div class="flex items-center mb-6">
+            <div
+              class="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-users text-emerald-500"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-slate-800 dark:text-white">
+                Family Information
+              </h3>
+              <p class="text-slate-600 dark:text-slate-300 text-sm">
+                Parent and guardian details
+              </p>
+            </div>
           </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-4">
-                <div
-                  class="bg-emerald-50 rounded-lg p-4 border border-emerald-100"
-                >
-                  <label
-                    class="text-sm font-semibold text-emerald-700 uppercase tracking-wide flex items-center"
-                  >
-                    <i class="fas fa-male mr-2"></i>Father's Name
-                  </label>
-                  <p class="text-lg font-medium text-gray-900 mt-1">
-                    {{ alumni.father_name or 'Not provided' }}
-                  </p>
-                </div>
-                <div class="bg-pink-50 rounded-lg p-4 border border-pink-100">
-                  <label
-                    class="text-sm font-semibold text-pink-700 uppercase tracking-wide flex items-center"
-                  >
-                    <i class="fas fa-female mr-2"></i>Mother's Name
-                  </label>
-                  <p class="text-lg font-medium text-gray-900 mt-1">
-                    {{ alumni.mother_name or 'Not provided' }}
-                  </p>
-                </div>
-              </div>
-              <div class="space-y-4">
-                <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                  <label
-                    class="text-sm font-semibold text-blue-700 uppercase tracking-wide flex items-center"
-                  >
-                    <i class="fas fa-user-shield mr-2"></i>Guardian's Name
-                  </label>
-                  <p class="text-lg font-medium text-gray-900 mt-1">
-                    {{ alumni.guardian_name or 'Not provided' }}
-                  </p>
-                </div>
-                <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                  <label
-                    class="text-sm font-semibold text-blue-700 uppercase tracking-wide flex items-center"
-                  >
-                    <i class="fas fa-phone mr-2"></i>Guardian's Contact
-                  </label>
-                  <p class="text-lg font-medium text-gray-900 mt-1">
-                    {{ alumni.guardian_contact or 'Not provided' }}
-                  </p>
-                </div>
-              </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="glass p-4 rounded-xl border-l-4 border-emerald-500">
+              <label
+                class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide flex items-center"
+              >
+                <i class="fas fa-male mr-2 text-emerald-500"></i>Father's Name
+              </label>
+              <p
+                class="text-lg font-medium text-slate-800 dark:text-white mt-1"
+              >
+                {{ alumni.father_name or 'Not provided' }}
+              </p>
+            </div>
+            <div class="glass p-4 rounded-xl border-l-4 border-pink-500">
+              <label
+                class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide flex items-center"
+              >
+                <i class="fas fa-female mr-2 text-pink-500"></i>Mother's Name
+              </label>
+              <p
+                class="text-lg font-medium text-slate-800 dark:text-white mt-1"
+              >
+                {{ alumni.mother_name or 'Not provided' }}
+              </p>
+            </div>
+            <div class="glass p-4 rounded-xl border-l-4 border-blue-500">
+              <label
+                class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide flex items-center"
+              >
+                <i class="fas fa-user-shield mr-2 text-blue-500"></i>Guardian's
+                Name
+              </label>
+              <p
+                class="text-lg font-medium text-slate-800 dark:text-white mt-1"
+              >
+                {{ alumni.guardian_name or 'Not provided' }}
+              </p>
+            </div>
+            <div class="glass p-4 rounded-xl border-l-4 border-blue-500">
+              <label
+                class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide flex items-center"
+              >
+                <i class="fas fa-phone mr-2 text-blue-500"></i>Guardian's
+                Contact
+              </label>
+              <p
+                class="text-lg font-medium text-slate-800 dark:text-white mt-1"
+              >
+                {{ alumni.guardian_contact or 'Not provided' }}
+              </p>
             </div>
           </div>
         </div>
 
         {% if graduation_record %}
         <!-- Graduation Details -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
-            <h3 class="text-xl font-bold text-white flex items-center">
-              <i class="fas fa-graduation-cap mr-3"></i>
-              Academic Performance
-            </h3>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div
-                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200"
-              >
-                <div class="flex items-center justify-between">
-                  <div>
-                    <label
-                      class="text-sm font-semibold text-purple-700 uppercase tracking-wide"
-                      >Final Grade</label
-                    >
-                    <div class="mt-2">
-                      {% set grade_colors = { 'A': 'bg-green-500 text-white',
-                      'B': 'bg-blue-500 text-white', 'C': 'bg-yellow-500
-                      text-white', 'D': 'bg-orange-500 text-white' } %}
-                      <span
-                        class="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold {{ grade_colors.get(graduation_record.final_grade, 'bg-gray-500 text-white') }}"
-                      >
-                        {{ graduation_record.final_grade or 'N/A' }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="text-4xl text-purple-300">
-                    <i class="fas fa-award"></i>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-6 border border-indigo-200"
-              >
-                <div class="flex items-center justify-between">
-                  <div>
-                    <label
-                      class="text-sm font-semibold text-indigo-700 uppercase tracking-wide"
-                      >Status</label
-                    >
-                    <div class="mt-2">
-                      <span
-                        class="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold {% if graduation_record.status == 'completed' %}bg-green-500 text-white{% else %}bg-yellow-500 text-white{% endif %}"
-                      >
-                        <i
-                          class="fas fa-{% if graduation_record.status == 'completed' %}check-circle{% else %}clock{% endif %} mr-2"
-                        ></i>
-                        {{ graduation_record.status|title }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="text-4xl text-indigo-300">
-                    <i class="fas fa-certificate"></i>
-                  </div>
-                </div>
-              </div>
+        <div class="professional-card p-6">
+          <div class="flex items-center mb-6">
+            <div
+              class="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-graduation-cap text-purple-500"></i>
             </div>
-
-            {% if graduation_record.remarks %}
-            <div class="mt-6 bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <label
-                class="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center"
-              >
-                <i class="fas fa-comment-alt mr-2"></i>Remarks
-              </label>
-              <p class="text-gray-900 mt-2 leading-relaxed">
-                {{ graduation_record.remarks }}
+            <div>
+              <h3 class="text-xl font-bold text-slate-800 dark:text-white">
+                Academic Performance
+              </h3>
+              <p class="text-slate-600 dark:text-slate-300 text-sm">
+                Final results and graduation status
               </p>
             </div>
-            {% endif %}
           </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div
+              class="glass p-6 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/10"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <label
+                    class="text-sm font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide"
+                  >
+                    Final Grade
+                  </label>
+                  <div class="mt-2">
+                    {% set grade_colors = { 'A': 'bg-emerald-500 text-white',
+                    'B': 'bg-blue-500 text-white', 'C': 'bg-amber-500
+                    text-white', 'D': 'bg-orange-500 text-white' } %}
+                    <span
+                      class="inline-flex items-center px-4 py-2 rounded-xl text-lg font-bold {{ grade_colors.get(graduation_record.final_grade, 'bg-slate-500 text-white') }}"
+                    >
+                      {{ graduation_record.final_grade or 'N/A' }}
+                    </span>
+                  </div>
+                </div>
+                <i class="fas fa-award text-purple-500 text-3xl"></i>
+              </div>
+            </div>
+
+            <div
+              class="glass p-6 rounded-xl bg-gradient-to-br from-indigo-500/10 to-indigo-600/10"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <label
+                    class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide"
+                  >
+                    Status
+                  </label>
+                  <div class="mt-2">
+                    <span
+                      class="inline-flex items-center px-4 py-2 rounded-xl text-lg font-bold {% if graduation_record.status == 'completed' %}bg-emerald-500 text-white{% else %}bg-amber-500 text-white{% endif %}"
+                    >
+                      <i
+                        class="fas fa-{% if graduation_record.status == 'completed' %}check-circle{% else %}clock{% endif %} mr-2"
+                      ></i>
+                      {{ graduation_record.status|title }}
+                    </span>
+                  </div>
+                </div>
+                <i class="fas fa-certificate text-indigo-500 text-3xl"></i>
+              </div>
+            </div>
+          </div>
+
+          {% if graduation_record.remarks %}
+          <div class="glass p-6 rounded-xl border-l-4 border-blue-500">
+            <label
+              class="text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wide flex items-center"
+            >
+              <i class="fas fa-comment-alt mr-2 text-blue-500"></i>Remarks
+            </label>
+            <p class="text-slate-800 dark:text-slate-100 mt-2 leading-relaxed">
+              {{ graduation_record.remarks }}
+            </p>
+          </div>
+          {% endif %}
         </div>
         {% endif %} {% if alumni.medical_records %}
         <!-- Medical Records -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4">
-            <h3 class="text-xl font-bold text-white flex items-center">
-              <i class="fas fa-heartbeat mr-3"></i>
-              Medical Records
-            </h3>
+        <div class="professional-card p-6">
+          <div class="flex items-center mb-6">
+            <div
+              class="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-heartbeat text-red-500"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-slate-800 dark:text-white">
+                Medical Records
+              </h3>
+              <p class="text-slate-600 dark:text-slate-300 text-sm">
+                Health and medical information
+              </p>
+            </div>
           </div>
-          <div class="p-6">
-            <div class="bg-red-50 rounded-xl p-6 border border-red-200">
-              <div class="flex items-start">
-                <div class="flex-shrink-0">
-                  <i class="fas fa-notes-medical text-red-500 text-2xl"></i>
-                </div>
-                <div class="ml-4">
-                  <p class="text-gray-900 leading-relaxed">
-                    {{ alumni.medical_records }}
-                  </p>
-                </div>
+
+          <div
+            class="glass p-6 rounded-xl bg-red-500/5 border-l-4 border-red-500"
+          >
+            <div class="flex items-start">
+              <i
+                class="fas fa-notes-medical text-red-500 text-xl mt-1 mr-4"
+              ></i>
+              <div>
+                <p class="text-slate-800 dark:text-slate-100 leading-relaxed">
+                  {{ alumni.medical_records }}
+                </p>
               </div>
             </div>
           </div>
@@ -346,35 +359,65 @@
         {% endif %}
 
         <!-- Action Buttons -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="p-6">
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="{{ url_for('graduation.alumni_list') }}"
-                class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                <i class="fas fa-arrow-left mr-2"></i>
-                Back to Alumni List
-              </a>
+        <div class="professional-card p-6">
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="{{ url_for('graduation.alumni_list') }}"
+              class="inline-flex items-center justify-center px-6 py-3 glass text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-white/20 transition-all duration-300"
+            >
+              <i class="fas fa-arrow-left mr-2"></i>
+              Back to Alumni List
+            </a>
 
-              <button
-                class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-base font-medium text-gray-700 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                <i class="fas fa-edit mr-2"></i>
-                Edit Profile
-              </button>
+            <button
+              class="inline-flex items-center justify-center px-6 py-3 glass text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-white/20 transition-all duration-300"
+            >
+              <i class="fas fa-edit mr-2"></i>
+              Edit Profile
+            </button>
 
-              <button
-                class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                <i class="fas fa-download mr-2"></i>
-                Export PDF
-              </button>
-            </div>
+            <button
+              class="inline-flex items-center justify-center px-6 py-3 glass-strong text-white font-medium rounded-xl hover-lift transition-all duration-300"
+            >
+              <i class="fas fa-download mr-2"></i>
+              Export PDF
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add loading states to action buttons
+    const actionButtons = document.querySelectorAll(
+      'button, a[href*="alumni_list"]'
+    );
+    actionButtons.forEach((button) => {
+      button.addEventListener("click", function (e) {
+        if (!this.getAttribute("disabled") && this.tagName === "BUTTON") {
+          const originalContent = this.innerHTML;
+          this.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+          this.style.pointerEvents = "none";
+
+          setTimeout(() => {
+            if (this.innerHTML.includes("Processing...")) {
+              this.innerHTML = originalContent;
+              this.style.pointerEvents = "auto";
+            }
+          }, 2000);
+        }
+      });
+    });
+
+    // Add smooth animations to cards
+    const cards = document.querySelectorAll(".professional-card");
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+    });
+  });
+</script>
 {% endblock %}

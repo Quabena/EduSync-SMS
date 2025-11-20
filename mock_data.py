@@ -1,6 +1,6 @@
 # mock_data.py
 import random
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, time
 from faker import Faker
 from sqlalchemy.exc import IntegrityError
 from app.models import (
@@ -27,6 +27,11 @@ from app.models import (
     StudentRemarks,
     GraduationStatus,
     Alumni,
+    PromotionPath,
+    PromotionRecord,
+    TeacherAttendance,
+    AttendanceSettings,
+    SchoolCalendar,
 )
 
 fake = Faker()
@@ -60,42 +65,43 @@ def create_school_info():
 
 
 def create_term_dates():
-    """Create term dates for current and previous years (robust to month rollover)."""
+    """Create term dates for current and previous years"""
     term_dates = []
     current_year = datetime.now().year
 
-    def safe_date_from_year_and_month(y, month, day):
-        """
-        Convert possibly out-of-range month into a valid date by carrying months into next year(s).
-        Example: (2024, 13, 15) -> date(2025, 1, 15)
-        """
-        year_offset, month_in_year = divmod(month - 1, 12)
-        real_year = y + year_offset
-        real_month = month_in_year + 1
-        return date(real_year, real_month, day)
-
     for year in range(current_year - 2, current_year + 1):
-        for term_num, term_name in enumerate(["Term 1", "Term 2", "Term 3"], 1):
-            start_month = (term_num - 1) * 4 + 1
-            end_month = start_month + 3
-            vacation_month = end_month + 1
-            reopening_month = vacation_month + 2
+        # Term 1: January - April
+        term1 = TermDates(
+            academic_year=f"{year}/{year+1}",
+            term="Term 1",
+            start_date=date(year, 1, 10),
+            end_date=date(year, 4, 5),
+            vacation_date=date(year, 4, 6),
+            reopening_date=date(year, 5, 6),
+        )
 
-            start_date = safe_date_from_year_and_month(year, start_month, 1)
-            end_date = safe_date_from_year_and_month(year, end_month, 28)
-            vacation_date = safe_date_from_year_and_month(year, vacation_month, 15)
-            reopening_date = safe_date_from_year_and_month(year, reopening_month, 8)
+        # Term 2: May - August
+        term2 = TermDates(
+            academic_year=f"{year}/{year+1}",
+            term="Term 2",
+            start_date=date(year, 5, 7),
+            end_date=date(year, 8, 2),
+            vacation_date=date(year, 8, 3),
+            reopening_date=date(year, 9, 3),
+        )
 
-            term_date = TermDates(
-                academic_year=f"{year}/{year+1}",
-                term=term_name,
-                start_date=start_date,
-                end_date=end_date,
-                vacation_date=vacation_date,
-                reopening_date=reopening_date,
-            )
-            term_dates.append(term_date)
-            db.session.add(term_date)
+        # Term 3: September - December
+        term3 = TermDates(
+            academic_year=f"{year}/{year+1}",
+            term="Term 3",
+            start_date=date(year, 9, 4),
+            end_date=date(year, 12, 15),
+            vacation_date=date(year, 12, 16),
+            reopening_date=date(year + 1, 1, 8),
+        )
+
+        term_dates.extend([term1, term2, term3])
+        db.session.add_all([term1, term2, term3])
 
     db.session.commit()
     print(f"Created {len(term_dates)} term date records")
@@ -106,22 +112,20 @@ def create_classes():
     classes = []
     levels = ["JHS 1", "JHS 2", "JHS 3"]
     sections = ["A", "B"]
-    master_classes = ["JHS 1", "JHS 2", "JHS 3"]
 
-    for _ in range(NUM_CLASSES):
-        level = random.choice(levels)
-        section = random.choice(sections)
-        master_class = random.choice(master_classes)
-        class_ = Class(
-            name=f"{level} {section}",
-            level=level,
-            section=section,
-            master_class=master_class,
-            is_alumni_class=False,
-        )
-        classes.append(class_)
-        db.session.add(class_)
+    for level in levels:
+        for section in sections:
+            class_ = Class(
+                name=f"{level} {section}",
+                level=level,
+                section=section,
+                master_class=level,
+                is_alumni_class=False,
+            )
+            classes.append(class_)
+            db.session.add(class_)
 
+    # Create alumni classes
     current_year = datetime.now().year
     for year in range(current_year - 3, current_year):
         alumni_class = Class(
@@ -140,27 +144,26 @@ def create_classes():
         return classes
     except IntegrityError:
         db.session.rollback()
-        return create_classes()
+        return Class.query.all()
 
 
 def create_subjects():
     subjects = []
-    subject_names = [
-        "Mathematics",
-        "English Language",
-        "Integrated Science",
-        "Social Studies",
-        "Computing",
-        "Religious and Moral Education",
-        "French",
-        "Ghanaian Language",
-        "Career Technology",
-        "Creative Arts",
+    subject_data = [
+        ("Mathematics", "MATH", True),
+        ("English Language", "ENG", True),
+        ("Integrated Science", "SCI", True),
+        ("Social Studies", "SOC", True),
+        ("Computing", "COMP", False),
+        ("Religious and Moral Education", "RME", False),
+        ("French", "FREN", False),
+        ("Ghanaian Language", "LANG", False),
+        ("Career Technology", "TECH", False),
+        ("Creative Arts", "ARTS", False),
     ]
 
-    for i, name in enumerate(subject_names[:NUM_SUBJECTS]):
-        code = f"SUB{i+1:03d}"
-        subject = Subject(name=name, code=code)
+    for name, code, is_core in subject_data:
+        subject = Subject(name=name, code=code, is_core=is_core)
         subjects.append(subject)
         db.session.add(subject)
 
@@ -170,12 +173,10 @@ def create_subjects():
 
 
 def create_teachers(classes, subjects):
-    """
-    Create teachers. Ensure teacher is added to session *before* mutating relationships
-    to avoid SAWarning where relationship changes happen on objects not in session.
-    """
     teachers = []
-    specializations = random.choices(subjects, k=NUM_TEACHERS)
+    ranks = ["Assistant Director", "Director", "Principal", "Head"]
+    staff_roles = ["Teacher", "Head of Department", "Assistant Head", "Coordinator"]
+    marital_statuses = ["Single", "Married", "Divorced", "Widowed"]
 
     for i in range(NUM_TEACHERS):
         gender = random.choice(["Male", "Female"])
@@ -183,62 +184,66 @@ def create_teachers(classes, subjects):
             fake.first_name_male() if gender == "Male" else fake.first_name_female()
         )
 
-        # Build teacher without setting relationship attributes that reference other persistent objects
         teacher = Teacher(
             first_name=first_name,
             middle_name=fake.first_name(),
             surname=fake.last_name(),
             gender=gender,
             date_of_birth=fake.date_of_birth(minimum_age=25, maximum_age=60),
-            hometown=fake.city(),
-            college_attended=fake.company(),
-            area_of_specialization=fake.job(),
-            academic_certificate=random.choice(["B.Ed", "M.Ed", "PhD"]),
-            academic_area_of_study=random.choice(
-                ["Education", "Mathematics", "Science"]
+            date_posted_to_present_station=fake.date_between(
+                start_date="-10y", end_date="today"
             ),
-            academic_college=fake.company(),
+            first_appointment_date=fake.date_between(start_date="-20y", end_date="-5y"),
+            last_promotion_date=fake.date_between(start_date="-5y", end_date="today"),
+            hometown=fake.city(),
+            live_at=fake.city(),
+            digital_address=fake.bothify("??-####-####"),
+            college_attended=fake.company() + " University",
+            area_of_specialization=random.choice(
+                ["Mathematics", "Science", "Languages", "Arts"]
+            ),
+            academic_certificate=random.choice(["B.Ed", "M.Ed", "PhD", "Diploma"]),
+            academic_area_of_study=random.choice(
+                ["Education", "Mathematics", "Science", "English"]
+            ),
+            academic_college=fake.company() + " University",
             professional_certificate=random.choice(
                 ["Teacher Cert A", "Diploma", "PGCE"]
             ),
             professional_area_of_study=random.choice(
                 ["Teaching", "Education Management"]
             ),
-            professional_college=fake.company(),
-            staff_id=f"STAFF{i:04d}",
-            registered_number=f"TCH-{fake.unique.random_number(digits=6)}",
-            ntc_number=f"NTC-{fake.unique.random_number(digits=8)}",
-            ssnit_number=f"SSN-{fake.unique.random_number(digits=9)}",
+            professional_college=fake.company() + " College",
+            staff_id=f"STAFF{i+1:04d}",
+            registered_number=f"TCH{fake.unique.random_number(digits=6)}",
+            ntc_number=f"NTC{fake.unique.random_number(digits=8)}",
+            ssnit_number=f"SSN{fake.unique.random_number(digits=9)}",
             phone_number=fake.unique.numerify("05########"),
             email=fake.unique.email(),
+            current_rank=random.choice(ranks),
+            salary_grade=random.choice(["15", "16", "17", "18"]),
+            salary_grade_type=random.choice(["SS", "TS"]),
             emergency_contact_name=fake.name(),
             emergency_contact_number=fake.numerify("05########"),
-            certificate_paths="certificates/"
-            + ",".join(
-                [
-                    f"{fake.file_name(extension='pdf')}"
-                    for _ in range(random.randint(1, 3))
-                ]
+            certificate_paths=",".join(
+                [f"cert_{i}.pdf" for i in range(1, random.randint(2, 4))]
             ),
+            status=random.choice(["Active", "On Leave", "Retired"]),
+            staff_role=random.choice(staff_roles),
+            marital_status=random.choice(marital_statuses),
+            specialization=random.choice(subjects),
         )
 
-        # Add to session first
         db.session.add(teacher)
-        # Flush not strictly necessary here, but safe if we ever need id immediately:
-        # db.session.flush()
-
-        # Now it's safe to set relationships referencing persistent Subject/Class objects
-        # assign specialization safely
-        teacher.specialization = specializations[i]
+        teachers.append(teacher)
 
         # Assign to 1-3 random classes (only non-alumni classes)
         active_classes = [c for c in classes if not c.is_alumni_class]
-        k = min(3, len(active_classes))
-        if k >= 1:
-            selected_classes = random.sample(active_classes, k=random.randint(1, k))
+        if active_classes:
+            selected_classes = random.sample(
+                active_classes, k=min(3, len(active_classes))
+            )
             teacher.classes.extend(selected_classes)
-
-        teachers.append(teacher)
 
     db.session.commit()
     print(f"Created {len(teachers)} teachers")
@@ -254,25 +259,29 @@ def create_teacher_subject_assignments(teachers, classes, subjects):
         if not active_classes or not subjects:
             continue
 
+        # Each teacher gets 2-4 subject-class assignments
         num_assignments = random.randint(2, min(4, len(subjects), len(active_classes)))
+        assigned_combinations = set()
 
         for _ in range(num_assignments):
             subject = random.choice(subjects)
             class_ = random.choice(active_classes)
 
-            existing = TeacherSubjectClass.query.filter_by(
-                teacher_id=teacher.id, subject_id=subject.id, class_id=class_.id
-            ).first()
+            # Avoid duplicate assignments
+            combo = (teacher.id, subject.id, class_.id)
+            if combo in assigned_combinations:
+                continue
 
-            if not existing:
-                assignment = TeacherSubjectClass(
-                    teacher_id=teacher.id,
-                    subject_id=subject.id,
-                    class_id=class_.id,
-                    is_active=True,
-                )
-                assignments.append(assignment)
-                db.session.add(assignment)
+            assigned_combinations.add(combo)
+
+            assignment = TeacherSubjectClass(
+                teacher_id=teacher.id,
+                subject_id=subject.id,
+                class_id=class_.id,
+                is_active=True,
+            )
+            assignments.append(assignment)
+            db.session.add(assignment)
 
     db.session.commit()
     print(f"Created {len(assignments)} teacher-subject-class assignments")
@@ -280,14 +289,17 @@ def create_teacher_subject_assignments(teachers, classes, subjects):
 
 
 def create_students(classes, subjects):
-    """
-    Create students. Add student to session before mutating relationships
-    (student.subjects) to avoid SAWarning and missing association rows.
-    """
     students = []
-    learning_styles = ["Visual", "Auditory", "Kinesthetic", "Reading/Writing"]
+    interests = [
+        "Sports",
+        "Arts",
+        "Science",
+        "Technology",
+        "Music",
+        "Reading",
+        "Dancing",
+    ]
     religions = ["Christian", "Muslim", "Traditionalist", "None"]
-    photo_paths = [None]
 
     active_classes = [c for c in classes if not c.is_alumni_class]
     if not active_classes:
@@ -308,40 +320,34 @@ def create_students(classes, subjects):
             surname=fake.last_name(),
             gender=gender,
             date_of_birth=fake.date_of_birth(minimum_age=10, maximum_age=18),
-            admission_date=date(
-                random.randint(2017, 2022), random.randint(1, 12), random.randint(1, 28)
-            ),
+            admission_date=fake.date_between(start_date="-5y", end_date="today"),
             hometown=fake.city(),
+            live_at=fake.city(),
+            digital_address=fake.bothify("??-####-####"),
             father_name=fake.name_male(),
             mother_name=fake.name_female(),
             guardian_name=fake.name(),
             guardian_contact=fake.numerify("05########"),
-            medical_records=fake.text(max_nb_chars=200),
+            religion=random.choice(religions),
+            medical_records=(
+                fake.text(max_nb_chars=200) if random.random() < 0.3 else None
+            ),
+            height=random.randint(140, 190),
+            weight=random.randint(40, 90),
             class_id=student_class.id,
             original_class_id=student_class.id,
             status="active",
-            religion=random.choice(religions),
-            height=random.randint(140, 190),
-            weight=random.randint(40, 90),
-            photo_path=random.choice(photo_paths),
-            learning_style=random.choice(learning_styles),
+            interest=random.choice(interests),
         )
 
-        # Add student to session before setting relationships
         db.session.add(student)
-        # If we need id immediately: db.session.flush()
-
-        # Enroll in 5-8 subjects defensively
-        max_k = min(8, len(subjects))
-        if max_k >= 5:
-            k = random.randint(5, max_k)
-        else:
-            k = max_k
-        if k > 0:
-            selected_subjects = random.sample(subjects, k=k)
-            student.subjects.extend(selected_subjects)
-
         students.append(student)
+
+        # Enroll in 5-8 subjects
+        if subjects:
+            num_subjects = random.randint(5, min(8, len(subjects)))
+            selected_subjects = random.sample(subjects, num_subjects)
+            student.subjects.extend(selected_subjects)
 
     db.session.commit()
     print(f"Created {len(students)} active students")
@@ -351,7 +357,15 @@ def create_students(classes, subjects):
 def create_graduated_students(classes, subjects):
     """Create some graduated students for testing the alumni system"""
     graduated_students = []
-    learning_styles = ["Visual", "Auditory", "Kinesthetic", "Reading/Writing"]
+    interests = [
+        "Sports",
+        "Arts",
+        "Science",
+        "Technology",
+        "Music",
+        "Reading",
+        "Dancing",
+    ]
     religions = ["Christian", "Muslim", "Traditionalist", "None"]
 
     alumni_classes = [c for c in classes if c.is_alumni_class]
@@ -359,21 +373,21 @@ def create_graduated_students(classes, subjects):
         print("No alumni classes found for graduated students")
         return []
 
-    for i in range(10):
+    for i in range(10):  # Create 10 graduated students
         gender = random.choice(["Male", "Female"])
         first_name = (
             fake.first_name_male() if gender == "Male" else fake.first_name_female()
         )
 
         alumni_class = random.choice(alumni_classes)
-        graduation_year = alumni_class.name.split(" ")[-1]
+        graduation_year = alumni_class.name.split(" ")[
+            -1
+        ]  # Extract year from "Alumni - Class of YYYY"
 
+        # Use an active class as original class
         original_classes = [c for c in classes if not c.is_alumni_class]
         if not original_classes:
-            print(
-                "No original (active) classes available — skipping graduated student creation"
-            )
-            break
+            continue
         original_class = random.choice(original_classes)
 
         student = Student(
@@ -386,44 +400,34 @@ def create_graduated_students(classes, subjects):
                 int(graduation_year) - 3, random.randint(1, 12), random.randint(1, 28)
             ),
             hometown=fake.city(),
+            live_at=fake.city(),
+            digital_address=fake.bothify("??-####-####"),
             father_name=fake.name_male(),
             mother_name=fake.name_female(),
             guardian_name=fake.name(),
             guardian_contact=fake.numerify("05########"),
-            medical_records=fake.text(max_nb_chars=200),
+            religion=random.choice(religions),
+            medical_records=(
+                fake.text(max_nb_chars=200) if random.random() < 0.3 else None
+            ),
             class_id=alumni_class.id,
             original_class_id=original_class.id,
             status="graduated",
-            religion=random.choice(religions),
-            height=random.randint(160, 190),
-            weight=random.randint(50, 90),
-            learning_style=random.choice(learning_styles),
+            interest=random.choice(interests),
         )
 
-        # Add and flush so student.id exists for GraduationStatus/Alumni
         db.session.add(student)
-        try:
-            db.session.flush()
-        except Exception as exc:
-            db.session.rollback()
-            print(
-                f"Error flushing student to DB for {first_name} {student.surname}: {exc}"
-            )
-            raise
+        db.session.flush()  # Get the student ID
 
-        # Enroll in subjects defensively
-        max_k = min(8, len(subjects))
-        if max_k >= 5:
-            k = random.randint(5, max_k)
-        else:
-            k = max_k
-        if k > 0:
-            selected_subjects = random.sample(subjects, k=k)
+        # Enroll in subjects
+        if subjects:
+            num_subjects = random.randint(5, min(8, len(subjects)))
+            selected_subjects = random.sample(subjects, num_subjects)
             student.subjects.extend(selected_subjects)
 
         graduated_students.append(student)
 
-        # GraduationStatus
+        # Create GraduationStatus record
         graduation_status = GraduationStatus(
             student_id=student.id,
             graduation_year=graduation_year,
@@ -434,7 +438,7 @@ def create_graduated_students(classes, subjects):
         )
         db.session.add(graduation_status)
 
-        # Alumni record (original_student_id is now present)
+        # Create Alumni record
         alumni = Alumni(
             original_student_id=student.id,
             first_name=student.first_name,
@@ -452,20 +456,66 @@ def create_graduated_students(classes, subjects):
             guardian_contact=student.guardian_contact,
             religion=student.religion,
             medical_records=student.medical_records,
-            photo_path=student.photo_path,
             final_class=original_class.name,
         )
         db.session.add(alumni)
 
-    try:
-        db.session.commit()
-    except Exception as exc:
-        db.session.rollback()
-        print(f"Error committing graduated students batch: {exc}")
-        raise
-
+    db.session.commit()
     print(f"Created {len(graduated_students)} graduated students with alumni records")
     return graduated_students
+
+
+def create_promotion_paths(classes):
+    """Create promotion paths between classes"""
+    paths = []
+    active_classes = [c for c in classes if not c.is_alumni_class]
+
+    # Create logical promotion paths: JHS 1 -> JHS 2 -> JHS 3
+    jhs1_classes = [c for c in active_classes if c.level == "JHS 1"]
+    jhs2_classes = [c for c in active_classes if c.level == "JHS 2"]
+    jhs3_classes = [c for c in active_classes if c.level == "JHS 3"]
+
+    for from_class in jhs1_classes:
+        for to_class in jhs2_classes:
+            path = PromotionPath(
+                from_class_id=from_class.id,
+                to_class_id=to_class.id,
+                order=1,
+                is_active=True,
+            )
+            paths.append(path)
+            db.session.add(path)
+
+    for from_class in jhs2_classes:
+        for to_class in jhs3_classes:
+            path = PromotionPath(
+                from_class_id=from_class.id,
+                to_class_id=to_class.id,
+                order=2,
+                is_active=True,
+            )
+            paths.append(path)
+            db.session.add(path)
+
+    # JHS 3 to Alumni
+    current_year = datetime.now().year
+    alumni_class = Class.query.filter_by(
+        name=f"Alumni - Class of {current_year}"
+    ).first()
+    if alumni_class:
+        for from_class in jhs3_classes:
+            path = PromotionPath(
+                from_class_id=from_class.id,
+                to_class_id=alumni_class.id,
+                order=3,
+                is_active=True,
+            )
+            paths.append(path)
+            db.session.add(path)
+
+    db.session.commit()
+    print(f"Created {len(paths)} promotion paths")
+    return paths
 
 
 def create_term_scores(students, subjects, teachers):
@@ -480,9 +530,10 @@ def create_term_scores(students, subjects, teachers):
         for subject in student.subjects:
             for term in terms:
                 for year in years:
-                    if random.random() > 0.7:
+                    if random.random() > 0.7:  # 30% chance to create score
                         continue
 
+                    # Find teacher assignment for this subject and class
                     assignment = TeacherSubjectClass.query.filter_by(
                         subject_id=subject.id, class_id=student.class_id, is_active=True
                     ).first()
@@ -490,6 +541,7 @@ def create_term_scores(students, subjects, teachers):
                     if not assignment:
                         continue
 
+                    # Generate component scores
                     individual_test = round(random.uniform(0, 15), 1)
                     group_work = round(random.uniform(0, 15), 1)
                     class_test = round(random.uniform(0, 15), 1)
@@ -529,9 +581,10 @@ def create_student_remarks(students, teachers):
             continue
 
         for term in terms:
-            if random.random() > 0.6:
+            if random.random() > 0.6:  # 40% chance to create remarks
                 continue
 
+            # Find teachers who teach this student's class
             class_teachers = [
                 t for t in teachers if student.class_id in [c.id for c in t.classes]
             ]
@@ -561,11 +614,14 @@ def create_student_remarks(students, teachers):
 
 def create_users(teachers):
     users = []
+
+    # Create admin user
     admin = User(username="admin", email="admin@school.edu.gh", role="admin")
     admin.set_password("admin123")
     users.append(admin)
     db.session.add(admin)
 
+    # Create headteacher user
     headteacher = User(
         username="headteacher", email="head@school.edu.gh", role="headteacher"
     )
@@ -573,6 +629,7 @@ def create_users(teachers):
     users.append(headteacher)
     db.session.add(headteacher)
 
+    # Create teacher users
     for i, teacher in enumerate(teachers[: NUM_USERS - 2]):
         user = User(username=f"teacher{i+1}", email=teacher.email, role="teacher")
         user.set_password(f"teacher{i+1}")
@@ -584,9 +641,130 @@ def create_users(teachers):
     return users
 
 
+def create_attendance_settings(users):
+    """Create default attendance settings"""
+    settings = AttendanceSettings(
+        school_start_time=time(8, 0),  # 8:00 AM
+        school_end_time=time(14, 0),  # 2:00 PM
+        late_threshold_minutes=15,
+        half_day_threshold_hours=4,
+        auto_mark_absent=True,
+        updated_by=users[0].id,  # Use first user (admin)
+    )
+    db.session.add(settings)
+    db.session.commit()
+    print("Created attendance settings")
+    return settings
+
+
+def create_school_calendar():
+    """Create school calendar with school days and holidays"""
+    calendar_entries = []
+    current_year = datetime.now().year
+    start_date = date(current_year, 1, 1)
+    end_date = date(current_year, 12, 31)
+
+    # Major holidays in Ghana
+    holidays = [
+        (date(current_year, 1, 1), "New Year's Day"),
+        (date(current_year, 3, 6), "Independence Day"),
+        (date(current_year, 4, 10), "Easter Friday"),
+        (date(current_year, 5, 1), "Labour Day"),
+        (date(current_year, 12, 25), "Christmas Day"),
+        (date(current_year, 12, 26), "Boxing Day"),
+    ]
+
+    single_date = start_date
+    while single_date <= end_date:
+        # Skip weekends
+        if single_date.weekday() >= 5:
+            day_type = "weekend"
+            description = "Weekend"
+        else:
+            # Check if it's a holiday
+            holiday = next((h for h in holidays if h[0] == single_date), None)
+            if holiday:
+                day_type = "holiday"
+                description = holiday[1]
+            else:
+                day_type = "school_day"
+                description = "Regular school day"
+
+        calendar_entry = SchoolCalendar(
+            date=single_date,
+            day_type=day_type,
+            description=description,
+            term=get_term_for_date(single_date),
+            year=str(current_year),
+        )
+        calendar_entries.append(calendar_entry)
+        db.session.add(calendar_entry)
+
+        single_date += timedelta(days=1)
+
+    db.session.commit()
+    print(f"Created {len(calendar_entries)} school calendar entries")
+    return calendar_entries
+
+
+def get_term_for_date(date_obj):
+    """Determine term based on date"""
+    month = date_obj.month
+    if 1 <= month <= 4:
+        return "Term 1"
+    elif 5 <= month <= 8:
+        return "Term 2"
+    else:
+        return "Term 3"
+
+
+def create_teacher_attendance(teachers, users):
+    """Create teacher attendance records"""
+    records = []
+    start_date = datetime.now() - timedelta(days=30)
+
+    for single_date in (start_date + timedelta(n) for n in range(30)):
+        if single_date.weekday() >= 5:  # Skip weekends
+            continue
+
+        for teacher in teachers:
+            if teacher.status != "Active":
+                continue
+
+            status = random.choices(
+                ["present", "absent", "late", "excused"],
+                weights=[0.80, 0.10, 0.05, 0.05],
+            )[0]
+
+            record = TeacherAttendance(
+                teacher_id=teacher.id,
+                date=single_date.date(),
+                status=status,
+                check_in_time=(
+                    time(7, random.randint(30, 59))
+                    if status in ["present", "late"]
+                    else None
+                ),
+                check_out_time=(
+                    time(14, random.randint(0, 30))
+                    if status in ["present", "late"]
+                    else None
+                ),
+                late_minutes=random.randint(1, 30) if status == "late" else 0,
+                excuse_reason=fake.sentence() if status == "excused" else None,
+                marked_by=random.choice(users).id,
+            )
+            records.append(record)
+            db.session.add(record)
+
+    db.session.commit()
+    print(f"Created {len(records)} teacher attendance records")
+    return records
+
+
 def create_academic_records(students, subjects):
     records = []
-    terms = ["1st Term", "2nd Term", "3rd Term"]
+    terms = ["Term 1", "Term 2", "Term 3"]
     current_year = datetime.now().year
 
     for student in students:
@@ -616,15 +794,16 @@ def create_academic_records(students, subjects):
 def get_grade(score):
     if score >= 80:
         return "1"
-    if score >= 70:
+    elif score >= 70:
         return "2"
-    if score >= 60:
+    elif score >= 60:
         return "3"
-    if score >= 50:
+    elif score >= 50:
         return "4"
-    if score >= 40:
+    elif score >= 40:
         return "5"
-    return "9"
+    else:
+        return "9"
 
 
 def create_medical_records(students):
@@ -641,7 +820,7 @@ def create_medical_records(students):
     ]
 
     for student in students:
-        if random.random() < 0.3:
+        if random.random() < 0.3:  # 30% of students have medical records
             record = MedicalRecord(
                 student_id=student.id,
                 condition=random.choice(conditions),
@@ -664,12 +843,14 @@ def create_attendances(students, classes):
     current_year = str(datetime.now().year)
 
     for single_date in (start_date + timedelta(n) for n in range(DAYS_OF_ATTENDANCE)):
-        if single_date.weekday() >= 5:
+        if single_date.weekday() >= 5:  # Skip weekends
             continue
 
-        if single_date.month <= 4:
+        # Determine term based on month
+        month = single_date.month
+        if 1 <= month <= 4:
             term = "Term 1"
-        elif single_date.month <= 8:
+        elif 5 <= month <= 8:
             term = "Term 2"
         else:
             term = "Term 3"
@@ -688,11 +869,17 @@ def create_attendances(students, classes):
             record = Attendance(
                 student_id=student.id,
                 class_id=student.class_id,
-                date=single_date,
+                date=single_date.date(),
                 term=term,
                 year=current_year,
                 status=status,
                 method=random.choice(["manual", "QR"]),
+                excuse_reason=(
+                    fake.sentence()
+                    if status == "absent" and random.random() < 0.3
+                    else None
+                ),
+                marked_by=1,  # Default to admin user
             )
             records.append(record)
             db.session.add(record)
@@ -725,29 +912,28 @@ def create_enrollments(students, classes):
 
 def create_grades(enrollments, subjects):
     grades = []
-    terms = ["1st Term", "2nd Term", "3rd Term"]
+    terms = ["Term 1", "Term 2", "Term 3"]
 
     for enrollment in enrollments:
-        sample_subjects = subjects[:]
-        if len(sample_subjects) < 5:
-            chosen = sample_subjects
-        else:
-            chosen = random.sample(
-                sample_subjects, k=random.randint(5, min(8, len(sample_subjects)))
-            )
-        for subject in chosen:
+        # Each student takes 5-8 subjects
+        num_subjects = random.randint(5, min(8, len(subjects)))
+        student_subjects = random.sample(subjects, num_subjects)
+
+        for subject in student_subjects:
             for term in terms:
-                if random.random() > 0.6:
-                    score = round(random.uniform(25, 100), 1)
-                    grade = Grade(
-                        enrollment_id=enrollment.id,
-                        subject_id=subject.id,
-                        term=term,
-                        score=score,
-                        remarks=get_grade_remarks(score),
-                    )
-                    grades.append(grade)
-                    db.session.add(grade)
+                if random.random() > 0.6:  # 40% chance to create grade
+                    continue
+
+                score = round(random.uniform(25, 100), 1)
+                grade = Grade(
+                    enrollment_id=enrollment.id,
+                    subject_id=subject.id,
+                    term=term,
+                    score=score,
+                    remarks=get_grade_remarks(score),
+                )
+                grades.append(grade)
+                db.session.add(grade)
 
     db.session.commit()
     print(f"Created {len(grades)} grades")
@@ -757,13 +943,14 @@ def create_grades(enrollments, subjects):
 def get_grade_remarks(score):
     if score >= 80:
         return "Excellent"
-    if score >= 70:
+    elif score >= 70:
         return "Very Good"
-    if score >= 60:
+    elif score >= 60:
         return "Good"
-    if score >= 50:
+    elif score >= 50:
         return "Satisfactory"
-    return "Needs Improvement"
+    else:
+        return "Needs Improvement"
 
 
 def create_hallpasses(students, users):
@@ -772,7 +959,7 @@ def create_hallpasses(students, users):
 
     active_students = [s for s in students if s.status == "active"]
 
-    for student in random.sample(active_students, k=min(200, len(active_students))):
+    for student in random.sample(active_students, k=min(20, len(active_students))):
         issued_at = fake.date_time_between(start_date="-30d", end_date="now")
 
         hallpass = HallPass(
@@ -803,7 +990,12 @@ def create_classrooms(classes):
 
     for class_ in active_classes:
         classroom = Classroom(
-            mood_data={"happy": random.randint(0, 10), "sad": random.randint(0, 5)},
+            mood_data={
+                "happy": random.randint(0, 10),
+                "sad": random.randint(0, 5),
+                "excited": random.randint(0, 8),
+                "focused": random.randint(0, 9),
+            },
             qr_code=f"CLASSQR-{class_.id}",
         )
         classrooms.append(classroom)
@@ -818,10 +1010,11 @@ def create_mood_entries(classes, users):
     entries = []
     sentiments = ["positive", "negative", "neutral"]
     active_classes = [c for c in classes if not c.is_alumni_class]
+
     if not active_classes:
         return entries
 
-    for _ in range(100):
+    for _ in range(50):  # Create 50 mood entries
         mood_entry = MoodEntry(
             class_id=random.choice(active_classes).id,
             notes=fake.sentence(),
@@ -840,7 +1033,8 @@ def create_mood_entries(classes, users):
 def create_assignments(teachers, classes, subjects):
     assignments = []
     active_classes = [c for c in classes if not c.is_alumni_class]
-    if not active_classes or not teachers or not subjects:
+
+    if not active_classes:
         return assignments
 
     for _ in range(NUM_ASSIGNMENTS):
@@ -866,15 +1060,20 @@ def create_student_assignments(assignments, students):
     submissions = []
     statuses = ["not_submitted", "submitted", "graded"]
     active_students = [s for s in students if s.status == "active"]
+
     if not active_students:
         return submissions
 
     for assignment in assignments:
-        candidates = random.sample(active_students, k=min(30, len(active_students)))
-        for student in candidates:
-            if student.class_id != assignment.class_id:
-                continue
+        # Get students in the same class as the assignment
+        class_students = [
+            s for s in active_students if s.class_id == assignment.class_id
+        ]
+        if not class_students:
+            continue
 
+        # Randomly select some students to have submissions
+        for student in random.sample(class_students, k=min(10, len(class_students))):
             status = random.choice(statuses)
             submission = StudentAssignment(
                 student_id=student.id, assignment_id=assignment.id, status=status
@@ -887,6 +1086,7 @@ def create_student_assignments(assignments, students):
                 submission.submission_path = (
                     f"/submissions/{fake.file_name(extension='pdf')}"
                 )
+
                 if status == "graded":
                     submission.marks_obtained = round(
                         random.uniform(0, assignment.total_marks), 1
@@ -904,9 +1104,11 @@ def create_student_assignments(assignments, students):
 def generate_mock_data():
     print("Starting mock data generation...")
 
+    # Clear existing data and create tables
     db.drop_all()
     db.create_all()
 
+    # Create core data
     create_school_info()
     create_term_dates()
     classes = create_classes()
@@ -918,28 +1120,45 @@ def generate_mock_data():
     students = create_students(classes, subjects)
     graduated_students = create_graduated_students(classes, subjects)
     all_students = students + graduated_students
+
+    # Create promotion system
+    create_promotion_paths(classes)
+
+    # Create academic data
     term_scores = create_term_scores(all_students, subjects, teachers)
     student_remarks = create_student_remarks(all_students, teachers)
-    users = create_users(teachers)
 
+    # Create users and system data
+    users = create_users(teachers)
+    create_attendance_settings(users)
+    create_school_calendar()
+
+    # Create additional records
     create_academic_records(all_students, subjects)
     create_medical_records(all_students)
     create_attendances(all_students, classes)
+    create_teacher_attendance(teachers, users)
     enrollments = create_enrollments(all_students, classes)
     create_grades(enrollments, subjects)
     create_hallpasses(all_students, users)
     create_classrooms(classes)
     create_mood_entries(classes, users)
 
+    # Create assignments
     assignments = create_assignments(teachers, classes, subjects)
     create_student_assignments(assignments, all_students)
 
-    print("Mock data generation completed successfully!")
+    print("\nMock data generation completed successfully!")
     print(f"Summary:")
     print(f"- {len(students)} active students")
     print(f"- {len(graduated_students)} graduated students")
+    print(f"- {len(teachers)} teachers")
     print(f"- {len([c for c in classes if not c.is_alumni_class])} active classes")
     print(f"- {len([c for c in classes if c.is_alumni_class])} alumni classes")
+    print(f"- {len(subjects)} subjects")
+    print(f"- {len(users)} users")
+    print(f"- {len(term_scores)} term scores")
+    print(f"- {len(teacher_assignments)} teacher-subject-class assignments")
 
 
 if __name__ == "__main__":

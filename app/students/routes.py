@@ -360,6 +360,7 @@ def edit(student_id):
         student.admission_date = form.admission_date.data
         student.height = form.height.data
         student.weight = form.weight.data
+        student.interest = form.interest.data
 
         try:
             db.session.commit()
@@ -472,7 +473,7 @@ def delete(student_id):
 
 
 # Bulk CSV Export
-@bp.route("/export")
+@bp.route("/export", methods=["GET", "POST"])
 @login_required
 @role_required(["admin", "headteacher"])
 def export_csv():
@@ -539,42 +540,216 @@ def export_csv():
 @role_required(["admin", "headteacher"])
 def import_csv():
     if request.method == "POST":
-        if "csv_file" not in request.files:
-            flash("No file part", "danger")
+
+        # --- FILE VALIDATION ---
+        file = request.files.get("csv_file")
+        if not file or not file.filename:
+            flash("Please select a CSV file.", "danger")
             return redirect(request.url)
 
-        file = request.files["csv_file"]
-        if file.filename == "":
-            flash("No selected file", "danger")
+        filename = (file.filename or "").lower()
+
+        if not filename.endswith(".csv"):
+            flash("Invalid file type. Only CSV files allowed.", "danger")
             return redirect(request.url)
 
-        if file and file.filename.endswith(".csv"):  # type: ignore
-            stream = StringIO(file.stream.read().decode("UTF8"), newline=None)
-            csv_reader = csv.DictReader(stream)
+        # --- OPTIONS ---
+        update_existing = "update_existing" in request.form
+        skip_duplicates = "skip_duplicates" in request.form
 
-            for row in csv_reader:
-                # Parsing data
-                dob = datetime.strptime(row["date_of_birth"], "%Y-%m-%d").date()
+        # --- READ CSV ---
+        try:
+            stream = StringIO(file.stream.read().decode("utf-8"))
+        except Exception:
+            flash("Unable to read CSV file. Ensure UTF-8 encoding.", "danger")
+            return redirect(request.url)
 
+        reader = csv.DictReader(stream)
+        fieldnames = reader.fieldnames or []
+
+        # --- REQUIRED COLUMNS ---
+        required_fields = [
+            "first_name",
+            "surname",
+            "gender",
+            "date_of_birth",
+            "guardian_name",
+            "guardian_contact",
+        ]
+
+        missing_columns = [c for c in required_fields if c not in fieldnames]
+        if missing_columns:
+            flash(f"Missing required columns: {', '.join(missing_columns)}", "danger")
+            return redirect(request.url)
+
+        if not fieldnames:
+            flash("The CSV file appears empty.", "danger")
+            return redirect(request.url)
+
+        imported = 0
+        updated = 0
+        skipped = 0
+        errors = []
+
+        # --- PROCESS ROWS ---
+        for idx, row in enumerate(reader, start=2):  # row number for errors
+            try:
+                # --- DATE OF BIRTH ---
+                raw_dob = row.get("date_of_birth", "").strip()
+                try:
+                    dob = datetime.strptime(raw_dob, "%Y-%m-%d").date()
+                except ValueError:
+                    raise ValueError(f"Invalid date_of_birth format on row {idx}")
+
+                # --- CLASS LOOKUP ---
+                class_val = row.get("class_id", "").strip()
+                class_obj = None
+
+                if class_val:
+                    # Accept ID or class name
+                    if class_val.isdigit():
+                        class_obj = Class.query.get(int(class_val))
+                    else:
+                        class_obj = Class.query.filter_by(name=class_val).first()
+
+                if not class_obj:
+                    raise ValueError(
+                        f"Invalid or unknown class_id/class name on row {idx}"
+                    )
+
+                # --- DUPLICATE RULE ---
+                first = (row.get("first_name") or "").strip()
+                last = (row.get("surname") or "").strip()
+
+                existing = Student.query.filter_by(
+                    first_name=first, surname=last, date_of_birth=dob
+                ).first()
+
+                if existing:
+                    if skip_duplicates and not update_existing:
+                        skipped += 1
+                        continue
+
+                    if update_existing:
+                        existing.middle_name = row.get("middle_name") or None
+                        existing.gender = row.get("gender")
+                        existing.hometown = row.get("hometown") or None
+                        existing.live_at = row.get("live_at") or None
+                        existing.digital_address = row.get("digital_address") or None
+                        existing.father_name = row.get("father_name") or None
+                        existing.mother_name = row.get("mother_name") or None
+                        existing.guardian_name = row.get("guardian_name") or None
+                        existing.guardian_contact = row.get("guardian_contact") or None
+                        existing.medical_records = row.get("medical_records") or None
+                        existing.class_id = class_obj.id
+                        updated += 1
+                        continue
+
+                # --- CREATE NEW STUDENT ---
                 student = Student(
-                    first_name=row["first_name"],
-                    middle_name=row["middle_name"] or None,
-                    surname=row["surname"],
-                    gender=row["gender"],
-                    date_of_birth=row["date_of_birth"],
-                    hometown=row["hometown"] or None,
-                    live_at=row["live_at"] or None,
-                    digital_address=row["digital_address"] or None,
-                    father_name=row["father_name"] or None,
-                    mother_name=row["mother_name"] or None,
-                    guardian_name=row["guardian_name"] or None,
-                    guardian_contact=row["guardian_contact"] or None,
-                    medical_records=row["medical_records"] or None,
-                    class_id=row["class_id"] or None,
+                    first_name=first,
+                    middle_name=row.get("middle_name") or None,
+                    surname=last,
+                    gender=row.get("gender"),
+                    date_of_birth=dob,
+                    hometown=row.get("hometown") or None,
+                    live_at=row.get("live_at") or None,
+                    digital_address=row.get("digital_address") or None,
+                    father_name=row.get("father_name") or None,
+                    mother_name=row.get("mother_name") or None,
+                    guardian_name=row.get("guardian_name") or None,
+                    guardian_contact=row.get("guardian_contact") or None,
+                    medical_records=row.get("medical_records") or None,
+                    class_id=class_obj.id,
                 )
-                db.session.add(student)
 
+                db.session.add(student)
+                imported += 1
+
+            except Exception as e:
+                errors.append(str(e))
+                continue
+
+        # --- COMMIT ---
+        try:
             db.session.commit()
-            flash("Students imported successfully!", "success")
-            return redirect(url_for("students.index"))
+        except Exception:
+            db.session.rollback()
+            flash("A database error occurred. No data was imported.", "danger")
+            return redirect(request.url)
+
+        # --- SUCCESS MESSAGE ---
+        flash(
+            f"Imported: {imported}, Updated: {updated}, Skipped: {skipped}",
+            "success",
+        )
+
+        if errors:
+            flash(
+                "Errors encountered:\n"
+                + "\n".join(errors[:5])
+                + ("…more…" if len(errors) > 5 else ""),
+                "warning",
+            )
+
+        return redirect(url_for("students.index"))
+
     return render_template("students/import.html")
+
+
+# --- csv template ---
+@bp.route("/csv-download", methods=["GET"])
+@login_required
+@role_required(["admin", "headteacher"])
+def download_template():
+
+    # Build CSV in memory
+    output = StringIO()
+    writer = csv.writer(output)
+
+    headers = [
+        "first_name",
+        "middle_name",
+        "surname",
+        "gender",
+        "date_of_birth",
+        "hometown",
+        "live_at",
+        "digital_address",
+        "father_name",
+        "mother_name",
+        "guardian_name",
+        "guardian_contact",
+        "medical_records",
+        "class_id",  # Accepts class ID or class name
+    ]
+
+    writer.writerow(headers)
+
+    # Provide an example row for guidance
+    writer.writerow(
+        [
+            "Kwame",
+            "",
+            "Boateng",
+            "Male",
+            "2008-05-15",
+            "Kumasi",
+            "Atonsu",
+            "AK-123-4567",
+            "Mr Boateng",
+            "Mrs Boateng",
+            "Auntie Mary",
+            "+233501234567",
+            "None",
+            "JHS 1",  # Works even if user enters class name
+        ]
+    )
+
+    output.seek(0)
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=students_template.csv"},
+    )

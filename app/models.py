@@ -126,10 +126,12 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     code = db.Column(db.String(10))
+    is_core = db.Column(db.Boolean, default=False)
 
-    def __init__(self, name, code):
+    def __init__(self, name, code, is_core=False):
         self.name = name
         self.code = code
+        self.is_core = is_core
 
     students = db.relationship(
         "Student", secondary=student_subject, back_populates="subjects"

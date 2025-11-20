@@ -332,6 +332,7 @@ def admin_dashboard():
         class_distribution=class_distribution,
         top_classes=top_classes,
         recent_activities=recent_activities,
+        current_user=current_user,
         date=datetime.now(timezone.utc),
     )
 

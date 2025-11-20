@@ -53,6 +53,7 @@ block content %}
         </p>
 
         <form method="POST" enctype="multipart/form-data" class="space-y-6">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <!-- File Upload Area -->
           <div
             class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 text-center transition-all duration-300 hover:border-blue-500 dark:hover:border-blue-400"
@@ -306,14 +307,14 @@ block content %}
           <pre
             class="text-sm text-slate-200"
           ><code>first_name,surname,gender,date_of_birth,guardian_name,guardian_contact,email,phone
-John,Doe,Male,2008-05-15,Jane Doe,+1234567890,john.doe@email.com,+1234567891
-Jane,Smith,Female,2009-03-22,Robert Smith,+1234567892,jane.smith@email.com,+1234567893</code></pre>
+kwame,boateng,Male,2008-05-15,Jane boateng,+1234567890,kwame.boateng@email.com,+1234567891
+Jane Appiah,Female,2009-03-22,Robert Appiah,+1234567892,jane.appiah@email.com,+1234567893</code></pre>
         </div>
 
         <!-- Download Template -->
         <div class="mt-6 flex justify-center">
           <a
-            href="#"
+            href="{{ url_for('students.download_template') }}"
             class="inline-flex items-center px-6 py-3 glass hover:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl transition-colors duration-200 font-medium"
           >
             <svg

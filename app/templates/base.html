@@ -476,7 +476,7 @@
 
   <div class="min-h-screen relative">
     <!-- Left Sidebar Navigation -->
-    <aside class="sidebar fixed top-0 left-0 h-full glass-strong z-40 flex flex-col border-r border-white/20"
+    <aside class="sidebar fixed top-0 left-0 h-full glass-strong z-40 flex flex-col border-r border-white/20 no-print"
       :class="{ 'open': mobileMenuOpen }">
       <!-- Sidebar Header -->
       <div class="p-6 border-b border-white/10">
@@ -508,13 +508,13 @@
             <h1 class="text-lg font-bold gradient-text leading-tight">
               EduSync
             </h1>
-            <p class="text-xs text-white/60 font-medium">School Management System</p>
+            <p class="text-xs text-slate-500 font-medium">School Management System</p>
           </div>
         </div>
       </div>
 
       <!-- Navigation Menu -->
-      <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+      <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-print">
         <a href="{{ url_for('main.index') }}"
           class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('main.index') %} active text-white {% else %} text-slate-500 hover:text-white {% endif %}">
           <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">

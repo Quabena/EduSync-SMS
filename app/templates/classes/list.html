@@ -2,84 +2,90 @@
 endblock %} {% block page_title %}Classes & Subjects{% endblock %} {% block
 page_description %}Manage classes, assign teachers, and view student
 distributions{% endblock %} {% block content %}
-<div class="max-w-7xl mx-auto">
+<div class="space-y-8">
   <!-- Header Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="professional-card p-6">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="professional-card p-6 hover-lift">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
+          <p class="text-sky-600 dark:text-sky-400 text-sm font-medium">
             Total Classes
           </p>
-          <p class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-3xl font-bold text-sky-800 dark:text-white mt-2">
             {% if classes | length %}{{ classes|length }}{% else %}--{% endif %}
           </p>
         </div>
         <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center"
+          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center glass"
         >
-          <i class="fas fa-chalkboard text-white text-2xl"></i>
+          <i class="fas fa-chalkboard text-sky-600 text-2xl"></i>
         </div>
       </div>
     </div>
 
-    <div class="professional-card p-6">
+    <div class="professional-card p-6 hover-lift">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
+          <p
+            class="text-red-600 dark:text-red-400 text-sm font-medium glass-effect"
+          >
             Active Students
           </p>
-          <p class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+          <p
+            class="text-3xl font-bold text-red-800 dark:text-white mt-2 glass-effect"
+          >
             {{ active_students_count or '--' }}
           </p>
         </div>
         <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center"
+          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-emerald to-emerald-600 flex items-center justify-center glass"
         >
-          <i class="fas fa-user-graduate text-white text-2xl"></i>
+          <i
+            class="fas fa-user-graduate text-red-500 text-2xl glass-effect"
+          ></i>
         </div>
       </div>
     </div>
 
-    <div class="professional-card p-6">
+    <div class="professional-card p-6 hover-lift">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
+          <p class="text-lime-600 dark:text-lime-400 text-sm font-medium">
             Assigned Teachers
           </p>
-          <p class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-3xl font-bold text-lime-800 dark:text-white mt-2">
             {{ total_teachers or '--' }}
           </p>
         </div>
         <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center"
+          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-purple to-purple-600 flex items-center justify-center glass"
         >
-          <i class="fas fa-chalkboard-teacher text-white text-2xl"></i>
+          <i class="fas fa-chalkboard-teacher text-lime-600 text-2xl"></i>
         </div>
       </div>
     </div>
 
-    <div class="professional-card p-6">
+    <div class="professional-card p-6 hover-lift">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
+          <p class="text-orange-600 dark:text-orange-400 text-sm font-medium">
             Average Students
           </p>
-          <p class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-3xl font-bold text-orange-800 dark:text-white mt-2">
             {{ average_students or '--' }}
           </p>
         </div>
         <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center"
+          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-amber to-amber-600 flex items-center justify-center glass"
         >
-          <i class="fas fa-chart-bar text-white text-2xl"></i>
+          <i class="fas fa-chart-bar text-orange-400 text-2xl"></i>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Action Bar -->
-  <div class="professional-card p-6 mb-6">
+  <div class="professional-card p-6">
     <div
       class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0"
     >
@@ -90,7 +96,7 @@ distributions{% endblock %} {% block content %}
             type="text"
             id="searchInput"
             placeholder="Search classes by name, level, or section..."
-            class="w-full px-4 py-3 pl-12 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            class="w-full px-4 py-3 pl-12 rounded-xl glass border border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
           />
           <div
             class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
@@ -99,7 +105,7 @@ distributions{% endblock %} {% block content %}
           </div>
           <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
             <kbd
-              class="hidden sm:inline-flex items-center px-2 py-1 border border-slate-300 dark:border-slate-600 rounded text-xs font-sans font-medium text-slate-400 dark:text-slate-500"
+              class="hidden sm:inline-flex items-center px-2 py-1 glass border border-slate-300 dark:border-slate-600 rounded text-xs font-sans font-medium text-slate-400 dark:text-slate-500"
             >
               /
             </kbd>
@@ -113,7 +119,7 @@ distributions{% endblock %} {% block content %}
       >
         <a
           href="{{ url_for('subjects.index') }}"
-          class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-105"
+          class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-accent-emerald to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-sky-600 font-medium rounded-xl transition-all duration-200 glass hover-lift"
         >
           <i class="fas fa-book-open mr-3"></i>
           List Subjects
@@ -121,7 +127,7 @@ distributions{% endblock %} {% block content %}
 
         <a
           href="{{ url_for('classes.create') }}"
-          class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-105"
+          class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-purple hover:from-primary-700 hover:to-purple-700 text-orange-400 font-medium rounded-xl transition-all duration-200 glass hover-lift"
         >
           <i class="fas fa-plus mr-3"></i>
           Create New Class
@@ -165,19 +171,33 @@ distributions{% endblock %} {% block content %}
       >
         <!-- Class Header -->
         <div
-          class="bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-800 p-6 text-white"
+          class="bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-700 dark:to-primary-900 p-6 text-white relative overflow-hidden"
         >
-          <div class="flex items-center justify-between mb-3">
-            <div class="p-2 bg-white/20 rounded-xl">
-              <i class="fas fa-chalkboard text-white text-xl"></i>
+          <!-- Background Pattern -->
+          <div class="absolute inset-0 opacity-10">
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"
+            ></div>
+            <div
+              class="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"
+            ></div>
+          </div>
+
+          <div class="flex items-center justify-between mb-3 relative z-10">
+            <div class="p-2 bg-white/20 backdrop-blur-sm rounded-xl glass">
+              <i class="fas fa-chalkboard text-blue-700 text-xl glass"></i>
             </div>
             <div class="text-right">
-              <div class="text-sm opacity-80">Class ID</div>
-              <div class="font-mono text-lg font-bold">{{ class.id }}</div>
+              <div class="text-sm opacity-80 text-sky-900">Class ID</div>
+              <div class="font-mono text-lg text-cyan-800 font-bold">
+                {{ class.id }}
+              </div>
             </div>
           </div>
-          <h3 class="text-2xl font-bold mb-2">{{ class.name }}</h3>
-          <p class="text-blue-100 font-medium">
+          <h3 class="text-2xl text-cyan-800 font-bold mb-2 relative z-10">
+            {{ class.name }}
+          </h3>
+          <p class="text-sky-700 font-medium relative z-10">
             {{ class.level }} • Section {{ class.section }}
           </p>
         </div>
@@ -185,9 +205,11 @@ distributions{% endblock %} {% block content %}
         <!-- Class Information -->
         <div class="p-6 space-y-4">
           <!-- Teacher Information -->
-          <div class="flex items-center space-x-3">
+          <div
+            class="flex items-center space-x-3 group-hover:transform group-hover:translate-x-1 transition-transform duration-200"
+          >
             <div
-              class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0"
+              class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 glass"
             >
               <i
                 class="fas fa-user-tie text-emerald-600 dark:text-emerald-400"
@@ -197,7 +219,7 @@ distributions{% endblock %} {% block content %}
               <div
                 class="text-sm text-slate-600 dark:text-slate-400 font-medium"
               >
-                Teacher
+                Class Teacher
               </div>
               <div
                 class="font-semibold text-slate-800 dark:text-white truncate"
@@ -213,9 +235,11 @@ distributions{% endblock %} {% block content %}
           </div>
 
           <!-- Student Count -->
-          <div class="flex items-center space-x-3">
+          <div
+            class="flex items-center space-x-3 group-hover:transform group-hover:translate-x-1 transition-transform duration-200"
+          >
             <div
-              class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0"
+              class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 glass"
             >
               <i class="fas fa-users text-blue-600 dark:text-blue-400"></i>
             </div>
@@ -232,9 +256,11 @@ distributions{% endblock %} {% block content %}
           </div>
 
           <!-- Status -->
-          <div class="flex items-center space-x-3">
+          <div
+            class="flex items-center space-x-3 group-hover:transform group-hover:translate-x-1 transition-transform duration-200"
+          >
             <div
-              class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0"
+              class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0 glass"
             >
               <i
                 class="fas fa-check-circle text-green-600 dark:text-green-400"
@@ -247,7 +273,9 @@ distributions{% endblock %} {% block content %}
                 Status
               </div>
               <div class="flex items-center space-x-2">
-                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div
+                  class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                ></div>
                 <span class="font-semibold text-green-600 dark:text-green-400"
                   >Active</span
                 >
@@ -261,26 +289,26 @@ distributions{% endblock %} {% block content %}
           <div class="flex space-x-2">
             <a
               href="{{ url_for('classes.detail', class_id=class.id) }}"
-              class="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg transition-colors duration-200 text-sm font-medium"
+              class="flex-1 text-center bg-primary-600 hover:bg-primary-700 text-sky-600 py-2 px-3 rounded-lg transition-all duration-200 text-sm font-medium glass hover-lift"
             >
-              <i class="fas fa-eye mr-2"></i>
+              <i class="fas fa-eye mr-2 text-sky-600"></i>
               View
             </a>
 
             <a
               href="{{ url_for('classes.edit', class_id=class.id) }}"
-              class="flex-1 text-center bg-amber-500 hover:bg-amber-600 text-white py-2 px-3 rounded-lg transition-colors duration-200 text-sm font-medium"
+              class="flex-1 text-center bg-amber-500 text-amber-500 hover:text-amber-500 py-2 px-3 rounded-lg transition-all duration-200 text-sm font-medium glass hover-lift"
             >
-              <i class="fas fa-edit mr-2"></i>
+              <i class="fas fa-edit mr-2 text-amber-500"></i>
               Edit
             </a>
 
             {% if current_user.role == 'admin' %}
             <button
               onclick="deleteClass({{ class.id }}, '{{ class.name }}')"
-              class="px-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200"
+              class="px-3 bg-red-500 text-white rounded-lg transition-all duration-200 glass hover-lift"
             >
-              <i class="fas fa-trash"></i>
+              <i class="fas fa-trash text-red-400"></i>
             </button>
             {% endif %}
           </div>
@@ -292,24 +320,24 @@ distributions{% endblock %} {% block content %}
     <!-- Empty State -->
     <div class="text-center py-12">
       <div
-        class="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-600 dark:to-slate-700 flex items-center justify-center"
+        class="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-600 dark:to-slate-700 flex items-center justify-center glass"
       >
         <i class="fas fa-chalkboard text-white text-3xl"></i>
       </div>
       <h4 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
         No Classes Created
       </h4>
-      <p class="text-slate-500 dark:text-slate-400 mb-6">
+      <p class="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
         Get started by creating your first class to organize students and assign
         teachers.
       </p>
 
       <a
         href="{{ url_for('classes.create') }}"
-        class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+        class="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-xl transition-all duration-200 glass hover-lift"
       >
         <i class="fas fa-plus"></i>
-        <span>Create Your First Class</span>
+        <span class="font-medium">Create Your First Class</span>
       </a>
     </div>
     {% endif %}
@@ -321,10 +349,10 @@ distributions{% endblock %} {% block content %}
   id="deleteModal"
   class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden"
 >
-  <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 mx-4 max-w-md w-full">
+  <div class="professional-card mx-4 max-w-md w-full">
     <div class="flex items-center space-x-3 mb-4">
       <div
-        class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center"
+        class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center glass"
       >
         <i
           class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-xl"
@@ -352,14 +380,14 @@ distributions{% endblock %} {% block content %}
     <div class="flex space-x-3">
       <button
         onclick="closeDeleteModal()"
-        class="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200"
+        class="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 glass"
       >
         Cancel
       </button>
       <form method="POST" action="" id="deleteForm" class="flex-1">
         <button
           type="submit"
-          class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+          class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 glass"
         >
           Delete
         </button>
@@ -460,4 +488,40 @@ distributions{% endblock %} {% block content %}
       }
     });
 </script>
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .professional-card.p-0 {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .grid > .professional-card.p-0:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .grid > .professional-card.p-0:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .grid > .professional-card.p-0:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .grid > .professional-card.p-0:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .grid > .professional-card.p-0:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+  .grid > .professional-card.p-0:nth-child(6) {
+    animation-delay: 0.6s;
+  }
+</style>
 {% endblock %}

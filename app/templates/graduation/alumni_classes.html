@@ -1,193 +1,210 @@
-{% extends "base.html" %} {% block title %}Alumni Classes{% endblock %} {% block
-content %}
-<div
-  class="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50 to-slate-100"
->
-  <div class="container mx-auto px-4 py-8 max-w-7xl">
+{% extends "base.html" %} {% block title %}Alumni Classes - EduSync{% endblock
+%} {% block page_title %}Alumni Classes{% endblock %} {% block page_description
+%}View graduates organized by graduation year{% endblock %} {% block content %}
+<div class="min-h-screen py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header Section -->
     <div class="mb-8">
-      <div class="flex items-center justify-between">
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+      >
         <div>
-          <h1 class="text-4xl font-bold text-slate-800 mb-2">Alumni Classes</h1>
-          <p class="text-slate-600">
+          <h1 class="text-4xl font-bold gradient-text mb-2">Alumni Classes</h1>
+          <p class="text-lg text-slate-600 dark:text-slate-300">
             View graduates organized by graduation year
           </p>
         </div>
         <div class="flex items-center space-x-3">
           <a
             href="{{ url_for('graduation.alumni_list') }}"
-            class="px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 font-medium"
+            class="inline-flex items-center px-6 py-3 glass text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-white/20 transition-all duration-300"
           >
+            <i class="fas fa-users mr-2"></i>
             View All Alumni
           </a>
           <a
             href="{{ url_for('graduation.graduation_management') }}"
-            class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+            class="inline-flex items-center px-6 py-3 glass-strong text-slate-500 font-medium rounded-xl hover-lift transition-all duration-300"
           >
+            <i class="fas fa-graduation-cap mr-2"></i>
             Back to Management
           </a>
         </div>
       </div>
     </div>
+    <!-- Statistics Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-3">
+      <div class="professional-card p-4 text-center">
+        <div
+          class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
+        >
+          <i class="fas fa-layer-group text-blue-500 text-xl"></i>
+        </div>
+        <div class="text-2xl font-bold text-slate-800 dark:text-white">
+          {{ class_data|length }}
+        </div>
+        <div class="text-sm text-slate-600 dark:text-slate-300">
+          Total Classes
+        </div>
+      </div>
+
+      <div class="professional-card p-4 text-center">
+        <div
+          class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
+        >
+          <i class="fas fa-user-graduate text-emerald-500 text-xl"></i>
+        </div>
+        <div class="text-2xl font-bold text-slate-800 dark:text-white">
+          {{ class_data|sum(attribute='student_count') }}
+        </div>
+        <div class="text-sm text-slate-600 dark:text-slate-300">
+          Total Alumni
+        </div>
+      </div>
+
+      <div class="professional-card p-4 text-center">
+        <div
+          class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
+        >
+          <i class="fas fa-trophy text-purple-500 text-xl"></i>
+        </div>
+        <div class="text-2xl font-bold text-slate-800 dark:text-white">
+          100%
+        </div>
+        <div class="text-sm text-slate-600 dark:text-slate-300">
+          Success Rate
+        </div>
+      </div>
+    </div>
 
     {% if class_data %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
       {% for item in class_data %}
       <a
         href="{{ url_for('graduation.alumni_class_detail', class_id=item.class.id) }}"
-        class="bg-white rounded-xl shadow-lg border-2 border-slate-200 hover:border-amber-500 hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+        class="professional-card p-6 hover-lift transition-all duration-300 group"
       >
-        <div
-          class="bg-gradient-to-br from-amber-500 to-amber-600 px-6 py-8 relative overflow-hidden"
-        >
+        <!-- Header Section -->
+        <div class="flex items-center justify-between mb-4">
           <div
-            class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"
-          ></div>
-          <div
-            class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"
-          ></div>
-
-          <div class="relative z-10">
-            <div class="flex items-center justify-between mb-4">
-              <svg
-                class="w-12 h-12 text-white/80"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
-                <path
-                  d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-                ></path>
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
-                ></path>
-              </svg>
-              <span
-                class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold"
-              >
-                Alumni
-              </span>
-            </div>
-            <h2 class="text-3xl font-bold text-white mb-2">
-              {{ item.class.name }}
-            </h2>
-            <p class="text-amber-100 text-sm">
-              {{ item.class.level if item.class.level else 'Graduated Class' }}
-            </p>
+            class="w-12 h-12 bg-gradient-to-br from-emerald-200 to-emerald-600 rounded-xl flex items-center justify-center"
+          >
+            <i class="fas fa-graduation-cap text-white text-lg"></i>
+          </div>
+          <div class="glass px-3 py-1 rounded-lg">
+            <span
+              class="text-slate-700 dark:text-slate-200 text-sm font-semibold"
+            >
+              Alumni
+            </span>
           </div>
         </div>
 
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <p
-                class="text-slate-500 text-sm font-medium uppercase tracking-wide"
-              >
-                Total Graduates
-              </p>
-              <p class="text-3xl font-bold text-slate-800 mt-1">
-                {{ item.student_count }}
-              </p>
-            </div>
-            <div
-              class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center group-hover:bg-amber-200 transition-colors duration-200"
+        <!-- Class Information -->
+        <h2
+          class="text-2xl font-bold text-slate-800 dark:text-white mb-2 group-hover:text-amber-500 transition-colors duration-200"
+        >
+          {{ item.class.name }}
+        </h2>
+        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4">
+          {{ item.class.level if item.class.level else 'Graduated Class' }}
+        </p>
+
+        <!-- Student Count -->
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <p
+              class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wide"
             >
-              <svg
-                class="w-8 h-8 text-amber-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                ></path>
-              </svg>
-            </div>
+              Total Graduates
+            </p>
+            <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
+              {{ item.student_count }}
+            </p>
           </div>
+          <div
+            class="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-amber-500/30 transition-colors duration-200"
+          >
+            <i class="fas fa-users text-blue-500 text-2xl"></i>
+          </div>
+        </div>
 
-          {% if item.class.description %}
-          <p class="text-slate-600 text-sm mb-4 line-clamp-2">
-            {{ item.class.description }}
-          </p>
-          {% endif %}
+        <!-- Description -->
+        {% if item.class.description %}
+        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4 line-clamp-2">
+          {{ item.class.description }}
+        </p>
+        {% endif %}
 
-          <div class="pt-4 border-t border-slate-200">
-            <div
-              class="flex items-center justify-between text-amber-600 font-medium group-hover:text-amber-700"
-            >
-              <span>View Class Details</span>
-              <svg
-                class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            </div>
+        <!-- View Details CTA -->
+        <div class="pt-4 border-t border-white/10">
+          <div
+            class="flex items-center justify-between text-sky-500 font-medium group-hover:text-sky-600 transition-colors duration-200"
+          >
+            <span>View Class Details</span>
+            <i
+              class="fas fa-chevron-right group-hover:translate-x-1 transition-transform duration-200"
+            ></i>
           </div>
         </div>
       </a>
       {% endfor %}
     </div>
+
     {% else %}
-    <div
-      class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden"
-    >
-      <div class="text-center py-16 px-6">
-        <svg
-          class="w-24 h-24 mx-auto text-slate-300 mb-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-          ></path>
-        </svg>
-        <h3 class="text-xl font-semibold text-slate-600 mb-2">
-          No Alumni Classes Found
-        </h3>
-        <p class="text-slate-500 mb-6">
-          No alumni classes have been created yet. Graduate students to create
-          alumni classes.
-        </p>
-        <a
-          href="{{ url_for('graduation.graduation_management') }}"
-          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
-        >
-          <svg
-            class="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            ></path>
-          </svg>
-          Graduate Students
-        </a>
+    <!-- Empty State -->
+    <div class="professional-card p-8 text-center">
+      <div
+        class="w-24 h-24 bg-slate-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4"
+      >
+        <i class="fas fa-graduation-cap text-slate-500 text-3xl"></i>
       </div>
+      <h3
+        class="text-2xl font-semibold text-slate-600 dark:text-slate-300 mb-2"
+      >
+        No Alumni Classes Found
+      </h3>
+      <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
+        No alumni classes have been created yet. Graduate students to create
+        alumni classes.
+      </p>
+      <a
+        href="{{ url_for('graduation.graduation_management') }}"
+        class="inline-flex items-center px-6 py-3 glass-strong text-white font-medium rounded-xl hover-lift transition-all duration-300"
+      >
+        <i class="fas fa-graduation-cap mr-2"></i>
+        Graduate Students
+      </a>
     </div>
     {% endif %}
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add loading states to class cards
+    const classCards = document.querySelectorAll(".professional-card a");
+    classCards.forEach((card) => {
+      card.addEventListener("click", function (e) {
+        const originalContent = this.innerHTML;
+        this.innerHTML =
+          '<div class="flex items-center justify-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Loading...</div>';
+        this.style.pointerEvents = "none";
+
+        setTimeout(() => {
+          if (this.innerHTML.includes("Loading...")) {
+            this.innerHTML = originalContent;
+            this.style.pointerEvents = "auto";
+          }
+        }, 3000);
+      });
+    });
+
+    // Add staggered animation to cards
+    const cards = document.querySelectorAll(".professional-card");
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+    });
+  });
+</script>
 {% endblock %}

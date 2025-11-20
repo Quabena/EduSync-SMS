@@ -1,22 +1,20 @@
-{% extends "base.html" %} {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
+{% extends "base.html" %} {% block title %}{{ class_.name }} - Class Details{%
+endblock %} {% block page_title %}{{ class_.name }}{% endblock %} {% block
+page_description %}Class Management Dashboard - {{ class_.level }} • Section {{
+class_.section }}{% endblock %} {% block content %}
+<div class="space-y-8">
   <!-- Header Section -->
   <div
-    class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6"
+    class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6"
   >
     <div class="space-y-2">
-      <h1
-        class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-      >
+      <h1 class="text-3xl lg:text-4xl font-bold text-slate-800 dark:text-white">
         {{ class_.name }}
       </h1>
-      <p class="text-gray-600 dark:text-gray-300 text-lg">
-        Class Management Dashboard
-      </p>
     </div>
     <a
       href="{{ url_for('classes.index') }}"
-      class="inline-flex items-center px-5 py-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-300 group"
+      class="inline-flex items-center px-5 py-3 glass border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-800/50 shadow-md hover:shadow-lg transition-all duration-300 group hover-lift"
     >
       <svg
         class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform"
@@ -36,18 +34,23 @@
   </div>
 
   <!-- Stats Overview -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div
-      class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg"
-    >
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Total Students Card -->
+    <div class="professional-card p-6 hover-lift">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-blue-100 text-sm font-medium">Total Students</p>
-          <h3 class="text-3xl font-bold mt-1">{{ students.count() }}</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
+            Total Students
+          </p>
+          <h3 class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+            {{ students.count() }}
+          </h3>
         </div>
-        <div class="p-3 bg-white/20 rounded-xl">
+        <div
+          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center glass"
+        >
           <svg
-            class="w-8 h-8"
+            class="w-6 h-6 text-sky-700"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -63,17 +66,22 @@
       </div>
     </div>
 
-    <div
-      class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg"
-    >
+    <!-- Assigned Teachers Card -->
+    <div class="professional-card p-6 hover-lift">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-purple-100 text-sm font-medium">Assigned Teachers</p>
-          <h3 class="text-3xl font-bold mt-1">{{ teachers|length }}</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
+            Assigned Teachers
+          </p>
+          <h3 class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+            {{ teachers|length }}
+          </h3>
         </div>
-        <div class="p-3 bg-white/20 rounded-xl">
+        <div
+          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-purple to-purple-600 flex items-center justify-center glass"
+        >
           <svg
-            class="w-8 h-8"
+            class="w-6 h-6 text-amber-700"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -89,19 +97,22 @@
       </div>
     </div>
 
-    <div
-      class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white shadow-lg"
-    >
+    <!-- Class Details Card -->
+    <div class="professional-card p-6 hover-lift">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-emerald-100 text-sm font-medium">Class Details</p>
-          <h3 class="text-xl font-bold mt-1">
+          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
+            Class Details
+          </p>
+          <h3 class="text-xl font-bold text-slate-800 dark:text-white mt-2">
             {{ class_.level }} • {{ class_.section }}
           </h3>
         </div>
-        <div class="p-3 bg-white/20 rounded-xl">
+        <div
+          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-emerald to-emerald-600 flex items-center justify-center glass"
+        >
           <svg
-            class="w-8 h-8"
+            class="w-6 h-6 text-emerald-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -120,17 +131,16 @@
 
   <!-- Main Content Grid -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- Teachers Section -->
-    <div class="lg:col-span-1">
-      <div
-        class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-6"
-      >
+    <!-- Left Column - Teachers & Actions -->
+    <div class="lg:col-span-1 space-y-6">
+      <!-- Teachers Section -->
+      <div class="professional-card p-6">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-800 dark:text-white">
+          <h2 class="text-xl font-bold text-slate-800 dark:text-white">
             Assigned Teachers
           </h2>
           <span
-            class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full"
+            class="glass px-3 py-1 rounded-full text-sm font-medium text-primary-600 dark:text-primary-400"
           >
             {{ teachers|length }}
           </span>
@@ -140,22 +150,22 @@
         <div class="space-y-4">
           {% for teacher in teachers %}
           <div
-            class="flex items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl border border-gray-100/50 dark:border-gray-700/50"
+            class="flex items-center p-4 glass rounded-xl border border-slate-200/50 dark:border-slate-700/50 group hover-lift"
           >
             <div class="flex-shrink-0 mr-4">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-lg"
+                class="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-indigo-600 font-semibold text-lg glass"
               >
                 {{ teacher.full_name[0] }}
               </div>
             </div>
             <div class="flex-1 min-w-0">
               <p
-                class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                class="text-sm font-medium text-slate-800 dark:text-white truncate"
               >
                 {{ teacher.full_name }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+              <p class="text-xs text-slate-500 dark:text-slate-400 truncate">
                 {{ teacher.specialization.name if teacher.specialization else
                 "No specialization" }}
               </p>
@@ -166,10 +176,10 @@
         {% else %}
         <div class="text-center py-8">
           <div
-            class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4"
+            class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center glass"
           >
             <svg
-              class="w-8 h-8 text-gray-400"
+              class="w-8 h-8 text-slate-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -182,7 +192,7 @@
               ></path>
             </svg>
           </div>
-          <p class="text-gray-500 dark:text-gray-400">
+          <p class="text-slate-500 dark:text-slate-400">
             No teachers assigned to this class
           </p>
         </div>
@@ -190,16 +200,14 @@
       </div>
 
       <!-- Quick Actions -->
-      <div
-        class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-6 mt-6"
-      >
-        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6">
+      <div class="professional-card p-6">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6">
           Manage Class
         </h2>
         <div class="space-y-3">
           <a
             href="{{ url_for('classes.edit', class_id=class_.id) }}"
-            class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl shadow-md transition-all duration-300 group"
+            class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-emerald-500 rounded-xl transition-all duration-300 group glass hover-lift"
           >
             <span class="font-medium">Edit Class Details</span>
             <svg
@@ -221,10 +229,11 @@
             action="{{ url_for('classes.delete', class_id=class_.id) }}"
             method="POST"
             onsubmit="return confirm('Are you sure you want to delete this class? This action cannot be undone.');"
+            class="w-full"
           >
             <button
               type="submit"
-              class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl shadow-md transition-all duration-300 group"
+              class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-red-500 rounded-xl transition-all duration-300 group glass hover-lift"
             >
               <span class="font-medium">Delete Class</span>
               <svg
@@ -246,17 +255,15 @@
       </div>
     </div>
 
-    <!-- Students Section -->
+    <!-- Right Column - Students Section -->
     <div class="lg:col-span-2">
-      <div
-        class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-6"
-      >
+      <div class="professional-card p-6">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-800 dark:text-white">
+          <h2 class="text-xl font-bold text-slate-800 dark:text-white">
             Enrolled Students
           </h2>
           <span
-            class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full"
+            class="glass px-3 py-1 rounded-full text-sm font-medium text-primary-600 dark:text-primary-400"
           >
             {{ students.count() }} students
           </span>
@@ -264,71 +271,67 @@
 
         {% if students %}
         <div
-          class="overflow-hidden rounded-xl border border-gray-200/50 dark:border-gray-700/50"
+          class="overflow-hidden rounded-xl border border-slate-200/50 dark:border-slate-700/50 glass"
         >
           <table
-            class="min-w-full divide-y divide-gray-200/50 dark:divide-gray-700/50"
+            class="min-w-full divide-y divide-slate-200/50 dark:divide-slate-700/50"
           >
-            <thead class="bg-gray-50/50 dark:bg-gray-800/50">
+            <thead class="bg-slate-50/50 dark:bg-slate-800/50">
               <tr>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider"
                 >
                   Student ID
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider"
                 >
                   Name
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider"
                 >
                   Gender
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider"
                 >
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody
-              class="bg-white dark:bg-gray-900 divide-y divide-gray-200/50 dark:divide-gray-700/50"
+              class="bg-white/50 dark:bg-slate-900/50 divide-y divide-slate-200/50 dark:divide-slate-700/50"
             >
               {% for student in students %}
               <tr
-                class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-150"
+                class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors duration-150"
               >
                 <td
-                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"
+                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-white"
                 >
                   {{ student.id }}
                 </td>
                 <td
-                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"
+                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-white"
                 >
                   {{ student.full_name }}
                 </td>
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-                >
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
                   <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if student.gender == 'Male' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200{% endif %} {% if student.gender == 'Female' %}bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200{% endif %}"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium glass {% if student.gender == 'Male' %}text-blue-700 dark:text-blue-300{% endif %} {% if student.gender == 'Female' %}text-pink-700 dark:text-pink-300{% endif %}"
                   >
                     {{ student.gender }}
                   </span>
                 </td>
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-                >
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
                   <a
                     href="{{ url_for('students.detail', student_id=student.id) }}"
-                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 transition-colors duration-150"
+                    class="text-amber-800 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 transition-colors duration-150 font-medium"
                   >
                     View Details
                   </a>
@@ -341,10 +344,10 @@
         {% else %}
         <div class="text-center py-12">
           <div
-            class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4"
+            class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center glass"
           >
             <svg
-              class="w-8 h-8 text-gray-400"
+              class="w-8 h-8 text-slate-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -357,10 +360,10 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">
+          <h3 class="text-lg font-medium text-slate-800 dark:text-white mb-1">
             No students enrolled
           </h3>
-          <p class="text-gray-500 dark:text-gray-400">
+          <p class="text-slate-500 dark:text-slate-400">
             Students will appear here once added to this class
           </p>
         </div>
@@ -371,44 +374,62 @@
 </div>
 
 <style>
-  /* Smooth transitions for all interactive elements */
-  * {
-    transition-property: color, background-color, border-color, transform,
-      box-shadow;
-    transition-duration: 200ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
   /* Custom scrollbar for table */
-  .overflow-x-auto::-webkit-scrollbar {
+  .overflow-hidden::-webkit-scrollbar {
     height: 6px;
   }
 
-  .overflow-x-auto::-webkit-scrollbar-track {
+  .overflow-hidden::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.05);
     border-radius: 3px;
   }
 
-  .overflow-x-auto::-webkit-scrollbar-thumb {
+  .overflow-hidden::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.2);
     border-radius: 3px;
   }
 
-  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  .overflow-hidden::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.3);
   }
 
   /* Dark mode scrollbar */
-  .dark .overflow-x-auto::-webkit-scrollbar-track {
+  .dark .overflow-hidden::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
   }
 
-  .dark .overflow-x-auto::-webkit-scrollbar-thumb {
+  .dark .overflow-hidden::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
   }
 
-  .dark .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  .dark .overflow-hidden::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Animation for cards */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .professional-card {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .grid > .professional-card:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .grid > .professional-card:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .grid > .professional-card:nth-child(3) {
+    animation-delay: 0.3s;
   }
 </style>
 {% endblock %}

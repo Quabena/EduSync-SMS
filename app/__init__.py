@@ -1,4 +1,3 @@
-# app/__init__.py
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from pathlib import Path
@@ -10,9 +9,13 @@ from config import Config
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+from dotenv import load_dotenv
 
 # NOTE: removed `from init_data import initialize_directories, seed_default_admin`
 # to avoid circular import at module import time.
+
+# Load dotenv
+load_dotenv()
 
 # Extension instances (module-level so other modules can import them)
 db = SQLAlchemy()

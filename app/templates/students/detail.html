@@ -880,16 +880,6 @@ Details - Namong SDA JHS{% endblock %} {% block content %}
               </div>
               <div class="text-sm text-gray-600 dark:text-gray-400">
                 {{ student.interest }}
-                <div class="mt-1">
-                  <div
-                    class="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700"
-                  >
-                    <div
-                      class="bg-purple-600 h-1.5 rounded-full"
-                      style="width: {% if student.interest == 'Sports' %}75%{% elif student.interest == 'Drama' %}60%{% else %}50%{% endif %}"
-                    ></div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -1322,25 +1312,27 @@ Details - Namong SDA JHS{% endblock %} {% block content %}
           <p class="text-gray-500 dark:text-gray-400 mb-4">
             Add medical information for this student to track health conditions.
           </p>
-          <button
-            onclick="addMedicalRecord()"
-            class="inline-flex items-center px-4 py-2 bg-red-100 dark:bg-red-900/50 hover:bg-red-200 dark:hover:bg-red-900/70 text-red-700 dark:text-red-300 font-semibold rounded-lg transition-all duration-200"
-          >
-            <svg
-              class="h-4 w-4 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <a href="{{ url_for('students.edit', student_id=student.id) }}#hnID">
+            <button
+              onclick="addMedicalRecord()"
+              class="inline-flex items-center px-4 py-2 bg-red-100 dark:bg-red-900/50 hover:bg-red-200 dark:hover:bg-red-900/70 text-red-700 dark:text-red-300 font-semibold rounded-lg transition-all duration-200"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            Add Medical Record
-          </button>
+              <svg
+                class="h-4 w-4 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add Medical Record
+            </button>
+          </a>
         </div>
       </div>
       {% endif %}

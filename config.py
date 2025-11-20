@@ -5,35 +5,40 @@ APP_NAME = "EduSync SMS"
 
 # Cross-platform app data directory
 if os.name == "nt":  # Windows
-    BASE_DIR = Path(os.getenv("APPDATA")) / APP_NAME  # type:ignore
-elif os.name == "posix":
-    BASE_DIR = Path.home() / ".config" / APP_NAME
+    appdata = os.getenv("APPDATA") or str(Path.home() / "AppData" / "Roaming")
+    BASE_DIR = Path(appdata) / APP_NAME
 else:
-    BASE_DIR = Path.home() / APP_NAME
+    BASE_DIR = Path.home() / ".config" / APP_NAME
+
 
 BASE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class Config:
-    SECRET_KEY = (
-        os.environ.get("SECRET_KEY")
-        or "43cba8188f13db93ab9b2f57d569b7c3b6ca59a6b2fcb623c6988be6e527a9b3"
-    )
+    """SAFE CONFIG — production secrets loaded from .env"""
 
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{BASE_DIR / 'edusync.db'}"
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-key-change-me")
+    DEBUG = os.environ.get("DEBUG", "false").lower() == "true"
+
+    # Database
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL", f"sqlite:///{BASE_DIR / 'edusync.db'}"
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    HOST = "127.0.0.1"
-    PORT = 5000
-    DEBUG = False
+    # Default admin values (only used if no admin exists)
+    DEFAULT_ADMIN_USER = os.environ.get("EDUSYNC_ADMIN_USER", "")
+    DEFAULT_ADMIN_EMAIL = os.environ.get("EDUSYNC_ADMIN_EMAIL", "")
+    DEFAULT_ADMIN_PASS = os.environ.get("EDUSYNC_ADMIN_PASS", "")
 
-    DEFAULT_ADMIN_USER = "Admin"
-    DEFAULT_ADMIN_EMAIL = "admin@edusync.edu"
-    DEFAULT_ADMIN_PASS = "pass@7777"
-
-    BACKUP_DIR = BASE_DIR / "backups"
-    DOCUMENT_DIR = BASE_DIR / "student_photos"
-    TEACHER_PHOTOS_DIR = BASE_DIR / "teacher_photos"
-    TEACHER_CERTS_DIR = BASE_DIR / "teacher_certificates"
-    QR_DIR = BASE_DIR / "qr_storage"
-    REPORT_DIR = BASE_DIR / "reports"
+    # Storage directories
+    BACKUP_DIR = Path(os.environ.get("BACKUP_DIR", BASE_DIR / "backups"))
+    DOCUMENT_DIR = Path(os.environ.get("DOCUMENT_DIR", BASE_DIR / "student_photos"))
+    TEACHER_PHOTOS_DIR = Path(
+        os.environ.get("TEACHER_PHOTOS_DIR", BASE_DIR / "teacher_photos")
+    )
+    TEACHER_CERTS_DIR = Path(
+        os.environ.get("TEACHER_CERTS_DIR", BASE_DIR / "teacher_certificates")
+    )
+    QR_DIR = Path(os.environ.get("QR_DIR", BASE_DIR / "qr_storage"))
+    REPORT_DIR = Path(os.environ.get("REPORT_DIR", BASE_DIR / "reports"))

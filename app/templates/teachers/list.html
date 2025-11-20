@@ -13,10 +13,10 @@ endblock %} {% block content %}
         <!-- Title and Description -->
         <div class="flex items-center space-x-4">
           <div
-            class="w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-800 gradient-text rounded-2xl flex items-center justify-center shadow-lg"
+            class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg"
           >
             <svg
-              class="w-8 h-8 text-slate-600"
+              class="w-8 h-8 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -141,7 +141,7 @@ endblock %} {% block content %}
           <div class="glass rounded-xl p-1 flex">
             <button
               id="gridViewBtn"
-              class="flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white shadow-sm transition-all duration-200"
+              class="flex items-center px-4 py-2 rounded-lg bg-primary-600 text-blue-600 shadow-sm transition-all duration-200"
             >
               <svg
                 class="w-4 h-4 mr-2"
@@ -160,7 +160,7 @@ endblock %} {% block content %}
             </button>
             <button
               id="tableViewBtn"
-              class="flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/20 transition-all duration-200"
+              class="flex items-center px-4 py-2 rounded-lg text-blue dark:text-white hover:bg-blue/20 transition-all duration-200"
             >
               <svg
                 class="w-4 h-4 mr-2"
@@ -181,7 +181,7 @@ endblock %} {% block content %}
 
           <button
             id="exportBtn"
-            class="flex items-center px-4 py-3 bg-accent-emerald hover:bg-emerald-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
+            class="flex items-center px-4 py-3 bg-accent-emerald bg-emerald-500 hover:bg-emerald-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
           >
             <svg
               class="w-4 w-4 mr-2"
@@ -201,7 +201,7 @@ endblock %} {% block content %}
 
           <a
             href="{{ url_for('teachers.create') }}"
-            class="flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg font-medium"
+            class="flex items-center px-6 py-3 bg-gradient-to-r from-indigo-400 to-cyan-300 hover:from-indigo-500 hover:to-cyan-400 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg font-medium"
           >
             <svg
               class="w-4 h-4 mr-2"
@@ -798,17 +798,17 @@ endblock %} {% block content %}
       tableView.classList.add("hidden");
 
       gridViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white shadow-sm transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white shadow-sm transition-all duration-200";
       tableViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/20 transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg text-blue dark:text-slate-300 hover:bg-blue/20 transition-all duration-200";
     } else {
       gridView.classList.add("hidden");
       tableView.classList.remove("hidden");
 
       tableViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white shadow-sm transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg bg-blue-300 text-blue shadow-sm transition-all duration-200";
       gridViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/20 transition-all duration-200";
+        "flex items-center px-4 py-2 rounded-lg text-blue-600 dark:text-blue-300 hover:bg-blue/20 transition-all duration-200";
     }
   }
 
@@ -930,7 +930,7 @@ endblock %} {% block content %}
     setTimeout(() => {
       exportBtn.innerHTML = originalHTML;
       // Here you would typically trigger the actual export functionality
-      alert("Export functionality would be implemented here");
+      alert("Only available in the paid version!");
     }, 2000);
   }
 

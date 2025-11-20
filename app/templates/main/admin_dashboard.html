@@ -19,11 +19,11 @@ page_description %}Comprehensive overview of school management system{% endblock
         <div
           class="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400"
         >
-          <div class="status-dot"></div>
+          <div class="status-dot mr-1"></div>
           <span>System Online</span>
         </div>
-        <div class="text-sm text-slate-600 dark:text-slate-400">
-          {{ active_users_count }} active users
+        <div class="text-sm text-slate-600 dark:text-slate-400 ml-2">
+          Current User: {{ current_user.username }}
         </div>
       </div>
     </div>

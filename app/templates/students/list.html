@@ -122,7 +122,7 @@ information.{% endblock %} {% block content %}
             >
               <option value="">All Classes</option>
               {% for class in active_classes %}
-              <option value="{{ class.name }}">{{ class.name }}</option>
+              <option value="{{ class.id }}">{{ class.name }}</option>
               {% endfor %}
             </select>
 
@@ -255,6 +255,7 @@ information.{% endblock %} {% block content %}
         class="student-card relative h-96 perspective-1000"
         data-name="{{ student.full_name|lower }}"
         data-class="{{ student.classroom.name if student.classroom else 'unassigned' }}"
+        data-class-id="{{ student.class_id }}"
         data-gender="{{ student.gender|lower }}"
       >
         <!-- Flip Card Container -->
@@ -493,6 +494,7 @@ information.{% endblock %} {% block content %}
               class="student-row hover:bg-white/5 transition-colors duration-200"
               data-name="{{ student.full_name|lower }}"
               data-class="{{ student.classroom.name if student.classroom else 'unassigned' }}"
+              data-class-id="{{ student.class_id }}"
               data-gender="{{ student.gender|lower }}"
             >
               <td class="px-6 py-4 whitespace-nowrap">
@@ -812,11 +814,11 @@ information.{% endblock %} {% block content %}
     // Filter grid view
     studentCards.forEach((card) => {
       const name = card.dataset.name;
-      const studentClass = card.dataset.class;
+      const studentClassId = card.dataset.classId;
       const gender = card.dataset.gender;
 
       const matchesSearch = name.includes(searchTerm);
-      const matchesClass = !classFilter || studentClass === classFilter;
+      const matchesClass = !classFilter || studentClassId === classFilter;
       const matchesGender = !genderFilter || gender === genderFilter;
 
       if (matchesSearch && matchesClass && matchesGender) {
@@ -830,11 +832,11 @@ information.{% endblock %} {% block content %}
     // Filter table view
     studentRows.forEach((row) => {
       const name = row.dataset.name;
-      const studentClass = row.dataset.class;
+      const studentClassId = row.dataset.classId;
       const gender = row.dataset.gender;
 
       const matchesSearch = name.includes(searchTerm);
-      const matchesClass = !classFilter || studentClass === classFilter;
+      const matchesClass = !classFilter || studentClassId === classFilter;
       const matchesGender = !genderFilter || gender === genderFilter;
 
       if (matchesSearch && matchesClass && matchesGender) {
