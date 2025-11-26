@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loading… | EduSync</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+      :root {
+        --primary-50: #f0f9ff;
+        --primary-100: #e0f2fe;
+        --primary-200: #bae6fd;
+        --primary-300: #7dd3fc;
+        --primary-400: #38bdf8;
+        --primary-500: #0ea5e9;
+        --primary-600: #0284c7;
+        --primary-700: #0369a1;
+        --primary-800: #075985;
+        --primary-900: #0c4a6e;
+
+        --primary-gradient: linear-gradient(
+          135deg,
+          #0ea5e9 0%,
+          #0369a1 50%,
+          #075985 100%
+        );
+        --glass-bg: rgba(255, 255, 255, 0.08);
+        --glass-border: rgba(14, 165, 233, 0.15);
+        --glass-shadow: 0 8px 32px rgba(14, 165, 233, 0.15);
+        --dark-glass-bg: rgba(15, 23, 42, 0.8);
+        --dark-glass-border: rgba(148, 163, 184, 0.1);
+        --dark-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: linear-gradient(
+          135deg,
+          #f8fafc 0%,
+          #e2e8f0 50%,
+          #cbd5e1 100%
+        );
+        background-attachment: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        overflow: hidden;
+        position: relative;
+      }
+
+      body.dark {
+        background: linear-gradient(
+          135deg,
+          #020617 0%,
+          #0f172a 50%,
+          #1e293b 100%
+        );
+        background-attachment: fixed;
+      }
+
+      /* Morphing Background Shapes */
+      .morph-shape {
+        position: absolute;
+        background: linear-gradient(
+          45deg,
+          rgba(14, 165, 233, 0.04),
+          rgba(139, 92, 246, 0.04)
+        );
+        animation: morphing 12s ease-in-out infinite;
+        filter: blur(2px);
+        z-index: 0;
+      }
+
+      .morph-shape-1 {
+        width: 400px;
+        height: 400px;
+        top: -200px;
+        left: -200px;
+        opacity: 0.4;
+      }
+
+      .morph-shape-2 {
+        width: 300px;
+        height: 300px;
+        top: 50%;
+        right: -150px;
+        opacity: 0.3;
+        animation-delay: 3s;
+      }
+
+      .morph-shape-3 {
+        width: 350px;
+        height: 350px;
+        bottom: -175px;
+        left: 30%;
+        opacity: 0.35;
+        animation-delay: 6s;
+      }
+
+      @keyframes morphing {
+        0%,
+        100% {
+          border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        }
+        25% {
+          border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+        }
+        50% {
+          border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%;
+        }
+        75% {
+          border-radius: 60% 40% 60% 30% / 70% 30% 60% 70%;
+        }
+      }
+
+      /* Floating particles */
+      .particle-float {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        animation: particle-float linear infinite;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.6;
+      }
+
+      @keyframes particle-float {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(-100vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      /* Main loader container */
+      .loader-container {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        background: var(--glass-bg);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        padding: 60px 50px;
+        border-radius: 24px;
+        max-width: 480px;
+        width: 90%;
+        border-radius: 2rem;
+      }
+
+      body.dark .loader-container {
+        background: var(--dark-glass-bg);
+        border: 1px solid var(--dark-glass-border);
+        box-shadow: var(--dark-glass-shadow);
+      }
+
+      /* Logo video container */
+      .video-wrapper {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        margin: 0 auto 32px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px -12px rgba(14, 165, 233, 0.4);
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .video-wrapper:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 25px 50px -12px rgba(14, 165, 233, 0.5);
+      }
+
+      body.dark .video-wrapper {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      }
+
+      .logo-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 20px;
+      }
+
+      .logo-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 20px;
+      }
+
+      /* Brand section */
+      .brand-section {
+        margin-bottom: 36px;
+      }
+
+      .app-title {
+        font-size: 36px;
+        font-weight: 800;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+      }
+
+      .app-subtitle {
+        font-size: 14px;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 24px;
+      }
+
+      body.dark .app-subtitle {
+        color: #94a3b8;
+      }
+
+      .developer {
+        font-size: 13px;
+        color: #94a3b8;
+        font-weight: 500;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: inline-block;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      body.dark .developer {
+        color: #cbd5e1;
+        background: rgba(15, 23, 42, 0.5);
+      }
+
+      .developer-label {
+        color: #475569;
+        font-weight: 600;
+      }
+
+      body.dark .developer-label {
+        color: #e2e8f0;
+      }
+
+      /* Loading section */
+      .loading-section {
+        margin-top: 40px;
+        padding-top: 32px;
+        border-top: 1px solid rgba(226, 232, 240, 0.5);
+      }
+
+      body.dark .loading-section {
+        border-top-color: rgba(148, 163, 184, 0.1);
+      }
+
+      .loading-text {
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 20px;
+        font-weight: 500;
+      }
+
+      body.dark .loading-text {
+        color: #94a3b8;
+      }
+
+      /* Enhanced spinner */
+      .spinner-container {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto;
+      }
+
+      .spinner {
+        width: 60px;
+        height: 60px;
+        border: 3px solid rgba(226, 232, 240, 0.3);
+        border-top: 3px solid #0ea5e9;
+        border-right: 3px solid #8b5cf6;
+        border-radius: 50%;
+        animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        position: relative;
+        z-index: 2;
+      }
+
+      body.dark .spinner {
+        border-color: rgba(148, 163, 184, 0.2);
+        border-top-color: #0ea5e9;
+        border-right-color: #8b5cf6;
+      }
+
+      .spinner-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        opacity: 0.15;
+        filter: blur(12px);
+        animation: pulse 2s ease-in-out infinite;
+        z-index: 1;
+      }
+
+      .progress-ring {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 60px;
+        height: 60px;
+        transform: rotate(-90deg);
+      }
+
+      .progress-ring-circle {
+        stroke: url(#gradient);
+        stroke-width: 3;
+        stroke-linecap: round;
+        fill: transparent;
+        stroke-dasharray: 157;
+        stroke-dashoffset: 157;
+        animation: progress 3s linear forwards;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.15;
+          transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+          opacity: 0.25;
+          transform: translate(-50%, -50%) scale(1.1);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes progress {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      /* Status indicator */
+      .status-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        gap: 8px;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        animation: glow-pulse 2s infinite;
+      }
+
+      .status-text {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 500;
+      }
+
+      body.dark .status-text {
+        color: #94a3b8;
+      }
+
+      @keyframes glow-pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+          transform: scale(1);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(14, 165, 233, 0.8);
+          transform: scale(1.2);
+        }
+      }
+
+      /* Responsive design */
+      @media (max-width: 640px) {
+        .loader-container {
+          padding: 40px 32px;
+          margin: 20px;
+        }
+
+        .video-wrapper {
+          width: 180px;
+          height: 180px;
+        }
+
+        .app-title {
+          font-size: 28px;
+        }
+
+        .morph-shape-1,
+        .morph-shape-2,
+        .morph-shape-3 {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Morphing Background Shapes -->
+    <div class="morph-shape morph-shape-1"></div>
+    <div class="morph-shape morph-shape-2"></div>
+    <div class="morph-shape morph-shape-3"></div>
+
+    <!-- Main Loader Container -->
+    <div class="loader-container">
+      <!-- Logo Video -->
+      <div class="video-wrapper">
+        <video autoplay loop muted playsinline class="logo-video">
+          <source
+            src="{{ url_for('static', filename='videos/EduSync_Logo_Animated.mp4') }}"
+            type="video/mp4"
+          />
+          <img
+            src="{{ url_for('static', filename='images/EduSync-Logo.jpg') }}"
+            alt="EduSync Logo"
+            class="logo-image"
+          />
+        </video>
+      </div>
+
+      <!-- Brand Section -->
+      <div class="brand-section">
+        <div class="app-title">EduSync SMS</div>
+        <div class="app-subtitle">School Management System</div>
+        <div class="developer">
+          <span class="developer-label">Developed by</span> Evans Adu
+        </div>
+      </div>
+
+      <!-- Loading Section -->
+      <div class="loading-section">
+        <div class="loading-text">Loading your dashboard...</div>
+        <div class="spinner-container">
+          <svg class="progress-ring" width="60" height="60">
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0ea5e9" />
+                <stop offset="100%" stop-color="#8b5cf6" />
+              </linearGradient>
+            </defs>
+            <circle class="progress-ring-circle" r="25" cx="30" cy="30" />
+          </svg>
+          <div class="spinner-glow"></div>
+          <div class="spinner"></div>
+        </div>
+
+        <!-- Status Indicator -->
+        <div class="status-indicator">
+          <div class="status-dot"></div>
+          <div class="status-text">System Initializing</div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    // Check for dark mode preference
+    if (
+      localStorage.getItem("darkMode") === "true" ||
+      (window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches &&
+        localStorage.getItem("darkMode") !== "false")
+    ) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    // Create floating particles
+    function createParticle() {
+      const particle = document.createElement("div");
+      particle.className = "particle-float";
+      particle.style.left = Math.random() * 100 + "%";
+      particle.style.animationDuration = Math.random() * 10 + 15 + "s";
+      particle.style.animationDelay = Math.random() * 5 + "s";
+      document.body.appendChild(particle);
+
+      setTimeout(() => {
+        particle.remove();
+      }, 20000);
+    }
+
+    // Create particles continuously
+    setInterval(createParticle, 3000);
+
+    // Create initial particles
+    for (let i = 0; i < 15; i++) {
+      createParticle();
+    }
+
+    // Redirect after 3.5 seconds with smooth transition
+    setTimeout(function () {
+      // Add fade-out effect
+      document.querySelector(".loader-container").style.opacity = "0";
+      document.querySelector(".loader-container").style.transform =
+        "scale(0.95)";
+      document.querySelector(".loader-container").style.transition =
+        "all 0.5s ease";
+
+      // Redirect after fade-out completes
+      setTimeout(function () {
+        window.location.href = "{{ url_for('main.index') }}";
+      }, 500);
+    }, 3000);
+  </script>
+</html>

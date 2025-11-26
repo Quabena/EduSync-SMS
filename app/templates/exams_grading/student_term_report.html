@@ -310,7 +310,7 @@ student.full_name }}{% endblock %} {% block content %}
                 Aggregate
               </div>
               <div
-                class="stat-value text-3xl font-bold grade-{{ overall_grade.lower() if overall_grade else 'f' }} inline-flex items-center justify-center w-12 h-12 rounded-full text-amber-700 shadow-sm"
+                class="stat-value text-3xl font-bold grade-{{ overall_grade if overall_grade else 9 }} inline-flex items-center justify-center w-12 h-12 rounded-full text-amber-700 shadow-sm"
               >
                 {{ overall_grade }}
               </div>
@@ -369,7 +369,7 @@ student.full_name }}{% endblock %} {% block content %}
                 </td>
                 <td class="px-3 py-2 text-center">
                   <span
-                    class="inline-flex items-center justify-center w-8 h-8 rounded-full text-amber-700 font-bold text-sm shadow grade-{{ row.grade.lower() if row.grade else 'f' }}"
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-full text-amber-700 font-bold text-sm shadow grade-{{ row.grade if row.grade else 9 }}"
                   >
                     {{ row.grade }}
                   </span>

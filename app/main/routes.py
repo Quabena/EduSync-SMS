@@ -90,7 +90,17 @@ def ping():
     return jsonify(status="ok")
 
 
+@bp.route("/loading")
+def splash_screen():
+    return render_template("splash.html")
+
+
 @bp.route("/")
+def root():
+    return redirect(url_for("main.splash_screen"))
+
+
+@bp.route("/home")
 @login_required
 def index():
     """Main dashboard router - redirects to role-specific dashboards"""

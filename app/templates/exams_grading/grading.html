@@ -1,473 +1,509 @@
 {% extends "base.html" %} {% block title %}Grade Students - {{ class_.name }} -
 {{ subject.name }}{% endblock %} {% block content %}
-
-<style>
-  /* Your existing CSS styles remain unchanged */
-  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
-
-  body {
-    font-family: "Inter", sans-serif;
-  }
-
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
-
-  .table-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-  }
-
-  .input-field {
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid rgba(226, 232, 240, 0.6);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .input-field:focus {
-    background: rgba(255, 255, 255, 1);
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    transform: translateY(-1px);
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-  }
-
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-  }
-
-  .btn-secondary {
-    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-    transition: all 0.3s ease;
-  }
-
-  .btn-secondary:hover {
-    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
-  }
-
-  .btn-success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    transition: all 0.3s ease;
-  }
-
-  .btn-success:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-  }
-
-  .icon-wrapper {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-  }
-
-  .table-row {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-  }
-
-  .table-row:hover {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    transform: translateX(2px);
-  }
-
-  .score-input {
-    width: 80px;
-    padding: 8px 12px;
-    border: 2px solid rgba(226, 232, 240, 0.6);
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-
-  .score-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    transform: scale(1.05);
-  }
-
-  .total-score {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    font-weight: bold;
-    padding: 8px 12px;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-  }
-
-  .position-badge {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-    font-weight: bold;
-    padding: 6px 12px;
-    border-radius: 20px;
-    text-align: center;
-    font-size: 12px;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-  }
-
-  .position-1 {
-    background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
-    color: #8b4513;
-  }
-
-  .position-2 {
-    background: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
-    color: #4a4a4a;
-  }
-
-  .position-3 {
-    background: linear-gradient(135deg, #cd7f32 0%, #b8860b 100%);
-    color: white;
-  }
-
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.6s ease forwards;
-  }
-
-  .fade-in:nth-child(1) {
-    animation-delay: 0.1s;
-  }
-
-  .fade-in:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-
-  .fade-in:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .save-indicator {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-  }
-
-  .save-indicator.show {
-    transform: translateX(0);
-  }
-
-  .save-indicator.success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-  }
-
-  .save-indicator.error {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-  }
-
-  .floating-save {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 50;
-  }
-
-  @media (max-width: 768px) {
-    .floating-save {
-      bottom: 16px;
-      right: 16px;
-    }
-  }
-</style>
-
 <div class="min-h-screen">
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <!-- Enhanced Header -->
-    <div class="glass-effect rounded-2xl shadow-xl p-8 mb-8 border border-white/20 fade-in">
-      <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-6 lg:space-y-0">
-        <div class="space-y-3">
-          <div class="flex items-center space-x-4">
-            <div class="icon-wrapper w-16 h-16 rounded-2xl flex items-center justify-center">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </div>
-            <div>
-              <h1
-                class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent">
-                Grade Students
-              </h1>
-              <p class="text-lg text-gray-600 font-medium">
-                {{ class_.name }} - {{ subject.name }}
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center space-x-4 text-sm">
-            <div class="flex items-center space-x-2">
-              <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <span class="font-medium text-gray-700">Teacher: {{ teacher.full_name }}</span>
-            </div>
-            <span class="text-gray-300">•</span>
-            <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
-              {{ term }} {{ year }}
-            </span>
-          </div>
-        </div>
-
-        <div class="flex space-x-3">
-          <a href="{{ url_for('exams_grading.select_grading_period', class_id=class_.id, subject_id=subject.id) }}"
-            class="btn-secondary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z" />
+  <!-- Header Section -->
+  <div class="professional-card p-8 mb-8">
+    <div
+      class="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-6 lg:space-y-0"
+    >
+      <div class="space-y-4">
+        <div class="flex items-center space-x-4">
+          <div
+            class="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-xl"
+          >
+            <svg
+              class="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
             </svg>
-            Change Period
-          </a>
-          <button id="save-all-btn"
-            class="btn-primary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            Save All Scores
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Grading Instructions -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-8 border border-white/20 fade-in">
-      <div class="flex items-center space-x-3 mb-4">
-        <div class="p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <h2 class="text-xl font-bold text-gray-800">Grading Instructions</h2>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-        <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
-          <h3 class="font-semibold text-blue-800 mb-2">Individual Test</h3>
-          <p class="text-blue-600">Maximum: 15 marks</p>
-        </div>
-        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
-          <h3 class="font-semibold text-emerald-800 mb-2">Group Work</h3>
-          <p class="text-emerald-600">Maximum: 15 marks</p>
-        </div>
-        <div class="bg-purple-50 p-4 rounded-xl border border-purple-200">
-          <h3 class="font-semibold text-purple-800 mb-2">Class Test</h3>
-          <p class="text-purple-600">Maximum: 15 marks</p>
-        </div>
-        <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
-          <h3 class="font-semibold text-amber-800 mb-2">Project</h3>
-          <p class="text-amber-600">Maximum: 15 marks</p>
-        </div>
-      </div>
-      <div class="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
-        <p class="text-sm text-indigo-700 font-medium">
-          <strong>Note:</strong> Class Total = Individual Test + Group Work +
-          Class Test + Project (Max: 60). Exam Score (Max: 100). Total Score is
-          calculated automatically based on 50% class work and 50% exam.
-        </p>
-      </div>
-    </div>
-
-    <!-- Grading Table -->
-    <div class="table-card rounded-2xl shadow-xl border fade-in">
-      <div class="p-6 border-b border-gray-200/60">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800">Student Scores</h2>
           </div>
-          <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">
-            {{ students | length }} Students
+          <div>
+            <h1 class="text-3xl font-bold gradient-text">Grade Students</h1>
+            <p class="text-lg text-slate-600 dark:text-slate-300 font-medium">
+              {{ class_.name }} - {{ subject.name }}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4 text-sm">
+          <div class="flex items-center space-x-2">
+            <svg
+              class="w-4 h-4 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            <span class="font-medium text-slate-700 dark:text-slate-300"
+              >Teacher: {{ teacher.full_name }}</span
+            >
+          </div>
+          <span class="text-slate-300 dark:text-slate-600">•</span>
+          <span
+            class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold"
+          >
+            {{ term }} {{ year }}
           </span>
         </div>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="min-w-full" id="grading-table">
-          <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-            <tr>
-              <th class="py-4 px-6 text-left text-sm font-semibold text-gray-900 sticky left-0 bg-gray-50">
-                Student
-              </th>
-              <th class="py-4 px-3 text-center text-sm font-semibold text-gray-900">
-                Individual Test<br /><span class="text-xs text-gray-500">(Max: 15)</span>
-              </th>
-              <th class="py-4 px-3 text-center text-sm font-semibold text-gray-900">
-                Group Work<br /><span class="text-xs text-gray-500">(Max: 15)</span>
-              </th>
-              <th class="py-4 px-3 text-center text-sm font-semibold text-gray-900">
-                Class Test<br /><span class="text-xs text-gray-500">(Max: 15)</span>
-              </th>
-              <th class="py-4 px-3 text-center text-sm font-semibold text-gray-900">
-                Project<br /><span class="text-xs text-gray-500">(Max: 15)</span>
-              </th>
-              <th class="py-4 px-3 text-center text-sm font-semibold text-gray-900">
-                Class Total<br /><span class="text-xs text-gray-500">(Max: 60)</span>
-              </th>
-              <th class="py-4 px-3 text-center text-sm font-semibold text-gray-900">
-                Exam Score<br /><span class="text-xs text-gray-500">(Max: 100)</span>
-              </th>
-              <th class="py-4 px-3 text-center text-sm font-semibold text-gray-900">
-                Total Score<br /><span class="text-xs text-gray-500">(Max: 100)</span>
-              </th>
-              <th class="py-4 px-3 text-center text-sm font-semibold text-gray-900">
-                Position
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white" id="grading-tbody">
-            {% for student in students %} {% set score =
-            term_scores.get(student.id) %}
-            <tr class="table-row" data-student-id="{{ student.id }}">
-              <td class="py-4 px-6 sticky left-0 bg-white">
-                <div class="flex items-center space-x-3">
-                  <div
-                    class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg">
-                    {{ student.full_name.split()[0][0] }}{{
-                    student.full_name.split()[-1][0] if
-                    student.full_name.split()|length > 1 else '' }}
-                  </div>
-                  <div>
-                    <p class="text-sm font-semibold text-gray-900">
-                      {{ student.full_name }}
-                    </p>
-                    <p class="text-xs text-gray-500">ID: {{ student.id }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="py-4 px-3 text-center">
-                <input type="number" class="score-input individual-test" data-student-id="{{ student.id }}"
-                  data-field="individual_test" value="{{ score.individual_test if score else 0 }}" min="0" max="15"
-                  step="0.5" onchange="updateScores({{ student.id }})" />
-              </td>
-              <td class="py-4 px-3 text-center">
-                <input type="number" class="score-input group-work" data-student-id="{{ student.id }}"
-                  data-field="group_work" value="{{ score.group_work if score else 0 }}" min="0" max="15" step="0.5"
-                  onchange="updateScores({{ student.id }})" />
-              </td>
-              <td class="py-4 px-3 text-center">
-                <input type="number" class="score-input class-test" data-student-id="{{ student.id }}"
-                  data-field="class_test" value="{{ score.class_test if score else 0 }}" min="0" max="15" step="0.5"
-                  onchange="updateScores({{ student.id }})" />
-              </td>
-              <td class="py-4 px-3 text-center">
-                <input type="number" class="score-input project" data-student-id="{{ student.id }}" data-field="project"
-                  value="{{ score.project if score else 0 }}" min="0" max="15" step="0.5"
-                  onchange="updateScores({{ student.id }})" />
-              </td>
-              <td class="py-4 px-3 text-center">
-                <div class="class-total bg-blue-100 text-blue-800 font-semibold py-2 px-3 rounded-lg"
-                  data-student-id="{{ student.id }}">
-                  {{ score.class_total if score else 0 }}
-                </div>
-              </td>
-              <td class="py-4 px-3 text-center">
-                <input type="number" class="score-input exam-score" data-student-id="{{ student.id }}"
-                  data-field="exam_score" value="{{ score.exam_score if score else 0 }}" min="0" max="100" step="0.5"
-                  onchange="updateScores({{ student.id }})" />
-              </td>
-              <td class="py-4 px-3 text-center">
-                <div class="total-score" data-student-id="{{ student.id }}">
-                  {{ "%.1f"|format(score.total_score) if score and
-                  score.total_score else "0.0" }}
-                </div>
-              </td>
-              <td class="py-4 px-3 text-center">
-                <div class="position-badge" data-student-id="{{ student.id }}">
-                  -
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="flex space-x-3">
+        <a
+          href="{{ url_for('exams_grading.select_grading_period', class_id=class_.id, subject_id=subject.id) }}"
+          class="inline-flex items-center justify-center px-5 py-3 glass rounded-xl font-medium text-slate-700 dark:text-slate-200 hover-lift transition-all duration-300"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
+            />
+          </svg>
+          Change Period
+        </a>
+        <button
+          id="save-all-btn"
+          class="inline-flex items-center justify-center px-5 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover-lift transition-all duration-300"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          Save All Scores
+        </button>
       </div>
+    </div>
+  </div>
 
-      <!-- Summary Footer -->
-      <div class="p-6 border-t border-gray-200/60 bg-gradient-to-r from-gray-50/50 to-white">
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
-          <div class="space-y-2">
-            <div class="flex items-center space-x-4 text-sm">
-              <div class="flex items-center space-x-2">
-                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span class="font-semibold text-gray-700">Total Students: {{ students | length }}</span>
+  <!-- Grading Instructions -->
+  <div class="professional-card p-6 mb-8">
+    <div class="flex items-center space-x-3 mb-4">
+      <div
+        class="p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg"
+      >
+        <svg
+          class="w-5 h-5 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </div>
+      <h2 class="text-xl font-bold text-slate-800 dark:text-white">
+        Grading Instructions
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+      <div
+        class="glass p-4 rounded-xl border border-blue-200 dark:border-blue-800"
+      >
+        <h3 class="font-semibold text-blue-700 dark:text-blue-300 mb-2">
+          Individual Test
+        </h3>
+        <p class="text-blue-600 dark:text-blue-400">Maximum: 15 marks</p>
+      </div>
+      <div
+        class="glass p-4 rounded-xl border border-emerald-200 dark:border-emerald-800"
+      >
+        <h3 class="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">
+          Group Work
+        </h3>
+        <p class="text-emerald-600 dark:text-emerald-400">Maximum: 15 marks</p>
+      </div>
+      <div
+        class="glass p-4 rounded-xl border border-purple-200 dark:border-purple-800"
+      >
+        <h3 class="font-semibold text-purple-700 dark:text-purple-300 mb-2">
+          Class Test
+        </h3>
+        <p class="text-purple-600 dark:text-purple-400">Maximum: 15 marks</p>
+      </div>
+      <div
+        class="glass p-4 rounded-xl border border-amber-200 dark:border-amber-800"
+      >
+        <h3 class="font-semibold text-amber-700 dark:text-amber-300 mb-2">
+          Project
+        </h3>
+        <p class="text-amber-600 dark:text-amber-400">Maximum: 15 marks</p>
+      </div>
+    </div>
+    <div
+      class="mt-4 p-4 glass rounded-xl border border-blue-200 dark:border-blue-800"
+    >
+      <p class="text-sm text-blue-700 dark:text-blue-300 font-medium">
+        <strong>Note:</strong> Class Total = Individual Test + Group Work +
+        Class Test + Project (Max: 60). Exam Score (Max: 100). Total Score is
+        calculated automatically based on 50% class work and 50% exam.
+      </p>
+    </div>
+  </div>
+
+  <!-- Grading Table -->
+  <div class="professional-card overflow-hidden">
+    <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div
+            class="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg"
+          >
+            <svg
+              class="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-slate-800 dark:text-white">
+            Student Scores
+          </h2>
+        </div>
+        <span
+          class="px-3 py-1 glass text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-full"
+        >
+          {{ students | length }} Students
+        </span>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full" id="grading-table">
+        <thead class="bg-slate-50 dark:bg-slate-800/50">
+          <tr>
+            <th
+              class="py-4 px-6 text-left text-sm font-semibold text-slate-700 dark:text-slate-300 sticky left-0 bg-slate-50 dark:bg-slate-800/80 z-10"
+            >
+              Student
+            </th>
+            <th
+              class="py-4 px-3 text-center text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Individual Test<br /><span class="text-xs text-slate-500"
+                >(Max: 15)</span
+              >
+            </th>
+            <th
+              class="py-4 px-3 text-center text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Group Work<br /><span class="text-xs text-slate-500"
+                >(Max: 15)</span
+              >
+            </th>
+            <th
+              class="py-4 px-3 text-center text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Class Test<br /><span class="text-xs text-slate-500"
+                >(Max: 15)</span
+              >
+            </th>
+            <th
+              class="py-4 px-3 text-center text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Project<br /><span class="text-xs text-slate-500">(Max: 15)</span>
+            </th>
+            <th
+              class="py-4 px-3 text-center text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Class Total<br /><span class="text-xs text-slate-500"
+                >(Max: 60)</span
+              >
+            </th>
+            <th
+              class="py-4 px-3 text-center text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Exam Score<br /><span class="text-xs text-slate-500"
+                >(Max: 100)</span
+              >
+            </th>
+            <th
+              class="py-4 px-3 text-center text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Total Score<br /><span class="text-xs text-slate-500"
+                >(Max: 100)</span
+              >
+            </th>
+            <th
+              class="py-4 px-3 text-center text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Position
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white/50 dark:bg-slate-800/30">
+          {% for student in students %} {% set score =
+          term_scores.get(student.id) %}
+          <tr
+            class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors duration-200"
+            data-student-id="{{ student.id }}"
+          >
+            <td
+              class="py-4 px-6 sticky left-0 bg-white/70 dark:bg-slate-800/70 z-5"
+            >
+              <div class="flex items-center space-x-3">
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg"
+                >
+                  {{ student.full_name.split()[0][0] }}{{
+                  student.full_name.split()[-1][0] if
+                  student.full_name.split()|length > 1 else '' }}
+                </div>
+                <div>
+                  <p
+                    class="text-sm font-semibold text-slate-800 dark:text-slate-200"
+                  >
+                    {{ student.full_name }}
+                  </p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                    ID: {{ student.id }}
+                  </p>
+                </div>
               </div>
-              <span class="text-gray-300">•</span>
-              <span class="text-sm text-gray-500 font-medium">Scores are auto-saved as you type</span>
-            </div>
-          </div>
+            </td>
+            <td class="py-4 px-3 text-center">
+              <input
+                type="number"
+                class="w-20 px-2 py-1.5 text-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                data-student-id="{{ student.id }}"
+                data-field="individual_test"
+                value="{{ score.individual_test if score else 0 }}"
+                min="0"
+                max="15"
+                step="0.5"
+                onchange="updateScores({{ student.id }})"
+              />
+            </td>
+            <td class="py-4 px-3 text-center">
+              <input
+                type="number"
+                class="w-20 px-2 py-1.5 text-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                data-student-id="{{ student.id }}"
+                data-field="group_work"
+                value="{{ score.group_work if score else 0 }}"
+                min="0"
+                max="15"
+                step="0.5"
+                onchange="updateScores({{ student.id }})"
+              />
+            </td>
+            <td class="py-4 px-3 text-center">
+              <input
+                type="number"
+                class="w-20 px-2 py-1.5 text-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                data-student-id="{{ student.id }}"
+                data-field="class_test"
+                value="{{ score.class_test if score else 0 }}"
+                min="0"
+                max="15"
+                step="0.5"
+                onchange="updateScores({{ student.id }})"
+              />
+            </td>
+            <td class="py-4 px-3 text-center">
+              <input
+                type="number"
+                class="w-20 px-2 py-1.5 text-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                data-student-id="{{ student.id }}"
+                data-field="project"
+                value="{{ score.project if score else 0 }}"
+                min="0"
+                max="15"
+                step="0.5"
+                onchange="updateScores({{ student.id }})"
+              />
+            </td>
+            <td class="py-4 px-3 text-center">
+              <div
+                class="class-total px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold"
+                data-student-id="{{ student.id }}"
+              >
+                {{ score.class_total if score else 0 }}
+              </div>
+            </td>
+            <td class="py-4 px-3 text-center">
+              <input
+                type="number"
+                class="w-20 px-2 py-1.5 text-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                data-student-id="{{ student.id }}"
+                data-field="exam_score"
+                value="{{ score.exam_score if score else 0 }}"
+                min="0"
+                max="100"
+                step="0.5"
+                onchange="updateScores({{ student.id }})"
+              />
+            </td>
+            <td class="py-4 px-3 text-center">
+              <div
+                class="total-score px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold shadow-md"
+                data-student-id="{{ student.id }}"
+              >
+                {{ "%.1f"|format(score.total_score) if score and
+                score.total_score else "0.0" }}
+              </div>
+            </td>
+            <td class="py-4 px-3 text-center">
+              <div
+                class="position-badge px-3 py-1.5 rounded-full font-semibold text-sm"
+                data-student-id="{{ student.id }}"
+              >
+                -
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-          <div class="flex space-x-3 w-full lg:w-auto">
-            <a href="{{ url_for('exams_grading.index') }}"
-              class="btn-secondary flex-1 lg:flex-none inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    <!-- Summary Footer -->
+    <div
+      class="p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
+    >
+      <div
+        class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0"
+      >
+        <div class="space-y-2">
+          <div class="flex items-center space-x-4 text-sm">
+            <div class="flex items-center space-x-2">
+              <svg
+                class="w-4 h-4 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
               </svg>
-              Back to Dashboard
-            </a>
-            <button id="save-all-footer"
-              class="btn-success flex-1 lg:flex-none inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              Save All Changes
-            </button>
+              <span class="font-semibold text-slate-700 dark:text-slate-300"
+                >Total Students: {{ students | length }}</span
+              >
+            </div>
+            <span class="text-slate-300 dark:text-slate-600">•</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400 font-medium"
+              >Scores are auto-saved as you type</span
+            >
           </div>
+        </div>
+
+        <div class="flex space-x-3 w-full lg:w-auto">
+          <a
+            href="{{ url_for('exams_grading.index') }}"
+            class="flex-1 lg:flex-none inline-flex items-center justify-center px-5 py-3 glass rounded-xl font-medium text-slate-700 dark:text-slate-200 hover-lift transition-all duration-300"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Dashboard
+          </a>
+          <button
+            id="save-all-footer"
+            class="flex-1 lg:flex-none inline-flex items-center justify-center px-5 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg hover-lift transition-all duration-300"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Save All Changes
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Floating Save Button for Mobile -->
-    <div class="floating-save lg:hidden">
-      <button id="floating-save-btn"
-        class="btn-primary w-14 h-14 rounded-full shadow-2xl flex items-center justify-center">
-        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-      </button>
-    </div>
+  <!-- Floating Save Button for Mobile -->
+  <div class="fixed bottom-6 right-6 lg:hidden z-40">
+    <button
+      id="floating-save-btn"
+      class="w-14 h-14 rounded-full shadow-2xl flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white transition-all duration-300 hover-lift"
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+    </button>
   </div>
 </div>
 
 <!-- Save Indicator -->
-<div id="save-indicator" class="save-indicator">
-  <span id="save-message">Saving...</span>
+<div id="save-indicator" class="fixed top-6 right-6 z-50">
+  <div
+    id="save-message"
+    class="px-4 py-3 rounded-xl shadow-lg font-medium transition-all duration-300 transform translate-x-full"
+  >
+    Saving...
+  </div>
 </div>
 
 <script>
@@ -497,14 +533,23 @@
     const row = document.querySelector(`tr[data-student-id="${studentId}"]`);
     if (!row) return;
 
-    const individualTest = parseFloat(row.querySelector('.individual-test').value) || 0;
-    const groupWork = parseFloat(row.querySelector('.group-work').value) || 0;
-    const classTest = parseFloat(row.querySelector('.class-test').value) || 0;
-    const project = parseFloat(row.querySelector('.project').value) || 0;
-    const examScore = parseFloat(row.querySelector('.exam-score').value) || 0;
+    const individualTest =
+      parseFloat(row.querySelector('[data-field="individual_test"]').value) ||
+      0;
+    const groupWork =
+      parseFloat(row.querySelector('[data-field="group_work"]').value) || 0;
+    const classTest =
+      parseFloat(row.querySelector('[data-field="class_test"]').value) || 0;
+    const project =
+      parseFloat(row.querySelector('[data-field="project"]').value) || 0;
+    const examScore =
+      parseFloat(row.querySelector('[data-field="exam_score"]').value) || 0;
 
     // Calculate class total (max 60)
-    const classTotal = Math.min(individualTest + groupWork + classTest + project, 60);
+    const classTotal = Math.min(
+      individualTest + groupWork + classTest + project,
+      60
+    );
 
     // Calculate total score (50% class work + 50% exam)
     const scaledClass = (classTotal / 60) * 50;
@@ -512,15 +557,15 @@
     const totalScore = scaledClass + scaledExam;
 
     // Update display
-    row.querySelector('.class-total').textContent = classTotal.toFixed(1);
-    row.querySelector('.total-score').textContent = totalScore.toFixed(1);
+    row.querySelector(".class-total").textContent = classTotal.toFixed(1);
+    row.querySelector(".total-score").textContent = totalScore.toFixed(1);
 
     // Store for position calculation
     row.dataset.totalScore = totalScore;
   }
 
   function updatePositions() {
-    const rows = Array.from(document.querySelectorAll('tr[data-student-id]'));
+    const rows = Array.from(document.querySelectorAll("tr[data-student-id]"));
 
     // Sort by total score (descending)
     rows.sort((a, b) => {
@@ -540,17 +585,41 @@
         currentPosition = index + 1;
       }
 
-      const positionElement = row.querySelector('.position-badge');
+      const positionElement = row.querySelector(".position-badge");
       positionElement.textContent = currentPosition;
 
       // Apply special styling for top 3
-      positionElement.className = 'position-badge';
+      positionElement.className =
+        "position-badge px-3 py-1.5 rounded-full font-semibold text-sm";
+
       if (currentPosition === 1) {
-        positionElement.classList.add('position-1');
+        positionElement.classList.add(
+          "bg-gradient-to-r",
+          "from-yellow-500",
+          "to-amber-600",
+          "text-white"
+        );
       } else if (currentPosition === 2) {
-        positionElement.classList.add('position-2');
+        positionElement.classList.add(
+          "bg-gradient-to-r",
+          "from-slate-400",
+          "to-slate-500",
+          "text-white"
+        );
       } else if (currentPosition === 3) {
-        positionElement.classList.add('position-3');
+        positionElement.classList.add(
+          "bg-gradient-to-r",
+          "from-amber-700",
+          "to-orange-700",
+          "text-white"
+        );
+      } else {
+        positionElement.classList.add(
+          "bg-slate-200",
+          "dark:bg-slate-700",
+          "text-slate-700",
+          "dark:text-slate-300"
+        );
       }
 
       previousScore = score;
@@ -560,14 +629,21 @@
   function saveAllScores() {
     const scores = {};
 
-    document.querySelectorAll('tr[data-student-id]').forEach(row => {
+    document.querySelectorAll("tr[data-student-id]").forEach((row) => {
       const studentId = row.dataset.studentId;
       scores[studentId] = {
-        individual_test: parseFloat(row.querySelector('.individual-test').value) || 0,
-        group_work: parseFloat(row.querySelector('.group-work').value) || 0,
-        class_test: parseFloat(row.querySelector('.class-test').value) || 0,
-        project: parseFloat(row.querySelector('.project').value) || 0,
-        exam_score: parseFloat(row.querySelector('.exam-score').value) || 0
+        individual_test:
+          parseFloat(
+            row.querySelector('[data-field="individual_test"]').value
+          ) || 0,
+        group_work:
+          parseFloat(row.querySelector('[data-field="group_work"]').value) || 0,
+        class_test:
+          parseFloat(row.querySelector('[data-field="class_test"]').value) || 0,
+        project:
+          parseFloat(row.querySelector('[data-field="project"]').value) || 0,
+        exam_score:
+          parseFloat(row.querySelector('[data-field="exam_score"]').value) || 0,
       };
     });
 
@@ -576,72 +652,82 @@
       subject_id: "{{ subject.id }}",
       term: "{{ term }}",
       year: "{{ year }}",
-      scores: scores
+      scores: scores,
     };
-    showSaveIndicator('Saving...', 'saving');
 
-    // FIXED: Added CSRF token to headers like in the old template
+    showSaveIndicator("Saving...", "bg-blue-500 text-white");
+
     fetch('{{ url_for("exams_grading.save_grades") }}', {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token() }}'  // This line was missing in the new template
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token() }}",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
-          showSaveIndicator('Saved successfully!', 'success');
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === "success") {
+          showSaveIndicator("Saved successfully!", "bg-emerald-500 text-white");
           hasUnsavedChanges = false;
         } else {
-          showSaveIndicator('Error saving: ' + data.message, 'error');
+          showSaveIndicator(
+            "Error saving: " + data.message,
+            "bg-red-500 text-white"
+          );
         }
       })
-      .catch(error => {
-        console.error('Error:', error);
-        showSaveIndicator('Network error occurred', 'error');
+      .catch((error) => {
+        console.error("Error:", error);
+        showSaveIndicator("Network error occurred", "bg-red-500 text-white");
       });
   }
 
-  function showSaveIndicator(message, type) {
-    const indicator = document.getElementById('save-indicator');
-    const messageEl = document.getElementById('save-message');
+  function showSaveIndicator(message, className) {
+    const indicator = document.getElementById("save-indicator");
+    const messageEl = document.getElementById("save-message");
 
     messageEl.textContent = message;
-    indicator.className = `save-indicator ${type} show`;
+    messageEl.className = `px-4 py-3 rounded-xl shadow-lg font-medium transition-all duration-300 ${className}`;
+    indicator.classList.remove("translate-x-full");
 
     setTimeout(() => {
-      indicator.classList.remove('show');
+      indicator.classList.add("translate-x-full");
     }, 3000);
   }
 
   // Event listeners
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener("DOMContentLoaded", function () {
     // Calculate initial totals and positions
-    document.querySelectorAll('tr[data-student-id]').forEach(row => {
+    document.querySelectorAll("tr[data-student-id]").forEach((row) => {
       const studentId = row.dataset.studentId;
       calculateStudentTotals(studentId);
     });
     updatePositions();
 
     // Save button event listeners
-    document.getElementById('save-all-btn').addEventListener('click', saveAllScores);
-    document.getElementById('save-all-footer').addEventListener('click', saveAllScores);
-    document.getElementById('floating-save-btn').addEventListener('click', saveAllScores);
+    document
+      .getElementById("save-all-btn")
+      .addEventListener("click", saveAllScores);
+    document
+      .getElementById("save-all-footer")
+      .addEventListener("click", saveAllScores);
+    document
+      .getElementById("floating-save-btn")
+      .addEventListener("click", saveAllScores);
 
     // Warn before leaving with unsaved changes
-    window.addEventListener('beforeunload', function (e) {
+    window.addEventListener("beforeunload", function (e) {
       if (hasUnsavedChanges) {
         e.preventDefault();
-        e.returnValue = '';
+        e.returnValue = "";
       }
     });
   });
 
   // Keyboard shortcuts
-  document.addEventListener('keydown', function (e) {
-    if (e.ctrlKey && e.key === 's') {
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && e.key === "s") {
       e.preventDefault();
       saveAllScores();
     }

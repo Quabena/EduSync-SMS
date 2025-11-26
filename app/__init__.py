@@ -1,27 +1,23 @@
-from flask import Flask
-from flask_wtf.csrf import CSRFProtect
+import os
 from pathlib import Path
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from flask_moment import Moment
-from config import Config
-import os
-import logging
-from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
+from config import Config
 
-# NOTE: removed `from init_data import initialize_directories, seed_default_admin`
-# to avoid circular import at module import time.
-
-# Load dotenv
+# loading .env
 load_dotenv()
 
-# Extension instances (module-level so other modules can import them)
+# --- EXTENSION INSTANCES ---
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 csrf = CSRFProtect()
+moment = Moment()
 
 
 def basename_filter(path):
@@ -29,78 +25,58 @@ def basename_filter(path):
 
 
 def create_app(config_class=Config):
-    """App factory"""
+    """Application factory"""
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # log_dir = Path(app.config.get("BASE_DIR", Path.home() / "EduSyncLogs")) / "logs"
-    # log_dir.mkdir(parents=True, exist_ok=True)
-    # log_file = log_dir / "backend.log"
-
-    # handler = RotatingFileHandler(
-    #     str(log_file), maxBytes=5 * 1024 * 1024, backupCount=3
-    # )
-    # handler.setLevel(logging.INFO)
-    # formatter = logging.Formatter(
-    #     "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
-    # )
-    # handler.setFormatter(formatter)
-    # app.logger.addHandler(handler)
-
-    # # Optional: also set werkzeug logger to write into same file
-    # import logging as _logging
-
-    # werkzeug_logger = _logging.getLogger("werkzeug")
-    # werkzeug_logger.addHandler(handler)
-
-    # Normalize storage config values -> ensure they are Path objects
-    storage_keys = (
+    # Convert all storage config values to Path() objects
+    STORAGE_KEYS = (
         "BACKUP_DIR",
         "DOCUMENT_DIR",
         "TEACHER_PHOTOS_DIR",
+        "TEACHER_CERTS_DIR",
         "QR_DIR",
         "REPORT_DIR",
     )
-    for key in storage_keys:
+
+    for key in STORAGE_KEYS:
         val = app.config.get(key)
+
         if isinstance(val, Path):
+            # already a Path – nothing to do
             app.config[key] = val
         elif isinstance(val, str):
-            app.config[key] = Path(val)
+            # convert non-empty string → Path
+            app.config[key] = Path(val) if val.strip() else Path()
         else:
+            # fallback: force Path
             app.config[key] = Path(str(val))
 
-    # Initialize extensions (do this before importing code that may rely on them)
-    Moment(app)
+    # Initialize Flask extensions
+    moment.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"  # type: ignore
-
-    # Initialize CSRF early so blueprints can rely on it
     csrf.init_app(app)
 
-    # Import get_grade here to avoid circular imports.
-    # Make sure app.utils.grading does NOT import 'app' (should be a pure helper).
-    try:
-        from app.utils.grading import get_grade
-    except Exception:
-        # If anything goes wrong importing the grading helper, surface a clearer error.
-        raise
-
-    # Register get_grade both as a filter (pipe-style) and as a template global (callable)
-    app.add_template_filter(get_grade, name="get_grade")
-    app.add_template_global(get_grade, name="get_grade")
-
-    # Register other small template filters/globals
+    # Template filters and helpers
     app.add_template_filter(basename_filter, name="basename")
 
-    # Create required storage directories (helper expects the app)
+    try:
+        from app.utils.grading import get_grade
+
+        app.add_template_filter(get_grade, name="get_grade")
+        app.add_template_global(get_grade, name="get_grade")
+    except Exception as e:
+        raise RuntimeError(f"Error loading grading utility: {e}")
+
+    # Ensure storage directories exist
     from app.utils.setup import create_storage_dirs
 
     create_storage_dirs(app)
 
-    # Register blueprints (import them here to avoid circular imports)
+    # Register Blueprints (imported here to avoid circular imports)
     from app.auth import bp as auth_bp
 
     app.register_blueprint(auth_bp)
@@ -113,9 +89,9 @@ def create_app(config_class=Config):
 
     app.register_blueprint(students_bp)
 
-    from app.subjects import bp as subject_bp
+    from app.subjects import bp as subjects_bp
 
-    app.register_blueprint(subject_bp)
+    app.register_blueprint(subjects_bp)
 
     from app.classes import bp as classes_bp
 
@@ -153,30 +129,25 @@ def create_app(config_class=Config):
 
     app.register_blueprint(search_bp)
 
-    # Import models and create tables while app context is active,
-    # then run the seeder here (imported lazily to avoid cycles).
+    # Create database tables + run seeding
     with app.app_context():
-        from . import models  # your models so db.create_all knows tables
+        from . import models
 
         db.create_all()
 
-        # Lazy import and run seeder safely
+        # Lazy-load seeding functions
         try:
             from init_data import initialize_directories, seed_default_admin
 
-            # ensure directories exist (safe)
-            initialize_directories()
+            initialize_directories()  # Safe; creates folders if missing
 
-            # seed admin, but don't allow seeder to raise
             ok, message = seed_default_admin(app)
             if not ok:
-                # Log the detailed error message (it's the traceback string)
                 app.logger.error("Seeder reported error: %s", message)
             else:
                 app.logger.info("Seeder success: %s", message)
 
         except Exception:
-            # This outer try/catch is extra safe: it logs any unexpected errors
             app.logger.exception("Unexpected error while running init_data seeder")
 
     return app

@@ -1,88 +1,139 @@
-{% extends "base.html" %} {% block title %}Select Grading Period{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Select Grading Period{% endblock %}
+
+{% block page_title %}Select Grading Period{% endblock %}
+
+{% block page_description %}{{ class_.name }} - {{ subject.name }}{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-  <!-- Header Section -->
-  <div class="bg-white shadow-sm border-b">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="py-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">
-              Select Grading Period
-            </h1>
-            <p class="mt-2 text-gray-600">
-              {{ class_.name }} - {{ subject.name }}
-            </p>
-          </div>
-          <a href="{{ url_for('exams_grading.index') }}"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
-              </path>
-            </svg>
-            Back to Dashboard
-          </a>
-        </div>
+<div class="max-w-4xl mx-auto space-y-6">
+  <!-- Main Card -->
+  <div class="professional-card p-8">
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
       </div>
+      <h2 class="text-3xl font-bold text-slate-800 dark:text-white mb-3">
+        Choose Academic Period
+      </h2>
+      <p class="text-slate-600 dark:text-slate-300 text-lg">
+        Select term and year for {{ class_.name }} - {{ subject.name }}
+      </p>
     </div>
-  </div>
 
-  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
+    <!-- Form Section -->
+    <form id="periodForm" class="space-y-8">
+      <!-- Term Selection -->
+      <div class="space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <label for="term" class="text-lg font-semibold text-slate-800 dark:text-white">Academic Term</label>
         </div>
-        <h2 class="text-2xl font-semibold text-gray-900">
-          Choose Term and Year
-        </h2>
-        <p class="text-gray-600 mt-2">Select the academic period for grading</p>
+        <div class="relative">
+          <select 
+            id="term" 
+            name="term" 
+            required
+            class="w-full px-6 py-4 text-slate-700 dark:text-white bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 glass appearance-none cursor-pointer"
+          >
+            <option value="">Select Term</option>
+            {% set current_term = 'Term 1' if current_month <= 4 else ('Term 2' if current_month <=8 else 'Term 3' ) %}
+            <option value="Term 1" {{ 'selected' if current_term=='Term 1' else '' }}>Term 1</option>
+            <option value="Term 2" {{ 'selected' if current_term=='Term 2' else '' }}>Term 2</option>
+            <option value="Term 3" {{ 'selected' if current_term=='Term 3' else '' }}>Term 3</option>
+          </select>
+          <div class="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <i class="fas fa-chevron-down text-slate-400"></i>
+          </div>
+        </div>
       </div>
 
-      <form id="periodForm" class="space-y-6">
-        <div>
-          <label for="term" class="block text-sm font-medium text-gray-700 mb-2">Term</label>
-          <select id="term" name="term" required
-            class="w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
-            <option value="">Select Term</option>
-            {% set current_term =
-            'Term 1' if current_month <= 4 else ('Term 2' if current_month <=8 else 'Term 3' ) %} <option value="Term 1"
-              {{ 'selected' if current_term=='Term 1' else '' }}>Term 1</option>
-              <option value="Term 2" {{ 'selected' if current_term=='Term 2' else '' }}>Term 2</option>
-              <option value="Term 3" {{ 'selected' if current_term=='Term 3' else '' }}>Term 3</option>
-
-          </select>
+      <!-- Year Selection -->
+      <div class="space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+          <label for="year" class="text-lg font-semibold text-slate-800 dark:text-white">Academic Year</label>
         </div>
-
-        <div>
-          <label for="year" class="block text-sm font-medium text-gray-700 mb-2">Academic Year</label>
-          <select id="year" name="year" required
-            class="w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
+        <div class="relative">
+          <select 
+            id="year" 
+            name="year" 
+            required
+            class="w-full px-6 py-4 text-slate-700 dark:text-white bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 glass appearance-none cursor-pointer"
+          >
             <option value="">Select Year</option>
             {% set current_year = now().year %}
-            <option value="{{ current_year }}" selected>
-              {{ current_year }}
-            </option>
-            <option value="{{ current_year - 1 }}">
-              {{ current_year - 1 }}
-            </option>
-            <option value="{{ current_year - 2 }}">
-              {{ current_year - 2 }}
-            </option>
+            <option value="{{ current_year }}" selected>{{ current_year }}</option>
+            <option value="{{ current_year - 1 }}">{{ current_year - 1 }}</option>
+            <option value="{{ current_year - 2 }}">{{ current_year - 2 }}</option>
           </select>
+          <div class="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <i class="fas fa-chevron-down text-slate-400"></i>
+          </div>
         </div>
+      </div>
 
-        <div class="pt-4">
-          <button type="submit"
-            class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 text-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
-            disabled>
-            Proceed to Grading
-          </button>
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/10">
+        <button
+          type="submit"
+          id="submitBtn"
+          class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg"
+          disabled
+        >
+          <i class="fas fa-arrow-right"></i>
+          <span>Proceed to Grading</span>
+        </button>
+        
+        <a
+          href="{{ url_for('exams_grading.index') }}"
+          class="flex-1 px-8 py-4 bg-gradient-to-r from-slate-500 to-gray-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3"
+        >
+          <i class="fas fa-arrow-left"></i>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Quick Info Card -->
+  <div class="professional-card p-6">
+    <div class="flex items-center space-x-3 mb-4">
+      <div class="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
+        <i class="fas fa-info text-white text-sm"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Grading Period Information</h3>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="p-4 glass rounded-xl hover-lift">
+        <div class="text-blue-500 text-lg mb-2">
+          <i class="fas fa-calendar-alt"></i>
         </div>
-      </form>
+        <p class="text-sm text-slate-600 dark:text-slate-300 font-semibold">Current Term</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">
+          {% set current_term = 'Term 1' if current_month <= 4 else ('Term 2' if current_month <=8 else 'Term 3' ) %}
+          {{ current_term }} (Auto-selected)
+        </p>
+      </div>
+      <div class="p-4 glass rounded-xl hover-lift">
+        <div class="text-emerald-500 text-lg mb-2">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <p class="text-sm text-slate-600 dark:text-slate-300 font-semibold">Class Information</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">{{ class_.name }}</p>
+      </div>
+      <div class="p-4 glass rounded-xl hover-lift">
+        <div class="text-purple-500 text-lg mb-2">
+          <i class="fas fa-book"></i>
+        </div>
+        <p class="text-sm text-slate-600 dark:text-slate-300 font-semibold">Subject</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">{{ subject.name }}</p>
+      </div>
     </div>
   </div>
 </div>
@@ -92,11 +143,17 @@
     const form = document.getElementById("periodForm");
     const termSelect = document.getElementById("term");
     const yearSelect = document.getElementById("year");
-    const submitBtn = form.querySelector('button[type="submit"]');
+    const submitBtn = document.getElementById("submitBtn");
 
     function toggleSubmitButton() {
       const hasTermAndYear = termSelect.value !== "" && yearSelect.value !== "";
       submitBtn.disabled = !hasTermAndYear;
+      
+      if (hasTermAndYear) {
+        submitBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
+      } else {
+        submitBtn.classList.add('disabled:opacity-50', 'disabled:cursor-not-allowed');
+      }
     }
 
     termSelect.addEventListener("change", toggleSubmitButton);
@@ -106,10 +163,15 @@
       e.preventDefault();
 
       if (termSelect.value && yearSelect.value) {
-        window.location.href =
-          `{{ url_for('exams_grading.grading_page', class_id=class_.id, subject_id=subject.id, term='TERM_PLACEHOLDER', year='YEAR_PLACEHOLDER') }}`
-            .replace("TERM_PLACEHOLDER", encodeURIComponent(termSelect.value))
-            .replace("YEAR_PLACEHOLDER", encodeURIComponent(yearSelect.value));
+        const url = `{{ url_for('exams_grading.grading_page', class_id=class_.id, subject_id=subject.id, term='TERM_PLACEHOLDER', year='YEAR_PLACEHOLDER') }}`
+          .replace("TERM_PLACEHOLDER", encodeURIComponent(termSelect.value))
+          .replace("YEAR_PLACEHOLDER", encodeURIComponent(yearSelect.value));
+        
+        // Add loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Loading...</span>';
+        submitBtn.disabled = true;
+        
+        window.location.href = url;
       }
     });
 
@@ -117,4 +179,36 @@
     toggleSubmitButton();
   });
 </script>
+
+<style>
+  select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  select:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(14, 165, 233, 0.15);
+  }
+
+  .professional-card {
+    animation: slideInFromTop 0.6s ease-out forwards;
+  }
+
+  @keyframes slideInFromTop {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+</style>
 {% endblock %}
