@@ -14,18 +14,18 @@
       "main.js",
       "preload.js",
       "assets/**",
-      "package.json",
       "node_modules/**"
     ],
     "extraResources": [
       {
-        "from": "../dist",
+        "from": "../dist/EduSync",
         "to": "backend",
         "filter": [
           "**/*"
         ]
       }
     ],
+    "asar": false,
     "win": {
       "target": "nsis",
       "icon": "../app/static/icon.ico"
@@ -37,11 +37,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "EduSync SMS"
-    },
-    "asar": true,
-    "asarUnpack": [
-      "backend/**"
-    ]
+    }
   },
   "scripts": {
     "start": "electron .",

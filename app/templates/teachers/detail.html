@@ -146,28 +146,71 @@
           </div>
 
           <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
-            <div class="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg">
-              <svg class="h-5 w-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+            <div class="p-2 bg-sky-100 dark:bg-sky-900/50 rounded-lg">
+              <div class="fas fa-house h-5 w-5 text-sky-600 dark:text-sky-400"></div>
             </div>
             <div class="flex-1">
               <div class="text-sm font-semibold text-gray-900 dark:text-white">Hometown</div>
               <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.hometown or 'Not specified' }}</div>
             </div>
           </div>
+
           <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
-            <div class="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
-              <svg class="h-5 w-5 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="p-2 bg-cyan-100 dark:bg-cyan-900/50 rounded-lg">
+              <div class="fas fa-location-crosshairs h-5 w-5 text-cyan-600 dark:text-cyan-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Hometown District</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.hometown_district or 'Not specified' }}</div>
+            </div>
+          </div>
+          <!-- Hometown Region -->
+          {% if teacher.hometown_region %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-green-100 dark:bg-green-900/50 rounded-lg">
+              <svg class="h-5 w-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Hometown Region</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.hometown_region }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Religion -->
+          {% if teacher.religion %}
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
+              <div class="fas fa-pray h-5 w-5 text-amber-600 dark:text-indigo-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Religion</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.religion }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
+              <div class="fas fa-home-user h-5 w-5 text-red-500 dark:text-red-400"></div>
             </div>
             <!-- Residence -->
             <div class="flex-1">
               <div class="text-sm font-semibold text-gray-900 dark:text-white">Residence</div>
               <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.live_at or 'Not specified' }}</div>
+            </div>
+          </div>
+          <!-- Ghana Card -->
+          <div class="flex items-center space-x-4 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200">
+            <div class="p-2 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg">
+              <div class="fas fa-id-card h-5 w-5 text-red-500 dark:text-red-400"></div>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-gray-900 dark:text-white">Ghana Card</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ teacher.ghana_card or 'Not specified' }}</div>
             </div>
           </div>
           <!-- Digital Address -->

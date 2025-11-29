@@ -37,6 +37,7 @@ class TeacherForm(FlaskForm):
         "Date of First Appointment", format="%Y-%m-%d", validators=[DataRequired()]
     )
     hometown = StringField("Hometown", validators=[Optional()])
+    hometown_district = StringField("Hometown District", validators=[Optional()])
     live_at = StringField("Residence", validators=[Optional()])
     digital_address = StringField("Residence", validators=[Optional()])
     college_attended = StringField("College Attended", validators=[Optional()])
@@ -56,6 +57,7 @@ class TeacherForm(FlaskForm):
     )
     professional_college = StringField("Professional College", validators=[Optional()])
     staff_id = StringField("Staff ID", validators=[DataRequired()])
+    ghana_card = StringField("Ghana Card", validators=[DataRequired()])
     salary_grade = StringField("Salary Grade", validators=[DataRequired()])
     salary_grade_type = SelectField(
         "Salary Grade Type",
@@ -68,6 +70,17 @@ class TeacherForm(FlaskForm):
     ssnit_number = StringField("SSNIT Number", validators=[Optional()])
     phone_number = TelField("Phone Number", validators=[DataRequired()])
     email = EmailField("Email", validators=[Optional(), Email()])
+    religion = SelectField(
+        "Religion",
+        choices=[
+            ("", "Select Religion"),
+            ("Christian", "Christian"),
+            ("Muslim", "Muslim"),
+            ("Traditionalist", "Traditionalist"),
+            ("Other", "Other"),
+        ],
+        validators=[Optional()],
+    )
     status = SelectField(
         "Status",
         choices=[
@@ -76,6 +89,28 @@ class TeacherForm(FlaskForm):
             ("Transferred", "Transferred"),
             ("Retired", "Retired"),
             ("Deceased", "Deceased"),
+        ],
+        validators=[Optional()],
+    )
+    hometown_region = SelectField(
+        "hometown_region",
+        choices=[
+            ("", "Not Specified"),
+            ("Ahafo Region", "Ahafo Region"),
+            ("Ashanti Region", "Ashanti Region"),
+            ("Bono Region", "Bono Region"),
+            ("Bono East Region", "Bono East Region"),
+            ("Central Region", "Central Region"),
+            ("Eastern Region", "Eastern Region"),
+            ("Greater Accra Region", "Greater Accra Region"),
+            ("North-East Region", "North-East Region"),
+            ("Northern Region", "Northern Region"),
+            ("Oti Region", "Oti Region"),
+            ("Savannah Region", "Savannah Region"),
+            ("Upper-East Region", "Upper-East Region"),
+            ("Volta Region", "Volta Region"),
+            ("Western Region", "Western Region"),
+            ("Western-North Region", "Western-North Region"),
         ],
         validators=[Optional()],
     )

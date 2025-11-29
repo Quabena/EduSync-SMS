@@ -46,3 +46,9 @@ class Config:
     )
     QR_DIR = Path(os.environ.get("QR_DIR") or (BASE_DIR / "qr_storage"))
     REPORT_DIR = Path(os.environ.get("REPORT_DIR") or (BASE_DIR / "reports"))
+
+    HOST = os.getenv("HOST", "127.0.0.1")
+    PORT = int(os.getenv("PORT", "5000"))
+
+    # Allow electron frontend to communicate CORS-free
+    FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "*")

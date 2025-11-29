@@ -62,7 +62,7 @@ class StudentForm(FlaskForm):
         ],
         validators=[Optional()],
     )
-    religion = SelectField(  # Added religion field
+    religion = SelectField(
         "Religion",
         choices=[
             ("", "Select Religion"),

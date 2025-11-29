@@ -170,6 +170,54 @@ endblock %} {% block content %}
             duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
           </div>
 
+          <!-- Hometown District -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="hometown"
+            >
+              Hometown District
+            </label>
+            {{ form.hometown_district(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Hometown Region -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="specialization_id"
+            >
+              Hometown Region
+            </label>
+            {{ form.hometown_region(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white focus:outline-none
+            focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 hover:bg-gray-100/50
+            dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Religion -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="specialization_id"
+            >
+              Religion
+            </label>
+            {{ form.religion(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white focus:outline-none
+            focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 hover:bg-gray-100/50
+            dark:hover:bg-gray-700/50") }}
+          </div>
+
           <!-- Marital Status -->
           <div class="space-y-2">
             <label
@@ -227,6 +275,22 @@ endblock %} {% block content %}
               Email Address <span class="text-red-500">*</span>
             </label>
             {{ form.email(class="w-full px-4 py-3 bg-gray-50/50
+            dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
+            rounded-xl text-gray-900 dark:text-white placeholder-gray-500
+            dark:placeholder-gray-400 focus:outline-none focus:ring-2
+            focus:ring-indigo-500 focus:border-transparent transition-all
+            duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50") }}
+          </div>
+
+          <!-- Ghana Card -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              for="live_at"
+            >
+              Ghana Card
+            </label>
+            {{ form.ghana_card(class="w-full px-4 py-3 bg-gray-50/50
             dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
             rounded-xl text-gray-900 dark:text-white placeholder-gray-500
             dark:placeholder-gray-400 focus:outline-none focus:ring-2
