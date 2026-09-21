@@ -2,717 +2,1036 @@
 endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
-  body {
-    font-family: "Inter", sans-serif;
-  }
+  /* ==========================================================
+     Assign Teachers — Dashboard design language.
+     Fraunces (display), Inter (body), JetBrains Mono (labels).
+     Flat surfaces, hairline borders, restrained palette.
+     ========================================================== */
+  .assign-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
 
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
 
-  .form-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-  }
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
 
-  .input-field {
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid rgba(226, 232, 240, 0.6);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
 
-  .input-field:focus {
-    background: rgba(255, 255, 255, 1);
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    transform: translateY(-1px);
-  }
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
 
-  .btn-primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-  }
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
 
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-  }
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
 
-  .btn-secondary {
-    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-    transition: all 0.3s ease;
-  }
-
-  .btn-secondary:hover {
-    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
-  }
-
-  .btn-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    transition: all 0.3s ease;
-  }
-
-  .btn-danger:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-  }
-
-  .btn-warning {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    transition: all 0.3s ease;
-  }
-
-  .btn-warning:hover {
-    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
-  }
-
-  .floating-label {
-    position: relative;
-  }
-
-  .floating-label label {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: white;
-    padding: 0 8px;
-    color: #6b7280;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
     font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    z-index: 1;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  .floating-label select:focus + label,
-  .floating-label select:not([value=""]) + label {
+  .dark .assign-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
+  }
+
+  .assign-page *,
+  .assign-page *::before,
+  .assign-page *::after {
+    box-sizing: border-box;
+  }
+  .assign-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .assign-page .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* ---------- Hero ---------- */
+  .assign-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 26px 22px 30px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .assign-hero::before {
+    content: "";
+    position: absolute;
     top: 0;
-    font-size: 12px;
-    color: #3b82f6;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--violet);
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
     font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
   }
-
-  .assignment-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    transition: all 0.3s ease;
+  .assign-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
   }
-
-  .assignment-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  .assign-hero p {
+    margin: 0;
+    max-width: 620px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
   }
-
-  .icon-wrapper {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
   }
-
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.6s ease forwards;
-  }
-
-  .fade-in:nth-child(1) {
-    animation-delay: 0.1s;
-  }
-  .fade-in:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-  .fade-in:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .status-badge {
+  .hero-stamp {
     display: inline-flex;
     align-items: center;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 4px 9px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--copy);
     font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .hero-stamp.violet {
+    border-color: var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+  }
+  .hero-stamp.green {
+    border-color: var(--green-edge);
+    background: var(--green-wash);
+    color: var(--green);
+  }
+  .hero-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
   }
 
-  .status-active {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
+  /* ---------- Buttons ---------- */
+  .dash-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .dash-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .dash-btn:hover {
+    border-color: var(--ink);
+  }
+  .dash-btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .dash-btn.primary {
+    color: #131817;
+  }
+  .dash-btn.primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .dash-btn.primary:hover {
+    color: #131817;
+  }
+  .dash-btn.primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .dash-btn.sm {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .dash-btn.danger {
+    background: var(--surface);
+    color: var(--red);
+    border-color: var(--red-edge);
+  }
+  .dash-btn.danger:hover {
+    background: var(--red-wash);
+    border-color: var(--red);
+  }
+  .dash-btn.warn {
+    background: var(--surface);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+  .dash-btn.warn:hover {
+    background: var(--brass-wash);
+    border-color: var(--brass);
   }
 
-  .status-inactive {
-    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-    color: white;
+  /* ---------- Layout grid ---------- */
+  .assign-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.85fr);
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 16px;
+  }
+  .assign-side,
+  .assign-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
   }
 
-  .table-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid rgba(226, 232, 240, 0.8);
+  /* ---------- Dash card ---------- */
+  .dash-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .dash-card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .dash-card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .dash-card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
   }
 
-  .table-row {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  /* ---------- Form ---------- */
+  .assign-form {
+    padding: 20px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .field-select {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 38px 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background-color: var(--surface-alt);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a8589' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field-select:focus {
+    outline: 0;
+    border-color: var(--green);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
   }
 
-  .table-row:hover {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    transform: translateX(2px);
+  /* ---------- Table ---------- */
+  .table-wrap {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) var(--surface-alt);
+  }
+  .table-wrap::-webkit-scrollbar {
+    height: 8px;
+  }
+  .table-wrap::-webkit-scrollbar-track {
+    background: var(--surface-alt);
+  }
+  .table-wrap::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 4px;
+  }
+
+  .assign-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+  }
+  .assign-table thead {
+    background: var(--surface-alt);
+  }
+  .assign-table th {
+    padding: 12px 18px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .assign-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: middle;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .assign-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .assign-table tbody tr:hover {
+    background: var(--surface-alt);
+  }
+
+  /* Teacher cell */
+  .teacher-cell {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+  .teacher-avatar {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: var(--violet-wash);
+    border: 1px solid var(--violet-edge);
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+  .teacher-meta {
+    min-width: 0;
+  }
+  .teacher-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .teacher-email {
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+  }
+
+  /* Subject / class cell */
+  .tag-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .tag-chip.is-subject {
+    background: var(--green-wash);
+    color: var(--green);
+    border-color: var(--green-edge);
+  }
+  .tag-chip.is-class {
+    background: var(--brass-wash);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+
+  /* Status pill */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--green-edge);
+    background: var(--green-wash);
+    color: var(--green);
+    white-space: nowrap;
+  }
+  .status-pill .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Row actions */
+  .row-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  /* Empty state */
+  .table-empty {
+    padding: 56px 24px;
+    text-align: center;
+  }
+  .table-empty svg {
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .table-empty h3 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .table-empty p {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ---------- Stats strip ---------- */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .stats-cell {
+    padding: 18px 22px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .stats-cell:last-child {
+    border-right: 0;
+  }
+  .stats-cell::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--violet);
+  }
+  .stats-cell:nth-child(1)::before {
+    background: var(--violet);
+  }
+  .stats-cell:nth-child(2)::before {
+    background: var(--green);
+  }
+  .stats-cell:nth-child(3)::before {
+    background: var(--brass);
+  }
+  .stats-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .stats-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Modal ---------- */
+  .assign-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 30, 29, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 60;
+  }
+  .assign-modal {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 20px 50px rgba(28, 47, 45, 0.25);
+    overflow: hidden;
+  }
+  .assign-modal-head {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .assign-modal-head h3 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .assign-modal-head p {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--copy);
+  }
+  .assign-modal-body {
+    padding: 16px 24px 20px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--copy);
+  }
+  .assign-modal-foot {
+    display: flex;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
+  .assign-modal-foot .dash-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* ---------- Notification ---------- */
+  .assign-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left-width: 3px;
+    border-radius: 3px;
+    box-shadow: 0 8px 24px rgba(28, 47, 45, 0.15);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--ink);
+    z-index: 80;
+    max-width: 340px;
+    transform: translateX(calc(100% + 30px));
+    transition: transform 0.25s ease;
+    pointer-events: none;
+  }
+  .assign-toast.is-visible {
+    transform: translateX(0);
+  }
+  .assign-toast.is-info {
+    border-left-color: var(--slate);
+  }
+  .assign-toast.is-success {
+    border-left-color: var(--green);
+  }
+  .assign-toast.is-error {
+    border-left-color: var(--red);
+  }
+  .assign-toast.is-warning {
+    border-left-color: var(--brass);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .assign-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 700px) {
+    .assign-page {
+      padding: 20px 14px 40px;
+    }
+    .assign-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .hero-actions {
+      width: 100%;
+    }
+    .hero-actions .dash-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .dash-card-head {
+      padding: 14px 16px 12px;
+    }
+    .assign-form {
+      padding: 16px;
+    }
+    .assign-table th,
+    .assign-table td {
+      padding: 12px 14px;
+    }
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .stats-cell {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-cell:last-child {
+      border-bottom: 0;
+    }
   }
 </style>
 
-<div class="min-h-screen">
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <!-- Enhanced Header -->
-    <div
-      class="glass-effect rounded-2xl shadow-xl p-8 mb-8 border border-white/20 fade-in"
-    >
-      <div
-        class="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-6 lg:space-y-0"
-      >
-        <div class="space-y-3">
-          <div class="flex items-center space-x-4">
-            <div
-              class="icon-wrapper w-16 h-16 rounded-2xl flex items-center justify-center"
-            >
-              <svg
-                class="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </div>
-            <div>
-              <h1
-                class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
-              >
-                Assign Teachers
-              </h1>
-              <p class="text-lg text-gray-600 font-medium">
-                Manage teacher-subject-class assignments for academic year
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center space-x-2 text-sm text-gray-500">
-            <svg
-              class="w-4 h-4 text-indigo-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
-              />
-            </svg>
-            <span class="font-medium">Academic Year 2025</span>
-            <span class="text-gray-300">•</span>
-            <span
-              class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold"
-            >
-              Active Assignments
-            </span>
-          </div>
-        </div>
-
-        <div class="flex space-x-3">
-          <a
-            href="{{ url_for('exams_grading.view_assignments') }}"
-            class="btn-secondary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
-          >
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            View All Assignments
-          </a>
-          <a
-            href="{{ url_for('exams_grading.index') }}"
-            class="btn-primary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
-          >
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to Dashboard
-          </a>
-        </div>
+<div class="assign-page">
+  <!-- Hero -->
+  <header class="assign-hero">
+    <div class="hero-copy">
+      <p class="dash-kicker">Academic records · Assignment office</p>
+      <h1>Assign teachers</h1>
+      <p>Manage teacher → subject → class assignments for the academic year.</p>
+      <div class="hero-meta">
+        <span class="hero-stamp violet">Academic year 2025</span>
+        <span class="hero-stamp green"
+          >{{ assignments|length }} active assignment{% if assignments|length !=
+          1 %}s{% endif %}</span
+        >
       </div>
     </div>
+    <div class="hero-actions">
+      <a
+        href="{{ url_for('exams_grading.view_assignments') }}"
+        class="dash-btn"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        View all assignments
+      </a>
+      <a href="{{ url_for('exams_grading.index') }}" class="dash-btn primary">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to dashboard
+      </a>
+    </div>
+  </header>
 
-    <!-- Assignment Form -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
-      <div class="xl:col-span-1">
-        <div class="form-card rounded-2xl shadow-xl p-8 border fade-in">
-          <div class="flex items-center space-x-3 mb-8">
-            <div
-              class="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800">New Assignment</h2>
+  <!-- Layout grid -->
+  <div class="assign-grid">
+    <!-- Sidebar: new assignment form -->
+    <aside class="assign-side">
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">01 · Create</p>
+            <h2>New assignment</h2>
           </div>
-
-          <form id="assignment-form" class="space-y-6">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-            <!-- Teacher Selection -->
-            <div class="floating-label">
-              <select
-                id="teacher_id"
-                name="teacher_id"
-                required
-                class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
-              >
-                <option value="">Select Teacher</option>
-                {% for teacher in teachers %}
-                <option value="{{ teacher.id }}">
-                  {{ teacher.full_name }}
-                </option>
-                {% endfor %}
-              </select>
-              <label for="teacher_id">Teacher</label>
-            </div>
-
-            <!-- Subject Selection -->
-            <div class="floating-label">
-              <select
-                id="subject_id"
-                name="subject_id"
-                required
-                class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
-              >
-                <option value="">Select Subject</option>
-                {% for subject in subjects %}
-                <option value="{{ subject.id }}">{{ subject.name }}</option>
-                {% endfor %}
-              </select>
-              <label for="subject_id">Subject</label>
-            </div>
-
-            <!-- Class Selection -->
-            <div class="floating-label">
-              <select
-                id="class_id"
-                name="class_id"
-                required
-                class="input-field w-full px-4 py-4 rounded-xl text-gray-800 font-medium focus:outline-none"
-              >
-                <option value="">Select Class</option>
-                {% for class_ in classes %}
-                <option value="{{ class_.id }}">{{ class_.name }}</option>
-                {% endfor %}
-              </select>
-              <label for="class_id">Class</label>
-            </div>
-
-            <!-- Submit Button -->
-            <button
-              type="submit"
-              class="btn-primary w-full px-6 py-4 text-white rounded-xl font-semibold shadow-lg"
-            >
-              <svg
-                class="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              Create Assignment
-            </button>
-          </form>
+          <span class="head-meta">All fields required</span>
         </div>
-      </div>
 
-      <!-- Current Assignments -->
-      <div class="xl:col-span-2">
-        <div class="table-card rounded-2xl shadow-xl border fade-in">
-          <div class="p-6 border-b border-gray-200/60">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div
-                  class="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg"
-                >
-                  <svg
-                    class="w-5 h-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                </div>
-                <h2 class="text-xl font-bold text-gray-800">
-                  Current Assignments
-                </h2>
-              </div>
-              <span
-                class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full"
-              >
-                Active: {{ assignments | length }}
-              </span>
-            </div>
+        <form id="assignment-form" class="assign-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+          <div class="field">
+            <label class="field-label" for="teacher_id">Teacher</label>
+            <select
+              id="teacher_id"
+              name="teacher_id"
+              required
+              class="field-select"
+            >
+              <option value="">Select teacher</option>
+              {% for teacher in teachers %}
+              <option value="{{ teacher.id }}">{{ teacher.full_name }}</option>
+              {% endfor %}
+            </select>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="min-w-full">
-              <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                <tr>
-                  <th
-                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Teacher
-                  </th>
-                  <th
-                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Subject
-                  </th>
-                  <th
-                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Class
-                  </th>
-                  <th
-                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Status
-                  </th>
-                  <th
-                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white" id="assignments-table">
-                {% for assignment in assignments %}
-                <tr class="table-row" data-assignment-id="{{ assignment.id }}">
-                  <td class="py-4 px-6">
-                    <div class="flex items-center space-x-3">
-                      <div
-                        class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg"
-                      >
-                        {{ assignment.teacher.full_name.split()[0][0] if
-                        assignment.teacher else 'N' }}{{
-                        assignment.teacher.full_name.split()[-1][0] if
-                        assignment.teacher and
-                        assignment.teacher.full_name.split()|length > 1 else 'A'
-                        }}
+          <div class="field">
+            <label class="field-label" for="subject_id">Subject</label>
+            <select
+              id="subject_id"
+              name="subject_id"
+              required
+              class="field-select"
+            >
+              <option value="">Select subject</option>
+              {% for subject in subjects %}
+              <option value="{{ subject.id }}">{{ subject.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="class_id">Class</label>
+            <select id="class_id" name="class_id" required class="field-select">
+              <option value="">Select class</option>
+              {% for class_ in classes %}
+              <option value="{{ class_.id }}">{{ class_.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            class="dash-btn primary"
+            style="width: 100%; justify-content: center"
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Create assignment
+          </button>
+        </form>
+      </section>
+    </aside>
+
+    <!-- Main: current assignments table -->
+    <main class="assign-main">
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">02 · Register</p>
+            <h2>Current assignments</h2>
+          </div>
+          <span class="head-meta"> {{ assignments|length }} active </span>
+        </div>
+
+        <div class="table-wrap">
+          <table class="assign-table">
+            <thead>
+              <tr>
+                <th>Teacher</th>
+                <th>Subject</th>
+                <th>Class</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="assignments-table">
+              {% for assignment in assignments %}
+              <tr data-assignment-id="{{ assignment.id }}">
+                <td>
+                  <div class="teacher-cell">
+                    <span class="teacher-avatar">
+                      {{ assignment.teacher.full_name.split()[0][0] if
+                      assignment.teacher else 'N' }}{{
+                      assignment.teacher.full_name.split()[-1][0] if
+                      assignment.teacher and
+                      assignment.teacher.full_name.split()|length > 1 else 'A'
+                      }}
+                    </span>
+                    <div class="teacher-meta">
+                      <div class="teacher-name">
+                        {{ assignment.teacher.full_name if assignment.teacher
+                        else 'Unknown teacher' }}
                       </div>
-                      <div>
-                        <p class="text-sm font-semibold text-gray-900">
-                          {{ assignment.teacher.full_name if assignment.teacher
-                          else 'Unknown Teacher' }}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                          {{ assignment.teacher.email if assignment.teacher else
-                          'No email' }}
-                        </p>
+                      <div class="teacher-email">
+                        {{ assignment.teacher.email if assignment.teacher else
+                        'No email' }}
                       </div>
                     </div>
-                  </td>
-                  <td class="py-4 px-6">
-                    <div class="flex items-center space-x-2">
-                      <div
-                        class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center"
-                      >
-                        <svg
-                          class="w-4 h-4 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                          />
-                        </svg>
-                      </div>
-                      <span class="text-sm font-medium text-gray-900"
-                        >{{ assignment.subject.name if assignment.subject else
-                        'Unknown Subject' }}</span
-                      >
-                    </div>
-                  </td>
-                  <td class="py-4 px-6">
-                    <div class="flex items-center space-x-2">
-                      <div
-                        class="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center"
-                      >
-                        <svg
-                          class="w-4 h-4 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h10M7 15h10"
-                          />
-                        </svg>
-                      </div>
-                      <span class="text-sm font-medium text-gray-900"
-                        >{{ assignment.class_.name if assignment.class_ else
-                        'Unknown Class' }}</span
-                      >
-                    </div>
-                  </td>
-                  <td class="py-4 px-6">
-                    <span class="status-badge status-active">
+                  </div>
+                </td>
+                <td>
+                  <div class="tag-cell">
+                    <span class="tag-chip is-subject">Subject</span>
+                    <span
+                      >{{ assignment.subject.name if assignment.subject else
+                      'Unknown' }}</span
+                    >
+                  </div>
+                </td>
+                <td>
+                  <div class="tag-cell">
+                    <span class="tag-chip is-class">Class</span>
+                    <span
+                      >{{ assignment.class_.name if assignment.class_ else
+                      'Unknown' }}</span
+                    >
+                  </div>
+                </td>
+                <td>
+                  <span class="status-pill">
+                    <span class="dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="dash-btn sm warn"
+                      onclick="reassignTeacher({{ assignment.id }})"
+                    >
                       <svg
-                        class="w-3 h-3 mr-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      Active
-                    </span>
-                  </td>
-                  <td class="py-4 px-6">
-                    <div class="flex space-x-2">
-                      <button
-                        onclick="reassignTeacher({{ assignment.id }})"
-                        class="btn-warning text-xs px-3 py-1 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
-                      >
-                        <svg
-                          class="w-3 h-3 mr-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                          />
-                        </svg>
-                        Reassign
-                      </button>
-                      <button
-                        onclick="unassignTeacher({{ assignment.id }})"
-                        class="btn-danger text-xs px-3 py-1 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
-                      >
-                        <svg
-                          class="w-3 h-3 mr-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                        Remove
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                {% else %}
-                <tr>
-                  <td colspan="5" class="py-12 text-center">
-                    <svg
-                      class="w-16 h-16 text-gray-400 mx-auto mb-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
+                        stroke-width="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
+                      >
+                        <path
+                          d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                        />
+                      </svg>
+                      Reassign
+                    </button>
+                    <button
+                      type="button"
+                      class="dash-btn sm danger"
+                      onclick="unassignTeacher({{ assignment.id }})"
+                    >
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                         stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                      Remove
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5">
+                  <div class="table-empty">
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
                         d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                       />
                     </svg>
-                    <p class="text-lg text-gray-500 font-medium mb-2">
-                      No assignments found
-                    </p>
-                    <p class="text-sm text-gray-400">
-                      Create your first teacher assignment to get started
-                    </p>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+                    <h3>No assignments yet</h3>
+                    <p>Create your first teacher assignment to get started.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-      </div>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in">
-      <div class="assignment-card rounded-2xl shadow-lg p-6 border">
-        <div class="flex items-center space-x-4">
-          <div
-            class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-gray-800">
-              {{ teachers | length }}
-            </p>
-            <p class="text-sm font-medium text-gray-500">Total Teachers</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="assignment-card rounded-2xl shadow-lg p-6 border">
-        <div class="flex items-center space-x-4">
-          <div
-            class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-              />
-            </svg>
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-gray-800">
-              {{ subjects | length }}
-            </p>
-            <p class="text-sm font-medium text-gray-500">Total Subjects</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="assignment-card rounded-2xl shadow-lg p-6 border">
-        <div class="flex items-center space-x-4">
-          <div
-            class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h10M7 15h10"
-              />
-            </svg>
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-gray-800">
-              {{ classes | length }}
-            </p>
-            <p class="text-sm font-medium text-gray-500">Total Classes</p>
-          </div>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
+
+  <!-- Stats strip -->
+  <section class="stats-grid" aria-label="Assignment stats">
+    <div class="stats-cell">
+      <span class="stats-label">Total teachers</span>
+      <strong class="stats-value">{{ teachers|length }}</strong>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Total subjects</span>
+      <strong class="stats-value">{{ subjects|length }}</strong>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Total classes</span>
+      <strong class="stats-value">{{ classes|length }}</strong>
+    </div>
+  </section>
 </div>
 
 <script>
-  // Form submission handler
+  // ---------- Create assignment ----------
   document
     .getElementById("assignment-form")
     .addEventListener("submit", function (e) {
@@ -720,16 +1039,9 @@ endblock %} {% block content %}
 
       const formData = new FormData(this);
       const submitBtn = this.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
+      const originalHtml = submitBtn.innerHTML;
 
-      // Show loading state
-      submitBtn.innerHTML = `
-    <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
-    Creating...
-  `;
+      submitBtn.innerHTML = "Creating…";
       submitBtn.disabled = true;
 
       fetch('{{ url_for("exams_grading.assign_teacher_subject") }}', {
@@ -739,75 +1051,91 @@ endblock %} {% block content %}
         .then((response) => response.json())
         .then((data) => {
           if (data.status === "success") {
-            showNotification(data.message, "success");
+            showToast(data.message, "success");
             this.reset();
-            // Refresh the assignments table
-            location.reload();
+            setTimeout(() => location.reload(), 600);
           } else if (data.status === "error") {
             if (data.assignment_data) {
-              // Show reassignment option
               showReassignmentModal(data);
             } else {
-              showNotification(data.message, "error");
+              showToast(data.message, "error");
             }
           }
         })
         .catch((error) => {
           console.error("Error:", error);
-          showNotification(
-            "An error occurred while creating the assignment",
-            "error"
-          );
+          showToast("An error occurred while creating the assignment", "error");
         })
         .finally(() => {
-          submitBtn.innerHTML = originalText;
+          submitBtn.innerHTML = originalHtml;
           submitBtn.disabled = false;
         });
     });
 
+  // ---------- Reassignment conflict modal ----------
+  let activeModal = null;
+
   function showReassignmentModal(data) {
+    closeModal();
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "assign-modal-backdrop";
+    backdrop.addEventListener("click", (e) => {
+      if (e.target === backdrop) closeModal();
+    });
+
     const modal = document.createElement("div");
-    modal.className =
-      "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+    modal.className = "assign-modal";
+
+    const message = document.createElement("p");
+    message.textContent =
+      data.message || "A conflicting assignment already exists.";
+    message.style.margin = "0";
+
     modal.innerHTML = `
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
-      <div class="flex items-center space-x-3 mb-4">
-        <div class="p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800">Assignment Conflict</h3>
+      <div class="assign-modal-head">
+        <h3>Assignment conflict</h3>
+        <p>This teacher is already assigned to a different subject for this class.</p>
       </div>
-      <p class="text-gray-600 mb-6">${data.message}</p>
-      <div class="flex space-x-3">
-        <button onclick="closeModal()" class="flex-1 btn-secondary px-4 py-2 text-white rounded-xl font-semibold">Cancel</button>
-        <button onclick="proceedWithReassignment(${JSON.stringify(
-          data.assignment_data
-        ).replace(
-          /"/g,
-          "&quot;"
-        )})" class="flex-1 btn-warning px-4 py-2 text-white rounded-xl font-semibold">Reassign</button>
+      <div class="assign-modal-body"></div>
+      <div class="assign-modal-foot">
+        <button type="button" class="dash-btn" onclick="closeModal()">Cancel</button>
+        <button type="button" class="dash-btn warn" id="confirm-reassign">Reassign anyway</button>
       </div>
-    </div>
-  `;
-    document.body.appendChild(modal);
+    `;
+
+    modal.querySelector(".assign-modal-body").appendChild(message);
+    backdrop.appendChild(modal);
+    document.body.appendChild(backdrop);
+    activeModal = backdrop;
+
+    modal.querySelector("#confirm-reassign").addEventListener("click", () => {
+      proceedWithReassignment(data.assignment_data);
+    });
   }
 
   function proceedWithReassignment(assignmentData) {
-    // Implementation for reassignment
     closeModal();
-    showNotification(
-      "Reassignment functionality would be implemented here",
-      "info"
-    );
+    // The original code contained only a placeholder for this flow.
+    // Behaviour is preserved: nothing actually happens yet.
+    showToast("Reassignment functionality would be implemented here", "info");
   }
 
+  function closeModal() {
+    if (activeModal && activeModal.parentNode) {
+      activeModal.parentNode.removeChild(activeModal);
+    }
+    activeModal = null;
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+
+  // ---------- Row actions ----------
   function reassignTeacher(assignmentId) {
-    showNotification(
-      "Reassignment functionality would be implemented here",
-      "info"
-    );
+    // Same placeholder behaviour as the original
+    showToast("Reassignment functionality would be implemented here", "info");
   }
 
   function unassignTeacher(assignmentId) {
@@ -824,56 +1152,40 @@ endblock %} {% block content %}
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "success") {
-          showNotification(data.message, "success");
-          // Remove the row from table
+          showToast(data.message, "success");
           const row = document.querySelector(
-            `tr[data-assignment-id="${assignmentId}"]`
+            `tr[data-assignment-id="${assignmentId}"]`,
           );
           if (row) {
+            row.style.transition = "opacity 0.2s ease, transform 0.2s ease";
             row.style.opacity = "0";
-            row.style.transform = "translateX(-100%)";
-            setTimeout(() => row.remove(), 300);
+            row.style.transform = "translateX(-8px)";
+            setTimeout(() => row.remove(), 220);
           }
         } else {
-          showNotification(data.message, "error");
+          showToast(data.message, "error");
         }
       })
       .catch((error) => {
         console.error("Error:", error);
-        showNotification(
-          "An error occurred while removing the assignment",
-          "error"
-        );
+        showToast("An error occurred while removing the assignment", "error");
       });
   }
 
-  function closeModal() {
-    const modal = document.querySelector(".fixed.inset-0");
-    if (modal) modal.remove();
-  }
+  // ---------- Toast ----------
+  function showToast(message, type = "info") {
+    const toast = document.createElement("div");
+    toast.className = `assign-toast is-${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
 
-  function showNotification(message, type = "info") {
-    const notification = document.createElement("div");
-    const colors = {
-      success: "bg-green-500",
-      error: "bg-red-500",
-      warning: "bg-yellow-500",
-      info: "bg-blue-500",
-    };
-
-    notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
-    notification.textContent = message;
-
-    document.body.appendChild(notification);
+    requestAnimationFrame(() => toast.classList.add("is-visible"));
 
     setTimeout(() => {
-      notification.style.transform = "translateX(0)";
-    }, 100);
-
-    setTimeout(() => {
-      notification.style.transform = "translateX(full)";
-      setTimeout(() => notification.remove(), 300);
+      toast.classList.remove("is-visible");
+      setTimeout(() => toast.remove(), 250);
     }, 3000);
   }
 </script>
+
 {% endblock %}

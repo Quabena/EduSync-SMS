@@ -4,973 +4,1398 @@ endblock %} {% block page_description %}Manage students attendance - mark
 students attendance, view history and trends{% endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
-  body {
-    font-family: "Inter", sans-serif;
+  /* ==========================================================
+     Attendance Dashboard — Fraunces + Inter + JetBrains Mono.
+     Fraunces  → hero heading, section headings, big numeric values
+     Inter     → body copy, list items, buttons, table-like content
+     JetBrains → kickers, labels, meta, counts, percentages
+     Includes dark mode.
+     ========================================================== */
+  :root {
+    --d-ink: #1a2226;
+    --d-copy: #4a5459;
+    --d-muted: #7a8589;
+    --d-surface: #ffffff;
+    --d-surface-alt: #f5f7f5;
+    --d-paper: #f4f5f3;
+    --d-line: #d7dfdb;
+    --d-line-soft: #e8ecea;
+
+    --d-green: #1f6259;
+    --d-green-hover: #185048;
+    --d-green-wash: #e6efe9;
+    --d-green-edge: #c2d5c8;
+
+    --d-red: #9a5148;
+    --d-red-wash: #f3e5e1;
+    --d-red-edge: #dcc1b9;
+
+    --d-brass: #8a632e;
+    --d-brass-wash: #f2ead8;
+    --d-brass-edge: #d9c8a4;
+
+    --d-slate: #5d7076;
+    --d-slate-wash: #ebefee;
+    --d-slate-edge: #c5d0d0;
+
+    --d-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --d-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --d-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
   }
 
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+  .dark {
+    --d-ink: #eef2ef;
+    --d-copy: #b8c1bd;
+    --d-muted: #8f9a96;
+    --d-surface: #1a201f;
+    --d-surface-alt: #1e2524;
+    --d-paper: #131817;
+    --d-line: #33403e;
+    --d-line-soft: #2a3533;
+
+    --d-green: #6fbfa7;
+    --d-green-hover: #8ed4bd;
+    --d-green-wash: #1c2b27;
+    --d-green-edge: #2d5a4b;
+
+    --d-red: #e0907a;
+    --d-red-wash: #3a251f;
+    --d-red-edge: #5a3a2f;
+
+    --d-brass: #d9b273;
+    --d-brass-wash: #2c2620;
+    --d-brass-edge: #4a3e2d;
+
+    --d-slate: #8fa2a8;
+    --d-slate-wash: #253032;
+    --d-slate-edge: #3d4d51;
   }
 
-  .gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  .attendance-page {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--d-ink);
+    background: var(--d-paper);
+    font-family: var(--d-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  .attendance-page *,
+  .attendance-page *::before,
+  .attendance-page *::after {
+    box-sizing: border-box;
+  }
+  .attendance-page a {
+    color: inherit;
+    text-decoration: none;
   }
 
-  .card-hover {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  }
-
-  .stat-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-  }
-
-  .progress-glow {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    transition: all 0.3s ease;
-  }
-
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-  }
-
-  .btn-secondary {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  }
-
-  .btn-secondary:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
-  }
-
-  .alert-card {
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-    border-left: 4px solid #ef4444;
-  }
-
-  .activity-dot {
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.7;
-    }
-  }
-
-  .chart-container {
+  /* ---------- Hero ---------- */
+  .attendance-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 26px 22px 30px;
+    background: var(--d-surface);
+    border: 1px solid var(--d-line);
+    border-radius: 4px;
     position: relative;
-    height: 200px;
-    width: 100%;
+  }
+  .attendance-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--d-green);
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--d-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--d-muted);
+    margin: 0 0 6px;
+  }
+  .attendance-hero h1 {
+    margin: 0 0 8px;
+    color: var(--d-ink);
+    font-family: var(--d-display);
+    font-size: clamp(26px, 3.2vw, 34px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .attendance-hero p {
+    margin: 0;
+    color: var(--d-copy);
+    font-family: var(--d-sans);
+    font-size: 14px;
   }
 
-  .trend-badge {
-    background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin-top: 14px;
+    color: var(--d-muted);
+    font-family: var(--d-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .hero-meta .hero-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--d-green-edge);
+    border-radius: 3px;
+    background: var(--d-green-wash);
+    color: var(--d-green);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .hero-meta .hero-stamp.brass {
+    border-color: var(--d-brass-edge);
+    background: var(--d-brass-wash);
+    color: var(--d-brass);
+  }
+  .hero-session {
+    color: var(--d-muted);
+    font-style: italic;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .dash-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--d-line);
+    border-radius: 3px;
+    background: var(--d-surface);
+    color: var(--d-ink);
+    font-family: var(--d-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .dash-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .dash-btn:hover {
+    border-color: var(--d-ink);
+  }
+  .dash-btn.primary {
+    background: var(--d-green);
+    color: #fff;
+    border-color: var(--d-green);
+  }
+  .dark .dash-btn.primary {
+    color: #131817;
+  }
+  .dash-btn.primary:hover {
+    background: var(--d-green-hover);
+    border-color: var(--d-green-hover);
+  }
+  .dark .dash-btn.primary:hover {
+    color: #131817;
+  }
+
+  /* ---------- Summary strip ---------- */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 16px 0;
+    background: var(--d-surface);
+    border: 1px solid var(--d-line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .summary-card {
+    padding: 16px 20px;
+    border-right: 1px solid var(--d-line);
+    position: relative;
+  }
+  .summary-card:last-child {
+    border-right: 0;
+  }
+  .summary-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--d-green);
+  }
+  .summary-card:nth-child(2)::before {
+    background: var(--d-ink);
+  }
+  .summary-card:nth-child(3)::before {
+    background: var(--d-red);
+  }
+  .summary-card:nth-child(4)::before {
+    background: var(--d-brass);
+  }
+  .summary-label {
+    display: block;
+    font-family: var(--d-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--d-muted);
+    margin: 0 0 8px;
+  }
+  .summary-value {
+    display: block;
+    font-family: var(--d-display);
+    font-size: 26px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--d-ink);
+  }
+
+  /* ---------- Dashboard grid ---------- */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.78fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .dash-main,
+  .dash-side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+  .dash-card {
+    background: var(--d-surface);
+    border: 1px solid var(--d-line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .dash-card-head {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--d-line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .dash-card-head h2 {
+    margin: 0;
+    font-family: var(--d-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--d-ink);
+  }
+  .dash-card-head .head-meta {
+    font-family: var(--d-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--d-muted);
+    white-space: nowrap;
+  }
+
+  /* ---------- Class attendance list ---------- */
+  .overview-list {
+    padding: 0 20px;
+  }
+  .class-attendance {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--d-line-soft);
+  }
+  .class-attendance:last-child {
+    border-bottom: 0;
+  }
+  .class-attendance-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .class-attendance h3 {
+    margin: 0;
+    font-family: var(--d-sans);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--d-ink);
+  }
+  .rate-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--d-mono);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .rate-label .rate-num {
+    color: var(--d-green);
+  }
+  .rate-label .rate-num.watch {
+    color: var(--d-brass);
+  }
+  .rate-label .rate-num.low {
+    color: var(--d-red);
+  }
+
+  .rate-tier {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 2px;
+    font-family: var(--d-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .rate-tier.good {
+    background: var(--d-green-wash);
+    color: var(--d-green);
+    border-color: var(--d-green-edge);
+  }
+  .rate-tier.watch {
+    background: var(--d-brass-wash);
+    color: var(--d-brass);
+    border-color: var(--d-brass-edge);
+  }
+  .rate-tier.low {
+    background: var(--d-red-wash);
+    color: var(--d-red);
+    border-color: var(--d-red-edge);
+  }
+
+  .progress-track {
+    height: 6px;
+    overflow: hidden;
+    background: var(--d-surface-alt);
+    border-radius: 1px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--d-green);
+  }
+  .progress-fill.watch {
+    background: var(--d-brass);
+  }
+  .progress-fill.low {
+    background: var(--d-red);
+  }
+
+  .attendance-breakdown {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    margin: 14px 0;
+    background: var(--d-line-soft);
+    border: 1px solid var(--d-line-soft);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .breakdown {
+    padding: 10px 8px;
+    text-align: center;
+    background: var(--d-surface);
+  }
+  .breakdown strong {
+    display: block;
+    font-family: var(--d-mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--d-ink);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .breakdown span {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--d-mono);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--d-muted);
+  }
+  .breakdown.present strong {
+    color: var(--d-green);
+  }
+  .breakdown.absent strong {
+    color: var(--d-red);
+  }
+  .breakdown.late strong {
+    color: var(--d-brass);
+  }
+  .breakdown.excused strong {
+    color: var(--d-slate);
+  }
+
+  .class-links {
+    display: flex;
+    gap: 6px;
+  }
+  .class-link {
+    flex: 1;
+    padding: 7px 6px;
+    border: 1px solid var(--d-line);
+    border-radius: 2px;
+    color: var(--d-copy);
+    text-align: center;
+    font-family: var(--d-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: var(--d-surface);
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .class-link:hover {
+    border-color: var(--d-ink);
+    color: var(--d-ink);
+  }
+  .class-link.primary {
+    background: var(--d-green);
+    border-color: var(--d-green);
+    color: #fff;
+  }
+  .dark .class-link.primary {
+    color: #131817;
+  }
+  .class-link.primary:hover {
+    background: var(--d-green-hover);
+    border-color: var(--d-green-hover);
+    color: #fff;
+  }
+  .dark .class-link.primary:hover {
+    color: #131817;
+  }
+
+  /* ---------- Sidebar lists ---------- */
+  .alert-list,
+  .activity-list,
+  .quick-list {
+    padding: 0 20px;
+  }
+
+  .alert-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--d-line-soft);
+  }
+  .alert-item:last-child {
+    border-bottom: 0;
+  }
+  .alert-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .alert-item strong {
+    color: var(--d-ink);
+    font-family: var(--d-sans);
+    font-size: 13px;
     font-weight: 600;
   }
-
-  .trend-positive {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  .alert-rate {
+    font-family: var(--d-mono);
+    color: var(--d-red);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .alert-detail {
+    display: block;
+    margin-top: 3px;
+    font-family: var(--d-mono);
+    color: var(--d-muted);
+    font-size: 11px;
+    letter-spacing: 0.02em;
   }
 
-  .trend-negative {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  .alert-footer {
+    display: block;
+    margin: 8px 20px 18px;
+    padding: 9px 12px;
+    border: 1px solid var(--d-red-edge);
+    border-radius: 3px;
+    background: var(--d-red-wash);
+    color: var(--d-red);
+    text-align: center;
+    font-family: var(--d-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: filter 0.15s ease;
+  }
+  .alert-footer:hover {
+    filter: brightness(0.96);
+  }
+
+  .activity-item {
+    display: flex;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--d-line-soft);
+  }
+  .activity-item:last-child {
+    border-bottom: 0;
+  }
+  .activity-dot {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: var(--d-green);
+  }
+  .activity-dot.absent {
+    background: var(--d-red);
+  }
+  .activity-dot.late {
+    background: var(--d-brass);
+  }
+  .activity-dot.excused {
+    background: var(--d-slate);
+  }
+  .activity-name {
+    color: var(--d-ink);
+    font-family: var(--d-sans);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .activity-copy {
+    color: var(--d-muted);
+    font-family: var(--d-sans);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .activity-copy strong {
+    font-family: var(--d-mono);
+    font-weight: 600;
+    color: var(--d-copy);
+    letter-spacing: 0.02em;
+  }
+
+  .quick-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--d-line-soft);
+    transition: color 0.15s ease;
+  }
+  .quick-action:last-child {
+    border-bottom: 0;
+  }
+  .quick-action:hover .quick-title {
+    color: var(--d-green);
+  }
+  .quick-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border: 1px solid var(--d-line);
+    border-radius: 3px;
+    background: var(--d-surface-alt);
+    color: var(--d-green);
+  }
+  .quick-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .quick-title {
+    display: block;
+    color: var(--d-ink);
+    font-family: var(--d-sans);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .quick-copy {
+    display: block;
+    margin-top: 2px;
+    color: var(--d-muted);
+    font-family: var(--d-sans);
+    font-size: 11px;
+  }
+
+  /* ==========================================================
+     Composition — flat data presentation
+     ========================================================== */
+  .composition-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.6fr);
+    gap: 28px;
+    padding: 22px 24px 26px;
+    align-items: start;
+  }
+
+  .composition-donut-side {
+    min-width: 0;
+  }
+  .donut-chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto 18px;
+    aspect-ratio: 1 / 1;
+  }
+  .donut-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .donut-center strong {
+    font-family: var(--d-display);
+    font-size: 32px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--d-ink);
+  }
+  .donut-center span {
+    margin-top: 5px;
+    font-family: var(--d-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--d-muted);
+  }
+
+  .donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--d-line-soft);
+  }
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--d-line-soft);
+    font-family: var(--d-sans);
+    font-size: 12px;
+    color: var(--d-copy);
+  }
+  .legend-row:last-child {
+    border-bottom: 0;
+  }
+  .legend-swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+  .legend-swatch.present {
+    background: var(--d-green);
+  }
+  .legend-swatch.absent {
+    background: var(--d-red);
+  }
+  .legend-swatch.late {
+    background: var(--d-brass);
+  }
+  .legend-swatch.excused {
+    background: var(--d-slate);
+  }
+  .legend-label {
+    flex: 1;
+  }
+  .legend-count {
+    font-family: var(--d-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--d-ink);
+  }
+  .legend-count .unit {
+    color: var(--d-muted);
+    font-weight: 500;
+    margin-left: 3px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Stacked bars side */
+  .composition-bars-side {
+    min-width: 0;
+  }
+  .composition-bars-head {
+    font-family: var(--d-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--d-muted);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--d-line);
+  }
+  .composition-row {
+    margin-bottom: 16px;
+  }
+  .composition-row:last-child {
+    margin-bottom: 0;
+  }
+  .composition-row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .composition-name {
+    font-family: var(--d-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--d-ink);
+  }
+  .composition-rate {
+    font-family: var(--d-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--d-green);
+    letter-spacing: 0.02em;
+  }
+  .composition-rate.watch {
+    color: var(--d-brass);
+  }
+  .composition-rate.low {
+    color: var(--d-red);
+  }
+
+  .composition-stack {
+    display: flex;
+    height: 12px;
+    overflow: hidden;
+    background: var(--d-surface-alt);
+    border-radius: 1px;
+  }
+  .stack-seg {
+    height: 100%;
+  }
+  .stack-seg.present {
+    background: var(--d-green);
+  }
+  .stack-seg.absent {
+    background: var(--d-red);
+  }
+  .stack-seg.late {
+    background: var(--d-brass);
+  }
+  .stack-seg.excused {
+    background: var(--d-slate);
+  }
+
+  .composition-counts {
+    display: flex;
+    gap: 14px;
+    margin-top: 5px;
+    font-family: var(--d-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--d-muted);
+  }
+
+  .composition-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--d-muted);
+  }
+  .composition-empty strong {
+    display: block;
+    color: var(--d-ink);
+    font-family: var(--d-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    margin-bottom: 6px;
+  }
+  .composition-empty p {
+    margin: 0;
+    font-family: var(--d-sans);
+    font-size: 13px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 980px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+    .composition-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 700px) {
+    .attendance-page {
+      padding: 20px 14px 40px;
+    }
+    .attendance-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .hero-actions {
+      width: 100%;
+    }
+    .hero-actions .dash-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .summary-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .summary-card:nth-child(2) {
+      border-right: 0;
+    }
+    .summary-card:nth-child(1),
+    .summary-card:nth-child(2) {
+      border-bottom: 1px solid var(--d-line);
+    }
+    .dash-card-head {
+      padding: 14px 16px 12px;
+    }
+    .overview-list,
+    .alert-list,
+    .activity-list,
+    .quick-list {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    .alert-footer {
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+    .composition-grid {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+  @media (max-width: 460px) {
+    .summary-grid {
+      grid-template-columns: 1fr;
+    }
+    .summary-card {
+      border-right: 0;
+      border-bottom: 1px solid var(--d-line);
+    }
+    .summary-card:last-child {
+      border-bottom: 0;
+    }
+    .attendance-breakdown {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .class-links {
+      flex-wrap: wrap;
+    }
+    .class-link {
+      min-width: calc(50% - 3px);
+    }
   }
 </style>
 
-<!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="min-h-screen">
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <!-- Enhanced Header -->
-    <div
-      class="glass-effect rounded-2xl shadow-xl p-8 mb-8 border border-white/20"
-    >
-      <div
-        class="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-6 lg:space-y-0"
+{# ---------- Shared totals ---------- #} {% set total_present =
+today_attendance.values() | sum(attribute='present') %} {% set total_absent =
+today_attendance.values() | sum(attribute='absent') %} {% set total_late =
+today_attendance.values() | sum(attribute='late') %} {% set total_excused =
+today_attendance.values() | sum(attribute='excused') %} {% set grand_total =
+total_present + total_absent + total_late + total_excused %} {% set overall_rate
+= ((total_present + total_late) / grand_total * 100) | round(1) if grand_total
+else 0 %}
+
+<div class="attendance-page">
+  <!-- Hero -->
+  <header class="attendance-hero">
+    <div class="hero-copy">
+      <p class="dash-kicker">Attendance Register · Overview</p>
+      <h1>Attendance dashboard</h1>
+      <p>A clear view of today's attendance across every class.</p>
+      <div class="hero-meta">
+        <span>{{ today.strftime('%A, %B %d, %Y') }}</span>
+        <span class="hero-stamp"
+          >Term {{ current_term }} · {{ current_year }}</span
+        >
+        <span class="hero-session" id="sessionLabel"></span>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <a
+        href="{{ url_for('attendance.select_attendance_date') }}"
+        class="dash-btn primary"
       >
-        <div class="space-y-3">
-          <h1
-            class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 bg-clip-text text-transparent"
-          >
-            Attendance Dashboard
-          </h1>
-          <p class="text-lg text-gray-600 font-medium">
-            Real-time overview of attendance data and analytics
-          </p>
-          <div class="flex items-center space-x-2 text-sm text-gray-500">
-            <svg
-              class="w-4 h-4 text-indigo-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
-              />
-            </svg>
-            <span class="font-medium"
-              >{{ today.strftime('%A, %B %d, %Y') }}</span
-            >
-            <span class="text-gray-300">•</span>
-            <span
-              class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold"
-            >
-              {{ current_term }} {{ current_year }}
-            </span>
-          </div>
-        </div>
-
-        <div
-          class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4"
-        >
-          <a
-            href="{{ url_for('attendance.select_attendance_date') }}"
-            class="btn-primary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg"
-          >
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            Mark Attendance
-          </a>
-          <a
-            href="{{ url_for('attendance.term_attendance') }}"
-            class="btn-secondary inline-flex items-center justify-center px-6 py-3 text-white rounded-xl font-semibold shadow-lg transition-all"
-          >
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            View Reports
-          </a>
-        </div>
-      </div>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+          />
+        </svg>
+        Mark attendance
+      </a>
+      <a href="{{ url_for('attendance.term_attendance') }}" class="dash-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+          />
+        </svg>
+        View reports
+      </a>
     </div>
+  </header>
 
-    <!-- Enhanced Quick Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-      <div class="stat-card card-hover rounded-2xl shadow-lg p-6 border">
-        <div class="flex items-center justify-between">
-          <div class="space-y-2">
-            <div class="flex items-center space-x-3">
-              <div
-                class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg"
-              >
-                <svg
-                  class="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="text-3xl font-bold text-gray-800">
-                  {{ classes | length }}
-                </p>
-                <p class="text-sm font-medium text-gray-500">Total Classes</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card card-hover rounded-2xl shadow-lg p-6 border">
-        <div class="flex items-center justify-between">
-          <div class="space-y-2">
-            <div class="flex items-center space-x-3">
-              <div
-                class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg"
-              >
-                <svg
-                  class="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="text-3xl font-bold text-gray-800">
-                  {% set total_present = today_attendance.values() |
-                  sum(attribute='present') %} {{ total_present }}
-                </p>
-                <p class="text-sm font-medium text-gray-500">Present Today</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card card-hover rounded-2xl shadow-lg p-6 border">
-        <div class="flex items-center justify-between">
-          <div class="space-y-2">
-            <div class="flex items-center space-x-3">
-              <div
-                class="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg"
-              >
-                <svg
-                  class="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="text-3xl font-bold text-gray-800">
-                  {% set total_absent = today_attendance.values() |
-                  sum(attribute='absent') %} {{ total_absent }}
-                </p>
-                <p class="text-sm font-medium text-gray-500">Absent Today</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card card-hover rounded-2xl shadow-lg p-6 border">
-        <div class="flex items-center justify-between">
-          <div class="space-y-2">
-            <div class="flex items-center space-x-3">
-              <div
-                class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg"
-              >
-                <svg
-                  class="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="text-3xl font-bold text-gray-800">
-                  {% if today_attendance.values() | sum(attribute='total') > 0
-                  %} {{ ((today_attendance.values() | sum(attribute='present'))
-                  / (today_attendance.values() | sum(attribute='total')) * 100)
-                  | round(1) }}% {% else %} 0% {% endif %}
-                </p>
-                <p class="text-sm font-medium text-gray-500">Attendance Rate</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Summary strip -->
+  <section class="summary-grid" aria-label="Attendance summary">
+    <div class="summary-card">
+      <span class="summary-label">Total classes</span>
+      <strong class="summary-value">{{ classes | length }}</strong>
     </div>
+    <div class="summary-card">
+      <span class="summary-label">Present today</span>
+      <strong class="summary-value">{{ total_present }}</strong>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Absent today</span>
+      <strong class="summary-value">{{ total_absent }}</strong>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Attendance rate</span>
+      <strong class="summary-value">{{ overall_rate }}%</strong>
+    </div>
+  </section>
 
-    <!-- Enhanced Main Content Grid -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
-      <!-- Class Attendance Overview -->
-      <div class="xl:col-span-2">
-        <div
-          class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20"
-        >
-          <div class="flex items-center space-x-3 mb-8">
-            <div
-              class="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800">
-              Class Attendance Overview
-            </h2>
+  <!-- Main grid -->
+  <div class="dashboard-grid">
+    <main class="dash-main">
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Today</p>
+            <h2>Class attendance</h2>
           </div>
-
-          <div class="space-y-6">
-            {% for class_ in classes %}
-            <div
-              class="bg-gradient-to-r from-white to-gray-50/50 border border-gray-200/60 rounded-xl p-6 card-hover"
-            >
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-800">
-                  {{ class_.name }}
-                </h3>
-                <div class="flex items-center space-x-2">
-                  <span
-                    class="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-bold rounded-full shadow-md"
-                  >
-                    {{ today_attendance[class_.id].attendance_rate | round(1)
-                    }}%
-                  </span>
-                  <span class="text-xs text-gray-500 font-medium">Today</span>
-                </div>
-              </div>
-
-              <div class="mb-4">
-                <div class="w-full bg-gray-200 rounded-full h-3 shadow-inner">
-                  <div
-                    class="bg-gradient-to-r from-emerald-400 to-emerald-600 h-3 rounded-full progress-glow transition-all duration-1000 ease-out"
-                    style="width: {{ today_attendance[class_.id].attendance_rate }}%"
-                  ></div>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-4 gap-4 mb-4">
-                <div
-                  class="text-center p-3 bg-emerald-50 rounded-lg border border-emerald-100"
-                >
-                  <p class="text-2xl font-bold text-emerald-700">
-                    {{ today_attendance[class_.id].present }}
-                  </p>
-                  <p class="text-xs text-emerald-600 font-semibold">Present</p>
-                </div>
-                <div
-                  class="text-center p-3 bg-red-50 rounded-lg border border-red-100"
-                >
-                  <p class="text-2xl font-bold text-red-700">
-                    {{ today_attendance[class_.id].absent }}
-                  </p>
-                  <p class="text-xs text-red-600 font-semibold">Absent</p>
-                </div>
-                <div
-                  class="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-100"
-                >
-                  <p class="text-2xl font-bold text-yellow-700">
-                    {{ today_attendance[class_.id].late }}
-                  </p>
-                  <p class="text-xs text-yellow-600 font-semibold">Late</p>
-                </div>
-                <div
-                  class="text-center p-3 bg-blue-50 rounded-lg border border-blue-100"
-                >
-                  <p class="text-2xl font-bold text-blue-700">
-                    {{ today_attendance[class_.id].excused }}
-                  </p>
-                  <p class="text-xs text-blue-600 font-semibold">Excused</p>
-                </div>
-              </div>
-
-              <div class="flex space-x-2">
-                <a
-                  href="{{ url_for('attendance.select_attendance_date') }}?class_id={{ class_.id }}"
-                  class="flex-1 text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                >
-                  Mark
-                </a>
-                <a
-                  href="{{ url_for('attendance.term_attendance_report', class_id=class_.id, term=current_term, year=current_year) }}"
-                  class="flex-1 text-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-semibold rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                >
-                  Report
-                </a>
-                <a
-                  href="{{ url_for('attendance.attendance_analytics', class_id=class_.id) }}"
-                  class="flex-1 text-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-semibold rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                >
-                  Analytics
-                </a>
-              </div>
-            </div>
-            {% endfor %}
-          </div>
+          <span class="head-meta">{{ classes | length }} classes</span>
         </div>
-      </div>
-
-      <!-- Enhanced Right Sidebar -->
-      <div class="space-y-6">
-        <!-- Enhanced Chronic Absenteeism Alerts -->
-        {% if chronic_absenteeism %}
-        <div
-          class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20"
-        >
-          <div class="flex items-center space-x-3 mb-6">
-            <div
-              class="p-2 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg"
-            >
-              <svg
-                class="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800">Attendance Alerts</h2>
-          </div>
-
-          <div class="space-y-4">
-            {% for alert in chronic_absenteeism %}
-            <div class="alert-card rounded-xl p-4 border">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-sm font-semibold text-red-800">
-                  {{ alert.student.full_name }}
-                </h3>
-                <span
-                  class="px-2 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full shadow-sm"
+        <div class="overview-list">
+          {% for class_ in classes %} {% set att = today_attendance[class_.id]
+          %} {% set rate = att.attendance_rate | round(1) %} {% if rate >= 90
+          %}{% set tier = 'good' %}{% elif rate >= 75 %}{% set tier = 'watch'
+          %}{% else %}{% set tier = 'low' %}{% endif %}
+          <article class="class-attendance">
+            <div class="class-attendance-top">
+              <h3>{{ class_.name }}</h3>
+              <span class="rate-label">
+                <span class="rate-num {{ tier if tier != 'good' else '' }}"
+                  >{{ rate }}%</span
                 >
-                  {{ alert.attendance_rate | round(1) }}%
+                <span class="rate-tier {{ tier }}">
+                  {% if tier == 'good' %}On track{% elif tier == 'watch'
+                  %}Watch{% else %}Low{% endif %}
                 </span>
-              </div>
-              <p class="text-xs text-red-600 font-medium">
-                {{ alert.class.name }} • {{ alert.absent_days }} absent days
-              </p>
+              </span>
             </div>
-            {% endfor %}
-          </div>
+            <div class="progress-track">
+              <div
+                class="progress-fill {{ tier if tier != 'good' else '' }}"
+                style="width: {{ rate }}%"
+              ></div>
+            </div>
+            <div class="attendance-breakdown">
+              <div class="breakdown present">
+                <strong>{{ att.present }}</strong><span>Present</span>
+              </div>
+              <div class="breakdown absent">
+                <strong>{{ att.absent }}</strong><span>Absent</span>
+              </div>
+              <div class="breakdown late">
+                <strong>{{ att.late }}</strong><span>Late</span>
+              </div>
+              <div class="breakdown excused">
+                <strong>{{ att.excused }}</strong><span>Excused</span>
+              </div>
+            </div>
+            <div class="class-links">
+              <a
+                class="class-link primary"
+                href="{{ url_for('attendance.select_attendance_date') }}?class_id={{ class_.id }}"
+                >Mark</a
+              >
+              <a
+                class="class-link"
+                href="{{ url_for('attendance.term_attendance_report', class_id=class_.id, term=current_term, year=current_year) }}"
+                >Report</a
+              >
+              <a
+                class="class-link"
+                href="{{ url_for('attendance.attendance_analytics', class_id=class_.id) }}"
+                >Analytics</a
+              >
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
 
+    <aside class="dash-side">
+      {% if chronic_absenteeism %}
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Follow up</p>
+            <h2>Attendance alerts</h2>
+          </div>
+          <span class="head-meta">{{ chronic_absenteeism | length }}</span>
+        </div>
+        <div class="alert-list">
+          {% for alert in chronic_absenteeism %}
+          <div class="alert-item">
+            <div class="alert-top">
+              <strong>{{ alert.student.full_name }}</strong>
+              <span class="alert-rate"
+                >{{ alert.attendance_rate | round(1) }}%</span
+              >
+            </div>
+            <span class="alert-detail"
+              >{{ alert.class.name }} · {{ alert.absent_days }} absent
+              days</span
+            >
+          </div>
+          {% endfor %}
+        </div>
+        <a
+          class="alert-footer"
+          href="{{ url_for('attendance.attendance_analytics') }}"
+          >View all analytics →</a
+        >
+      </section>
+      {% endif %}
+
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Latest</p>
+            <h2>Recent activity</h2>
+          </div>
+        </div>
+        <div class="activity-list">
+          {% for activity in recent_activity %}
+          <div class="activity-item">
+            <span
+              class="activity-dot {% if activity.status == 'absent' %}absent{% elif activity.status == 'late' %}late{% elif activity.status != 'present' %}excused{% endif %}"
+            ></span>
+            <div>
+              <div class="activity-name">{{ activity.student.full_name }}</div>
+              <div class="activity-copy">
+                Marked <strong>{{ activity.status }}</strong> in
+                <strong>{{ activity.classroom.name }}</strong> · {{
+                activity.date.strftime('%m/%d') }} at {{
+                activity.created_at.strftime('%H:%M') }}
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="composition-empty" style="padding: 24px 8px">
+            <p>No recent activity.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Shortcuts</p>
+            <h2>Quick actions</h2>
+          </div>
+        </div>
+        <div class="quick-list">
           <a
-            href="{{ url_for('attendance.attendance_analytics') }}"
-            class="block mt-6 text-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 py-2 rounded-lg"
+            class="quick-action"
+            href="{{ url_for('attendance.select_attendance_date') }}"
           >
-            View All Analytics →
+            <span class="quick-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">Mark attendance</span>
+              <span class="quick-copy">Record today's attendance</span>
+            </span>
+          </a>
+          <a
+            class="quick-action"
+            href="{{ url_for('attendance.term_attendance') }}"
+          >
+            <span class="quick-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">View reports</span>
+              <span class="quick-copy">Generate attendance reports</span>
+            </span>
+          </a>
+          <a class="quick-action" href="{{ url_for('attendance.scanner') }}">
+            <span class="quick-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h2M4 4h5.01M4 20h5.01"
+                />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">QR scanner</span>
+              <span class="quick-copy">Scan student QR codes</span>
+            </span>
           </a>
         </div>
-        {% endif %}
+      </section>
+    </aside>
+  </div>
 
-        <!-- Enhanced Recent Activity -->
-        <div
-          class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20"
-        >
-          <div class="flex items-center space-x-3 mb-6">
-            <div
-              class="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg"
-            >
-              <svg
-                class="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800">Recent Activity</h2>
-          </div>
-
-          <div class="space-y-4">
-            {% for activity in recent_activity %}
-            <div
-              class="flex items-start space-x-3 p-3 bg-gray-50/50 rounded-lg border border-gray-100 hover:bg-gray-100/50 transition-colors"
-            >
-              <div class="flex-shrink-0 mt-1">
-                {% if activity.status == 'present' %}
-                <div
-                  class="w-3 h-3 bg-gradient-to-r from-green-400 to-green-500 rounded-full activity-dot shadow-sm"
-                ></div>
-                {% elif activity.status == 'absent' %}
-                <div
-                  class="w-3 h-3 bg-gradient-to-r from-red-400 to-red-500 rounded-full activity-dot shadow-sm"
-                ></div>
-                {% elif activity.status == 'late' %}
-                <div
-                  class="w-3 h-3 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full activity-dot shadow-sm"
-                ></div>
-                {% else %}
-                <div
-                  class="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full activity-dot shadow-sm"
-                ></div>
-                {% endif %}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-gray-800">
-                  {{ activity.student.full_name }}
-                </p>
-                <p class="text-xs text-gray-500 leading-relaxed">
-                  Marked
-                  <span class="font-medium text-gray-700"
-                    >{{ activity.status }}</span
-                  >
-                  in
-                  <span class="font-medium text-gray-700"
-                    >{{ activity.classroom.name }}</span
-                  >
-                  • {{ activity.date.strftime('%m/%d') }} at {{
-                  activity.created_at.strftime('%H:%M') }}
-                </p>
-              </div>
-            </div>
-            {% else %}
-            <div class="text-center py-8">
-              <svg
-                class="w-12 h-12 text-gray-400 mx-auto mb-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
-              <p class="text-sm text-gray-500 font-medium">
-                No recent activity
-              </p>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-
-        <!-- Enhanced Quick Actions -->
-        <div
-          class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20"
-        >
-          <div class="flex items-center space-x-3 mb-6">
-            <div
-              class="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg"
-            >
-              <svg
-                class="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800">Quick Actions</h2>
-          </div>
-
-          <div class="space-y-3">
-            <a
-              href="{{ url_for('attendance.select_attendance_date') }}"
-              class="group flex items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl transition-all duration-200 border border-blue-100 hover:border-blue-200"
-            >
-              <div
-                class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200 shadow-lg"
-              >
-                <svg
-                  class="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm font-semibold text-gray-800">
-                  Mark Attendance
-                </p>
-                <p class="text-xs text-gray-600">Record today's attendance</p>
-              </div>
-            </a>
-
-            <a
-              href="{{ url_for('attendance.term_attendance') }}"
-              class="group flex items-center p-4 bg-gradient-to-r from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 rounded-xl transition-all duration-200 border border-emerald-100 hover:border-emerald-200"
-            >
-              <div
-                class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200 shadow-lg"
-              >
-                <svg
-                  class="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm font-semibold text-gray-800">View Reports</p>
-                <p class="text-xs text-gray-600">Generate attendance reports</p>
-              </div>
-            </a>
-
-            <a
-              href="{{ url_for('attendance.scanner') }}"
-              class="group flex items-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 rounded-xl transition-all duration-200 border border-purple-100 hover:border-purple-200"
-            >
-              <div
-                class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200 shadow-lg"
-              >
-                <svg
-                  class="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm font-semibold text-gray-800">QR Scanner</p>
-                <p class="text-xs text-gray-600">Scan student QR codes</p>
-              </div>
-            </a>
-          </div>
-        </div>
+  <!-- Composition -->
+  <section class="dash-card" style="margin-top: 16px">
+    <div class="dash-card-head">
+      <div>
+        <p class="section-kicker">Composition</p>
+        <h2>Today's attendance breakdown</h2>
       </div>
+      <span class="head-meta">Live · {{ today.strftime('%b %d') }}</span>
     </div>
 
-    <!-- Enhanced Monthly Trends with Real Charts -->
-    <div
-      class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20"
-    >
-      <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center space-x-3">
-          <div
-            class="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
+    {% if grand_total > 0 %}
+    <div class="composition-grid">
+      <!-- Donut -->
+      <div class="composition-donut-side">
+        <div class="donut-chart-container">
+          <canvas id="schoolWideDonut"></canvas>
+          <div class="donut-center">
+            <strong>{{ overall_rate }}%</strong>
+            <span>Attending</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-800">Attendance Trends</h2>
         </div>
-        <span class="trend-badge" id="trendIndicator"> Last 30 Days </span>
+        <div class="donut-legend">
+          <div class="legend-row">
+            <span class="legend-swatch present"></span>
+            <span class="legend-label">Present</span>
+            <span class="legend-count"
+              >{{ total_present }}<span class="unit">students</span></span
+            >
+          </div>
+          <div class="legend-row">
+            <span class="legend-swatch late"></span>
+            <span class="legend-label">Late</span>
+            <span class="legend-count"
+              >{{ total_late }}<span class="unit">students</span></span
+            >
+          </div>
+          <div class="legend-row">
+            <span class="legend-swatch excused"></span>
+            <span class="legend-label">Excused</span>
+            <span class="legend-count"
+              >{{ total_excused }}<span class="unit">students</span></span
+            >
+          </div>
+          <div class="legend-row">
+            <span class="legend-swatch absent"></span>
+            <span class="legend-label">Absent</span>
+            <span class="legend-count"
+              >{{ total_absent }}<span class="unit">students</span></span
+            >
+          </div>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {% for class_ in classes %}
-        <div
-          class="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-6 card-hover"
-        >
-          <div class="flex justify-between items-start mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">
-              {{ class_.name }}
-            </h3>
-            <div class="text-right">
-              <p class="text-2xl font-bold text-gray-800">
-                {{ today_attendance[class_.id].attendance_rate | round(1) }}%
-              </p>
-              <p class="text-xs text-gray-500">Current Rate</p>
-            </div>
+      <!-- Stacked bars -->
+      <div class="composition-bars-side">
+        <div class="composition-bars-head">Per-class distribution · today</div>
+        {% for class_ in classes %} {% set att = today_attendance[class_.id] %}
+        {% set rate = att.attendance_rate | round(1) %} {% if rate >= 90 %}{%
+        set tier = 'good' %}{% elif rate >= 75 %}{% set tier = 'watch' %}{% else
+        %}{% set tier = 'low' %}{% endif %}
+        <div class="composition-row">
+          <div class="composition-row-head">
+            <span class="composition-name">{{ class_.name }}</span>
+            <span class="composition-rate {{ tier if tier != 'good' else '' }}"
+              >{{ rate }}%</span
+            >
           </div>
-
-          <div class="chart-container">
-            <canvas id="trendChart{{ class_.id }}"></canvas>
+          <div class="composition-stack">
+            {% if att.total > 0 %}
+            <div
+              class="stack-seg present"
+              style="width: {{ (att.present / att.total * 100) | round(2) }}%"
+            ></div>
+            <div
+              class="stack-seg late"
+              style="width: {{ (att.late / att.total * 100) | round(2) }}%"
+            ></div>
+            <div
+              class="stack-seg excused"
+              style="width: {{ (att.excused / att.total * 100) | round(2) }}%"
+            ></div>
+            <div
+              class="stack-seg absent"
+              style="width: {{ (att.absent / att.total * 100) | round(2) }}%"
+            ></div>
+            {% endif %}
           </div>
-
-          <div class="mt-4 flex justify-between items-center">
-            <div class="flex space-x-2">
-              <div class="flex items-center space-x-1">
-                <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                <span class="text-xs text-gray-600">Present</span>
-              </div>
-              <div class="flex items-center space-x-1">
-                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span class="text-xs text-gray-600">Absent</span>
-              </div>
-            </div>
-            <span class="text-xs text-gray-500 font-medium">
-              {% set trend = today_attendance[class_.id].attendance_rate - 85 %}
-              {% if trend > 0 %}
-              <span class="text-emerald-600"
-                >+{{ trend | round(1) }}% vs avg</span
-              >
-              {% else %}
-              <span class="text-red-600">{{ trend | round(1) }}% vs avg</span>
-              {% endif %}
-            </span>
+          <div class="composition-counts">
+            <span>{{ att.present }} P</span>
+            <span>{{ att.late }} L</span>
+            <span>{{ att.excused }} E</span>
+            <span>{{ att.absent }} A</span>
           </div>
         </div>
         {% endfor %}
       </div>
     </div>
-  </div>
+    {% else %}
+    <div class="composition-empty">
+      <strong>No attendance recorded today</strong>
+      <p>Mark attendance for at least one class to see today's composition.</p>
+    </div>
+    {% endif %}
+  </section>
 </div>
 
 <script>
-  // Enhanced functionality for modern interactions
   document.addEventListener("DOMContentLoaded", function () {
-    // Initialize attendance trend charts
-    initializeTrendCharts();
-
-    // Add smooth scroll behavior for better UX
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      anchor.addEventListener("click", function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute("href"));
-        if (target) {
-          target.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      });
-    });
-
-    // Add loading states for better perceived performance
-    document.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", function () {
-        if (!this.href.includes("#")) {
-          this.style.opacity = "0.7";
-          this.style.pointerEvents = "none";
-          setTimeout(() => {
-            this.style.opacity = "1";
-            this.style.pointerEvents = "auto";
-          }, 1000);
-        }
-      });
-    });
-
-    // Animate progress bars on load
-    const progressBars = document.querySelectorAll(".progress-glow");
-    progressBars.forEach((bar) => {
-      const width = bar.style.width;
-      bar.style.width = "0%";
-      setTimeout(() => {
-        bar.style.width = width;
-      }, 300);
-    });
-
-    // Initialize trend charts
-    function initializeTrendCharts() {
-      const classElements = document.querySelectorAll('[id^="trendChart"]');
-
-      classElements.forEach((canvas, index) => {
-        const ctx = canvas.getContext("2d");
-
-        // Generate sample data for demonstration
-        const days = Array.from({ length: 30 }, (_, i) => {
-          const date = new Date();
-          date.setDate(date.getDate() - (29 - i));
-          return date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          });
-        });
-
-        const presentData = Array.from(
-          { length: 30 },
-          () => Math.floor(Math.random() * 25) + 15
-        );
-
-        const absentData = Array.from(
-          { length: 30 },
-          () => Math.floor(Math.random() * 8) + 2
-        );
-
-        // Calculate attendance rates
-        const attendanceRates = presentData.map((present, i) => {
-          const total = present + absentData[i];
-          return total > 0 ? Math.round((present / total) * 100) : 0;
-        });
-
-        new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: days,
-            datasets: [
-              {
-                label: "Attendance Rate",
-                data: attendanceRates,
-                borderColor: "#4F46E5",
-                backgroundColor: "rgba(79, 70, 229, 0.1)",
-                borderWidth: 3,
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: "#4F46E5",
-                pointBorderColor: "#ffffff",
-                pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false,
-              },
-              tooltip: {
-                mode: "index",
-                intersect: false,
-                backgroundColor: "rgba(255, 255, 255, 0.95)",
-                titleColor: "#1f2937",
-                bodyColor: "#4b5563",
-                borderColor: "#e5e7eb",
-                borderWidth: 1,
-                padding: 12,
-                callbacks: {
-                  label: function (context) {
-                    return `Attendance: ${context.parsed.y}%`;
-                  },
-                },
-              },
-            },
-            scales: {
-              x: {
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  maxTicksLimit: 6,
-                  color: "#6b7280",
-                  font: {
-                    size: 11,
-                  },
-                },
-              },
-              y: {
-                min: 0,
-                max: 100,
-                grid: {
-                  color: "rgba(0, 0, 0, 0.05)",
-                },
-                ticks: {
-                  color: "#6b7280",
-                  callback: function (value) {
-                    return value + "%";
-                  },
-                  font: {
-                    size: 11,
-                  },
-                },
-              },
-            },
-            interaction: {
-              intersect: false,
-              mode: "nearest",
-            },
-            elements: {
-              line: {
-                tension: 0.4,
-              },
-            },
-          },
-        });
-      });
+    // Session label — honest client-time indicator
+    var sessionLabel = document.getElementById("sessionLabel");
+    if (sessionLabel) {
+      var hour = new Date().getHours();
+      if (hour < 12) sessionLabel.textContent = "Morning register";
+      else if (hour < 17) sessionLabel.textContent = "Afternoon register";
+      else sessionLabel.textContent = "Evening review";
     }
 
-    // Update trend indicator based on current time
-    function updateTrendIndicator() {
-      const indicator = document.getElementById("trendIndicator");
-      const hour = new Date().getHours();
+    // School-wide donut — uses real numbers from the server
+    var donutCanvas = document.getElementById("schoolWideDonut");
+    if (donutCanvas && window.Chart) {
+      var present = {{ total_present | tojson }};
+      var late = {{ total_late | tojson }};
+      var excused = {{ total_excused | tojson }};
+      var absent = {{ total_absent | tojson }};
 
-      if (hour >= 5 && hour < 12) {
-        indicator.textContent = "Morning Session";
-        indicator.classList.add("trend-positive");
-      } else if (hour >= 12 && hour < 17) {
-        indicator.textContent = "Afternoon Session";
-        indicator.classList.add("trend-positive");
-      } else {
-        indicator.textContent = "Evening Review";
-        indicator.classList.add("trend-negative");
-      }
+      // Donut colors resolve to the current theme at render time
+      var isDark = document.documentElement.classList.contains("dark")
+        || document.body.classList.contains("dark");
+      var donutColors = isDark
+        ? ["#6fbfa7", "#d9b273", "#8fa2a8", "#e0907a"]
+        : ["#1f6259", "#8a632e", "#5d7076", "#9a5148"];
+      var donutBorder = isDark ? "#1a201f" : "#ffffff";
+      var tooltipBg = isDark ? "#1a201f" : "#ffffff";
+      var tooltipTitle = isDark ? "#eef2ef" : "#1a2226";
+      var tooltipBody = isDark ? "#b8c1bd" : "#4a5459";
+      var tooltipBorder = isDark ? "#33403e" : "#d7dfdb";
+
+      new Chart(donutCanvas.getContext("2d"), {
+        type: "doughnut",
+        data: {
+          labels: ["Present", "Late", "Excused", "Absent"],
+          datasets: [{
+            data: [present, late, excused, absent],
+            backgroundColor: donutColors,
+            borderColor: donutBorder,
+            borderWidth: 2,
+            hoverOffset: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "72%",
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: tooltipBg,
+              titleColor: tooltipTitle,
+              bodyColor: tooltipBody,
+              borderColor: tooltipBorder,
+              borderWidth: 1,
+              padding: 10,
+              displayColors: false,
+              callbacks: {
+                label: function (ctx) {
+                  var total = present + late + excused + absent;
+                  var pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
+                  return ctx.label + ": " + ctx.parsed + " (" + pct + "%)";
+                }
+              }
+            }
+          }
+        }
+      });
     }
-
-    updateTrendIndicator();
   });
 </script>
 {% endblock %}

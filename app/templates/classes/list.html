@@ -2,392 +2,845 @@
 endblock %} {% block page_title %}Classes & Subjects{% endblock %} {% block
 page_description %}Manage classes, assign teachers, and view student
 distributions{% endblock %} {% block content %}
-<div class="space-y-8">
-  <!-- Header Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-    <div class="professional-card p-6 hover-lift">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sky-600 dark:text-sky-400 text-sm font-medium">
-            Total Classes
-          </p>
-          <p class="text-3xl font-bold text-sky-800 dark:text-white mt-2">
-            {% if classes | length %}{{ classes|length }}{% else %}--{% endif %}
-          </p>
-        </div>
-        <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center glass"
-        >
-          <i class="fas fa-chalkboard text-sky-600 text-2xl"></i>
-        </div>
-      </div>
-    </div>
 
-    <div class="professional-card p-6 hover-lift">
-      <div class="flex items-center justify-between">
-        <div>
-          <p
-            class="text-red-600 dark:text-red-400 text-sm font-medium glass-effect"
-          >
-            Active Students
-          </p>
-          <p
-            class="text-3xl font-bold text-red-800 dark:text-white mt-2 glass-effect"
-          >
-            {{ active_students_count or '--' }}
-          </p>
-        </div>
-        <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-emerald to-emerald-600 flex items-center justify-center glass"
-        >
-          <i
-            class="fas fa-user-graduate text-red-500 text-2xl glass-effect"
-          ></i>
-        </div>
-      </div>
-    </div>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
-    <div class="professional-card p-6 hover-lift">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-lime-600 dark:text-lime-400 text-sm font-medium">
-            Assigned Teachers
-          </p>
-          <p class="text-3xl font-bold text-lime-800 dark:text-white mt-2">
-            {{ total_teachers or '--' }}
-          </p>
-        </div>
-        <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-purple to-purple-600 flex items-center justify-center glass"
-        >
-          <i class="fas fa-chalkboard-teacher text-lime-600 text-2xl"></i>
-        </div>
-      </div>
-    </div>
+  /* ==========================================================
+     Classes — Fraunces + Inter + JetBrains Mono.
+     Fraunces  → headings (editorial voice)
+     Inter     → body, labels, inputs, buttons
+     JetBrains → kickers, meta, class IDs, numeric data
+     Includes dark mode.
+     ========================================================== */
+  :root {
+    --ink: #1a2226;
+    --ink-soft: #4a5459;
+    --muted: #7a8589;
+    --paper: #f7f5f0;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+    --input-bg: #ffffff;
 
-    <div class="professional-card p-6 hover-lift">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-orange-600 dark:text-orange-400 text-sm font-medium">
-            Average Students
-          </p>
-          <p class="text-3xl font-bold text-orange-800 dark:text-white mt-2">
-            {{ average_students or '--' }}
-          </p>
-        </div>
-        <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-amber to-amber-600 flex items-center justify-center glass"
-        >
-          <i class="fas fa-chart-bar text-orange-400 text-2xl"></i>
-        </div>
-      </div>
-    </div>
-  </div>
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-tint: #e6efe9;
+    --green-edge: #c2d5c8;
 
-  <!-- Action Bar -->
-  <div class="professional-card p-6">
-    <div
-      class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0"
-    >
-      <!-- Search Bar -->
-      <div class="flex-1 max-w-lg">
-        <div class="relative">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search classes by name, level, or section..."
-            class="w-full px-4 py-3 pl-12 rounded-xl glass border border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+    --gold: #8a632e;
+    --gold-tint: #f2ead8;
+    --gold-edge: #d9c8a4;
+
+    --clay: #9a5148;
+    --clay-hover: #7f4139;
+    --clay-tint: #f3e5e1;
+    --clay-edge: #dcc1b9;
+
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+  }
+
+  .dark {
+    --ink: #eef2ef;
+    --ink-soft: #b8c1bd;
+    --muted: #8f9a96;
+    --paper: #131817;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --line: #33403e;
+    --line-soft: #2a3533;
+    --input-bg: #1e2524;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-tint: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --gold: #d9b273;
+    --gold-tint: #2c2620;
+    --gold-edge: #4a3e2d;
+
+    --clay: #e0907a;
+    --clay-hover: #c9755e;
+    --clay-tint: #3a251f;
+    --clay-edge: #5a3a2f;
+  }
+
+  .classes-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 24px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  .classes-page *,
+  .classes-page *::before,
+  .classes-page *::after {
+    box-sizing: border-box;
+  }
+  .classes-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ---------- Stat strip ---------- */
+  .classes-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .stat-tile {
+    padding: 16px 20px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .stat-tile:last-child {
+    border-right: 0;
+  }
+  .stat-tile::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--green);
+  }
+  .stat-tile:nth-child(2)::before {
+    background: var(--ink);
+  }
+  .stat-tile:nth-child(3)::before {
+    background: var(--gold);
+  }
+  .stat-tile:nth-child(4)::before {
+    background: var(--clay);
+  }
+
+  .stat-tile .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+
+  .stat-tile .stat-value {
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  /* ---------- Toolbar ---------- */
+  .classes-toolbar {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .search-field {
+    flex: 1 1 320px;
+    max-width: 480px;
+  }
+
+  .search-field label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .search-field input {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--input-bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .search-field input::placeholder {
+    color: var(--muted);
+  }
+  .search-field input:hover {
+    border-color: var(--muted);
+  }
+  .search-field input:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px var(--green-tint);
+  }
+
+  .toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ---------- Buttons ---------- */
+  .classes-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 3px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .classes-page .btn:hover {
+    background: var(--surface-alt);
+    border-color: var(--ink);
+  }
+
+  .classes-page .btn-primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .classes-page .btn-primary {
+    color: #131817;
+  }
+  .classes-page .btn-primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .classes-page .btn-primary:hover {
+    color: #131817;
+  }
+
+  .classes-page .btn-secondary {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .classes-page .btn-secondary:hover {
+    background: var(--surface-alt);
+    border-color: var(--ink);
+  }
+
+  .classes-page .btn-danger {
+    background: var(--clay);
+    color: #fff;
+    border-color: var(--clay);
+  }
+  .dark .classes-page .btn-danger {
+    color: #131817;
+  }
+  .classes-page .btn-danger:hover {
+    background: var(--clay-hover);
+    border-color: var(--clay-hover);
+  }
+  .dark .classes-page .btn-danger:hover {
+    color: #131817;
+  }
+
+  .classes-page .btn-sm {
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+
+  .classes-page .btn-icon-only {
+    flex: 0 0 auto;
+    padding: 7px 10px;
+  }
+
+  /* ---------- Result line ---------- */
+  .result-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  .result-line .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+
+  /* ---------- Directory panel ---------- */
+  .directory {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 22px 22px 24px;
+  }
+
+  .directory-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .directory-head h2 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .directory-head .count {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  /* ---------- Class grid ---------- */
+  .class-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+
+  .class-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .class-card:hover {
+    border-color: var(--muted);
+  }
+
+  .class-card-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
+
+  .class-card-head h3 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .class-card-body {
+    padding: 4px 18px 6px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .class-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .class-field:last-child {
+    border-bottom: none;
+  }
+
+  .class-field .k {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  .class-field .v {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    text-align: right;
+  }
+
+  .class-field .v.is-empty {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .class-field .v.is-active {
+    font-family: var(--mono);
+    color: var(--green);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .class-card-actions {
+    display: flex;
+    gap: 6px;
+    padding: 12px 18px 14px;
+    margin-top: auto;
+    border-top: 1px solid var(--line-soft);
+  }
+  .class-card-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .class-card-actions .btn-icon-only {
+    flex: 0 0 auto;
+  }
+
+  /* ---------- Empty state ---------- */
+  .empty-state {
+    text-align: center;
+    padding: 56px 20px;
+  }
+  .empty-state h3 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0 0 10px;
+  }
+  .empty-state p {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 440px;
+    margin: 0 auto 22px;
+    line-height: 1.55;
+  }
+
+  /* ---------- Delete modal ---------- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 30, 29, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 60;
+  }
+  .modal-backdrop.hidden {
+    display: none;
+  }
+
+  .confirm-modal {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 420px;
+    padding: 22px;
+  }
+
+  .confirm-modal h3 {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin: 0 0 6px;
+  }
+
+  .confirm-modal .sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    margin: 0 0 18px;
+  }
+
+  .confirm-modal p.body {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin: 0 0 22px;
+  }
+
+  .confirm-modal p.body strong {
+    color: var(--clay);
+    font-weight: 600;
+  }
+
+  .confirm-modal .actions {
+    display: flex;
+    gap: 8px;
+  }
+  .confirm-modal .actions > * {
+    flex: 1;
+  }
+  .confirm-modal form {
+    margin: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1024px) {
+    .classes-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .stat-tile:nth-child(2) {
+      border-right: 0;
+    }
+    .stat-tile:nth-child(1),
+    .stat-tile:nth-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+    .class-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .classes-stats {
+      grid-template-columns: 1fr;
+    }
+    .stat-tile {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .stat-tile:last-child {
+      border-bottom: 0;
+    }
+    .class-grid {
+      grid-template-columns: 1fr;
+    }
+    .toolbar-actions {
+      width: 100%;
+    }
+    .toolbar-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .directory {
+      padding: 18px;
+    }
+  }
+</style>
+
+<div class="classes-page">
+  <!-- Stat strip -->
+  <section class="classes-stats" aria-label="Class statistics">
+    <div class="stat-tile">
+      <p class="stat-label">Total Classes</p>
+      <p class="stat-value">{{ classes|length if classes else '—' }}</p>
+    </div>
+    <div class="stat-tile">
+      <p class="stat-label">Active Students</p>
+      <p class="stat-value">{{ active_students_count or '—' }}</p>
+    </div>
+    <div class="stat-tile">
+      <p class="stat-label">Assigned Teachers</p>
+      <p class="stat-value">{{ total_teachers or '—' }}</p>
+    </div>
+    <div class="stat-tile">
+      <p class="stat-label">Average Students</p>
+      <p class="stat-value">{{ average_students or '—' }}</p>
+    </div>
+  </section>
+
+  <!-- Toolbar -->
+  <section class="classes-toolbar">
+    <div class="search-field">
+      <label for="searchInput">Search classes</label>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Filter by name, level, or section"
+        autocomplete="off"
+      />
+    </div>
+    <div class="toolbar-actions">
+      <a href="{{ url_for('subjects.index') }}" class="btn btn-secondary">
+        <svg
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
           />
-          <div
-            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
-          >
-            <i class="fas fa-search text-slate-400"></i>
-          </div>
-          <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
-            <kbd
-              class="hidden sm:inline-flex items-center px-2 py-1 glass border border-slate-300 dark:border-slate-600 rounded text-xs font-sans font-medium text-slate-400 dark:text-slate-500"
-            >
-              /
-            </kbd>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div
-        class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4"
-      >
-        <a
-          href="{{ url_for('subjects.index') }}"
-          class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-accent-emerald to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-sky-600 font-medium rounded-xl transition-all duration-200 glass hover-lift"
+        </svg>
+        <span>List Subjects</span>
+      </a>
+      <a href="{{ url_for('classes.create') }}" class="btn btn-primary">
+        <svg
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          <i class="fas fa-book-open mr-3"></i>
-          List Subjects
-        </a>
-
-        <a
-          href="{{ url_for('classes.create') }}"
-          class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-purple hover:from-primary-700 hover:to-purple-700 text-orange-400 font-medium rounded-xl transition-all duration-200 glass hover-lift"
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+          />
+        </svg>
+        <span>Create New Class</span>
+      </a>
+    </div>
+    <div style="flex-basis: 100%">
+      <div class="result-line">
+        <span class="dot"></span>
+        <span
+          ><span id="resultCount">{{ classes|length }}</span> classes
+          found</span
         >
-          <i class="fas fa-plus mr-3"></i>
-          Create New Class
-        </a>
       </div>
     </div>
+  </section>
 
-    <!-- Results Counter -->
-    <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-      <div class="flex items-center text-sm text-slate-600 dark:text-slate-400">
-        <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-        <span id="resultCount">{{ classes|length }}</span>
-        <span class="ml-1">classes found</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Classes Grid -->
-  <div class="professional-card p-6">
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-xl font-semibold text-slate-800 dark:text-white">
-        Class Directory
-      </h3>
-      <div class="text-sm text-slate-600 dark:text-slate-400">
+  <!-- Class directory -->
+  <section class="directory">
+    <div class="directory-head">
+      <h2>Class Directory</h2>
+      <span class="count">
         {{ classes|length }} active class{% if classes|length != 1 %}es{% endif
         %}
-      </div>
+      </span>
     </div>
 
     {% if classes %}
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      id="classesGrid"
-    >
+    <div class="class-grid" id="classesGrid">
       {% for class in classes %}
-      <div
-        class="professional-card p-0 overflow-hidden group hover-lift"
+      <article
+        class="class-card"
         data-name="{{ class.name|lower }}"
         data-level="{{ class.level|lower }}"
         data-section="{{ class.section|lower }}"
       >
-        <!-- Class Header -->
-        <div
-          class="bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-700 dark:to-primary-900 p-6 text-white relative overflow-hidden"
-        >
-          <!-- Background Pattern -->
-          <div class="absolute inset-0 opacity-10">
-            <div
-              class="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"
-            ></div>
-            <div
-              class="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"
-            ></div>
-          </div>
+        <header class="class-card-head">
+          <h3>{{ class.name }}</h3>
+        </header>
 
-          <div class="flex items-center justify-between mb-3 relative z-10">
-            <div class="p-2 bg-white/20 backdrop-blur-sm rounded-xl glass">
-              <i class="fas fa-chalkboard text-blue-700 text-xl glass"></i>
-            </div>
-            <div class="text-right">
-              <div class="text-sm opacity-80 text-sky-900">Class ID</div>
-              <div class="font-mono text-lg text-cyan-800 font-bold">
-                {{ class.id }}
-              </div>
-            </div>
+        <div class="class-card-body">
+          <div class="class-field">
+            <span class="k">Class Teacher</span>
+            <span class="v {% if not class.teachers %}is-empty{% endif %}">
+              {% if class.teachers %} {{ class.teachers[0].full_name }} {% else
+              %} Not assigned {% endif %}
+            </span>
           </div>
-          <h3 class="text-2xl text-cyan-800 font-bold mb-2 relative z-10">
-            {{ class.name }}
-          </h3>
-          <p class="text-sky-700 font-medium relative z-10">
-            {{ class.level }} • Section {{ class.section }}
-          </p>
-        </div>
-
-        <!-- Class Information -->
-        <div class="p-6 space-y-4">
-          <!-- Teacher Information -->
-          <div
-            class="flex items-center space-x-3 group-hover:transform group-hover:translate-x-1 transition-transform duration-200"
-          >
-            <div
-              class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 glass"
-            >
-              <i
-                class="fas fa-user-tie text-emerald-600 dark:text-emerald-400"
-              ></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div
-                class="text-sm text-slate-600 dark:text-slate-400 font-medium"
-              >
-                Class Teacher
-              </div>
-              <div
-                class="font-semibold text-slate-800 dark:text-white truncate"
-              >
-                {% if class.teachers %} {{ class.teachers[0].full_name }} {%
-                else %}
-                <span class="text-amber-600 dark:text-amber-400"
-                  >Not assigned</span
-                >
-                {% endif %}
-              </div>
-            </div>
+          <div class="class-field">
+            <span class="k">Students</span>
+            <span class="v">{{ class.students.count() }} enrolled</span>
           </div>
-
-          <!-- Student Count -->
-          <div
-            class="flex items-center space-x-3 group-hover:transform group-hover:translate-x-1 transition-transform duration-200"
-          >
-            <div
-              class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 glass"
-            >
-              <i class="fas fa-users text-blue-600 dark:text-blue-400"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div
-                class="text-sm text-slate-600 dark:text-slate-400 font-medium"
-              >
-                Students
-              </div>
-              <div class="font-semibold text-slate-800 dark:text-white">
-                {{ class.students.count() }} enrolled
-              </div>
-            </div>
+          <div class="class-field">
+            <span class="k">Level</span>
+            <span class="v">{{ class.level or '—' }}</span>
           </div>
-
-          <!-- Status -->
-          <div
-            class="flex items-center space-x-3 group-hover:transform group-hover:translate-x-1 transition-transform duration-200"
-          >
-            <div
-              class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0 glass"
-            >
-              <i
-                class="fas fa-check-circle text-green-600 dark:text-green-400"
-              ></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div
-                class="text-sm text-slate-600 dark:text-slate-400 font-medium"
-              >
-                Status
-              </div>
-              <div class="flex items-center space-x-2">
-                <div
-                  class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
-                ></div>
-                <span class="font-semibold text-green-600 dark:text-green-400"
-                  >Active</span
-                >
-              </div>
-            </div>
+          <div class="class-field">
+            <span class="k">Section</span>
+            <span class="v">{{ class.section or '—' }}</span>
+          </div>
+          <div class="class-field">
+            <span class="k">Status</span>
+            <span class="v is-active">Active</span>
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="px-6 pb-6 pt-0">
-          <div class="flex space-x-2">
-            <a
-              href="{{ url_for('classes.detail', class_id=class.id) }}"
-              class="flex-1 text-center bg-primary-600 hover:bg-primary-700 text-sky-600 py-2 px-3 rounded-lg transition-all duration-200 text-sm font-medium glass hover-lift"
+        <div class="class-card-actions">
+          <a
+            href="{{ url_for('classes.detail', class_id=class.id) }}"
+            class="btn btn-primary btn-sm"
+          >
+            <svg
+              width="12"
+              height="12"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <i class="fas fa-eye mr-2 text-sky-600"></i>
-              View
-            </a>
-
-            <a
-              href="{{ url_for('classes.edit', class_id=class.id) }}"
-              class="flex-1 text-center bg-amber-500 text-amber-500 hover:text-amber-500 py-2 px-3 rounded-lg transition-all duration-200 text-sm font-medium glass hover-lift"
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
+            </svg>
+            <span>View</span>
+          </a>
+          <a
+            href="{{ url_for('classes.edit', class_id=class.id) }}"
+            class="btn btn-secondary btn-sm"
+          >
+            <svg
+              width="12"
+              height="12"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <i class="fas fa-edit mr-2 text-amber-500"></i>
-              Edit
-            </a>
-
-            {% if current_user.role == 'admin' %}
-            <button
-              onclick="deleteClass({{ class.id }}, '{{ class.name }}')"
-              class="px-3 bg-red-500 text-white rounded-lg transition-all duration-200 glass hover-lift"
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            <span>Edit</span>
+          </a>
+          {% if current_user.role == 'admin' %}
+          <button
+            type="button"
+            class="btn btn-danger btn-sm btn-icon-only"
+            title="Delete class"
+            aria-label="Delete class"
+            onclick="deleteClass({{ class.id }}, '{{ class.name }}')"
+          >
+            <svg
+              width="12"
+              height="12"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <i class="fas fa-trash text-red-400"></i>
-            </button>
-            {% endif %}
-          </div>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </button>
+          {% endif %}
         </div>
-      </div>
+      </article>
       {% endfor %}
     </div>
     {% else %}
-    <!-- Empty State -->
-    <div class="text-center py-12">
-      <div
-        class="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-600 dark:to-slate-700 flex items-center justify-center glass"
-      >
-        <i class="fas fa-chalkboard text-white text-3xl"></i>
-      </div>
-      <h4 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-        No Classes Created
-      </h4>
-      <p class="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
+    <div class="empty-state">
+      <h3>No Classes Created</h3>
+      <p>
         Get started by creating your first class to organize students and assign
         teachers.
       </p>
-
-      <a
-        href="{{ url_for('classes.create') }}"
-        class="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-xl transition-all duration-200 glass hover-lift"
-      >
-        <i class="fas fa-plus"></i>
-        <span class="font-medium">Create Your First Class</span>
+      <a href="{{ url_for('classes.create') }}" class="btn btn-primary">
+        <svg
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+          />
+        </svg>
+        <span>Create Your First Class</span>
       </a>
     </div>
     {% endif %}
-  </div>
+  </section>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div
-  id="deleteModal"
-  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden"
->
-  <div class="professional-card mx-4 max-w-md w-full">
-    <div class="flex items-center space-x-3 mb-4">
-      <div
-        class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center glass"
-      >
-        <i
-          class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-xl"
-        ></i>
-      </div>
-      <div>
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
-          Delete Class
-        </h3>
-        <p class="text-slate-600 dark:text-slate-400 text-sm">
-          This action cannot be undone
-        </p>
-      </div>
-    </div>
-
-    <p class="text-slate-700 dark:text-slate-300 mb-6">
+<!-- Delete confirmation modal -->
+<div id="deleteModal" class="modal-backdrop hidden">
+  <div
+    class="confirm-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="deleteModalTitle"
+  >
+    <h3 id="deleteModalTitle">Delete Class</h3>
+    <p class="sub">This action cannot be undone.</p>
+    <p class="body">
       Are you sure you want to delete
-      <strong
-        id="deleteClassName"
-        class="text-red-600 dark:text-red-400"
-      ></strong
-      >? This will remove the class and all associated data.
+      <strong id="deleteClassName"></strong>? This will remove the class and all
+      associated data.
     </p>
-
-    <div class="flex space-x-3">
+    <div class="actions">
       <button
+        type="button"
+        class="btn btn-secondary"
         onclick="closeDeleteModal()"
-        class="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 glass"
       >
         Cancel
       </button>
-      <form method="POST" action="" id="deleteForm" class="flex-1">
+      <form method="POST" action="" id="deleteForm">
         <button
           type="submit"
-          class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 glass"
+          class="btn btn-danger"
+          style="width: 100%; justify-content: center"
         >
           Delete
         </button>
@@ -400,128 +853,58 @@ distributions{% endblock %} {% block content %}
   let currentClassId = null;
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Initialize search functionality
     const searchInput = document.getElementById("searchInput");
-    searchInput.addEventListener("input", filterClasses);
+    if (searchInput) {
+      searchInput.addEventListener("input", filterClasses);
+    }
 
-    // Animate cards on load
-    animateCards();
+    const modal = document.getElementById("deleteModal");
+    if (modal) {
+      modal.addEventListener("click", function (e) {
+        if (e.target === modal) closeDeleteModal();
+      });
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeDeleteModal();
+      if (e.key === "/" && !e.target.matches("input, textarea, select")) {
+        e.preventDefault();
+        if (searchInput) searchInput.focus();
+      }
+    });
   });
 
   function filterClasses() {
-    const searchTerm = document
-      .getElementById("searchInput")
-      .value.toLowerCase();
-    const classCards = document.querySelectorAll(".professional-card.p-0");
-    let visibleCount = 0;
+    const term = document.getElementById("searchInput").value.toLowerCase();
+    const cards = document.querySelectorAll(".class-card");
+    let visible = 0;
 
-    classCards.forEach((card) => {
-      const name = card.dataset.name;
-      const level = card.dataset.level;
-      const section = card.dataset.section;
+    cards.forEach((card) => {
+      const matches =
+        card.dataset.name.includes(term) ||
+        card.dataset.level.includes(term) ||
+        card.dataset.section.includes(term);
 
-      const matchesSearch =
-        name.includes(searchTerm) ||
-        level.includes(searchTerm) ||
-        section.includes(searchTerm);
-
-      if (matchesSearch) {
-        card.style.display = "block";
-        visibleCount++;
-      } else {
-        card.style.display = "none";
-      }
+      card.style.display = matches ? "" : "none";
+      if (matches) visible++;
     });
 
-    // Update result count
-    const resultCount = document.getElementById("resultCount");
-    resultCount.textContent = visibleCount;
+    const counter = document.getElementById("resultCount");
+    if (counter) counter.textContent = visible;
   }
 
   function deleteClass(classId, className) {
     currentClassId = classId;
     document.getElementById("deleteClassName").textContent = className;
-
-    // Set the form action
     document.getElementById("deleteForm").action = `/classes/${classId}/delete`;
-
-    const modal = document.getElementById("deleteModal");
-    modal.classList.remove("hidden");
+    document.getElementById("deleteModal").classList.remove("hidden");
   }
 
   function closeDeleteModal() {
     const modal = document.getElementById("deleteModal");
-    modal.classList.add("hidden");
+    if (modal) modal.classList.add("hidden");
     currentClassId = null;
   }
-
-  function animateCards() {
-    const cards = document.querySelectorAll(".professional-card.p-0");
-    cards.forEach((card, index) => {
-      card.style.opacity = "0";
-      card.style.transform = "translateY(20px)";
-      setTimeout(() => {
-        card.style.transition = "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
-        card.style.opacity = "1";
-        card.style.transform = "translateY(0)";
-      }, index * 100);
-    });
-  }
-
-  // Enhanced keyboard shortcuts
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      closeDeleteModal();
-    }
-    if (e.key === "/" && !e.target.matches("input, textarea, select")) {
-      e.preventDefault();
-      document.getElementById("searchInput").focus();
-    }
-  });
-
-  // Close modal when clicking outside
-  document
-    .getElementById("deleteModal")
-    .addEventListener("click", function (e) {
-      if (e.target === this) {
-        closeDeleteModal();
-      }
-    });
 </script>
 
-<style>
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .professional-card.p-0 {
-    animation: fadeInUp 0.6s ease-out forwards;
-  }
-
-  .grid > .professional-card.p-0:nth-child(1) {
-    animation-delay: 0.1s;
-  }
-  .grid > .professional-card.p-0:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-  .grid > .professional-card.p-0:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-  .grid > .professional-card.p-0:nth-child(4) {
-    animation-delay: 0.4s;
-  }
-  .grid > .professional-card.p-0:nth-child(5) {
-    animation-delay: 0.5s;
-  }
-  .grid > .professional-card.p-0:nth-child(6) {
-    animation-delay: 0.6s;
-  }
-</style>
 {% endblock %}

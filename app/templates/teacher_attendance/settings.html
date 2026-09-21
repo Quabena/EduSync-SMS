@@ -1,628 +1,1147 @@
 {% extends 'base.html' %} {% block title %}Attendance Settings • Staff Portal{%
-endblock %} {% block head %}
-<!-- Font Awesome Icons -->
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/font-awesome.min.css') }}"
-/>
+endblock %} {% block content %}
 
 <style>
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+  /* ==========================================================
+     Attendance Settings — Dashboard design language.
+     Fraunces (display), Inter (body), JetBrains Mono (labels).
+     Flat surfaces, hairline borders, restrained palette.
+     ========================================================== */
+  .settings-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+  .dark .settings-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
   }
 
-  @keyframes pulseSubtle {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.8;
-    }
+  .settings-page *,
+  .settings-page *::before,
+  .settings-page *::after {
+    box-sizing: border-box;
+  }
+  .settings-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .settings-page .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 
-  .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
+  /* ---------- Hero ---------- */
+  .settings-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 26px 22px 30px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+  }
+  .settings-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--ink);
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .settings-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3.2vw, 34px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .settings-hero p {
+    margin: 0;
+    max-width: 620px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin-top: 14px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .hero-meta .hero-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--copy);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .hero-meta .hero-stamp.ink {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--surface);
+  }
+  .dark .hero-meta .hero-stamp.ink {
+    color: var(--paper);
+  }
+  .hero-meta .hero-stamp.green {
+    border-color: var(--green-edge);
+    background: var(--green-wash);
+    color: var(--green);
   }
 
-  .animate-slide-in-right {
-    animation: slideInRight 0.5s ease-out;
+  .hero-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .dash-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .dash-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .dash-btn:hover {
+    border-color: var(--ink);
+  }
+  .dash-btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .dash-btn.primary {
+    color: #131817;
+  }
+  .dash-btn.primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .dash-btn.primary:hover {
+    color: #131817;
   }
 
-  .animate-pulse-subtle {
-    animation: pulseSubtle 2s infinite;
+  /* ---------- Flash ---------- */
+  .flash-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0 0;
+  }
+  .flash {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .flash.is-error {
+    border-color: var(--red-edge);
+    background: var(--red-wash);
+    color: var(--red);
+  }
+  .flash.is-success {
+    border-color: var(--green-edge);
+    background: var(--green-wash);
+    color: var(--green);
+  }
+  .flash svg {
+    flex-shrink: 0;
+    margin-top: 2px;
   }
 
-  .glass-morphism {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+  /* ---------- Summary strip ---------- */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 16px 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .summary-card {
+    padding: 16px 20px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .summary-card:last-child {
+    border-right: 0;
+  }
+  .summary-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--ink);
+  }
+  .summary-card:nth-child(1)::before {
+    background: var(--brass);
+  }
+  .summary-card:nth-child(2)::before {
+    background: var(--slate);
+  }
+  .summary-card:nth-child(3)::before {
+    background: var(--green);
+  }
+  .summary-card:nth-child(4)::before {
+    background: var(--ink);
+  }
+  .summary-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .summary-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-value .unit {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-left: 4px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
   }
 
-  .gradient-border {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2px;
-    border-radius: 16px;
+  /* ---------- Dash card ---------- */
+  .dash-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .dash-card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .dash-card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .dash-card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
   }
 
-  .gradient-border-inner {
-    background: white;
-    border-radius: 14px;
-    padding: 1.5rem;
+  /* ---------- Form field ---------- */
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding: 20px 22px 22px;
+  }
+  .field-grid.single {
+    grid-template-columns: 1fr;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .field-input-wrap {
+    position: relative;
+  }
+  .field-input {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field-input:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
+  }
+  .field-input.has-suffix {
+    padding-right: 62px;
+  }
+  .field-suffix {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    pointer-events: none;
+  }
+  .field-hint {
+    margin: 8px 0 0;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
   }
 
-  .setting-card {
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+  /* ---------- Toggle row ---------- */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 18px 22px;
+  }
+  .toggle-copy {
+    min-width: 0;
+  }
+  .toggle-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .toggle-description {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--copy);
+    max-width: 640px;
   }
 
-  .setting-card:hover {
-    border-color: #e5e7eb;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  }
-
+  /* Flat toggle switch */
   .toggle-switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    flex-shrink: 0;
+    width: 42px;
+    height: 24px;
   }
-
   .toggle-switch input {
     opacity: 0;
     width: 0;
     height: 0;
   }
-
   .toggle-slider {
     position: absolute;
+    inset: 0;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 34px;
+    background: var(--surface-alt);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
-
-  .toggle-slider:before {
-    position: absolute;
+  .toggle-slider::before {
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    top: 3px;
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-radius: 50%;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .toggle-switch input:checked + .toggle-slider {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(18px);
+    background: var(--surface);
+    border-color: var(--green);
+  }
+  .toggle-switch input:focus-visible + .toggle-slider {
+    box-shadow: 0 0 0 3px var(--green-wash);
   }
 
-  input:checked + .toggle-slider {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  /* ---------- Form actions ---------- */
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
+  .form-actions .note {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .form-actions .note svg {
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .form-actions .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
-  input:checked + .toggle-slider:before {
-    transform: translateX(26px);
+  /* ---------- Config guide ---------- */
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+  .guide-item {
+    display: flex;
+    gap: 14px;
+    padding: 18px 22px;
+    border-right: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .guide-item:nth-child(even) {
+    border-right: 0;
+  }
+  .guide-item:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+  .guide-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: var(--green-wash);
+    border: 1px solid var(--green-edge);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .guide-icon.brass {
+    background: var(--brass-wash);
+    border-color: var(--brass-edge);
+    color: var(--brass);
+  }
+  .guide-icon.slate {
+    background: var(--slate-wash);
+    border-color: var(--slate-edge);
+    color: var(--slate);
+  }
+  .guide-icon.ink {
+    background: var(--surface-alt);
+    border-color: var(--line);
+    color: var(--ink);
+  }
+  .guide-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+  .guide-copy {
+    min-width: 0;
+  }
+  .guide-copy h3 {
+    margin: 0 0 4px;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .guide-copy p {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--copy);
   }
 
-  input:focus + .toggle-slider {
-    box-shadow: 0 0 1px #10b981;
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .guide-grid {
+      grid-template-columns: 1fr;
+    }
+    .guide-item {
+      border-right: 0;
+    }
+    .guide-item:nth-last-child(-n + 2) {
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .guide-item:last-child {
+      border-bottom: 0;
+    }
+  }
+  @media (max-width: 700px) {
+    .settings-page {
+      padding: 20px 14px 40px;
+    }
+    .settings-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .hero-actions {
+      width: 100%;
+    }
+    .hero-actions .dash-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .summary-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .summary-card:nth-child(2) {
+      border-right: 0;
+    }
+    .summary-card:nth-child(1),
+    .summary-card:nth-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+    .dash-card-head {
+      padding: 14px 18px 12px;
+    }
+    .field-grid {
+      grid-template-columns: 1fr;
+      padding: 16px 18px 18px;
+    }
+    .toggle-row {
+      padding: 16px 18px;
+    }
+    .form-actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+      padding: 14px 18px;
+    }
+    .form-actions .actions {
+      width: 100%;
+    }
+    .form-actions .actions .dash-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .guide-item {
+      padding: 16px 18px;
+    }
+  }
+  @media (max-width: 460px) {
+    .summary-grid {
+      grid-template-columns: 1fr;
+    }
+    .summary-card {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .summary-card:last-child {
+      border-bottom: 0;
+    }
   }
 </style>
-{% endblock %} {% block content %}
-<!-- Background Elements -->
-<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-  <div
-    class="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle"
-  ></div>
-  <div
-    class="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle"
-    style="animation-delay: 1s"
-  ></div>
-  <div
-    class="absolute bottom-0 left-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle"
-    style="animation-delay: 2s"
-  ></div>
-</div>
 
-<!-- Navigation -->
-<nav class="glass-morphism sticky top-0 z-50 mb-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="flex justify-between items-center h-16">
-      <div class="flex items-center space-x-3">
-        <div
-          class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg"
-        >
-          <i class="fas fa-chalkboard-teacher text-white text-lg"></i>
-        </div>
-        <a href="{{ url_for('teacher_attendance.index') }}">
-          <span
-            class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-          >
-            Staff Attendance
-          </span>
-        </a>
-      </div>
-      <div class="flex space-x-1">
-        <a
-          href="{{ url_for('teacher_attendance.mark_teacher_attendance') }}"
-          class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center"
-        >
-          <i class="fas fa-edit mr-2"></i>
-          Mark Attendance
-        </a>
-        <a
-          href="{{ url_for('teacher_attendance.teacher_attendance_records') }}"
-          class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center"
-        >
-          <i class="fas fa-database mr-2"></i>
-          Records
-        </a>
-        <a
-          href="{{ url_for('teacher_attendance.teacher_attendance_analytics') }}"
-          class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center"
-        >
-          <i class="fas fa-chart-bar mr-2"></i>
-          Analytics
-        </a>
-        <a
-          href="{{ url_for('teacher_attendance.attendance_settings') }}"
-          class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium text-sm shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex items-center"
-        >
-          <i class="fas fa-cog mr-2"></i>
-          Settings
-        </a>
+<div class="settings-page">
+  <!-- Hero -->
+  <header class="settings-hero">
+    <div class="hero-copy">
+      <p class="dash-kicker">Staff records · Configuration</p>
+      <h1>Attendance settings</h1>
+      <p>
+        Configure the rules, thresholds, and automation that govern every
+        register.
+      </p>
+      <div class="hero-meta">
+        <span class="hero-stamp ink">Namong SDA JHS</span>
+        <span class="hero-stamp green">Applied immediately</span>
       </div>
     </div>
-  </div>
-</nav>
-
-<div class="max-w-4xl mx-auto px-4 pb-12">
-  <!-- Header Section -->
-  <div class="text-center mb-12 animate-fade-in-up">
-    <div
-      class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-2xl mb-6"
-    >
-      <i class="fas fa-sliders-h text-white text-2xl"></i>
+    <div class="hero-actions">
+      <a href="{{ url_for('teacher_attendance.index') }}" class="dash-btn">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to hub
+      </a>
     </div>
-    <h1
-      class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4"
-    >
-      System Settings
-    </h1>
-    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-      Configure attendance parameters, rules, and system preferences
-    </p>
-  </div>
+  </header>
 
-  <!-- Flash Messages -->
+  <!-- Flash -->
   {% with messages = get_flashed_messages(with_categories=true) %} {% if
   messages %}
-  <div class="max-w-4xl mx-auto mb-8 animate-slide-in-right">
+  <div class="flash-stack">
     {% for category, message in messages %}
     <div
-      class="glass-morphism rounded-2xl p-4 shadow-lg border-l-4 {% if category == 'error' %}border-red-500{% else %}border-green-500{% endif %}"
+      class="flash {% if category == 'error' %}is-error{% else %}is-success{% endif %}"
     >
-      <div class="flex items-center">
-        <i
-          class="fas {% if category == 'error' %}fa-exclamation-triangle text-red-500{% else %}fa-check-circle text-green-500{% endif %} text-lg mr-3"
-        ></i>
-        <span class="text-gray-800">{{ message }}</span>
-      </div>
+      {% if category == 'error' %}
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+        />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+      {% else %}
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </svg>
+      {% endif %}
+      <span>{{ message }}</span>
     </div>
     {% endfor %}
   </div>
   {% endif %} {% endwith %}
 
-  <!-- Settings Form -->
-  <div class="gradient-border animate-fade-in-up">
-    <div class="gradient-border-inner">
-      <form method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-        <!-- Form Header -->
-        <div class="flex items-center justify-between mb-8">
-          <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            <i class="fas fa-cogs mr-3 text-purple-500"></i>
-            Attendance Configuration
-          </h2>
-          <div class="flex items-center space-x-2 text-sm text-gray-500">
-            <i class="fas fa-info-circle text-blue-500"></i>
-            <span>Configure system behavior and rules</span>
-          </div>
-        </div>
-
-        <div class="space-y-8">
-          <!-- School Hours Section -->
-          <div class="setting-card bg-gray-50 rounded-2xl p-6">
-            <h3
-              class="text-xl font-semibold text-gray-800 mb-6 flex items-center"
-            >
-              <i class="fas fa-clock mr-3 text-blue-500"></i>
-              School Hours Configuration
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- School Start Time -->
-              <div>
-                <label
-                  for="school_start_time"
-                  class="block text-sm font-semibold text-gray-700 mb-3 flex items-center"
-                >
-                  <i class="fas fa-sun mr-2 text-yellow-500"></i>
-                  School Start Time
-                </label>
-                <input
-                  type="time"
-                  id="school_start_time"
-                  name="school_start_time"
-                  value="{{ settings.school_start_time.strftime('%H:%M') }}"
-                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer"
-                />
-              </div>
-
-              <!-- School End Time -->
-              <div>
-                <label
-                  for="school_end_time"
-                  class="block text-sm font-semibold text-gray-700 mb-3 flex items-center"
-                >
-                  <i class="fas fa-moon mr-2 text-indigo-500"></i>
-                  School End Time
-                </label>
-                <input
-                  type="time"
-                  id="school_end_time"
-                  name="school_end_time"
-                  value="{{ settings.school_end_time.strftime('%H:%M') }}"
-                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Thresholds Section -->
-          <div class="setting-card bg-gray-50 rounded-2xl p-6">
-            <h3
-              class="text-xl font-semibold text-gray-800 mb-6 flex items-center"
-            >
-              <i class="fas fa-tachometer-alt mr-3 text-green-500"></i>
-              Attendance Thresholds
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Late Threshold -->
-              <div>
-                <label
-                  for="late_threshold_minutes"
-                  class="block text-sm font-semibold text-gray-700 mb-3 flex items-center"
-                >
-                  <i class="fas fa-running mr-2 text-yellow-500"></i>
-                  Late Threshold (minutes)
-                </label>
-                <div class="relative">
-                  <input
-                    type="number"
-                    id="late_threshold_minutes"
-                    name="late_threshold_minutes"
-                    value="{{ settings.late_threshold_minutes }}"
-                    min="1"
-                    max="120"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer"
-                  />
-                  <div
-                    class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
-                  >
-                    <span class="text-gray-500">min</span>
-                  </div>
-                </div>
-                <p class="mt-2 text-sm text-gray-600 flex items-center">
-                  <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                  Minutes after start time to be considered late
-                </p>
-              </div>
-
-              <!-- Half Day Threshold -->
-              <div>
-                <label
-                  for="half_day_threshold_hours"
-                  class="block text-sm font-semibold text-gray-700 mb-3 flex items-center"
-                >
-                  <i class="fas fa-business-time mr-2 text-purple-500"></i>
-                  Half Day Threshold (hours)
-                </label>
-                <div class="relative">
-                  <input
-                    type="number"
-                    id="half_day_threshold_hours"
-                    name="half_day_threshold_hours"
-                    value="{{ settings.half_day_threshold_hours }}"
-                    min="1"
-                    max="8"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer"
-                  />
-                  <div
-                    class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
-                  >
-                    <span class="text-gray-500">hours</span>
-                  </div>
-                </div>
-                <p class="mt-2 text-sm text-gray-600 flex items-center">
-                  <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                  Minimum hours required for half day attendance
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Automation Section -->
-          <div class="setting-card bg-gray-50 rounded-2xl p-6">
-            <h3
-              class="text-xl font-semibold text-gray-800 mb-6 flex items-center"
-            >
-              <i class="fas fa-robot mr-3 text-red-500"></i>
-              Automation Settings
-            </h3>
-
-            <div class="space-y-4">
-              <!-- Auto-mark Absent Toggle -->
-              <div
-                class="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-200"
-              >
-                <div class="flex-1">
-                  <label
-                    for="auto_mark_absent"
-                    class="block text-sm font-semibold text-gray-700 mb-1"
-                  >
-                    Automatic Absence Marking
-                  </label>
-                  <p class="text-sm text-gray-600">
-                    Automatically mark teachers as absent if no attendance is
-                    recorded by end of day
-                  </p>
-                </div>
-                <div class="ml-4">
-                  <label class="toggle-switch">
-                    <input
-                      type="checkbox"
-                      id="auto_mark_absent"
-                      name="auto_mark_absent"
-                      {%
-                      if
-                      settings.auto_mark_absent
-                      %}checked{%
-                      endif
-                      %}
-                    />
-                    <span class="toggle-slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Form Actions -->
-        <div
-          class="mt-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200"
-        >
-          <div class="text-sm text-gray-500 flex items-center">
-            <i class="fas fa-shield-alt mr-2 text-green-500"></i>
-            <span>All settings are securely saved and applied immediately</span>
-          </div>
-
-          <div class="flex space-x-3">
-            <button
-              type="button"
-              onclick="resetToDefaults()"
-              class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-300 flex items-center cursor-pointer"
-            >
-              <i class="fas fa-undo mr-2"></i>
-              Reset Defaults
-            </button>
-            <button
-              type="submit"
-              class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center cursor-pointer"
-            >
-              <i class="fas fa-save mr-2"></i>
-              Save Settings
-            </button>
-          </div>
-        </div>
-      </form>
+  <!-- Summary strip -->
+  <section class="summary-grid" aria-label="Current configuration">
+    <div class="summary-card">
+      <span class="summary-label">School start</span>
+      <strong class="summary-value tabular">
+        {{ settings.school_start_time.strftime('%H:%M') }}
+      </strong>
     </div>
-  </div>
+    <div class="summary-card">
+      <span class="summary-label">School end</span>
+      <strong class="summary-value tabular">
+        {{ settings.school_end_time.strftime('%H:%M') }}
+      </strong>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Late threshold</span>
+      <strong class="summary-value tabular">
+        {{ settings.late_threshold_minutes }}<span class="unit">min</span>
+      </strong>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Half day threshold</span>
+      <strong class="summary-value tabular">
+        {{ settings.half_day_threshold_hours }}<span class="unit">hrs</span>
+      </strong>
+    </div>
+  </section>
 
-  <!-- Help Section -->
-  <div
-    class="mt-8 glass-morphism rounded-2xl p-6 shadow-lg animate-fade-in-up"
-    style="animation-delay: 0.2s"
-  >
-    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-      <i class="fas fa-life-ring mr-2 text-blue-500"></i>
-      Configuration Guide
-    </h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-      <div class="space-y-3">
-        <div class="flex items-start">
-          <i class="fas fa-clock text-green-500 mt-1 mr-3"></i>
-          <div>
-            <div class="font-semibold text-gray-700">School Hours</div>
-            <div class="text-gray-600">
-              Set the official start and end times for accurate attendance
-              tracking and late calculations.
-            </div>
-          </div>
+  <form method="POST" id="settingsForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+    <!-- School hours -->
+    <section class="dash-card">
+      <div class="dash-card-head">
+        <div>
+          <p class="section-kicker">01 · School hours</p>
+          <h2>Working day boundaries</h2>
         </div>
-        <div class="flex items-start">
-          <i class="fas fa-running text-yellow-500 mt-1 mr-3"></i>
-          <div>
-            <div class="font-semibold text-gray-700">Late Threshold</div>
-            <div class="text-gray-600">
-              Define how many minutes after start time should be considered late
-              arrival.
-            </div>
+        <span class="head-meta">Used for late and half-day calculations</span>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label class="field-label" for="school_start_time"
+            >School start time</label
+          >
+          <div class="field-input-wrap">
+            <input
+              type="time"
+              id="school_start_time"
+              name="school_start_time"
+              value="{{ settings.school_start_time.strftime('%H:%M') }}"
+              class="field-input tabular"
+            />
           </div>
+          <p class="field-hint">
+            Marked after this time + threshold counts as late.
+          </p>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="school_end_time"
+            >School end time</label
+          >
+          <div class="field-input-wrap">
+            <input
+              type="time"
+              id="school_end_time"
+              name="school_end_time"
+              value="{{ settings.school_end_time.strftime('%H:%M') }}"
+              class="field-input tabular"
+            />
+          </div>
+          <p class="field-hint">
+            End of the register for automatic absence marking.
+          </p>
         </div>
       </div>
-      <div class="space-y-3">
-        <div class="flex items-start">
-          <i class="fas fa-robot text-red-500 mt-1 mr-3"></i>
-          <div>
-            <div class="font-semibold text-gray-700">Automation</div>
-            <div class="text-gray-600">
-              Enable automatic absence marking to ensure complete attendance
-              records.
-            </div>
-          </div>
+    </section>
+
+    <!-- Thresholds -->
+    <section class="dash-card">
+      <div class="dash-card-head">
+        <div>
+          <p class="section-kicker">02 · Thresholds</p>
+          <h2>Attendance rules</h2>
         </div>
-        <div class="flex items-start">
-          <i class="fas fa-business-time text-purple-500 mt-1 mr-3"></i>
-          <div>
-            <div class="font-semibold text-gray-700">Half Day Threshold</div>
-            <div class="text-gray-600">
-              Set minimum hours required to count as a half day of attendance.
-            </div>
+        <span class="head-meta">Values in minutes and hours</span>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label class="field-label" for="late_threshold_minutes"
+            >Late threshold</label
+          >
+          <div class="field-input-wrap">
+            <input
+              type="number"
+              id="late_threshold_minutes"
+              name="late_threshold_minutes"
+              value="{{ settings.late_threshold_minutes }}"
+              min="1"
+              max="120"
+              class="field-input has-suffix tabular"
+            />
+            <span class="field-suffix">minutes</span>
           </div>
+          <p class="field-hint">
+            Minutes after start time to be considered late.
+          </p>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="half_day_threshold_hours"
+            >Half day threshold</label
+          >
+          <div class="field-input-wrap">
+            <input
+              type="number"
+              id="half_day_threshold_hours"
+              name="half_day_threshold_hours"
+              value="{{ settings.half_day_threshold_hours }}"
+              min="1"
+              max="8"
+              class="field-input has-suffix tabular"
+            />
+            <span class="field-suffix">hours</span>
+          </div>
+          <p class="field-hint">
+            Minimum hours required to count as a half day.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Automation -->
+    <section class="dash-card">
+      <div class="dash-card-head">
+        <div>
+          <p class="section-kicker">03 · Automation</p>
+          <h2>Hands-free behaviour</h2>
+        </div>
+        <span class="head-meta">Runs once at end of each school day</span>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-copy">
+          <span class="toggle-title">Automatic absence marking</span>
+          <p class="toggle-description">
+            If a teacher has no attendance recorded by the end of the day, mark
+            them absent automatically. This keeps the register complete without
+            manual follow-up.
+          </p>
+        </div>
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            id="auto_mark_absent"
+            name="auto_mark_absent"
+            {%
+            if
+            settings.auto_mark_absent
+            %}checked{%
+            endif
+            %}
+          />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <div class="note">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          <span>Settings are saved securely and applied immediately.</span>
+        </div>
+        <div class="actions">
+          <button type="button" onclick="resetToDefaults()" class="dash-btn">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+              <polyline points="3 3 3 8 8 8" />
+            </svg>
+            Reset to defaults
+          </button>
+          <button type="submit" id="submitBtn" class="dash-btn primary">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+              />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            Save settings
+          </button>
+        </div>
+      </div>
+    </section>
+  </form>
+
+  <!-- Configuration guide -->
+  <section class="dash-card">
+    <div class="dash-card-head">
+      <div>
+        <p class="section-kicker">Reference</p>
+        <h2>Configuration guide</h2>
+      </div>
+      <span class="head-meta">What each setting does</span>
+    </div>
+
+    <div class="guide-grid">
+      <div class="guide-item">
+        <div class="guide-icon brass">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <polyline points="12 7 12 12 15.5 14" />
+          </svg>
+        </div>
+        <div class="guide-copy">
+          <h3>School hours</h3>
+          <p>
+            Official start and end times drive late and half-day calculations.
+          </p>
+        </div>
+      </div>
+
+      <div class="guide-item">
+        <div class="guide-icon">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18 12h3M16.3 7.7l2.1-2.1" />
+            <circle cx="12" cy="13" r="5" />
+          </svg>
+        </div>
+        <div class="guide-copy">
+          <h3>Late threshold</h3>
+          <p>Minutes after the start time before an arrival is flagged late.</p>
+        </div>
+      </div>
+
+      <div class="guide-item">
+        <div class="guide-icon slate">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <line x1="8" y1="14" x2="8" y2="18" />
+            <line x1="16" y1="14" x2="16" y2="18" />
+          </svg>
+        </div>
+        <div class="guide-copy">
+          <h3>Half day threshold</h3>
+          <p>
+            Minimum hours on site required to count as a half day of attendance.
+          </p>
+        </div>
+      </div>
+
+      <div class="guide-item">
+        <div class="guide-icon ink">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="4" y="4" width="16" height="16" rx="2" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
+          </svg>
+        </div>
+        <div class="guide-copy">
+          <h3>Automation</h3>
+          <p>
+            Automatic absence marking ensures every teacher has a complete
+            record.
+          </p>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </div>
 
 <script>
-  // Initialize interactive elements
   document.addEventListener("DOMContentLoaded", function () {
-    console.log("Settings page loaded");
-
-    // Add animation delays for staggered effects
-    const cards = document.querySelectorAll(".setting-card");
-    cards.forEach((card, index) => {
-      card.style.animationDelay = `${index * 0.1}s`;
-    });
-
-    // Add real-time validation for inputs
-    const inputs = document.querySelectorAll('input[type="number"]');
-    inputs.forEach((input) => {
-      input.addEventListener("input", function () {
-        const min = parseInt(this.getAttribute("min"));
-        const max = parseInt(this.getAttribute("max"));
-        const value = parseInt(this.value);
-
-        if (value < min) {
-          this.value = min;
-          showNotification(`Value cannot be less than ${min}`, "warning");
-        } else if (value > max) {
-          this.value = max;
-          showNotification(`Value cannot be greater than ${max}`, "warning");
-        }
+    // Clamp number inputs to their min/max on blur (quiet, non-intrusive)
+    document.querySelectorAll('input[type="number"]').forEach(function (input) {
+      input.addEventListener("blur", function () {
+        const min = parseInt(input.getAttribute("min"), 10);
+        const max = parseInt(input.getAttribute("max"), 10);
+        let value = parseInt(input.value, 10);
+        if (isNaN(value)) return;
+        if (!isNaN(min) && value < min) input.value = min;
+        if (!isNaN(max) && value > max) input.value = max;
       });
     });
   });
 
   function resetToDefaults() {
-    if (
-      confirm(
-        "Are you sure you want to reset all settings to their default values?"
-      )
-    ) {
-      // Reset form values to defaults
-      document.getElementById("school_start_time").value = "08:00";
-      document.getElementById("school_end_time").value = "15:00";
-      document.getElementById("late_threshold_minutes").value = "15";
-      document.getElementById("half_day_threshold_hours").value = "4";
-      document.getElementById("auto_mark_absent").checked = true;
+    if (!confirm("Reset all settings to their default values?")) return;
 
-      showNotification("Settings reset to default values", "info");
-    }
+    document.getElementById("school_start_time").value = "08:00";
+    document.getElementById("school_end_time").value = "15:00";
+    document.getElementById("late_threshold_minutes").value = "15";
+    document.getElementById("half_day_threshold_hours").value = "4";
+    document.getElementById("auto_mark_absent").checked = true;
   }
 
-  function showNotification(message, type = "info") {
-    // Create notification element
-    const notification = document.createElement("div");
-    notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 translate-x-full ${
-      type === "success"
-        ? "bg-green-500 text-white"
-        : type === "error"
-        ? "bg-red-500 text-white"
-        : type === "warning"
-        ? "bg-yellow-500 text-white"
-        : "bg-blue-500 text-white"
-    }`;
-    notification.innerHTML = `
-    <div class="flex items-center">
-      <i class="fas ${
-        type === "success"
-          ? "fa-check-circle"
-          : type === "error"
-          ? "fa-exclamation-circle"
-          : type === "warning"
-          ? "fa-exclamation-triangle"
-          : "fa-info-circle"
-      } mr-2"></i>
-      <span>${message}</span>
-    </div>
-  `;
-
-    // Add to page
-    document.body.appendChild(notification);
-
-    // Animate in
-    setTimeout(() => {
-      notification.style.transform = "translateX(0)";
-    }, 10);
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-      notification.style.transform = "translateX(100%)";
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 300);
-    }, 3000);
-  }
-
-  // Add form submission enhancement
-  document.querySelector("form").addEventListener("submit", function (e) {
-    // Add loading state to submit button
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-
-    submitBtn.innerHTML = `
-    <i class="fas fa-spinner fa-spin mr-2"></i>
-    Saving Settings...
-  `;
-    submitBtn.disabled = true;
-
-    // Simulate save delay for better UX
-    setTimeout(() => {
-      submitBtn.innerHTML = originalText;
-      submitBtn.disabled = false;
-      showNotification("Settings saved successfully!", "success");
-    }, 1500);
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("settingsForm");
+    if (!form) return;
+    form.addEventListener("submit", function () {
+      const btn = document.getElementById("submitBtn");
+      if (!btn) return;
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+    });
   });
-
-  console.log("Settings management system ready!");
 </script>
+
 {% endblock %}

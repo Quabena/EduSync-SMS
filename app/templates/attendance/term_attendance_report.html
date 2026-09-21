@@ -2,493 +2,969 @@
 SMS{% endblock %} {% block page_title %}Term Attendance Report{% endblock %} {%
 block page_description %}Detailed term attendance overview for {{ class_.name
 }}{% endblock %} {% block content %}
-<div class="max-w-7xl mx-auto space-y-8">
-  <!-- Header Section -->
-  <div class="professional-card p-8 text-center">
-    <div class="flex justify-center mb-6">
-      <div
-        class="w-20 h-20 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center"
-      >
-        <svg
-          class="w-10 h-10 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+  /* ==========================================================
+     Term Attendance Report — Fraunces + Inter + JetBrains Mono.
+     Fraunces  → masthead title, section headings, metric values
+     Inter     → body copy, student names, list rows, buttons
+     JetBrains → kickers, labels, dates, all numeric data
+     Includes dark mode and print styles.
+     ========================================================== */
+  :root {
+    --r-ink: #1a2226;
+    --r-copy: #4a5459;
+    --r-muted: #7a8589;
+    --r-line: #d7dfdb;
+    --r-line-soft: #e8ecea;
+    --r-surface: #ffffff;
+    --r-surface-alt: #f5f7f5;
+    --r-paper: #f4f5f3;
+    --r-row-hover: #f4f7f4;
+    --r-row-hover-first: #eef4f0;
+    --r-none-bg: #f7f8f7;
+    --r-none-fg: #b7bfbc;
+
+    --r-green: #1f6259;
+    --r-green-hover: #185048;
+    --r-green-wash: #e6efe9;
+    --r-green-edge: #c2d5c8;
+
+    --r-red: #9a5148;
+    --r-red-wash: #f3e5e1;
+    --r-red-edge: #dcc1b9;
+
+    --r-brass: #8a632e;
+    --r-brass-wash: #f2ead8;
+    --r-brass-edge: #d9c8a4;
+
+    --r-slate: #5d7076;
+    --r-slate-wash: #ebefee;
+    --r-slate-edge: #c5d0d0;
+
+    --r-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --r-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --r-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+  }
+
+  .dark {
+    --r-ink: #eef2ef;
+    --r-copy: #b8c1bd;
+    --r-muted: #8f9a96;
+    --r-line: #33403e;
+    --r-line-soft: #2a3533;
+    --r-surface: #1a201f;
+    --r-surface-alt: #1e2524;
+    --r-paper: #131817;
+    --r-row-hover: #1e2524;
+    --r-row-hover-first: #223028;
+    --r-none-bg: #1e2524;
+    --r-none-fg: #55605c;
+
+    --r-green: #6fbfa7;
+    --r-green-hover: #8ed4bd;
+    --r-green-wash: #1c2b27;
+    --r-green-edge: #2d5a4b;
+
+    --r-red: #e0907a;
+    --r-red-wash: #3a251f;
+    --r-red-edge: #5a3a2f;
+
+    --r-brass: #d9b273;
+    --r-brass-wash: #2c2620;
+    --r-brass-edge: #4a3e2d;
+
+    --r-slate: #8fa2a8;
+    --r-slate-wash: #253032;
+    --r-slate-edge: #3d4d51;
+  }
+
+  .term-report {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--r-ink);
+    background: var(--r-paper);
+    font-family: var(--r-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  .term-report *,
+  .term-report *::before,
+  .term-report *::after {
+    box-sizing: border-box;
+  }
+
+  /* ==========================================================
+     Masthead
+     ========================================================== */
+  .report-masthead {
+    padding: 24px 26px 22px;
+    background: var(--r-surface);
+    border: 1px solid var(--r-line);
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .report-masthead-copy {
+    min-width: 0;
+  }
+  .report-kicker {
+    font-family: var(--r-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--r-muted);
+    margin: 0 0 10px;
+  }
+  .report-masthead h1 {
+    margin: 0;
+    color: var(--r-ink);
+    font-family: var(--r-display);
+    font-size: clamp(26px, 3.4vw, 40px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+  .report-subtitle {
+    margin: 10px 0 0;
+    color: var(--r-copy);
+    font-family: var(--r-sans);
+    font-size: 14px;
+  }
+  .report-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    font-family: var(--r-mono);
+    font-size: 12px;
+    color: var(--r-muted);
+    letter-spacing: 0.02em;
+  }
+  .report-meta span {
+    position: relative;
+    padding-right: 18px;
+  }
+  .report-meta span:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 1px;
+    height: 12px;
+    background: var(--r-line);
+    transform: translateY(-50%);
+  }
+  .report-meta strong {
+    color: var(--r-ink);
+    font-weight: 600;
+  }
+
+  .report-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .report-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border: 1px solid var(--r-line);
+    border-radius: 3px;
+    background: var(--r-surface);
+    color: var(--r-ink);
+    text-decoration: none;
+    font-family: var(--r-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .report-button:hover {
+    border-color: var(--r-ink);
+    background: var(--r-surface-alt);
+  }
+  .report-button svg {
+    width: 14px;
+    height: 14px;
+  }
+  .report-button.primary {
+    background: var(--r-green);
+    color: #fff;
+    border-color: var(--r-green);
+  }
+  .dark .report-button.primary {
+    color: #131817;
+  }
+  .report-button.primary:hover {
+    background: var(--r-green-hover);
+    border-color: var(--r-green-hover);
+  }
+  .dark .report-button.primary:hover {
+    color: #131817;
+  }
+
+  /* ==========================================================
+     Metric strip
+     ========================================================== */
+  .metric-rail {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 16px 0 0;
+    background: var(--r-surface);
+    border: 1px solid var(--r-line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .metric-card {
+    padding: 16px 20px;
+    border-right: 1px solid var(--r-line);
+    position: relative;
+  }
+  .metric-card:last-child {
+    border-right: 0;
+  }
+  .metric-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--r-green);
+  }
+  .metric-card:nth-child(2)::before {
+    background: var(--r-ink);
+  }
+  .metric-card:nth-child(3)::before {
+    background: var(--r-brass);
+  }
+  .metric-card:nth-child(4)::before {
+    background: var(--r-red);
+  }
+
+  .metric-label {
+    display: block;
+    font-family: var(--r-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--r-muted);
+    margin: 0 0 8px;
+  }
+  .metric-value {
+    display: block;
+    font-family: var(--r-display);
+    font-size: 28px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--r-ink);
+  }
+  .metric-value .unit {
+    font-family: var(--r-display);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--r-muted);
+    letter-spacing: 0;
+    margin-left: 2px;
+  }
+
+  /* ==========================================================
+     Report sections
+     ========================================================== */
+  .report-section {
+    margin-top: 16px;
+    background: var(--r-surface);
+    border: 1px solid var(--r-line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .section-head {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--r-line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    background: var(--r-surface-alt);
+  }
+  .section-label {
+    font-family: var(--r-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--r-muted);
+    margin: 0 0 4px;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-family: var(--r-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--r-ink);
+  }
+  .section-head .section-count {
+    font-family: var(--r-mono);
+    font-size: 11px;
+    color: var(--r-muted);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  /* ==========================================================
+     Legend
+     ========================================================== */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--r-line-soft);
+    background: var(--r-surface-alt);
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--r-sans);
+    font-size: 12px;
+    color: var(--r-copy);
+  }
+  .legend-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
+    font-family: var(--r-mono);
+    font-size: 10px;
+    font-weight: 700;
+    border: 1px solid;
+  }
+  .key-present {
+    background: var(--r-green-wash);
+    border-color: var(--r-green-edge);
+    color: var(--r-green);
+  }
+  .key-absent {
+    background: var(--r-red-wash);
+    border-color: var(--r-red-edge);
+    color: var(--r-red);
+  }
+  .key-late {
+    background: var(--r-brass-wash);
+    border-color: var(--r-brass-edge);
+    color: var(--r-brass);
+  }
+  .key-excused {
+    background: var(--r-slate-wash);
+    border-color: var(--r-slate-edge);
+    color: var(--r-slate);
+  }
+  .key-none {
+    background: var(--r-none-bg);
+    border-color: var(--r-line);
+    color: var(--r-muted);
+  }
+
+  /* ==========================================================
+     Attendance matrix
+     ========================================================== */
+  .matrix-wrap {
+    overflow: auto;
+    max-height: 640px;
+  }
+  .attendance-matrix {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: var(--r-sans);
+  }
+  .attendance-matrix thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 10px 8px;
+    background: var(--r-surface-alt);
+    color: var(--r-ink);
+    font-family: var(--r-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--r-line);
+  }
+  .attendance-matrix thead th:first-child {
+    left: 0;
+    z-index: 3;
+    min-width: 190px;
+    padding-left: 20px;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 10px;
+    color: var(--r-muted);
+  }
+  .attendance-matrix thead th:nth-last-child(-n + 3) {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 10px;
+    color: var(--r-muted);
+  }
+  .attendance-matrix thead th:last-child {
+    min-width: 72px;
+  }
+
+  .attendance-matrix tbody td {
+    padding: 0;
+    border-bottom: 1px solid var(--r-line-soft);
+    font-size: 12px;
+    color: var(--r-copy);
+    text-align: center;
+    background: var(--r-surface);
+  }
+  .attendance-matrix tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    padding: 10px 20px;
+    text-align: left;
+    white-space: nowrap;
+    background: var(--r-surface);
+    color: var(--r-ink);
+    font-family: var(--r-sans);
+    font-weight: 600;
+    font-size: 13px;
+    border-right: 1px solid var(--r-line-soft);
+  }
+  .attendance-matrix tbody tr:hover td {
+    background: var(--r-row-hover);
+  }
+  .attendance-matrix tbody tr:hover td:first-child {
+    background: var(--r-row-hover-first);
+  }
+  .attendance-matrix tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  /* Flat status cell */
+  .status-cell {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 10px 0;
+    font-family: var(--r-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .status-present {
+    background: var(--r-green-wash);
+    color: var(--r-green);
+  }
+  .status-absent {
+    background: var(--r-red-wash);
+    color: var(--r-red);
+  }
+  .status-late {
+    background: var(--r-brass-wash);
+    color: var(--r-brass);
+  }
+  .status-excused {
+    background: var(--r-slate-wash);
+    color: var(--r-slate);
+  }
+  .status-none {
+    background: transparent;
+    color: var(--r-none-fg);
+  }
+
+  /* Total columns */
+  .total-cell {
+    font-family: var(--r-mono) !important;
+    font-weight: 700;
+    font-size: 12px !important;
+    padding: 10px 8px !important;
+    background: var(--r-surface-alt) !important;
+    border-left: 1px solid var(--r-line-soft);
+    letter-spacing: 0.02em;
+  }
+  .total-cell.present-total {
+    color: var(--r-green);
+  }
+  .total-cell.absent-total {
+    color: var(--r-red);
+  }
+  .total-cell.rate-cell {
+    color: var(--r-ink);
+  }
+
+  .rate-value {
+    display: inline-block;
+    font-family: var(--r-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--r-green);
+  }
+  .rate-value.mid {
+    color: var(--r-brass);
+  }
+  .rate-value.low {
+    color: var(--r-red);
+  }
+
+  /* ==========================================================
+     Performance lists
+     ========================================================== */
+  .performance-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .performance-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .performance-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--r-line-soft);
+  }
+  .performance-row:last-child {
+    border-bottom: 0;
+  }
+
+  .student-identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .student-initials {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--r-green-wash);
+    color: var(--r-green);
+    font-family: var(--r-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .needs-card .student-initials {
+    background: var(--r-red-wash);
+    color: var(--r-red);
+  }
+  .student-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--r-ink);
+    font-family: var(--r-sans);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .performance-rate {
+    font-family: var(--r-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--r-green);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .needs-card .performance-rate {
+    color: var(--r-red);
+  }
+
+  .empty-line {
+    padding: 24px 20px;
+    color: var(--r-muted);
+    font-family: var(--r-sans);
+    font-size: 12px;
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* ==========================================================
+     Responsive
+     ========================================================== */
+  @media (max-width: 800px) {
+    .metric-rail {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .metric-card:nth-child(2) {
+      border-right: 0;
+    }
+    .metric-card:nth-child(1),
+    .metric-card:nth-child(2) {
+      border-bottom: 1px solid var(--r-line);
+    }
+    .performance-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 620px) {
+    .term-report {
+      padding: 18px 14px 40px;
+    }
+    .report-masthead {
+      padding: 18px;
+    }
+    .report-actions {
+      width: 100%;
+    }
+    .report-actions .report-button {
+      flex: 1;
+      justify-content: center;
+    }
+    .metric-rail {
+      grid-template-columns: 1fr;
+    }
+    .metric-card {
+      border-right: 0;
+      border-bottom: 1px solid var(--r-line);
+    }
+    .metric-card:last-child {
+      border-bottom: 0;
+    }
+    .section-head {
+      padding: 14px 16px;
+    }
+    .legend {
+      padding: 10px 16px;
+      gap: 6px 14px;
+    }
+    .performance-row {
+      padding: 11px 16px;
+    }
+  }
+
+  /* ==========================================================
+     Print — clean document output
+     ========================================================== */
+  @media print {
+    .term-report {
+      padding: 0;
+      font-size: 11pt;
+      background: #fff;
+    }
+    .report-actions {
+      display: none !important;
+    }
+    .report-masthead {
+      border-color: #333;
+    }
+    .matrix-wrap {
+      max-height: none;
+      overflow: visible;
+    }
+    .attendance-matrix thead th,
+    .attendance-matrix td:first-child,
+    .attendance-matrix thead th:first-child {
+      position: static !important;
+    }
+    .report-section,
+    .metric-rail,
+    .report-masthead {
+      page-break-inside: avoid;
+      border-color: #999;
+    }
+    .performance-grid {
+      page-break-inside: avoid;
+    }
+  }
+</style>
+
+<div class="term-report">
+  <!-- Masthead -->
+  <header class="report-masthead">
+    <div class="report-masthead-copy">
+      <p class="report-kicker">Attendance Register · Term Report</p>
+      <h1>{{ class_.name }}</h1>
+      <p class="report-subtitle">
+        Complete attendance record for the selected term.
+      </p>
+      <div class="report-meta">
+        <span
+          ><strong>{{ class_.level }}</strong> · Section {{ class_.section
+          }}</span
         >
+        <span><strong>{{ term }}</strong> {{ year }}</span>
+        <span
+          ><strong>{{ summary.total_days }}</strong> school days recorded</span
+        >
+      </div>
+    </div>
+    <div class="report-actions">
+      <a
+        class="report-button primary"
+        href="{{ url_for('attendance.export_attendance', class_id=class_.id, term=term, year=year) }}"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
           />
         </svg>
-      </div>
-    </div>
-    <h1 class="text-4xl font-bold gradient-text mb-4">
-      Term Attendance Report
-    </h1>
-    <div class="flex flex-wrap justify-center gap-4 mb-4">
-      <span
-        class="px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold"
+        Export CSV
+      </a>
+      <a
+        class="report-button"
+        href="{{ url_for('attendance.term_attendance') }}"
       >
-        {{ class_.name }}
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        Back to reports
+      </a>
+    </div>
+  </header>
+
+  {# Compute summary numbers once for reuse #} {% set total_percentage =
+  namespace(value=0) %} {% set chronic_count = namespace(value=0) %} {% for
+  student in students %} {% set stats = summary.student_stats[student.id] %} {%
+  set total_percentage.value = total_percentage.value + stats.percentage %} {%
+  if stats.percentage < 80 %} {% set chronic_count.value = chronic_count.value +
+  1 %} {% endif %} {% endfor %} {% set avg_pct = (total_percentage.value /
+  (students | length)) if students else 0 %}
+
+  <!-- Metric strip -->
+  <section class="metric-rail" aria-label="Report summary">
+    <div class="metric-card">
+      <p class="metric-label">Students</p>
+      <p class="metric-value">{{ students | length }}</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">School days</p>
+      <p class="metric-value">{{ summary.total_days }}</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Average attendance</p>
+      <p class="metric-value">
+        {{ "%.1f"|format(avg_pct) }}<span class="unit">%</span>
+      </p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Below 80%</p>
+      <p class="metric-value">{{ chronic_count.value }}</p>
+    </div>
+  </section>
+
+  <!-- Attendance matrix -->
+  <section class="report-section">
+    <div class="section-head">
+      <div>
+        <p class="section-label">01 · Daily record</p>
+        <h2>Attendance matrix</h2>
+      </div>
+      <span class="section-count">
+        {{ attendance_days | length }} day{{ '' if attendance_days|length == 1
+        else 's' }}
       </span>
-      <span
-        class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold"
+    </div>
+
+    <div class="legend">
+      <span class="legend-item"
+        ><span class="legend-key key-present">P</span>Present</span
       >
-        {{ term }} {{ year }}
-      </span>
-    </div>
-    <p class="text-slate-600 dark:text-slate-300 text-lg max-w-2xl mx-auto">
-      Detailed attendance overview with {{ summary.total_days }} school days
-      recorded
-    </p>
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="flex flex-col sm:flex-row gap-4 justify-center">
-    <a
-      href="{{ url_for('attendance.export_attendance', class_id=class_.id, term=term, year=year) }}"
-      class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 interactive"
-    >
-      <svg
-        class="w-5 h-5 mr-2"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
+      <span class="legend-item"
+        ><span class="legend-key key-absent">A</span>Absent</span
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-      Export CSV
-    </a>
-    <a
-      href="{{ url_for('attendance.term_attendance') }}"
-      class="inline-flex items-center justify-center px-6 py-3 glass hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl transition-all duration-300 interactive"
-    >
-      <svg
-        class="w-5 h-5 mr-2"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
+      <span class="legend-item"
+        ><span class="legend-key key-late">L</span>Late</span
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M10 19l-7-7m0 0l7-7m-7 7h18"
-        />
-      </svg>
-      Back to Reports
-    </a>
-  </div>
-
-  <!-- Summary Statistics -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-    <!-- Total Students -->
-    <div class="professional-card p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-2xl font-bold text-slate-800 dark:text-white">
-            {{ students | length }}
-          </p>
-          <p class="text-sm text-slate-600 dark:text-slate-300">
-            Total Students
-          </p>
-        </div>
-        <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
-          <svg
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
-        </div>
-      </div>
+      <span class="legend-item"
+        ><span class="legend-key key-excused">E</span>Excused</span
+      >
+      <span class="legend-item"
+        ><span class="legend-key key-none">–</span>No record</span
+      >
     </div>
 
-    <!-- School Days -->
-    <div class="professional-card p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-2xl font-bold text-slate-800 dark:text-white">
-            {{ summary.total_days }}
-          </p>
-          <p class="text-sm text-slate-600 dark:text-slate-300">School Days</p>
-        </div>
-        <div
-          class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl"
-        >
-          <svg
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
-            />
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- Average Attendance -->
-    <div class="professional-card p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          {% set total_percentage = 0 %} {% for student in students %} {% set
-          stats = summary.student_stats[student.id] %} {% set total_percentage =
-          total_percentage + stats.percentage %} {% endfor %}
-          <p class="text-2xl font-bold text-slate-800 dark:text-white">
-            {% if students %}{{ (total_percentage / students | length) |
-            round(1) }}%{% else %}0%{% endif %}
-          </p>
-          <p class="text-sm text-slate-600 dark:text-slate-300">
-            Average Attendance
-          </p>
-        </div>
-        <div
-          class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl"
-        >
-          <svg
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            />
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- Below 80% -->
-    <div class="professional-card p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          {% set chronic_count = 0 %} {% for student in students %} {% set stats
-          = summary.student_stats[student.id] %} {% if stats.percentage < 80 %}
-          {% set chronic_count = chronic_count + 1 %} {% endif %} {% endfor %}
-          <p class="text-2xl font-bold text-slate-800 dark:text-white">
-            {{ chronic_count }}
-          </p>
-          <p class="text-sm text-slate-600 dark:text-slate-300">Below 80%</p>
-        </div>
-        <div class="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
-          <svg
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Attendance Legend -->
-  <div class="professional-card p-6">
-    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
-      Attendance Legend
-    </h3>
-    <div class="flex flex-wrap gap-4">
-      <div class="flex items-center space-x-2">
-        <div
-          class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-        >
-          P
-        </div>
-        <span class="text-sm text-slate-600 dark:text-slate-300">Present</span>
-      </div>
-      <div class="flex items-center space-x-2">
-        <div
-          class="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-        >
-          A
-        </div>
-        <span class="text-sm text-slate-600 dark:text-slate-300">Absent</span>
-      </div>
-      <div class="flex items-center space-x-2">
-        <div
-          class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-        >
-          L
-        </div>
-        <span class="text-sm text-slate-600 dark:text-slate-300">Late</span>
-      </div>
-      <div class="flex items-center space-x-2">
-        <div
-          class="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-        >
-          E
-        </div>
-        <span class="text-sm text-slate-600 dark:text-slate-300">Excused</span>
-      </div>
-      <div class="flex items-center space-x-2">
-        <div
-          class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center"
-        >
-          <span class="text-xs text-slate-500 dark:text-slate-400">-</span>
-        </div>
-        <span class="text-sm text-slate-600 dark:text-slate-300"
-          >No Record</span
-        >
-      </div>
-    </div>
-  </div>
-
-  <!-- Attendance Table -->
-  <div class="professional-card p-8 overflow-x-auto">
-    <table class="w-full">
-      <thead>
-        <tr class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-          <th
-            class="px-6 py-4 text-left font-semibold sticky left-0 bg-indigo-500 z-10"
-          >
-            Student
-          </th>
-          {% for day in attendance_days %}
-          <th
-            class="px-3 py-4 text-center font-semibold text-sm whitespace-nowrap"
-          >
-            {{ day.strftime('%m/%d') }}
-          </th>
+    <div class="matrix-wrap">
+      <table class="attendance-matrix">
+        <thead>
+          <tr>
+            <th scope="col">Student</th>
+            {% for day in attendance_days %}
+            <th scope="col">{{ day.strftime('%m/%d') }}</th>
+            {% endfor %}
+            <th scope="col">Present</th>
+            <th scope="col">Absent</th>
+            <th scope="col">Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %} {% set stats =
+          summary.student_stats[student.id] %} {% set percentage =
+          stats.percentage %}
+          <tr>
+            <td>{{ student.surname }}, {{ student.first_name }}</td>
+            {% for day in attendance_days %} {% set status =
+            attendance_records[student.id].get(day) %}
+            <td>
+              {% if status == 'present' %}
+              <span
+                class="status-cell status-present"
+                title="Present — {{ day.strftime('%b %d, %Y') }}"
+                >P</span
+              >
+              {% elif status == 'absent' %}
+              <span
+                class="status-cell status-absent"
+                title="Absent — {{ day.strftime('%b %d, %Y') }}"
+                >A</span
+              >
+              {% elif status == 'late' %}
+              <span
+                class="status-cell status-late"
+                title="Late — {{ day.strftime('%b %d, %Y') }}"
+                >L</span
+              >
+              {% elif status == 'excused' %}
+              <span
+                class="status-cell status-excused"
+                title="Excused — {{ day.strftime('%b %d, %Y') }}"
+                >E</span
+              >
+              {% else %}
+              <span
+                class="status-cell status-none"
+                title="No record — {{ day.strftime('%b %d, %Y') }}"
+                >–</span
+              >
+              {% endif %}
+            </td>
+            {% endfor %}
+            <td class="total-cell present-total">{{ stats.present }}</td>
+            <td class="total-cell absent-total">{{ stats.absent }}</td>
+            <td class="total-cell rate-cell">
+              <span
+                class="rate-value {% if percentage < 80 %}low{% elif percentage < 90 %}mid{% endif %}"
+              >
+                {{ "%.1f"|format(percentage) }}%
+              </span>
+            </td>
+          </tr>
           {% endfor %}
-          <th class="px-6 py-4 text-center font-semibold">Present</th>
-          <th class="px-6 py-4 text-center font-semibold">Absent</th>
-          <th class="px-6 py-4 text-center font-semibold">Rate</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-        {% for student in students %}
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-          <td
-            class="px-6 py-4 font-medium text-slate-900 dark:text-white sticky left-0 bg-white dark:bg-slate-900"
-          >
-            {{ student.surname }}, {{ student.first_name }}
-          </td>
-          {% for day in attendance_days %}
-          <td class="px-3 py-3 text-center">
-            {% set status = attendance_records[student.id].get(day) %} {% if
-            status == 'present' %}
-            <div
-              class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
-              title="Present - {{ day.strftime('%b %d') }}"
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top performers and Needs attention -->
+  <div class="performance-grid">
+    <section class="report-section">
+      <div class="section-head">
+        <div>
+          <p class="section-label">02 · Recognition</p>
+          <h2>Top performers</h2>
+        </div>
+        <span class="section-count">≥ 90%</span>
+      </div>
+      {% set top_performers = [] %} {% for student in students %} {% set stats =
+      summary.student_stats[student.id] %} {% if stats.percentage >= 90 %} {%
+      set _ = top_performers.append((student, stats.percentage)) %} {% endif %}
+      {% endfor %} {% if top_performers %}
+      <ul class="performance-list">
+        {% for student, percentage in top_performers[:5] %}
+        <li class="performance-row">
+          <div class="student-identity">
+            <span class="student-initials"
+              >{{ student.first_name[0] }}{{ student.surname[0] }}</span
             >
-              P
-            </div>
-            {% elif status == 'absent' %}
-            <div
-              class="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
-              title="Absent - {{ day.strftime('%b %d') }}"
+            <span class="student-name"
+              >{{ student.first_name }} {{ student.surname[0] }}.</span
             >
-              A
-            </div>
-            {% elif status == 'late' %}
-            <div
-              class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
-              title="Late - {{ day.strftime('%b %d') }}"
-            >
-              L
-            </div>
-            {% elif status == 'excused' %}
-            <div
-              class="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
-              title="Excused - {{ day.strftime('%b %d') }}"
-            >
-              E
-            </div>
-            {% else %}
-            <div
-              class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
-              title="No record - {{ day.strftime('%b %d') }}"
-            >
-              <span class="text-xs text-slate-500 dark:text-slate-400">-</span>
-            </div>
-            {% endif %}
-          </td>
-          {% endfor %}
-          <td class="px-6 py-4 text-center font-semibold text-emerald-600">
-            {{ summary.student_stats[student.id].present }}
-          </td>
-          <td class="px-6 py-4 text-center font-semibold text-red-600">
-            {{ summary.student_stats[student.id].absent }}
-          </td>
-          <td class="px-6 py-4 text-center">
-            {% set percentage = summary.student_stats[student.id].percentage %}
-            <span
-              class="px-3 py-1 rounded-full text-xs font-bold {% if percentage >= 90 %}bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 {% elif percentage >= 80 %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300 {% else %}bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300{% endif %}"
-            >
-              {{ "%.1f"|format(percentage) }}%
-            </span>
-          </td>
-        </tr>
+          </div>
+          <span class="performance-rate">{{ "%.1f"|format(percentage) }}%</span>
+        </li>
         {% endfor %}
-      </tbody>
-    </table>
-  </div>
+      </ul>
+      {% else %}
+      <p class="empty-line">No students with 90%+ attendance.</p>
+      {% endif %}
+    </section>
 
-  <!-- Performance Summary -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <!-- Top Performers -->
-    <div class="professional-card p-6">
-      <div class="flex items-center space-x-3 mb-6">
-        <div
-          class="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg"
-        >
-          <svg
-            class="w-5 h-5 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-            />
-          </svg>
+    <section class="report-section needs-card">
+      <div class="section-head">
+        <div>
+          <p class="section-label">03 · Support</p>
+          <h2>Needs attention</h2>
         </div>
-        <h3 class="text-xl font-bold text-slate-800 dark:text-white">
-          Top Performers
-        </h3>
+        <span class="section-count">&lt; 80%</span>
       </div>
-      <div class="space-y-3">
-        {% set top_performers = [] %} {% for student in students %} {% set stats
-        = summary.student_stats[student.id] %} {% if stats.percentage >= 90 %}
-        {% set _ = top_performers.append((student, stats.percentage)) %} {%
-        endif %} {% endfor %} {% if top_performers %} {% for student, percentage
-        in top_performers[:5] %}
-        <div
-          class="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
-        >
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white text-sm font-bold"
+      {% set need_attention = [] %} {% for student in students %} {% set stats =
+      summary.student_stats[student.id] %} {% if stats.percentage < 80 %} {% set
+      _ = need_attention.append((student, stats.percentage)) %} {% endif %} {%
+      endfor %} {% if need_attention %}
+      <ul class="performance-list">
+        {% for student, percentage in need_attention[:5] %}
+        <li class="performance-row">
+          <div class="student-identity">
+            <span class="student-initials"
+              >{{ student.first_name[0] }}{{ student.surname[0] }}</span
             >
-              {{ student.first_name[0] }}{{ student.surname[0] }}
-            </div>
-            <span class="font-medium text-slate-800 dark:text-white"
+            <span class="student-name"
               >{{ student.first_name }} {{ student.surname[0] }}.</span
             >
           </div>
-          <span
-            class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full"
-          >
-            {{ "%.1f"|format(percentage) }}%
-          </span>
-        </div>
-        {% endfor %} {% else %}
-        <div class="text-center py-4 text-slate-500 dark:text-slate-400">
-          No students with 90%+ attendance
-        </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Need Attention -->
-    <div class="professional-card p-6">
-      <div class="flex items-center space-x-3 mb-6">
-        <div class="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-lg">
-          <svg
-            class="w-5 h-5 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold text-slate-800 dark:text-white">
-          Need Attention
-        </h3>
-      </div>
-      <div class="space-y-3">
-        {% set need_attention = [] %} {% for student in students %} {% set stats
-        = summary.student_stats[student.id] %} {% if stats.percentage < 80 %} {%
-        set _ = need_attention.append((student, stats.percentage)) %} {% endif
-        %} {% endfor %} {% if need_attention %} {% for student, percentage in
-        need_attention[:5] %}
-        <div
-          class="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
-        >
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-8 h-8 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center text-white text-sm font-bold"
-            >
-              {{ student.first_name[0] }}{{ student.surname[0] }}
-            </div>
-            <span class="font-medium text-slate-800 dark:text-white"
-              >{{ student.first_name }} {{ student.surname[0] }}.</span
-            >
-          </div>
-          <span
-            class="px-2 py-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-xs font-bold rounded-full"
-          >
-            {{ "%.1f"|format(percentage) }}%
-          </span>
-        </div>
-        {% endfor %} {% else %}
-        <div class="text-center py-4 text-slate-500 dark:text-slate-400">
-          No students below 80% attendance
-        </div>
-        {% endif %}
-      </div>
-    </div>
+          <span class="performance-rate">{{ "%.1f"|format(percentage) }}%</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="empty-line">No students below 80% attendance.</p>
+      {% endif %}
+    </section>
   </div>
 </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Add interactive features to the attendance table
-    const attendanceCells = document.querySelectorAll("[title]");
-
-    attendanceCells.forEach((cell) => {
-      cell.addEventListener("click", function () {
-        const title = this.getAttribute("title");
-        if (title) {
-          const [status, date] = title.split(" - ");
-          const student = this.closest("tr").querySelector("td").textContent;
-
-          alert(
-            `Attendance Record:\nStudent: ${student}\nDate: ${date}\nStatus: ${status}`
-          );
-        }
-      });
-    });
-  });
-</script>
 {% endblock %}

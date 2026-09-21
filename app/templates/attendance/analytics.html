@@ -2,621 +2,1057 @@
 endblock %} {% block page_title %}Attendance Analytics{% endblock %} {% block
 page_description %}Deep insights and trends for {{ class_.name }} attendance{%
 endblock %} {% block content %}
-<div class="max-w-7xl mx-auto space-y-8">
-  <!-- Header Section -->
-  <div class="professional-card p-8 text-center">
-    <div class="flex justify-center mb-6">
-      <div
-        class="w-20 h-20 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center"
-      >
-        <svg
-          class="w-10 h-10 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+  /* ==========================================================
+     Attendance Analytics — Fraunces + Inter + JetBrains Mono.
+     Fraunces  → header title, card headings, metric values
+     Inter     → body copy, list rows, alert names, buttons
+     JetBrains → kickers, labels, badges, all numeric data
+     Includes dark mode with chart theme detection.
+     ========================================================== */
+  :root {
+    --an-ink: #1a2226;
+    --an-copy: #4a5459;
+    --an-muted: #7a8589;
+    --an-surface: #ffffff;
+    --an-surface-alt: #f5f7f5;
+    --an-paper: #f4f5f3;
+    --an-line: #d7dfdb;
+    --an-line-soft: #e8ecea;
+
+    --an-green: #1f6259;
+    --an-green-hover: #185048;
+    --an-green-wash: #e6efe9;
+    --an-green-edge: #c2d5c8;
+
+    --an-red: #9a5148;
+    --an-red-wash: #f3e5e1;
+    --an-red-edge: #dcc1b9;
+
+    --an-brass: #8a632e;
+    --an-brass-wash: #f2ead8;
+    --an-brass-edge: #d9c8a4;
+
+    --an-slate: #5d7076;
+    --an-slate-wash: #ebefee;
+    --an-slate-edge: #c5d0d0;
+
+    --an-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --an-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --an-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+  }
+
+  .dark {
+    --an-ink: #eef2ef;
+    --an-copy: #b8c1bd;
+    --an-muted: #8f9a96;
+    --an-surface: #1a201f;
+    --an-surface-alt: #1e2524;
+    --an-paper: #131817;
+    --an-line: #33403e;
+    --an-line-soft: #2a3533;
+
+    --an-green: #6fbfa7;
+    --an-green-hover: #8ed4bd;
+    --an-green-wash: #1c2b27;
+    --an-green-edge: #2d5a4b;
+
+    --an-red: #e0907a;
+    --an-red-wash: #3a251f;
+    --an-red-edge: #5a3a2f;
+
+    --an-brass: #d9b273;
+    --an-brass-wash: #2c2620;
+    --an-brass-edge: #4a3e2d;
+
+    --an-slate: #8fa2a8;
+    --an-slate-wash: #253032;
+    --an-slate-edge: #3d4d51;
+  }
+
+  .analytics-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--an-ink);
+    background: var(--an-paper);
+    font-family: var(--an-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  .analytics-page *,
+  .analytics-page *::before,
+  .analytics-page *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---------- Header ---------- */
+  .an-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 24px 22px 28px;
+    background: var(--an-surface);
+    border: 1px solid var(--an-line);
+    border-radius: 4px;
+    position: relative;
+  }
+  .an-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--an-green);
+  }
+  .an-header-copy {
+    min-width: 0;
+  }
+  .an-kicker {
+    font-family: var(--an-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--an-muted);
+    margin: 0 0 6px;
+  }
+  .an-header h1 {
+    margin: 0 0 10px;
+    color: var(--an-ink);
+    font-family: var(--an-display);
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .an-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    color: var(--an-muted);
+    font-family: var(--an-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .an-meta .an-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--an-green-edge);
+    border-radius: 3px;
+    background: var(--an-green-wash);
+    color: var(--an-green);
+    font-family: var(--an-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .an-meta .an-stamp.brass {
+    border-color: var(--an-brass-edge);
+    background: var(--an-brass-wash);
+    color: var(--an-brass);
+  }
+
+  .an-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .an-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border: 1px solid var(--an-line);
+    border-radius: 3px;
+    background: var(--an-surface);
+    color: var(--an-ink);
+    text-decoration: none;
+    font-family: var(--an-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .an-btn:hover {
+    border-color: var(--an-ink);
+    background: var(--an-surface-alt);
+  }
+  .an-btn.primary {
+    background: var(--an-green);
+    color: #fff;
+    border-color: var(--an-green);
+  }
+  .dark .an-btn.primary {
+    color: #131817;
+  }
+  .an-btn.primary:hover {
+    background: var(--an-green-hover);
+    border-color: var(--an-green-hover);
+  }
+  .dark .an-btn.primary:hover {
+    color: #131817;
+  }
+  .an-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ---------- Metric strip ---------- */
+  .an-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    background: var(--an-surface);
+    border: 1px solid var(--an-line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .an-metric {
+    padding: 16px 20px;
+    border-right: 1px solid var(--an-line);
+    position: relative;
+  }
+  .an-metric:last-child {
+    border-right: 0;
+  }
+  .an-metric::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--an-green);
+  }
+  .an-metric.m-present::before {
+    background: var(--an-green);
+  }
+  .an-metric.m-absent::before {
+    background: var(--an-red);
+  }
+  .an-metric.m-late::before {
+    background: var(--an-brass);
+  }
+
+  .an-metric-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    font-family: var(--an-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--an-muted);
+    margin: 0 0 8px;
+  }
+  .an-metric-label .badge {
+    font-family: var(--an-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+  .an-metric-label .badge.b-green {
+    color: var(--an-green);
+    background: var(--an-green-wash);
+    border-color: var(--an-green-edge);
+  }
+  .an-metric-label .badge.b-red {
+    color: var(--an-red);
+    background: var(--an-red-wash);
+    border-color: var(--an-red-edge);
+  }
+  .an-metric-label .badge.b-brass {
+    color: var(--an-brass);
+    background: var(--an-brass-wash);
+    border-color: var(--an-brass-edge);
+  }
+  .an-metric-label .badge.b-slate {
+    color: var(--an-slate);
+    background: var(--an-slate-wash);
+    border-color: var(--an-slate-edge);
+  }
+
+  .an-metric-value {
+    font-family: var(--an-display);
+    font-size: 28px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--an-ink);
+    margin: 0 0 12px;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .an-metric-value .unit {
+    font-family: var(--an-sans);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--an-muted);
+    margin-left: 1px;
+    letter-spacing: 0;
+  }
+
+  .an-meter {
+    height: 5px;
+    background: var(--an-surface-alt);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .an-meter-fill {
+    height: 100%;
+    background: var(--an-green);
+  }
+  .an-meter-fill.m-present {
+    background: var(--an-green);
+  }
+  .an-meter-fill.m-absent {
+    background: var(--an-red);
+  }
+  .an-meter-fill.m-late {
+    background: var(--an-brass);
+  }
+
+  /* ---------- Charts row ---------- */
+  .an-charts {
+    display: grid;
+    grid-template-columns: minmax(0, 1.85fr) minmax(280px, 0.85fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .an-card {
+    background: var(--an-surface);
+    border: 1px solid var(--an-line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .an-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--an-line);
+    background: var(--an-surface-alt);
+  }
+  .an-card-head h2 {
+    font-family: var(--an-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--an-ink);
+    margin: 0;
+  }
+  .an-card-head .head-meta {
+    font-family: var(--an-mono);
+    font-size: 11px;
+    color: var(--an-muted);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .an-card-body {
+    padding: 20px;
+  }
+
+  .an-chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+  }
+  .an-chart-container.small {
+    height: 200px;
+  }
+
+  /* ---------- Side stats list ---------- */
+  .an-stat-list {
+    padding: 0 20px 8px;
+  }
+  .an-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--an-line-soft);
+  }
+  .an-stat-row:last-child {
+    border-bottom: 0;
+  }
+  .an-stat-row.is-total {
+    border-top: 1px solid var(--an-line);
+    border-bottom: 0;
+    margin-top: 6px;
+  }
+  .an-stat-row .k {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--an-sans);
+    font-size: 13px;
+    color: var(--an-copy);
+  }
+  .an-stat-row .k .swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+  .an-stat-row .k .swatch.present {
+    background: var(--an-green);
+  }
+  .an-stat-row .k .swatch.absent {
+    background: var(--an-red);
+  }
+  .an-stat-row .k .swatch.late {
+    background: var(--an-brass);
+  }
+  .an-stat-row .k .swatch.excused {
+    background: var(--an-slate);
+  }
+  .an-stat-row .v {
+    font-family: var(--an-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--an-ink);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .an-stat-row .v .unit {
+    font-family: var(--an-mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--an-muted);
+    margin-left: 3px;
+    letter-spacing: 0;
+  }
+  .an-stat-row.is-total .k {
+    font-family: var(--an-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--an-muted);
+  }
+
+  /* ---------- Chronic absenteeism ---------- */
+  .an-alerts-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px 20px 14px;
+    background: var(--an-surface-alt);
+    border-bottom: 1px solid var(--an-line);
+  }
+  .an-alerts-head h2 {
+    font-family: var(--an-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--an-ink);
+    margin: 0;
+  }
+  .an-alerts-head .count {
+    font-family: var(--an-mono);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--an-red-edge);
+    background: var(--an-red-wash);
+    color: var(--an-red);
+  }
+
+  .an-alert-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+  .an-alert {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--an-line-soft);
+    border-right: 1px solid var(--an-line-soft);
+  }
+  .an-alert:nth-child(2n) {
+    border-right: 0;
+  }
+  .an-alert:last-child,
+  .an-alert:nth-last-child(2):nth-child(odd) {
+    border-bottom: 0;
+  }
+
+  .an-alert-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .an-alert-name {
+    font-family: var(--an-sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--an-ink);
+  }
+  .an-alert-rate {
+    font-family: var(--an-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--an-red);
+    letter-spacing: 0.02em;
+  }
+  .an-alert-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-family: var(--an-mono);
+    font-size: 11px;
+    color: var(--an-muted);
+    letter-spacing: 0.02em;
+  }
+  .an-alert-detail strong {
+    color: var(--an-red);
+    font-weight: 700;
+  }
+  .an-alert-note {
+    margin: 10px 0 0;
+    font-family: var(--an-sans);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--an-copy);
+  }
+
+  /* ---------- Empty state ---------- */
+  .an-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--an-muted);
+  }
+  .an-empty strong {
+    display: block;
+    font-family: var(--an-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--an-ink);
+    margin-bottom: 6px;
+  }
+  .an-empty p {
+    margin: 0;
+    font-family: var(--an-sans);
+    font-size: 13px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1100px) {
+    .an-charts {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 800px) {
+    .an-metrics {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .an-metric:nth-child(2) {
+      border-right: 0;
+    }
+    .an-metric:nth-child(1),
+    .an-metric:nth-child(2) {
+      border-bottom: 1px solid var(--an-line);
+    }
+    .an-alert-grid {
+      grid-template-columns: 1fr;
+    }
+    .an-alert {
+      border-right: 0;
+    }
+    .an-alert:last-child {
+      border-bottom: 0;
+    }
+    .an-alert:nth-last-child(2):nth-child(odd) {
+      border-bottom: 1px solid var(--an-line-soft);
+    }
+  }
+  @media (max-width: 640px) {
+    .analytics-page {
+      padding: 18px 14px 40px;
+    }
+    .an-header {
+      padding: 18px 16px 18px 20px;
+    }
+    .an-header-actions {
+      width: 100%;
+    }
+    .an-header-actions .an-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .an-metrics {
+      grid-template-columns: 1fr;
+    }
+    .an-metric {
+      border-right: 0;
+      border-bottom: 1px solid var(--an-line);
+    }
+    .an-metric:last-child {
+      border-bottom: 0;
+    }
+    .an-chart-container {
+      height: 240px;
+    }
+  }
+</style>
+
+<div class="analytics-page">
+  <!-- Header -->
+  <header class="an-header">
+    <div class="an-header-copy">
+      <p class="an-kicker">Attendance · Analytics</p>
+      <h1>Attendance Analytics</h1>
+      <div class="an-meta">
+        <span class="an-stamp">{{ class_.name }}</span>
+        <span class="an-stamp brass">Last 30 days</span>
+      </div>
+    </div>
+    <div class="an-header-actions">
+      <a href="{{ url_for('attendance.attendance_dashboard') }}" class="an-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
           />
         </svg>
-      </div>
+        Dashboard
+      </a>
+      <a
+        href="{{ url_for('attendance.term_attendance') }}"
+        class="an-btn primary"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        View reports
+      </a>
     </div>
-    <h1 class="text-4xl font-bold gradient-text mb-4">Attendance Analytics</h1>
-    <div class="flex flex-wrap justify-center gap-4 mb-4">
-      <span
-        class="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold"
-      >
-        {{ class_.name }}
-      </span>
-      <span
-        class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold"
-      >
-        Last 30 Days Analysis
-      </span>
-    </div>
-    <p class="text-slate-600 dark:text-slate-300 text-lg max-w-2xl mx-auto">
-      Deep insights into attendance patterns and student performance metrics
-    </p>
-  </div>
+  </header>
 
-  <!-- Action Buttons -->
-  <div class="flex flex-col sm:flex-row gap-4 justify-center">
-    <a
-      href="{{ url_for('attendance.attendance_dashboard') }}"
-      class="inline-flex items-center justify-center px-6 py-3 glass hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl transition-all duration-300 interactive"
-    >
-      <svg
-        class="w-5 h-5 mr-2"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-        />
-      </svg>
-      Dashboard
-    </a>
-    <a
-      href="{{ url_for('attendance.term_attendance') }}"
-      class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 interactive"
-    >
-      <svg
-        class="w-5 h-5 mr-2"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-      View Reports
-    </a>
-  </div>
+  {# ---------- Compute totals ---------- #} {% set total_present = 0 %} {% set
+  total_absent = 0 %} {% set total_late = 0 %} {% set total_excused = 0 %} {%
+  set total_records = 0 %} {% for data in attendance_data %} {% set
+  total_present = total_present + data.present %} {% set total_absent =
+  total_absent + data.absent %} {% set total_late = total_late + data.late %} {%
+  set total_excused = total_excused + data.excused %} {% set total_records =
+  total_records + data.present + data.absent + data.late + data.excused %} {%
+  endfor %} {% set avg_attendance_rate = (total_present / total_records * 100)
+  if total_records > 0 else 0 %} {% set present_rate = (total_present /
+  (total_present + total_absent) * 100) if (total_present + total_absent) > 0
+  else 0 %} {% set absenteeism_rate = (total_absent / total_records * 100) if
+  total_records > 0 else 0 %} {% set late_rate = (total_late / total_records *
+  100) if total_records > 0 else 0 %} {% set excused_rate = (total_excused /
+  total_records * 100) if total_records > 0 else 0 %}
 
-  <!-- Key Metrics Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    {% set total_present = 0 %} {% set total_absent = 0 %} {% set total_late = 0
-    %} {% set total_excused = 0 %} {% set total_records = 0 %} {% for data in
-    attendance_data %} {% set total_present = total_present + data.present %} {%
-    set total_absent = total_absent + data.absent %} {% set total_late =
-    total_late + data.late %} {% set total_excused = total_excused +
-    data.excused %} {% set total_records = total_records + data.present +
-    data.absent + data.late + data.excused %} {% endfor %} {% set
-    avg_attendance_rate = (total_present / total_records * 100) if total_records
-    > 0 else 0 %} {% set present_rate = (total_present / (total_present +
-    total_absent) * 100) if (total_present + total_absent) > 0 else 0 %} {% set
-    absenteeism_rate = (total_absent / total_records * 100) if total_records > 0
-    else 0 %} {% set late_rate = (total_late / total_records * 100) if
-    total_records > 0 else 0 %}
-
-    <!-- Average Attendance Card -->
-    <div class="professional-card p-6">
-      <div class="flex items-center justify-between mb-4">
-        <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
-          <svg
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            />
-          </svg>
-        </div>
-        <span
-          class="px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-full"
-          >Last 30d</span
-        >
-      </div>
-      <p class="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-        {{ "%.1f"|format(avg_attendance_rate) }}%
+  <!-- Metric strip -->
+  <section class="an-metrics" aria-label="Key metrics">
+    <div class="an-metric">
+      <p class="an-metric-label">
+        Average attendance
+        <span class="badge b-slate">30d</span>
       </p>
-      <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
-        Average Attendance
+      <p class="an-metric-value">
+        {{ "%.1f"|format(avg_attendance_rate) }}<span class="unit">%</span>
       </p>
-      <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+      <div class="an-meter">
         <div
-          class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-1000"
+          class="an-meter-fill m-present"
           style="width: {{ avg_attendance_rate }}%"
         ></div>
       </div>
     </div>
 
-    <!-- Present Records Card -->
-    <div class="professional-card p-6">
-      <div class="flex items-center justify-between mb-4">
-        <div
-          class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl"
-        >
-          <svg
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <span
-          class="px-3 py-1 bg-emerald-500 text-white text-xs font-semibold rounded-full"
-          >Present</span
-        >
-      </div>
-      <p class="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-        {{ total_present }}
+    <div class="an-metric m-present">
+      <p class="an-metric-label">
+        Present records
+        <span class="badge b-green">{{ "%.0f"|format(present_rate) }}%</span>
       </p>
-      <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
-        Present Records
+      <p class="an-metric-value">
+        {{ total_present }}<span class="unit">records</span>
       </p>
-      <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+      <div class="an-meter">
         <div
-          class="bg-gradient-to-r from-emerald-500 to-emerald-600 h-2 rounded-full transition-all duration-1000"
+          class="an-meter-fill m-present"
           style="width: {{ present_rate }}%"
         ></div>
       </div>
     </div>
 
-    <!-- Absent Records Card -->
-    <div class="professional-card p-6">
-      <div class="flex items-center justify-between mb-4">
-        <div class="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
-          <svg
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </div>
-        <span
-          class="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full"
-          >Absent</span
-        >
-      </div>
-      <p class="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-        {{ total_absent }}
+    <div class="an-metric m-absent">
+      <p class="an-metric-label">
+        Absent records
+        <span class="badge b-red">{{ "%.0f"|format(absenteeism_rate) }}%</span>
       </p>
-      <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
-        Absent Records
+      <p class="an-metric-value">
+        {{ total_absent }}<span class="unit">records</span>
       </p>
-      <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+      <div class="an-meter">
         <div
-          class="bg-gradient-to-r from-red-500 to-red-600 h-2 rounded-full transition-all duration-1000"
+          class="an-meter-fill m-absent"
           style="width: {{ absenteeism_rate }}%"
         ></div>
       </div>
     </div>
 
-    <!-- Late & Excused Card -->
-    <div class="professional-card p-6">
-      <div class="flex items-center justify-between mb-4">
-        <div
-          class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl"
+    <div class="an-metric m-late">
+      <p class="an-metric-label">
+        Late &amp; excused
+        <span class="badge b-brass"
+          >{{ "%.0f"|format(late_rate + excused_rate) }}%</span
         >
-          <svg
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <span
-          class="px-3 py-1 bg-purple-500 text-white text-xs font-semibold rounded-full"
-          >Late/Excused</span
-        >
-      </div>
-      <p class="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-        {{ total_late + total_excused }}
       </p>
-      <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
-        Late & Excused
+      <p class="an-metric-value">
+        {{ total_late + total_excused }}<span class="unit">records</span>
       </p>
-      <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+      <div class="an-meter">
         <div
-          class="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-1000"
-          style="width: {{ late_rate + (total_excused / total_records * 100) if total_records > 0 else 0 }}%"
+          class="an-meter-fill m-late"
+          style="width: {{ late_rate + excused_rate }}%"
         ></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Charts Section -->
-  <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-    <!-- Main Chart -->
-    <div class="xl:col-span-2">
-      <div class="professional-card p-8">
-        <div class="flex items-center space-x-3 mb-8">
-          <div
-            class="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
-            Attendance Trends (Last 30 Days)
-          </h2>
-        </div>
-        <div class="chart-container" style="height: 300px">
+  <!-- Charts + side stats -->
+  <div class="an-charts">
+    <!-- Trend chart -->
+    <div class="an-card">
+      <div class="an-card-head">
+        <h2>Attendance trend</h2>
+        <span class="head-meta">Last 30 days · daily rate</span>
+      </div>
+      <div class="an-card-body">
+        <div class="an-chart-container">
           <canvas id="attendanceTrendChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Status Distribution -->
-    <div class="space-y-6">
-      <div class="professional-card p-6">
-        <div class="flex items-center space-x-3 mb-6">
-          <div
-            class="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg"
-          >
-            <svg
-              class="w-5 h-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
-              />
-            </svg>
-          </div>
-          <h2 class="text-xl font-bold text-slate-800 dark:text-white">
-            Status Distribution
-          </h2>
+    <!-- Side column -->
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <!-- Status distribution -->
+      <div class="an-card">
+        <div class="an-card-head">
+          <h2>Status distribution</h2>
+          <span class="head-meta">{{ total_records }} records</span>
         </div>
-        <div class="chart-container" style="height: 200px">
-          <canvas id="statusDistributionChart"></canvas>
+        <div class="an-card-body">
+          <div class="an-chart-container small">
+            <canvas id="statusDistributionChart"></canvas>
+          </div>
         </div>
       </div>
 
-      <!-- Daily Averages -->
-      <div class="professional-card p-6">
-        <div class="flex items-center space-x-3 mb-6">
-          <div
-            class="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg"
-          >
-            <svg
-              class="w-5 h-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-          </div>
-          <h2 class="text-xl font-bold text-slate-800 dark:text-white">
-            Daily Averages
-          </h2>
+      <!-- Daily averages list -->
+      <div class="an-card">
+        <div class="an-card-head">
+          <h2>Record counts</h2>
+          <span class="head-meta">30-day totals</span>
         </div>
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300"
-              >Present</span
-            >
-            <span class="text-sm font-bold text-emerald-600"
-              >{{ total_present }} records</span
+        <div class="an-stat-list">
+          <div class="an-stat-row">
+            <span class="k"><span class="swatch present"></span>Present</span>
+            <span class="v"
+              >{{ total_present }}<span class="unit">records</span></span
             >
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300"
-              >Absent</span
-            >
-            <span class="text-sm font-bold text-red-600"
-              >{{ total_absent }} records</span
+          <div class="an-stat-row">
+            <span class="k"><span class="swatch absent"></span>Absent</span>
+            <span class="v"
+              >{{ total_absent }}<span class="unit">records</span></span
             >
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300"
-              >Late</span
-            >
-            <span class="text-sm font-bold text-yellow-600"
-              >{{ total_late }} records</span
+          <div class="an-stat-row">
+            <span class="k"><span class="swatch late"></span>Late</span>
+            <span class="v"
+              >{{ total_late }}<span class="unit">records</span></span
             >
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300"
-              >Excused</span
-            >
-            <span class="text-sm font-bold text-purple-600"
-              >{{ total_excused }} records</span
+          <div class="an-stat-row">
+            <span class="k"><span class="swatch excused"></span>Excused</span>
+            <span class="v"
+              >{{ total_excused }}<span class="unit">records</span></span
             >
           </div>
-          <div
-            class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700"
-          >
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300"
-              >Total Records</span
-            >
-            <span class="text-sm font-bold text-slate-600 dark:text-slate-400"
-              >{{ total_records }}</span
-            >
+          <div class="an-stat-row is-total">
+            <span class="k">Total records</span>
+            <span class="v">{{ total_records }}</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Chronic Absenteeism Alerts -->
-  <div class="professional-card p-8">
-    <div class="flex items-center space-x-3 mb-8">
-      <div class="p-2 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg">
-        <svg
-          class="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-          />
-        </svg>
-      </div>
-      <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
-        Chronic Absenteeism Alerts
-      </h2>
-      <span
-        class="px-3 py-1 bg-red-500 text-white text-sm font-semibold rounded-full"
-      >
-        {{ chronic_absenteeism | length }} Students
+  <!-- Chronic absenteeism -->
+  <section class="an-card">
+    <div class="an-alerts-head">
+      <h2>Chronic absenteeism alerts</h2>
+      <span class="count">
+        {{ chronic_absenteeism | length }} student{{ '' if
+        chronic_absenteeism|length == 1 else 's' }}
       </span>
     </div>
 
     {% if chronic_absenteeism %}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="an-alert-grid">
       {% for alert in chronic_absenteeism %}
-      <div
-        class="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-6 border border-red-200 dark:border-red-800"
-      >
-        <div class="flex justify-between items-start mb-3">
-          <h3 class="text-lg font-semibold text-red-800 dark:text-red-300">
-            {{ alert.student }}
-          </h3>
-          <span
-            class="px-3 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-bold rounded-full"
+      <article class="an-alert">
+        <div class="an-alert-top">
+          <span class="an-alert-name">{{ alert.student }}</span>
+          <span class="an-alert-rate"
+            >{{ "%.1f"|format(alert.attendance_rate) }}%</span
           >
-            {{ "%.1f"|format(alert.attendance_rate) }}%
-          </span>
         </div>
-        <div class="space-y-2">
-          <div class="flex justify-between text-sm">
-            <span class="text-red-600 dark:text-red-400 font-medium"
-              >Absent Days</span
-            >
-            <span class="text-red-700 dark:text-red-300 font-bold"
-              >{{ alert.absent_days }}</span
-            >
-          </div>
-          <div class="w-full bg-red-200 dark:bg-red-800 rounded-full h-2">
-            <div
-              class="bg-gradient-to-r from-red-500 to-red-600 h-2 rounded-full"
-              style="width: {{ alert.attendance_rate }}%"
-            ></div>
-          </div>
-          <p class="text-xs text-red-600 dark:text-red-400 mt-2">
-            {% if alert.attendance_rate < 60 %} Critical: Student has missed {{
-            alert.absent_days }} days {% elif alert.attendance_rate < 70 %}
-            Severe: Immediate attention required {% else %} Warning: Below
-            expected attendance threshold {% endif %}
-          </p>
+        <div class="an-alert-detail">
+          <span>Absent days</span>
+          <strong>{{ alert.absent_days }}</strong>
         </div>
-      </div>
+        <div class="an-meter">
+          <div
+            class="an-meter-fill m-absent"
+            style="width: {{ alert.attendance_rate }}%"
+          ></div>
+        </div>
+        <p class="an-alert-note">
+          {% if alert.attendance_rate < 60 %} Critical — student has missed {{
+          alert.absent_days }} days this period. {% elif alert.attendance_rate <
+          70 %} Severe — immediate attention required. {% else %} Warning —
+          below expected attendance threshold. {% endif %}
+        </p>
+      </article>
       {% endfor %}
     </div>
     {% else %}
-    <div class="text-center py-12">
-      <div
-        class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900 rounded-full flex items-center justify-center mx-auto mb-4"
-      >
-        <svg
-          class="w-8 h-8 text-emerald-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-      <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-2">
-        No Chronic Absenteeism
-      </h3>
-      <p class="text-slate-600 dark:text-slate-400">
-        All students are maintaining good attendance records!
-      </p>
+    <div class="an-empty">
+      <strong>No chronic absenteeism</strong>
+      <p>All students are maintaining good attendance records.</p>
     </div>
     {% endif %}
-  </div>
+  </section>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialize trend chart with actual data
-    const trendCtx = document.getElementById('attendanceTrendChart').getContext('2d');
+  document.addEventListener("DOMContentLoaded", function () {
+    var isDark = document.documentElement.classList.contains("dark")
+      || document.body.classList.contains("dark");
 
-    // Use actual attendance data from the backend
-    const dates = [
-      {% for data in attendance_data %}
-        "{{ data.date.strftime('%m/%d') }}"{% if not loop.last %},{% endif %}
-      {% endfor %}
-    ];
+    // Theme-aware palette for the charts
+    var palette = isDark
+      ? {
+          green: "#6fbfa7",
+          red: "#e0907a",
+          brass: "#d9b273",
+          slate: "#8fa2a8",
+          ink: "#eef2ef",
+          copy: "#b8c1bd",
+          muted: "#8f9a96",
+          line: "#33403e",
+          surface: "#1a201f",
+          tooltipBg: "#1a201f",
+          tooltipTitle: "#eef2ef",
+          tooltipBody: "#b8c1bd",
+          tooltipBorder: "#33403e",
+          gridLine: "rgba(111, 191, 167, 0.10)"
+        }
+      : {
+          green: "#1f6259",
+          red: "#9a5148",
+          brass: "#8a632e",
+          slate: "#5d7076",
+          ink: "#1a2226",
+          copy: "#4a5459",
+          muted: "#7a8589",
+          line: "#d7dfdb",
+          surface: "#ffffff",
+          tooltipBg: "#ffffff",
+          tooltipTitle: "#1a2226",
+          tooltipBody: "#4a5459",
+          tooltipBorder: "#d7dfdb",
+          gridLine: "rgba(31, 98, 89, 0.08)"
+        };
 
-    const attendanceRates = [
-      {% for data in attendance_data %}
-        {% set total = data.present + data.absent + data.late + data.excused %}
-        {% if total > 0 %}
-          {{ (data.present / total * 100) | round }}{% if not loop.last %},{% endif %}
-        {% else %}
-          0{% if not loop.last %},{% endif %}
-        {% endif %}
-      {% endfor %}
-    ];
+    /* ---------- Attendance trend ---------- */
+    var trendCanvas = document.getElementById("attendanceTrendChart");
+    if (trendCanvas && window.Chart) {
+      var dates = [
+        {% for data in attendance_data %}
+          "{{ data.date.strftime('%m/%d') }}"{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ];
 
-    new Chart(trendCtx, {
-      type: 'line',
-      data: {
-        labels: dates,
-        datasets: [
-          {
-            label: 'Attendance Rate',
+      var attendanceRates = [
+        {% for data in attendance_data %}
+          {% set total = data.present + data.absent + data.late + data.excused %}
+          {% if total > 0 %}
+            {{ (data.present / total * 100) | round }}{% if not loop.last %},{% endif %}
+          {% else %}
+            0{% if not loop.last %},{% endif %}
+          {% endif %}
+        {% endfor %}
+      ];
+
+      new Chart(trendCanvas.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: dates,
+          datasets: [{
+            label: "Attendance Rate",
             data: attendanceRates,
-            borderColor: '#4F46E5',
-            backgroundColor: 'rgba(79, 70, 229, 0.1)',
-            borderWidth: 3,
-            tension: 0.4,
+            borderColor: palette.green,
+            backgroundColor: isDark
+              ? "rgba(111, 191, 167, 0.10)"
+              : "rgba(31, 98, 89, 0.08)",
+            borderWidth: 2,
+            tension: 0.35,
             fill: true,
-            pointBackgroundColor: '#4F46E5',
-            pointBorderColor: '#ffffff',
+            pointBackgroundColor: palette.green,
+            pointBorderColor: palette.surface,
             pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            mode: 'index',
-            intersect: false,
-            callbacks: {
-              label: function(context) {
-                return `Attendance: ${context.parsed.y}%`;
+            pointRadius: 3,
+            pointHoverRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: "index",
+              intersect: false,
+              backgroundColor: palette.tooltipBg,
+              titleColor: palette.tooltipTitle,
+              bodyColor: palette.tooltipBody,
+              borderColor: palette.tooltipBorder,
+              borderWidth: 1,
+              padding: 10,
+              displayColors: false,
+              callbacks: {
+                label: function (ctx) {
+                  return "Attendance: " + ctx.parsed.y + "%";
+                }
               }
             }
-          }
-        },
-        scales: {
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              maxTicksLimit: 8
-            }
           },
-          y: {
-            min: 0,
-            max: 100,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                maxTicksLimit: 8,
+                color: palette.muted,
+                font: { size: 10 }
+              }
             },
-            ticks: {
-              callback: function(value) {
-                return value + '%';
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: palette.gridLine },
+              ticks: {
+                color: palette.muted,
+                font: { size: 10 },
+                callback: function (v) { return v + "%"; }
               }
             }
           }
         }
-      }
-    });
+      });
+    }
 
-    // Initialize status distribution chart with actual data
-    const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
-
-    new Chart(statusCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Present', 'Absent', 'Late', 'Excused'],
-        datasets: [{
-          data: [{{ total_present }}, {{ total_absent }}, {{ total_late }}, {{ total_excused }}],
-          backgroundColor: [
-            '#10b981',
-            '#ef4444',
-            '#f59e0b',
-            '#8b5cf6'
-          ],
-          borderWidth: 2,
-          borderColor: '#ffffff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 20,
-              usePointStyle: true
+    /* ---------- Status distribution doughnut ---------- */
+    var statusCanvas = document.getElementById("statusDistributionChart");
+    if (statusCanvas && window.Chart) {
+      new Chart(statusCanvas.getContext("2d"), {
+        type: "doughnut",
+        data: {
+          labels: ["Present", "Absent", "Late", "Excused"],
+          datasets: [{
+            data: [{{ total_present }}, {{ total_absent }}, {{ total_late }}, {{ total_excused }}],
+            backgroundColor: [
+              palette.green,
+              palette.red,
+              palette.brass,
+              palette.slate
+            ],
+            borderWidth: 2,
+            borderColor: palette.surface
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "68%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                padding: 14,
+                boxWidth: 10,
+                boxHeight: 10,
+                color: palette.copy,
+                font: { size: 11, family: "inherit" }
+              }
+            },
+            tooltip: {
+              backgroundColor: palette.tooltipBg,
+              titleColor: palette.tooltipTitle,
+              bodyColor: palette.tooltipBody,
+              borderColor: palette.tooltipBorder,
+              borderWidth: 1,
+              padding: 10,
+              displayColors: false
             }
           }
-        },
-        cutout: '70%'
-      }
-    });
-
-    // Animate progress bars on load
-    const progressBars = document.querySelectorAll('.transition-all');
-    progressBars.forEach(bar => {
-      const width = bar.style.width;
-      bar.style.width = '0%';
-      setTimeout(() => {
-        bar.style.width = width;
-      }, 500);
-    });
+        }
+      });
+    }
   });
 </script>
 {% endblock %}

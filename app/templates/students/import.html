@@ -3,16 +3,118 @@
 endblock %} {% block page_title %}Import Students{% endblock %} {% block
 page_description %}Bulk import student data from CSV files{% endblock %} {%
 block content %}
-<div class="min-h-screen">
-  <!-- Header Section -->
-  <div class="glass-strong border-b border-white/20">
-    <div class="max-w-4xl mx-auto px-6 py-8">
-      <div class="flex items-center space-x-6">
-        <div
-          class="w-20 h-20 bg-gradient-to-br from-green-600/20 to-emerald-700/20 rounded-3xl flex items-center justify-center shadow-xl backdrop-blur-xl border border-white/10"
-        >
+
+<style>
+  .dossier {
+    --paper: #faf7ef;
+    --paper-line: #e6ddc6;
+    --paper-edge: #ddd3b6;
+    --stamp: var(--brass);
+  }
+
+  .dark .dossier {
+    --paper: var(--surface-elevated);
+    --paper-line: var(--border);
+    --paper-edge: var(--border);
+  }
+
+  .dossier-cover {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .dossier-cover-band {
+    background: var(--paper);
+    border-bottom: 3px double var(--paper-edge);
+    padding: 1.75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .dossier-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--stamp);
+    margin-bottom: 0.35rem;
+    display: block;
+  }
+
+  .dossier-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .dossier-panel-head {
+    background: var(--paper);
+    border-bottom: 1px solid var(--paper-edge);
+    padding: 1.1rem 1.5rem;
+  }
+
+  .dossier-panel-body {
+    padding: 1.75rem 1.5rem;
+  }
+
+  /* ---------- Upload dropzone ---------- */
+  .upload-area {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .upload-area.has-file {
+    border-color: var(--success);
+  }
+
+  .upload-area.is-dragover {
+    border-color: var(--accent);
+    background: var(--accent-tint);
+  }
+
+  /* ---------- Checkbox rows ---------- */
+  .dossier input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ---------- Code sample ---------- */
+  .code-sample {
+    background: var(--side-bg);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+  }
+
+  .code-sample code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.8125rem;
+    color: var(--side-text);
+    white-space: pre;
+  }
+</style>
+
+<div class="min-h-screen dossier">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <!-- Cover -->
+    <div class="dossier-cover">
+      <div class="dossier-cover-band">
+        <div class="icon-tile icon-tile-success w-16 h-16">
           <svg
-            class="w-10 h-10 text-green-600"
+            class="w-8 h-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -26,44 +128,34 @@ block content %}
           </svg>
         </div>
         <div>
-          <h1
-            class="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-800 bg-clip-text text-transparent"
-          >
-            Import Students
-          </h1>
-          <p class="text-slate-600 dark:text-slate-300 mt-2 text-lg">
+          <span class="dossier-eyebrow">EduSync · Bulk Intake</span>
+          <h1 class="text-2xl font-semibold text-primary">Import Students</h1>
+          <p class="text-sm text-secondary mt-1">
             Bulk import student records using CSV files
           </p>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Main Content -->
-  <div class="max-w-4xl mx-auto px-6 py-8">
-    <div class="professional-card p-8">
-      <!-- Upload Section -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-          Upload CSV File
-        </h2>
-        <p class="text-slate-600 dark:text-slate-400 mb-6">
+    <!-- Upload Section -->
+    <div class="dossier-panel">
+      <div class="dossier-panel-head">
+        <h2 class="text-base font-semibold text-primary">Upload CSV File</h2>
+        <p class="text-xs text-muted mt-1">
           Select a CSV file containing student data. The file should follow the
           standard export format.
         </p>
+      </div>
 
+      <div class="dossier-panel-body">
         <form method="POST" enctype="multipart/form-data" class="space-y-6">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
           <!-- File Upload Area -->
-          <div
-            class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 text-center transition-all duration-300 hover:border-blue-500 dark:hover:border-blue-400"
-            id="uploadArea"
-          >
-            <div
-              class="w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-900 rounded-2xl flex items-center justify-center"
-            >
+          <div class="upload-area" id="uploadArea">
+            <div class="icon-tile icon-tile-accent w-14 h-14 mx-auto mb-4">
               <svg
-                class="w-8 h-8 text-blue-600 dark:text-blue-400"
+                class="w-7 h-7"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -76,14 +168,10 @@ block content %}
                 />
               </svg>
             </div>
-            <h3
-              class="text-lg font-semibold text-slate-900 dark:text-white mb-2"
-            >
+            <h3 class="text-base font-semibold text-primary mb-1">
               Drop your CSV file here
             </h3>
-            <p class="text-slate-600 dark:text-slate-400 mb-4">
-              or click to browse
-            </p>
+            <p class="text-sm text-secondary mb-4">or click to browse</p>
             <input
               type="file"
               name="csv_file"
@@ -95,54 +183,36 @@ block content %}
             <button
               type="button"
               onclick="document.getElementById('csv_file').click()"
-              class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors duration-200 font-medium"
+              class="btn btn-primary"
             >
               Choose File
             </button>
-            <p
-              class="text-sm text-slate-500 dark:text-slate-500 mt-4"
-              id="fileName"
-            >
+            <p class="text-xs text-muted mt-4" id="fileName">
               No file selected
             </p>
           </div>
 
           <!-- Import Options -->
-          <div class="glass rounded-2xl p-6">
-            <h3
-              class="text-lg font-semibold text-slate-900 dark:text-white mb-4"
-            >
+          <div>
+            <h3 class="text-sm font-semibold text-primary mb-3">
               Import Options
             </h3>
-            <div class="space-y-4">
-              <label class="flex items-center">
-                <input
-                  type="checkbox"
-                  name="update_existing"
-                  class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
-                />
-                <span class="ml-3 text-sm text-slate-700 dark:text-slate-300"
+            <div class="space-y-2">
+              <label class="tile-row flex items-center px-4 py-3">
+                <input type="checkbox" name="update_existing" />
+                <span class="ml-3 text-sm text-secondary"
                   >Update existing records</span
                 >
               </label>
-              <label class="flex items-center">
-                <input
-                  type="checkbox"
-                  name="skip_duplicates"
-                  class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
-                  checked
-                />
-                <span class="ml-3 text-sm text-slate-700 dark:text-slate-300"
+              <label class="tile-row flex items-center px-4 py-3">
+                <input type="checkbox" name="skip_duplicates" checked />
+                <span class="ml-3 text-sm text-secondary"
                   >Skip duplicate entries</span
                 >
               </label>
-              <label class="flex items-center">
-                <input
-                  type="checkbox"
-                  name="send_notifications"
-                  class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
-                />
-                <span class="ml-3 text-sm text-slate-700 dark:text-slate-300"
+              <label class="tile-row flex items-center px-4 py-3">
+                <input type="checkbox" name="send_notifications" />
+                <span class="ml-3 text-sm text-secondary"
                   >Send welcome notifications</span
                 >
               </label>
@@ -151,20 +221,15 @@ block content %}
 
           <!-- Submit Button -->
           <div
-            class="flex items-center justify-between pt-6 border-t border-white/10"
+            class="flex items-center justify-between pt-4 border-t"
+            style="border-color: var(--border-subtle)"
           >
-            <a
-              href="{{ url_for('students.index') }}"
-              class="px-6 py-3 glass hover:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl transition-colors duration-200 font-medium"
-            >
+            <a href="{{ url_for('students.index') }}" class="btn btn-secondary">
               Back to Students
             </a>
-            <button
-              type="submit"
-              class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg font-medium flex items-center"
-            >
+            <button type="submit" class="btn btn-primary">
               <svg
-                class="w-5 h-5 mr-2"
+                class="w-4 h-4 mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -181,22 +246,26 @@ block content %}
           </div>
         </form>
       </div>
+    </div>
 
-      <!-- CSV Format Guide -->
-      <div class="glass rounded-2xl p-6">
-        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">
+    <!-- CSV Format Guide -->
+    <div class="dossier-panel">
+      <div class="dossier-panel-head">
+        <h2 class="text-base font-semibold text-primary">
           CSV Format Requirements
-        </h3>
+        </h2>
+      </div>
 
+      <div class="dossier-panel-body">
         <div class="grid md:grid-cols-2 gap-6 mb-6">
           <div>
-            <h4 class="font-semibold text-slate-900 dark:text-white mb-3">
+            <h4 class="text-sm font-semibold text-primary mb-3">
               Required Fields
             </h4>
-            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+            <ul class="space-y-2 text-sm text-secondary">
               <li class="flex items-center">
                 <svg
-                  class="w-4 h-4 text-green-500 mr-2"
+                  class="w-4 h-4 text-success mr-2 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -212,7 +281,7 @@ block content %}
               </li>
               <li class="flex items-center">
                 <svg
-                  class="w-4 h-4 text-green-500 mr-2"
+                  class="w-4 h-4 text-success mr-2 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -228,7 +297,7 @@ block content %}
               </li>
               <li class="flex items-center">
                 <svg
-                  class="w-4 h-4 text-green-500 mr-2"
+                  class="w-4 h-4 text-success mr-2 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -246,13 +315,13 @@ block content %}
           </div>
 
           <div>
-            <h4 class="font-semibold text-slate-900 dark:text-white mb-3">
+            <h4 class="text-sm font-semibold text-primary mb-3">
               Optional Fields
             </h4>
-            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+            <ul class="space-y-2 text-sm text-secondary">
               <li class="flex items-center">
                 <svg
-                  class="w-4 h-4 text-blue-500 mr-2"
+                  class="w-4 h-4 text-info mr-2 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -268,7 +337,7 @@ block content %}
               </li>
               <li class="flex items-center">
                 <svg
-                  class="w-4 h-4 text-blue-500 mr-2"
+                  class="w-4 h-4 text-info mr-2 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -284,7 +353,7 @@ block content %}
               </li>
               <li class="flex items-center">
                 <svg
-                  class="w-4 h-4 text-blue-500 mr-2"
+                  class="w-4 h-4 text-info mr-2 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -303,10 +372,8 @@ block content %}
         </div>
 
         <!-- Sample CSV Preview -->
-        <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto">
-          <pre
-            class="text-sm text-slate-200"
-          ><code>first_name,surname,gender,date_of_birth,guardian_name,guardian_contact,email,phone
+        <div class="code-sample">
+          <pre><code>first_name,surname,gender,date_of_birth,guardian_name,guardian_contact,email,phone
 kwame,boateng,Male,2008-05-15,Jane boateng,+1234567890,kwame.boateng@email.com,+1234567891
 Jane Appiah,Female,2009-03-22,Robert Appiah,+1234567892,jane.appiah@email.com,+1234567893</code></pre>
         </div>
@@ -315,10 +382,10 @@ Jane Appiah,Female,2009-03-22,Robert Appiah,+1234567892,jane.appiah@email.com,+1
         <div class="mt-6 flex justify-center">
           <a
             href="{{ url_for('students.download_template') }}"
-            class="inline-flex items-center px-6 py-3 glass hover:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl transition-colors duration-200 font-medium"
+            class="btn btn-secondary"
           >
             <svg
-              class="w-5 h-5 mr-2"
+              class="w-4 h-4 mr-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -348,55 +415,32 @@ Jane Appiah,Female,2009-03-22,Robert Appiah,+1234567892,jane.appiah@email.com,+1
     fileInput.addEventListener("change", function (e) {
       if (this.files.length > 0) {
         fileName.textContent = this.files[0].name;
-        uploadArea.classList.add("border-green-500", "dark:border-green-400");
-        uploadArea.classList.remove(
-          "border-slate-300",
-          "dark:border-slate-600"
-        );
+        uploadArea.classList.add("has-file");
       } else {
         fileName.textContent = "No file selected";
-        uploadArea.classList.remove(
-          "border-green-500",
-          "dark:border-green-400"
-        );
-        uploadArea.classList.add("border-slate-300", "dark:border-slate-600");
+        uploadArea.classList.remove("has-file");
       }
     });
 
     // Drag and drop functionality
     uploadArea.addEventListener("dragover", function (e) {
       e.preventDefault();
-      this.classList.add(
-        "border-blue-500",
-        "dark:border-blue-400",
-        "bg-blue-50",
-        "dark:bg-blue-900/20"
-      );
+      this.classList.add("is-dragover");
     });
 
     uploadArea.addEventListener("dragleave", function (e) {
       e.preventDefault();
-      this.classList.remove(
-        "border-blue-500",
-        "dark:border-blue-400",
-        "bg-blue-50",
-        "dark:bg-blue-900/20"
-      );
+      this.classList.remove("is-dragover");
     });
 
     uploadArea.addEventListener("drop", function (e) {
       e.preventDefault();
-      this.classList.remove(
-        "border-blue-500",
-        "dark:border-blue-400",
-        "bg-blue-50",
-        "dark:bg-blue-900/20"
-      );
+      this.classList.remove("is-dragover");
 
       if (e.dataTransfer.files.length > 0) {
         fileInput.files = e.dataTransfer.files;
         fileName.textContent = e.dataTransfer.files[0].name;
-        this.classList.add("border-green-500", "dark:border-green-400");
+        this.classList.add("has-file");
       }
     });
 

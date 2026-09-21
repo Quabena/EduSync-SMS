@@ -2,640 +2,1330 @@
 student.full_name }}{% endblock %} {% block page_title %}Student Performance{%
 endblock %} {% block page_description %}Detailed academic performance analysis
 for {{ student.full_name }}{% endblock %} {% block content %}
+
 <style>
-  /* Custom Performance Page Styles */
-  .performance-card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(14, 165, 233, 0.08);
-    border-radius: 1.5rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: slideInFromTop 0.6s ease-out forwards;
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+  /* ==========================================================
+     Student Performance — Dashboard design language.
+     Fraunces (display), Inter (body), JetBrains Mono (labels).
+     ========================================================== */
+  .student-perf-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  .performance-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 60px rgba(14, 165, 233, 0.15);
-    border-color: rgba(14, 165, 233, 0.2);
+  .dark .student-perf-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
   }
 
-  .dark .performance-card {
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(148, 163, 184, 0.08);
+  .student-perf-page *,
+  .student-perf-page *::before,
+  .student-perf-page *::after {
+    box-sizing: border-box;
+  }
+  .student-perf-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .student-perf-page .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 
-  .dark .performance-card:hover {
-    border-color: rgba(148, 163, 184, 0.2);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  /* ---------- Hero ---------- */
+  .page-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 26px 22px 30px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--violet);
+  }
+  .hero-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+  }
+  .hero-avatar {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: var(--violet-wash);
+    border: 1px solid var(--violet-edge);
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 0.03em;
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .page-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.8vw, 28px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .hero-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--copy);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .hero-stamp.violet {
+    border-color: var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+  }
+  .hero-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
   }
 
-  .subject-header {
-    background: linear-gradient(
-      135deg,
-      rgba(14, 165, 233, 0.1) 0%,
-      rgba(3, 105, 161, 0.05) 100%
-    );
-    border-radius: 1rem 1rem 0 0;
-    padding: 1.5rem;
-    border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    border-color: var(--ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .btn.primary {
+    color: #131817;
+  }
+  .btn.primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .btn.primary:hover {
+    color: #131817;
   }
 
-  .trend-indicator {
-    width: 10px;
-    height: 10px;
+  /* Details-based dropdown for reports */
+  .dropdown {
+    position: relative;
+  }
+  .dropdown > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .dropdown > summary::-webkit-details-marker,
+  .dropdown > summary::marker {
+    display: none;
+    content: "";
+  }
+  .dropdown-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 200px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: 0 12px 30px rgba(28, 47, 45, 0.12);
+    overflow: hidden;
+    z-index: 30;
+    padding: 4px;
+  }
+  .dropdown-panel a {
+    display: block;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 3px;
+    color: var(--copy);
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .dropdown-panel a:hover {
+    background: var(--surface-alt);
+    color: var(--ink);
+  }
+  .dropdown-panel a:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: -2px;
+  }
+
+  /* ---------- Layout grid ---------- */
+  .perf-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.95fr) minmax(0, 2.05fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card:last-child {
+    margin-bottom: 0;
+  }
+  .card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ---------- Overall panel ---------- */
+  .overall-panel {
+    padding: 22px;
+  }
+  .overall-big {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .overall-big .num {
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .overall-big .pct {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .overall-tier {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid;
+    margin-bottom: 20px;
+  }
+  .overall-tier.is-excellent {
+    background: var(--green-wash);
+    color: var(--green);
+    border-color: var(--green-edge);
+  }
+  .overall-tier.is-good {
+    background: var(--violet-wash);
+    color: var(--violet);
+    border-color: var(--violet-edge);
+  }
+  .overall-tier.is-average {
+    background: var(--brass-wash);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+  .overall-tier.is-low {
+    background: var(--red-wash);
+    color: var(--red);
+    border-color: var(--red-edge);
+  }
+
+  .score-track {
+    height: 8px;
+    background: var(--surface-alt);
+    border-radius: 1px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .score-fill {
+    height: 100%;
+    border-radius: 1px;
+    background: var(--green);
+  }
+  .score-fill.is-low {
+    background: var(--red);
+  }
+  .score-fill.is-average {
+    background: var(--brass);
+  }
+  .score-fill.is-good {
+    background: var(--violet);
+  }
+
+  .score-scale {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* Stats list under the overall score */
+  .panel-stats {
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line-soft);
+  }
+  .panel-stats li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .panel-stats li:last-child {
+    border-bottom: 0;
+  }
+  .panel-stats dt {
+    font-size: 12.5px;
+    color: var(--copy);
+  }
+  .panel-stats dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Subject panel ---------- */
+  .subject-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .subject-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .subject-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 22px;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .subject-id {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .subject-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: var(--violet-wash);
+    border: 1px solid var(--violet-edge);
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .subject-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .subject-name {
+    margin: 0 0 4px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .trend-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .trend-dot {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    margin-right: 8px;
-    display: inline-block;
+    background: var(--muted);
+  }
+  .trend-dot.is-improving {
+    background: var(--green);
+  }
+  .trend-dot.is-declining {
+    background: var(--red);
+  }
+  .trend-dot.is-stable {
+    background: var(--brass);
   }
 
-  .trend-improving {
-    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  .subject-stats {
+    display: flex;
+    gap: 26px;
+    flex-shrink: 0;
+  }
+  .subject-stat {
+    text-align: right;
+  }
+  .subject-stat .val {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .subject-stat .lbl {
+    display: block;
+    margin-top: 5px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
 
-  .trend-declining {
-    background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
-    box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+  /* ---------- Term bars ---------- */
+  .term-bars {
+    padding: 20px 22px 8px;
+  }
+  .term-bar-row {
+    display: grid;
+    grid-template-columns: 76px 1fr 56px;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+  }
+  .term-bar-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--copy);
+  }
+  .term-bar-track {
+    height: 8px;
+    background: var(--surface-alt);
+    border-radius: 1px;
+    overflow: hidden;
+    position: relative;
+  }
+  .term-bar-fill {
+    height: 100%;
+    border-radius: 1px;
+    background: var(--green);
+  }
+  .term-bar-fill.is-mid {
+    background: var(--brass);
+  }
+  .term-bar-fill.is-low {
+    background: var(--red);
+  }
+  .term-bar-value {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
 
-  .trend-stable {
-    background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  /* ---------- Term tabs ---------- */
+  .term-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px 22px 0;
+    border-top: 1px solid var(--line-soft);
+    margin-top: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .term-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .term-tab {
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+    margin-bottom: -1px;
+  }
+  .term-tab:hover {
+    color: var(--ink);
+  }
+  .term-tab.is-active {
+    color: var(--ink);
+    background: var(--surface);
+    border-color: var(--line);
+  }
+  .term-tab:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
   }
 
+  /* ---------- Detail table ---------- */
+  .detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+  }
+  .detail-table th {
+    padding: 12px 22px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--surface);
+  }
+  .detail-table th.num {
+    text-align: right;
+  }
+  .detail-table th.center {
+    text-align: center;
+  }
+  .detail-table td {
+    padding: 12px 22px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .detail-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .detail-table tbody tr:hover td {
+    background: var(--surface-alt);
+  }
+  .detail-table .component {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--copy);
+  }
+  .detail-table .total-row .component {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .detail-table .num {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .detail-table .total-row .num {
+    font-weight: 700;
+  }
+  .detail-table .center {
+    text-align: center;
+  }
+
+  /* Grade badge */
   .grade-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .grade-1 {
-    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
-    color: white;
-  }
-
-  .grade-2 {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
-    color: white;
-  }
-
-  .grade-3 {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-  }
-
-  .grade-4 {
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-    color: white;
-  }
-
-  .grade-5 {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-  }
-
-  .performance-bar {
-    height: 8px;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
     border-radius: 4px;
-    background: rgba(148, 163, 184, 0.2);
-    overflow: hidden;
-    position: relative;
-  }
-
-  .performance-fill {
-    height: 100%;
-    border-radius: 4px;
-    background: linear-gradient(90deg, #0ea5e9 0%, #7dd3fc 100%);
-    transition: width 1s ease-in-out;
-  }
-
-  .term-tabs {
-    display: flex;
-    border-radius: 12px;
-    padding: 4px;
-    background: rgba(148, 163, 184, 0.1);
-    margin-bottom: 1.5rem;
-  }
-
-  .term-tab {
-    flex: 1;
-    text-align: center;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .term-tab.active {
-    background: rgba(14, 165, 233, 0.2);
-    color: #0ea5e9;
-    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
-  }
-
-  .chart-container {
-    height: 200px;
-    position: relative;
-  }
-
-  .chart-bar {
-    position: absolute;
-    bottom: 0;
-    width: 20%;
-    border-radius: 8px 8px 0 0;
-    background: linear-gradient(to top, #0ea5e9, #7dd3fc);
-    transition: all 0.5s ease;
-    animation: growBar 1s ease-out forwards;
-    transform-origin: bottom;
-  }
-
-  @keyframes growBar {
-    from {
-      transform: scaleY(0);
-      opacity: 0;
-    }
-    to {
-      transform: scaleY(1);
-      opacity: 1;
-    }
-  }
-
-  .chart-bar:hover {
-    filter: brightness(1.2);
-    transform: scaleY(1.05);
-  }
-
-  .chart-label {
-    position: absolute;
-    bottom: -25px;
-    width: 100%;
-    text-align: center;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .overall-score {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    color: white;
-    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
-  }
-
-  .overall-score .score {
-    font-size: 3rem;
+    font-family: var(--font-mono);
+    font-size: 12px;
     font-weight: 700;
-    line-height: 1;
+    letter-spacing: 0.02em;
+    border: 1px solid;
+  }
+  .grade-badge.is-1 {
+    background: var(--green-wash);
+    color: var(--green);
+    border-color: var(--green-edge);
+  }
+  .grade-badge.is-2 {
+    background: var(--violet-wash);
+    color: var(--violet);
+    border-color: var(--violet-edge);
+  }
+  .grade-badge.is-3 {
+    background: var(--brass-wash);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+  .grade-badge.is-4 {
+    background: var(--slate-wash);
+    color: var(--slate);
+    border-color: var(--slate-edge);
+  }
+  .grade-badge.is-5 {
+    background: var(--red-wash);
+    color: var(--red);
+    border-color: var(--red-edge);
   }
 
-  .action-btn {
-    background: rgba(14, 165, 233, 0.1);
-    border: 1px solid rgba(14, 165, 233, 0.2);
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    color: #0ea5e9;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+  /* Empty state */
+  .panel-empty {
+    padding: 48px 24px;
+    text-align: center;
+  }
+  .panel-empty svg {
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .panel-empty h3 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .panel-empty p {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
   }
 
-  .action-btn:hover {
-    background: rgba(14, 165, 233, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(14, 165, 233, 0.15);
+  /* Screen-reader helper */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1000px) {
+    .perf-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 700px) {
+    .student-perf-page {
+      padding: 20px 14px 40px;
+    }
+    .page-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .hero-actions {
+      width: 100%;
+    }
+    .hero-actions .btn,
+    .hero-actions .dropdown {
+      flex: 1;
+    }
+    .hero-actions .btn {
+      justify-content: center;
+      width: 100%;
+    }
+    .hero-actions .dropdown > summary {
+      width: 100%;
+    }
+    .hero-avatar {
+      width: 52px;
+      height: 52px;
+      font-size: 18px;
+    }
+    .card-head {
+      padding: 14px 16px 12px;
+    }
+    .overall-panel {
+      padding: 18px;
+    }
+    .overall-big .num {
+      font-size: 36px;
+    }
+    .subject-head {
+      padding: 16px;
+      gap: 14px;
+    }
+    .term-bars {
+      padding: 16px 16px 4px;
+    }
+    .term-bar-row {
+      grid-template-columns: 66px 1fr 48px;
+      gap: 10px;
+    }
+    .term-tabs {
+      padding: 6px 16px 0;
+    }
+    .detail-table th,
+    .detail-table td {
+      padding: 10px 16px;
+    }
+    .subject-stats {
+      gap: 18px;
+    }
+    .subject-stat .val {
+      font-size: 18px;
+    }
   }
 </style>
 
-<div class="space-y-6">
-  <!-- Student Header Card -->
-  <div class="performance-card p-6 mb-20">
-    <div
-      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
-    >
-      <div class="flex items-center gap-4">
-        <div
-          class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-xl"
-        >
-          {{ student.full_name.split(' ')[0][0] }}{{ student.full_name.split('
-          ')[-1][0] if student.full_name.split(' ')|length > 1 else '' }}
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold text-slate-800 dark:text-white">
-            {{ student.full_name }}
-          </h1>
-          <div class="flex items-center gap-2 mt-1">
-            {% if student.classroom %}
-            <span class="text-sm text-slate-600 dark:text-slate-300"
-              >{{ student.classroom.name }}</span
-            >
-            {% endif %}
-            <span class="text-sm text-slate-500 dark:text-slate-400">•</span>
-            <span class="text-sm text-slate-600 dark:text-slate-300"
-              >{{ performance_data|length }} Subjects</span
-            >
-          </div>
+{# ---------- Derived values ---------- #} {% set total_subjects =
+performance_data|length %} {% set overall = namespace(sum=0, count=0) %} {% for
+subject_id, data in performance_data.items() %} {% set overall.sum = overall.sum
++ data.average %} {% set overall.count = overall.count + 1 %} {% endfor %} {%
+set overall_average = (overall.sum / overall.count) if overall.count > 0 else 0
+%} {# ---------- Grade badge class helper: 1=90+, 2=80+, 3=70+, 4=60+, 5=<60
+---------- #} {% macro grade_badge(score) %} {%- if score >= 90 -%}<span
+  class="grade-badge is-1"
+  >1</span
+>
+{%- elif score >= 80 -%}<span class="grade-badge is-2">2</span> {%- elif score
+>= 70 -%}<span class="grade-badge is-3">3</span> {%- elif score >= 60 -%}<span
+  class="grade-badge is-4"
+  >4</span
+>
+{%- else -%}<span class="grade-badge is-5">5</span>
+{%- endif -%} {% endmacro %}
+
+<div class="student-perf-page">
+  <!-- Hero -->
+  <header class="page-hero">
+    <div class="hero-main">
+      <span class="hero-avatar" aria-hidden="true">
+        {{ student.full_name.split(' ')[0][0] }}{{ student.full_name.split('
+        ')[-1][0] if student.full_name.split(' ')|length > 1 else '' }}
+      </span>
+      <div class="hero-copy">
+        <p class="dash-kicker">Academic records · Student performance</p>
+        <h1>{{ student.full_name }}</h1>
+        <div class="hero-meta">
+          {% if student.classroom %}
+          <span class="hero-stamp violet">{{ student.classroom.name }}</span>
+          {% endif %}
+          <span class="hero-stamp"
+            >{{ total_subjects }} subject{% if total_subjects != 1 %}s{% endif
+            %}</span
+          >
+          <span class="hero-stamp">Academic year {{ year }}</span>
         </div>
       </div>
-
-      <div class="flex gap-3">
-        <div class="relative" x-data="{ open: false }">
-          <button @click="open = !open" class="action-btn">
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            Reports
-          </button>
-
-          <div
-            x-show="open"
-            @click.away="open = false"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-75"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
-            class="absolute right-0 mt-2 w-48 glass-strong rounded-xl shadow-xl border border-white/20 overflow-hidden z-10"
-          >
-            <div class="p-2">
-              <a
-                href="{{ url_for('exams_grading.student_remarks', student_id=student.id, term='Term 1', year=year) }}"
-                class="flex items-center px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-blue-500/20 rounded-lg transition-all duration-200"
-              >
-                Term 1 Report
-              </a>
-              <a
-                href="{{ url_for('exams_grading.student_remarks', student_id=student.id, term='Term 2', year=year) }}"
-                class="flex items-center px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-blue-500/20 rounded-lg transition-all duration-200"
-              >
-                Term 2 Report
-              </a>
-              <a
-                href="{{ url_for('exams_grading.student_remarks', student_id=student.id, term='Term 3', year=year) }}"
-                class="flex items-center px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-blue-500/20 rounded-lg transition-all duration-200"
-              >
-                Term 3 Report
-              </a>
-            </div>
-          </div>
-        </div>
-        <a
-          href="{{ url_for('students.detail', student_id=student.id) }}"
-          class="action-btn"
-        >
+    </div>
+    <div class="hero-actions">
+      <details class="dropdown">
+        <summary class="btn" aria-label="Open term reports">
           <svg
-            class="w-5 h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             />
           </svg>
-          Back to Profile
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Performance Overview -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Overall Performance -->
-    <div class="performance-card p-6 lg:col-span-1">
-      <h2 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
-        Overall Performance
-      </h2>
-
-      <div class="space-y-4">
-        {% set overall_avg = namespace(total=0, count=0) %} {% for subject_id,
-        data in performance_data.items() %} {% set overall_avg.total =
-        overall_avg.total + data.average %} {% set overall_avg.count =
-        overall_avg.count + 1 %} {% endfor %} {% set overall_average =
-        (overall_avg.total / overall_avg.count) if overall_avg.count > 0 else 0
-        %}
-
-        <div class="overall-score text-center">
-          <div class="score">{{ "%.1f"|format(overall_average) }}</div>
-          <div class="text-blue-100 mt-2">Overall Average</div>
-        </div>
-
-        <div class="flex justify-between text-sm">
-          <span class="text-slate-600 dark:text-slate-400"
-            >Performance Level</span
+          Reports
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            style="width: 11px; height: 11px"
           >
-          <span class="font-medium text-slate-800 dark:text-white">
-            {% if overall_average >= 80 %} Excellent {% elif overall_average >=
-            70 %} Good {% elif overall_average >= 60 %} Average {% elif
-            overall_average >= 50 %} Below Average {% else %} Needs Improvement
-            {% endif %}
-          </span>
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </summary>
+        <div class="dropdown-panel" role="menu">
+          <a
+            role="menuitem"
+            href="{{ url_for('exams_grading.student_remarks', student_id=student.id, term='Term 1', year=year) }}"
+            >Term 1 report</a
+          >
+          <a
+            role="menuitem"
+            href="{{ url_for('exams_grading.student_remarks', student_id=student.id, term='Term 2', year=year) }}"
+            >Term 2 report</a
+          >
+          <a
+            role="menuitem"
+            href="{{ url_for('exams_grading.student_remarks', student_id=student.id, term='Term 3', year=year) }}"
+            >Term 3 report</a
+          >
         </div>
+      </details>
 
-        <div class="performance-bar mt-2">
-          <div
-            class="performance-fill"
-            style="width: {{ overall_average }}%;"
-          ></div>
-        </div>
-
-        <div
-          class="flex justify-between text-xs text-slate-500 dark:text-slate-400"
+      <a
+        href="{{ url_for('students.detail', student_id=student.id) }}"
+        class="btn"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
         >
-          <span>0</span>
-          <span>50</span>
-          <span>100</span>
-        </div>
-      </div>
+          <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to profile
+      </a>
     </div>
+  </header>
 
-    <!-- Subject Performance Cards -->
-    <div class="lg:col-span-2 space-y-6">
-      {% for subject_id, data in performance_data.items() %}
-      <div class="performance-card overflow-hidden">
-        <!-- Subject Header -->
-        <div class="subject-header">
+  <div class="perf-grid">
+    <!-- Overall column -->
+    <aside>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <p class="section-kicker">Overview</p>
+            <h2>Overall performance</h2>
+          </div>
+        </div>
+
+        <div class="overall-panel">
+          <div class="overall-big">
+            <span class="num">{{ "%.1f"|format(overall_average) }}</span>
+            <span class="pct">%</span>
+          </div>
+
+          {% if overall_average >= 80 %}
+          <span class="overall-tier is-excellent">Excellent</span>
+          {% elif overall_average >= 70 %}
+          <span class="overall-tier is-good">Good</span>
+          {% elif overall_average >= 60 %}
+          <span class="overall-tier is-average">Average</span>
+          {% elif overall_average >= 50 %}
+          <span class="overall-tier is-average">Below average</span>
+          {% else %}
+          <span class="overall-tier is-low">Needs improvement</span>
+          {% endif %}
+
           <div
-            class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+            class="score-track"
+            role="img"
+            aria-label="Overall average {{ overall_average|round(1) }} percent"
           >
-            <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center"
-              >
+            {% set tier_class = 'is-excellent' if overall_average >= 80 else
+            ('is-good' if overall_average >= 70 else ('is-average' if
+            overall_average >= 60 else ('is-average' if overall_average >= 50
+            else 'is-low'))) %} {% set fill_class = 'is-low' if overall_average
+            < 60 else ('is-average' if overall_average < 70 else ('is-good' if
+            overall_average < 80 else '')) %}
+            <div
+              class="score-fill {{ fill_class }}"
+              style="width: {{ overall_average }}%"
+            ></div>
+          </div>
+          <div class="score-scale">
+            <span>0</span>
+            <span>50</span>
+            <span>100</span>
+          </div>
+
+          <dl class="panel-stats">
+            <li>
+              <dt>Subjects tracked</dt>
+              <dd>{{ total_subjects }}</dd>
+            </li>
+            <li>
+              <dt>Terms recorded</dt>
+              <dd>
+                {% set term_set = namespace(list=[]) %} {% for subject_id, data
+                in performance_data.items() %} {% for term in data.scores.keys()
+                %} {% if term not in term_set.list %} {% set _ =
+                term_set.list.append(term) %} {% endif %} {% endfor %} {% endfor
+                %} {{ term_set.list|length }}
+              </dd>
+            </li>
+          </dl>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Subject panels -->
+    <main>
+      {% if performance_data %}
+      <div class="subject-list">
+        {% for subject_id, data in performance_data.items() %} {% set best_term
+        = namespace(name='', value=0) %} {% for term, score_data in
+        data.scores.items() %} {% if score_data.total_score > best_term.value %}
+        {% set best_term.name = term %} {% set best_term.value =
+        score_data.total_score %} {% endif %} {% endfor %}
+
+        <article class="subject-card">
+          <header class="subject-head">
+            <div class="subject-id">
+              <span class="subject-icon" aria-hidden="true">
                 <svg
-                  class="w-5 h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                   />
                 </svg>
-              </div>
+              </span>
               <div>
-                <h3 class="text-xl font-bold text-slate-800 dark:text-white">
-                  {{ data.subject.name }}
-                </h3>
-                <div class="flex items-center mt-1">
+                <h3 class="subject-name">{{ data.subject.name }}</h3>
+                <span class="trend-line">
                   <span
-                    class="trend-indicator {% if data.trend == 'improving' %}trend-improving{% elif data.trend == 'declining' %}trend-declining{% else %}trend-stable{% endif %}"
+                    class="trend-dot {% if data.trend == 'improving' %}is-improving{% elif data.trend == 'declining' %}is-declining{% else %}is-stable{% endif %}"
+                    aria-hidden="true"
                   ></span>
-                  <span
-                    class="text-sm text-slate-600 dark:text-slate-400 capitalize"
-                    >{{ data.trend }} performance</span
-                  >
-                </div>
+                  {{ data.trend }} trend
+                </span>
               </div>
             </div>
 
-            <div class="flex items-center gap-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-slate-800 dark:text-white">
-                  {{ "%.1f"|format(data.average) }}
-                </div>
-                <div class="text-xs text-slate-600 dark:text-slate-400">
-                  Average
-                </div>
+            <div class="subject-stats">
+              <div class="subject-stat">
+                <span class="val tabular"
+                  >{{ "%.1f"|format(data.average) }}</span
+                >
+                <span class="lbl">Average</span>
               </div>
-
-              {% set best_term_score = namespace(value=0) %} {% for term,
-              score_data in data.scores.items() %} {% if score_data.total_score
-              > best_term_score.value %} {% set best_term_score.value =
-              score_data.total_score %} {% endif %} {% endfor %}
-
-              <div class="text-center">
-                <div class="text-2xl font-bold text-slate-800 dark:text-white">
-                  {{ "%.1f"|format(best_term_score.value) }}
-                </div>
-                <div class="text-xs text-slate-600 dark:text-slate-400">
-                  Best Term
-                </div>
+              <div class="subject-stat">
+                <span class="val tabular"
+                  >{{ "%.1f"|format(best_term.value) }}</span
+                >
+                <span class="lbl">Best term</span>
               </div>
             </div>
-          </div>
-        </div>
+          </header>
 
-        <!-- Performance Chart -->
-        <div class="p-6">
-          <h4
-            class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-4"
-          >
-            Performance Trend
-          </h4>
-
-          <div class="chart-container">
-            {% for term, score_data in data.scores.items() %}
-            <div
-              class="chart-bar"
-              style="height: {{ (score_data.total_score / 100 * 180) | round }}px; 
-                                        left: {{ (loop.index0 * 25) + 10 }}%;"
-              data-score="{{ score_data.total_score }}"
-            >
-              <div class="chart-label">{{ term.split(' ')[0] }}</div>
+          <!-- Term bars -->
+          <div class="term-bars">
+            {% for term, score_data in data.scores.items() %} {% set score =
+            score_data.total_score|default(0) %} {% set fill_class = 'is-low' if
+            score < 60 else ('is-mid' if score < 75 else '') %}
+            <div class="term-bar-row">
+              <span class="term-bar-label">{{ term }}</span>
+              <div
+                class="term-bar-track"
+                role="img"
+                aria-label="{{ term }} score {{ score|round(1) }} out of 100"
+              >
+                <div
+                  class="term-bar-fill {{ fill_class }}"
+                  style="width: {{ score }}%"
+                ></div>
+              </div>
+              <span class="term-bar-value tabular"
+                >{{ "%.1f"|format(score) }}</span
+              >
             </div>
             {% endfor %}
           </div>
 
-          <!-- Term Tabs -->
-          <div class="term-tabs">
-            {% for term, score_data in data.scores.items() %}
-            <div
-              class="term-tab {% if loop.first %}active{% endif %}"
+          <!-- Term tabs -->
+          {% if data.scores|length > 1 %}
+          <div class="term-tabs" role="tablist" aria-label="Select term">
+            {% for term in data.scores.keys() %}
+            <button
+              type="button"
+              class="term-tab {% if loop.first %}is-active{% endif %}"
               data-term="{{ term }}"
+              role="tab"
+              aria-selected="{{ 'true' if loop.first else 'false' }}"
             >
               {{ term }}
-            </div>
+            </button>
             {% endfor %}
           </div>
+          {% endif %}
 
-          <!-- Detailed Scores Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead>
-                <tr class="border-b border-slate-200 dark:border-slate-700">
-                  <th
-                    class="pb-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-                  >
-                    Component
-                  </th>
-                  <th
-                    class="pb-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-                  >
-                    Score
-                  </th>
-                  <th
-                    class="pb-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-                  >
-                    Grade
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for term, score_data in data.scores.items() %}
-                <tr
-                  class="term-data {% if not loop.first %}hidden{% endif %}"
-                  data-term="{{ term }}"
-                >
-                  <td class="py-3 text-sm text-slate-700 dark:text-slate-300">
-                    Class Work
-                  </td>
-                  <td
-                    class="py-3 text-sm font-medium text-slate-800 dark:text-white"
-                  >
-                    {{ "%.1f"|format(score_data.class_total) }}
-                  </td>
-                  <td class="py-3">
-                    {% if score_data.class_total >= 90 %}
-                    <div class="grade-badge grade-1">1</div>
-                    {% elif score_data.class_total >= 80 %}
-                    <div class="grade-badge grade-2">2</div>
-                    {% elif score_data.class_total >= 70 %}
-                    <div class="grade-badge grade-3">3</div>
-                    {% elif score_data.class_total >= 60 %}
-                    <div class="grade-badge grade-4">4</div>
-                    {% else %}
-                    <div class="grade-badge grade-5">5</div>
-                    {% endif %}
-                  </td>
-                </tr>
-                <tr
-                  class="term-data {% if not loop.first %}hidden{% endif %}"
-                  data-term="{{ term }}"
-                >
-                  <td class="py-3 text-sm text-slate-700 dark:text-slate-300">
-                    Exam
-                  </td>
-                  <td
-                    class="py-3 text-sm font-medium text-slate-800 dark:text-white"
-                  >
-                    {{ "%.1f"|format(score_data.exam_score) }}
-                  </td>
-                  <td class="py-3">
-                    {% if score_data.exam_score >= 90 %}
-                    <div class="grade-badge grade-1">1</div>
-                    {% elif score_data.exam_score >= 80 %}
-                    <div class="grade-badge grade-2">2</div>
-                    {% elif score_data.exam_score >= 70 %}
-                    <div class="grade-badge grade-3">3</div>
-                    {% elif score_data.exam_score >= 60 %}
-                    <div class="grade-badge grade-4">4</div>
-                    {% else %}
-                    <div class="grade-badge grade-5">5</div>
-                    {% endif %}
-                  </td>
-                </tr>
-                <tr
-                  class="term-data {% if not loop.first %}hidden{% endif %} border-b border-slate-200 dark:border-slate-700"
-                  data-term="{{ term }}"
-                >
-                  <td
-                    class="py-3 text-sm font-medium text-slate-800 dark:text-white"
-                  >
-                    Total
-                  </td>
-                  <td
-                    class="py-3 text-sm font-bold text-slate-800 dark:text-white"
-                  >
-                    {{ "%.1f"|format(score_data.total_score) }}
-                  </td>
-                  <td class="py-3">
-                    {% if score_data.total_score >= 90 %}
-                    <div class="grade-badge grade-1">1</div>
-                    {% elif score_data.total_score >= 80 %}
-                    <div class="grade-badge grade-2">2</div>
-                    {% elif score_data.total_score >= 70 %}
-                    <div class="grade-badge grade-3">3</div>
-                    {% elif score_data.total_score >= 60 %}
-                    <div class="grade-badge grade-4">4</div>
-                    {% else %}
-                    <div class="grade-badge grade-5">5</div>
-                    {% endif %}
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+          <!-- Detail table -->
+          <table class="detail-table" data-subject="{{ subject_id }}">
+            <caption class="sr-only">
+              Component breakdown by term for {{ data.subject.name }}
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Component</th>
+                <th scope="col" class="num">Score</th>
+                <th scope="col" class="center">Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for term, score_data in data.scores.items() %}
+              <tr
+                class="term-row {% if not loop.first %}is-hidden{% endif %}"
+                data-term="{{ term }}"
+                {%
+                if
+                not
+                loop.first
+                %}hidden{%
+                endif
+                %}
+              >
+                <td class="component">Class work</td>
+                <td class="num tabular">
+                  {{ "%.1f"|format(score_data.class_total) }}
+                </td>
+                <td class="center">
+                  {{ grade_badge(score_data.class_total) }}
+                </td>
+              </tr>
+              <tr
+                class="term-row {% if not loop.first %}is-hidden{% endif %}"
+                data-term="{{ term }}"
+                {%
+                if
+                not
+                loop.first
+                %}hidden{%
+                endif
+                %}
+              >
+                <td class="component">Exam score</td>
+                <td class="num tabular">
+                  {{ "%.1f"|format(score_data.exam_score) }}
+                </td>
+                <td class="center">{{ grade_badge(score_data.exam_score) }}</td>
+              </tr>
+              <tr
+                class="term-row total-row {% if not loop.first %}is-hidden{% endif %}"
+                data-term="{{ term }}"
+                {%
+                if
+                not
+                loop.first
+                %}hidden{%
+                endif
+                %}
+              >
+                <td class="component">Total score</td>
+                <td class="num tabular">
+                  {{ "%.1f"|format(score_data.total_score) }}
+                </td>
+                <td class="center">
+                  {{ grade_badge(score_data.total_score) }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card">
+        <div class="panel-empty">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+          <h3>No performance data yet</h3>
+          <p>
+            Once scores are recorded for this student, subject panels will
+            appear here.
+          </p>
         </div>
       </div>
-      {% endfor %}
-    </div>
+      {% endif %}
+    </main>
   </div>
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Term tab functionality
-    const termTabs = document.querySelectorAll(".term-tab");
+  "use strict";
 
-    termTabs.forEach((tab) => {
-      tab.addEventListener("click", function () {
-        const term = this.getAttribute("data-term");
-        const parentCard = this.closest(".performance-card");
+  (function () {
+    // ---------- Term tabs ----------
+    // Delegated listener per subject card. Term tabs and rows share a
+    // subject scope so a click in one card never touches another.
+    document.querySelectorAll(".subject-card").forEach(function (card) {
+      const tabs = card.querySelectorAll(".term-tab");
+      const rows = card.querySelectorAll(".term-row");
+      if (!tabs.length) return;
 
-        // Update active tab
-        parentCard
-          .querySelectorAll(".term-tab")
-          .forEach((t) => t.classList.remove("active"));
-        this.classList.add("active");
+      function activate(term) {
+        tabs.forEach(function (t) {
+          const active = t.dataset.term === term;
+          t.classList.toggle("is-active", active);
+          t.setAttribute("aria-selected", active ? "true" : "false");
+        });
 
-        // Show corresponding term data
-        parentCard.querySelectorAll(".term-data").forEach((row) => {
-          if (row.getAttribute("data-term") === term) {
-            row.classList.remove("hidden");
-          } else {
-            row.classList.add("hidden");
+        rows.forEach(function (r) {
+          const match = r.dataset.term === term;
+          r.hidden = !match;
+          r.classList.toggle("is-hidden", !match);
+        });
+      }
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          activate(tab.dataset.term);
+        });
+      });
+
+      // Keyboard: left/right arrows move between tabs
+      tabs.forEach(function (tab, idx) {
+        tab.addEventListener("keydown", function (e) {
+          let next = null;
+          if (e.key === "ArrowRight") next = tabs[(idx + 1) % tabs.length];
+          else if (e.key === "ArrowLeft")
+            next = tabs[(idx - 1 + tabs.length) % tabs.length];
+          if (next) {
+            e.preventDefault();
+            next.focus();
+            activate(next.dataset.term);
           }
         });
       });
     });
 
-    // Animate chart bars on scroll into view
-    const observerOptions = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.1,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const chartBars = entry.target.querySelectorAll(".chart-bar");
-          chartBars.forEach((bar) => {
-            const score = bar.getAttribute("data-score");
-            bar.style.height = `${(score / 100) * 180}px`;
-          });
-        }
+    // ---------- Close reports dropdown on outside click ----------
+    document.addEventListener("click", function (e) {
+      document.querySelectorAll("details.dropdown[open]").forEach(function (d) {
+        if (!d.contains(e.target)) d.removeAttribute("open");
       });
-    }, observerOptions);
-
-    document.querySelectorAll(".performance-card").forEach((card) => {
-      observer.observe(card);
     });
-  });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        document
+          .querySelectorAll("details.dropdown[open]")
+          .forEach(function (d) {
+            d.removeAttribute("open");
+          });
+      }
+    });
+  })();
 </script>
+
 {% endblock %}

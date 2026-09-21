@@ -7,22 +7,20 @@ page_description %}Comprehensive overview of school management system{% endblock
   <div class="mb-8">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-          Welcome back, <span class="gradient-text">Admin</span>
+        <h1 class="text-3xl font-semibold text-primary mb-2">
+          Welcome back, <span class="text-accent">Admin</span>
         </h1>
-        <p class="text-slate-600 dark:text-slate-300">
+        <p class="text-secondary">
           {{ date.strftime('%A, %B %d, %Y') }} • {{ current_term }} {{
           current_year }}
         </p>
       </div>
       <div class="mt-4 lg:mt-0 flex items-center space-x-4">
-        <div
-          class="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400"
-        >
+        <div class="flex items-center space-x-2 text-sm text-secondary">
           <div class="status-dot mr-1"></div>
           <span>System Online</span>
         </div>
-        <div class="text-sm text-slate-600 dark:text-slate-400 ml-2">
+        <div class="text-sm text-secondary ml-2">
           Current User: {{ current_user.username }}
         </div>
       </div>
@@ -32,124 +30,100 @@ page_description %}Comprehensive overview of school management system{% endblock
   <!-- Key Metrics Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Total Students -->
-    <div class="professional-card p-6">
+    <div class="professional-card hover-lift p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-            Total Students
-          </p>
-          <p class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-secondary text-sm font-medium">Total Students</p>
+          <p class="text-3xl font-semibold text-primary mt-2">
             {{ total_students }}
           </p>
           <div class="flex items-center mt-2">
             {% if student_growth > 0 %}
-            <span
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200 mr-2"
-            >
+            <span class="trend-badge trend-badge-up mr-2">
               <i class="fas fa-arrow-up mr-1 text-xs"></i>
               +{{ student_growth }}
             </span>
             {% elif student_growth < 0 %}
-            <span
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200 mr-2"
-            >
+            <span class="trend-badge trend-badge-down mr-2">
               <i class="fas fa-arrow-down mr-1 text-xs"></i>
               {{ student_growth }}
             </span>
             {% endif %}
-            <span class="text-slate-600 dark:text-slate-400 text-xs">
+            <span class="text-muted text-xs">
               {{ active_students_count }} active
             </span>
           </div>
         </div>
-        <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center"
-        >
-          <i class="fas fa-user-graduate text-white text-2xl"></i>
+        <div class="icon-tile icon-tile-accent w-14 h-14">
+          <i class="fas fa-user-graduate text-2xl"></i>
         </div>
       </div>
     </div>
 
     <!-- Teaching Staff -->
-    <div class="professional-card p-6">
+    <div class="professional-card hover-lift p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-            Teaching Staff
-          </p>
-          <p class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-secondary text-sm font-medium">Teaching Staff</p>
+          <p class="text-3xl font-semibold text-primary mt-2">
             {{ total_teachers }}
           </p>
           <div class="mt-2">
-            <span class="text-slate-600 dark:text-slate-400 text-xs">
+            <span class="text-muted text-xs">
               {{ active_users_count }} active now
             </span>
           </div>
         </div>
-        <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center"
-        >
-          <i class="fas fa-chalkboard-teacher text-white text-2xl"></i>
+        <div class="icon-tile icon-tile-success w-14 h-14">
+          <i class="fas fa-chalkboard-teacher text-2xl"></i>
         </div>
       </div>
     </div>
 
     <!-- Today's Attendance -->
-    <div class="professional-card p-6">
+    <div class="professional-card hover-lift p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-            Today's Attendance
-          </p>
-          <p class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-secondary text-sm font-medium">Today's Attendance</p>
+          <p class="text-3xl font-semibold text-primary mt-2">
             {{ today_attendance_count }}
           </p>
           <div class="mt-2">
             <div class="flex items-center space-x-2">
-              <div
-                class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2"
-              >
+              <div class="progress-track w-full h-2">
                 <div
-                  class="bg-blue-600 h-2 rounded-full"
+                  class="progress-fill h-2"
                   style="width: {{ today_attendance_percentage }}%"
                 ></div>
               </div>
-              <span
-                class="text-slate-600 dark:text-slate-400 text-xs whitespace-nowrap"
-              >
+              <span class="text-muted text-xs whitespace-nowrap">
                 {{ "%.1f"|format(today_attendance_percentage) }}%
               </span>
             </div>
           </div>
         </div>
-        <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center"
-        >
-          <i class="fas fa-clipboard-check text-white text-2xl"></i>
+        <div class="icon-tile icon-tile-info w-14 h-14">
+          <i class="fas fa-clipboard-check text-2xl"></i>
         </div>
       </div>
     </div>
 
     <!-- Active Classes -->
-    <div class="professional-card p-6">
+    <div class="professional-card hover-lift p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-            Active Classes
-          </p>
-          <p class="text-3xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-secondary text-sm font-medium">Active Classes</p>
+          <p class="text-3xl font-semibold text-primary mt-2">
             {{ active_classes_count }}
           </p>
           <div class="mt-2">
-            <span class="text-slate-600 dark:text-slate-400 text-xs">
+            <span class="text-muted text-xs">
               {{ alumni_classes_count }} alumni classes
             </span>
           </div>
         </div>
-        <div
-          class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center"
-        >
-          <i class="fas fa-chalkboard text-white text-2xl"></i>
+        <div class="icon-tile icon-tile-brass w-14 h-14">
+          <i class="fas fa-chalkboard text-2xl"></i>
         </div>
       </div>
     </div>
@@ -158,97 +132,77 @@ page_description %}Comprehensive overview of school management system{% endblock
   <!-- Second Row: Additional Metrics -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Academic Progress -->
-    <div class="professional-card p-6">
+    <div class="professional-card hover-lift p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-            Term Scores
-          </p>
-          <p class="text-2xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-secondary text-sm font-medium">Term Scores</p>
+          <p class="text-2xl font-semibold text-primary mt-2">
             {{ term_scores_count }}
           </p>
           <div class="mt-2">
-            <span class="text-slate-600 dark:text-slate-400 text-xs">
+            <span class="text-muted text-xs">
               {{ current_term }} {{ current_year }}
             </span>
           </div>
         </div>
-        <div
-          class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center"
-        >
-          <i class="fas fa-chart-line text-white text-xl"></i>
+        <div class="icon-tile icon-tile-success w-12 h-12">
+          <i class="fas fa-chart-line text-xl"></i>
         </div>
       </div>
     </div>
 
     <!-- Assignments -->
-    <div class="professional-card p-6">
+    <div class="professional-card hover-lift p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-            Active Assignments
-          </p>
-          <p class="text-2xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-secondary text-sm font-medium">Active Assignments</p>
+          <p class="text-2xl font-semibold text-primary mt-2">
             {{ active_assignments_count }}
           </p>
           <div class="mt-2">
-            <span class="text-slate-600 dark:text-slate-400 text-xs">
+            <span class="text-muted text-xs">
               {{ pending_submissions_count }} pending
             </span>
           </div>
         </div>
-        <div
-          class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center"
-        >
-          <i class="fas fa-tasks text-white text-xl"></i>
+        <div class="icon-tile icon-tile-info w-12 h-12">
+          <i class="fas fa-tasks text-xl"></i>
         </div>
       </div>
     </div>
 
     <!-- Subjects -->
-    <div class="professional-card p-6">
+    <div class="professional-card hover-lift p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-            Subjects
-          </p>
-          <p class="text-2xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-secondary text-sm font-medium">Subjects</p>
+          <p class="text-2xl font-semibold text-primary mt-2">
             {{ subjects_count }}
           </p>
           <div class="mt-2">
-            <span class="text-slate-600 dark:text-slate-400 text-xs">
-              Curriculum coverage
-            </span>
+            <span class="text-muted text-xs"> Curriculum coverage </span>
           </div>
         </div>
-        <div
-          class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center"
-        >
-          <i class="fas fa-book text-white text-xl"></i>
+        <div class="icon-tile icon-tile-accent w-12 h-12">
+          <i class="fas fa-book text-xl"></i>
         </div>
       </div>
     </div>
 
     <!-- Alumni -->
-    <div class="professional-card p-6">
+    <div class="professional-card hover-lift p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-            Alumni
-          </p>
-          <p class="text-2xl font-bold text-slate-800 dark:text-white mt-2">
+          <p class="text-secondary text-sm font-medium">Alumni</p>
+          <p class="text-2xl font-semibold text-primary mt-2">
             {{ alumni_count }}
           </p>
           <div class="mt-2">
-            <span class="text-slate-600 dark:text-slate-400 text-xs">
-              Graduated students
-            </span>
+            <span class="text-muted text-xs"> Graduated students </span>
           </div>
         </div>
-        <div
-          class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center"
-        >
-          <i class="fas fa-graduation-cap text-white text-xl"></i>
+        <div class="icon-tile icon-tile-brass w-12 h-12">
+          <i class="fas fa-graduation-cap text-xl"></i>
         </div>
       </div>
     </div>
@@ -259,12 +213,8 @@ page_description %}Comprehensive overview of school management system{% endblock
     <!-- Attendance Chart -->
     <div class="professional-card p-6">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
-          Weekly Attendance
-        </h3>
-        <div
-          class="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400"
-        >
+        <h3 class="text-lg font-semibold text-primary">Weekly Attendance</h3>
+        <div class="flex items-center space-x-2 text-sm text-secondary">
           <i class="fas fa-calendar"></i>
           <span>Last 7 days</span>
         </div>
@@ -277,12 +227,8 @@ page_description %}Comprehensive overview of school management system{% endblock
     <!-- Class Distribution -->
     <div class="professional-card p-6">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
-          Class Distribution
-        </h3>
-        <div
-          class="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400"
-        >
+        <h3 class="text-lg font-semibold text-primary">Class Distribution</h3>
+        <div class="flex items-center space-x-2 text-sm text-secondary">
           <i class="fas fa-users"></i>
           <span>{{ active_students_count }} students</span>
         </div>
@@ -298,50 +244,44 @@ page_description %}Comprehensive overview of school management system{% endblock
     <!-- Top Performing Classes -->
     <div class="professional-card p-6">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
+        <h3 class="text-lg font-semibold text-primary">
           Top Performing Classes
         </h3>
-        <span class="text-sm text-slate-600 dark:text-slate-400"
+        <span class="text-sm text-secondary"
           >{{ current_term }} {{ current_year }}</span
         >
       </div>
 
       {% if top_classes %}
-      <div class="space-y-4">
+      <div class="space-y-3">
         {% for class in top_classes %}
-        <div
-          class="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
-        >
+        <div class="tile-row flex items-center justify-between p-4">
           <div class="flex items-center space-x-4">
             <div
-              class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold"
+              class="avatar-solid w-12 h-12 rounded-md flex items-center justify-center font-semibold"
             >
               {{ class.name[:3] }}
             </div>
             <div>
-              <p class="font-medium text-slate-800 dark:text-white">
-                {{ class.name }}
-              </p>
-              <p class="text-sm text-slate-600 dark:text-slate-400">
+              <p class="font-medium text-primary">{{ class.name }}</p>
+              <p class="text-sm text-secondary">
                 {{ class.student_count }} students
               </p>
             </div>
           </div>
           <div class="text-right">
-            <p class="text-2xl font-bold text-slate-800 dark:text-white">
+            <p class="text-2xl font-semibold text-primary">
               {{ "%.1f"|format(class.avg_score) }}%
             </p>
-            <p class="text-sm text-slate-600 dark:text-slate-400">Average</p>
+            <p class="text-sm text-secondary">Average</p>
           </div>
         </div>
         {% endfor %}
       </div>
       {% else %}
       <div class="text-center py-8">
-        <i
-          class="fas fa-chart-bar text-3xl text-slate-300 dark:text-slate-600 mb-3"
-        ></i>
-        <p class="text-slate-500 dark:text-slate-400">
+        <i class="fas fa-chart-bar text-3xl text-muted mb-3"></i>
+        <p class="text-secondary">
           No performance data available for {{ current_term }}
         </p>
       </div>
@@ -351,25 +291,16 @@ page_description %}Comprehensive overview of school management system{% endblock
     <!-- Recent Activity -->
     <div class="professional-card p-6">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
-          Recent Activity
-        </h3>
-        <a
-          href="#"
-          class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium"
-        >
-          View All
-        </a>
+        <h3 class="text-lg font-semibold text-primary">Recent Activity</h3>
+        <a href="#" class="link-accent text-sm font-medium"> View All </a>
       </div>
 
-      <div class="space-y-4">
+      <div class="space-y-2">
         {% for activity in recent_activities %}
-        <div
-          class="flex items-start space-x-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-150"
-        >
+        <div class="activity-row flex items-start space-x-4 p-3">
           <div class="flex-shrink-0 mt-1">
             <div
-              class="w-10 h-10 rounded-full flex items-center justify-center {% if activity.color == 'green' %}bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 {% elif activity.color == 'blue' %}bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 {% elif activity.color == 'yellow' %}bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 {% else %}bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400{% endif %}"
+              class="icon-tile {% if activity.color == 'green' %}icon-tile-success{% elif activity.color == 'blue' %}icon-tile-info{% elif activity.color == 'yellow' %}icon-tile-warning{% else %}icon-tile-brass{% endif %} w-10 h-10 rounded-full"
             >
               {% if activity.color == 'green' %}
               <i class="fas fa-user-plus text-sm"></i>
@@ -383,15 +314,11 @@ page_description %}Comprehensive overview of school management system{% endblock
             </div>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-medium text-slate-800 dark:text-white">
-              {{ activity.title }}
-            </p>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+            <p class="font-medium text-primary">{{ activity.title }}</p>
+            <p class="text-sm text-secondary mt-1">
               {{ activity.description }}
             </p>
-            <p class="text-xs text-slate-500 dark:text-slate-500 mt-2">
-              {{ activity.time }}
-            </p>
+            <p class="text-xs text-muted mt-2">{{ activity.time }}</p>
           </div>
         </div>
         {% endfor %}
@@ -401,78 +328,52 @@ page_description %}Comprehensive overview of school management system{% endblock
 
   <!-- Quick Actions -->
   <div class="professional-card p-6">
-    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-6">
-      Quick Actions
-    </h3>
+    <h3 class="text-lg font-semibold text-primary mb-6">Quick Actions</h3>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <a
         href="{{ url_for('students.index') }}"
-        class="group p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 text-center"
+        class="tile-row p-4 text-center block"
       >
-        <div
-          class="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors duration-200 flex items-center justify-center"
-        >
-          <i
-            class="fas fa-user-graduate text-blue-600 dark:text-blue-400 text-xl"
-          ></i>
+        <div class="icon-tile icon-tile-accent w-12 h-12 mx-auto mb-3">
+          <i class="fas fa-user-graduate text-xl"></i>
         </div>
-        <p class="font-medium text-slate-800 dark:text-white">
-          Manage Students
-        </p>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
-          {{ total_students }} students
-        </p>
+        <p class="font-medium text-primary">Manage Students</p>
+        <p class="text-xs text-muted mt-1">{{ total_students }} students</p>
       </a>
 
       <a
         href="{{ url_for('teachers.index') }}"
-        class="group p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-green-300 dark:hover:border-green-700 transition-all duration-200 text-center"
+        class="tile-row p-4 text-center block"
       >
-        <div
-          class="w-12 h-12 mx-auto mb-3 rounded-xl bg-green-100 dark:bg-green-900/30 group-hover:bg-green-200 dark:group-hover:bg-green-800/50 transition-colors duration-200 flex items-center justify-center"
-        >
-          <i
-            class="fas fa-chalkboard-teacher text-green-600 dark:text-green-400 text-xl"
-          ></i>
+        <div class="icon-tile icon-tile-success w-12 h-12 mx-auto mb-3">
+          <i class="fas fa-chalkboard-teacher text-xl"></i>
         </div>
-        <p class="font-medium text-slate-800 dark:text-white">Manage Staff</p>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
-          {{ total_teachers }} teachers
-        </p>
+        <p class="font-medium text-primary">Manage Staff</p>
+        <p class="text-xs text-muted mt-1">{{ total_teachers }} teachers</p>
       </a>
 
       <a
         href="{{ url_for('attendance.attendance_dashboard') }}"
-        class="group p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-200 text-center"
+        class="tile-row p-4 text-center block"
       >
-        <div
-          class="w-12 h-12 mx-auto mb-3 rounded-xl bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors duration-200 flex items-center justify-center"
-        >
-          <i
-            class="fas fa-clipboard-check text-purple-600 dark:text-purple-400 text-xl"
-          ></i>
+        <div class="icon-tile icon-tile-info w-12 h-12 mx-auto mb-3">
+          <i class="fas fa-clipboard-check text-xl"></i>
         </div>
-        <p class="font-medium text-slate-800 dark:text-white">Attendance</p>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+        <p class="font-medium text-primary">Attendance</p>
+        <p class="text-xs text-muted mt-1">
           {{ today_attendance_count }} today
         </p>
       </a>
 
       <a
         href="{{ url_for('main.backup_dashboard') }}"
-        class="group p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700 transition-all duration-200 text-center"
+        class="tile-row p-4 text-center block"
       >
-        <div
-          class="w-12 h-12 mx-auto mb-3 rounded-xl bg-amber-100 dark:bg-amber-900/30 group-hover:bg-amber-200 dark:group-hover:bg-amber-800/50 transition-colors duration-200 flex items-center justify-center"
-        >
-          <i
-            class="fas fa-database text-amber-600 dark:text-amber-400 text-xl"
-          ></i>
+        <div class="icon-tile icon-tile-brass w-12 h-12 mx-auto mb-3">
+          <i class="fas fa-database text-xl"></i>
         </div>
-        <p class="font-medium text-slate-800 dark:text-white">Backup</p>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
-          Database Management
-        </p>
+        <p class="font-medium text-primary">Backup</p>
+        <p class="text-xs text-muted mt-1">Database Management</p>
       </a>
     </div>
   </div>
@@ -480,6 +381,20 @@ page_description %}Comprehensive overview of school management system{% endblock
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Design-system colors for charts (kept in sync with the CSS custom
+    // properties defined in base.html so charts match the rest of the UI)
+    const chartPalette = {
+      light: { line: '#4f9184', fill: 'rgba(79, 145, 132, 0.12)', grid: 'rgba(30, 70, 63, 0.08)', text: '#4c5450' },
+      dark: { line: '#74baa8', fill: 'rgba(116, 186, 168, 0.14)', grid: 'rgba(148, 163, 154, 0.12)', text: '#aab3ac' }
+    };
+    const categoryPalette = [
+      '#1e463f', '#a1752f', '#4c6fa3', '#96552e', '#5c7a4f',
+      '#8a4a52', '#8f8f4d', '#5f6b76', '#3f7d7a', '#6f5a7a'
+    ];
+
+    const isDarkNow = () => document.documentElement.classList.contains('dark');
+    const palette = isDarkNow() ? chartPalette.dark : chartPalette.light;
+
     // Attendance Chart
     const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
     const attendanceChart = new Chart(attendanceCtx, {
@@ -489,12 +404,12 @@ page_description %}Comprehensive overview of school management system{% endblock
         datasets: [{
           label: 'Daily Attendance',
           data: {{ attendance_data | map(attribute='count') | list | tojson }},
-          borderColor: '#0ea5e9',
-          backgroundColor: 'rgba(14, 165, 233, 0.1)',
+          borderColor: palette.line,
+          backgroundColor: palette.fill,
           borderWidth: 3,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: '#0ea5e9',
+          pointBackgroundColor: palette.line,
           pointBorderColor: '#ffffff',
           pointBorderWidth: 2,
           pointRadius: 5,
@@ -511,10 +426,10 @@ page_description %}Comprehensive overview of school management system{% endblock
           tooltip: {
             mode: 'index',
             intersect: false,
-            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            titleColor: '#f8fafc',
-            bodyColor: '#cbd5e1',
-            borderColor: '#475569',
+            backgroundColor: 'rgba(23, 27, 26, 0.92)',
+            titleColor: '#f5f7f4',
+            bodyColor: '#cfd8d1',
+            borderColor: '#2a322e',
             borderWidth: 1
           }
         },
@@ -522,18 +437,18 @@ page_description %}Comprehensive overview of school management system{% endblock
           y: {
             beginAtZero: true,
             grid: {
-              color: 'rgba(148, 163, 184, 0.1)'
+              color: palette.grid
             },
             ticks: {
-              color: '#64748b'
+              color: palette.text
             }
           },
           x: {
             grid: {
-              color: 'rgba(148, 163, 184, 0.1)'
+              color: palette.grid
             },
             ticks: {
-              color: '#64748b'
+              color: palette.text
             }
           }
         }
@@ -548,10 +463,7 @@ page_description %}Comprehensive overview of school management system{% endblock
         labels: {{ class_distribution | map(attribute='name') | list | tojson }},
         datasets: [{
           data: {{ class_distribution | map(attribute='count') | list | tojson }},
-          backgroundColor: [
-            '#0ea5e9', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444',
-            '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
-          ],
+          backgroundColor: categoryPalette,
           borderWidth: 2,
           borderColor: 'rgba(255, 255, 255, 0.1)'
         }]
@@ -563,7 +475,7 @@ page_description %}Comprehensive overview of school management system{% endblock
           legend: {
             position: 'right',
             labels: {
-              color: '#64748b',
+              color: palette.text,
               usePointStyle: true,
               padding: 20
             }
@@ -577,18 +489,20 @@ page_description %}Comprehensive overview of school management system{% endblock
     const themeStore = Alpine.store('theme');
     const updateChartsForTheme = () => {
       const isDark = themeStore.dark;
-      const gridColor = isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(148, 163, 184, 0.1)';
-      const textColor = isDark ? '#64748b' : '#64748b';
+      const p = isDark ? chartPalette.dark : chartPalette.light;
 
       // Update attendance chart
-      attendanceChart.options.scales.x.grid.color = gridColor;
-      attendanceChart.options.scales.x.ticks.color = textColor;
-      attendanceChart.options.scales.y.grid.color = gridColor;
-      attendanceChart.options.scales.y.ticks.color = textColor;
+      attendanceChart.data.datasets[0].borderColor = p.line;
+      attendanceChart.data.datasets[0].backgroundColor = p.fill;
+      attendanceChart.data.datasets[0].pointBackgroundColor = p.line;
+      attendanceChart.options.scales.x.grid.color = p.grid;
+      attendanceChart.options.scales.x.ticks.color = p.text;
+      attendanceChart.options.scales.y.grid.color = p.grid;
+      attendanceChart.options.scales.y.ticks.color = p.text;
       attendanceChart.update();
 
       // Update class distribution chart
-      classDistributionChart.options.plugins.legend.labels.color = textColor;
+      classDistributionChart.options.plugins.legend.labels.color = p.text;
       classDistributionChart.update();
     };
 

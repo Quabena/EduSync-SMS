@@ -74,50 +74,128 @@
     ></script>
 
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
 
+      /* ==========================================================
+       DESIGN TOKENS
+       ========================================================== */
       :root {
-        /* Institutional ink + brass palette */
-        --ink-950: #0d1120;
-        --ink-900: #131730;
-        --ink-800: #1b2140;
-        --ink-700: #262d52;
-        --ink-600: #333c68;
+        /* Surfaces */
+        --bg: #f5f6f4;
+        --surface: #ffffff;
+        --surface-elevated: #ffffff;
+        --surface-sunken: #eef0ee;
 
-        --paper-50: #faf8f2;
-        --paper-100: #f4f0e6;
-        --paper-200: #e9e2d2;
+        /* Borders */
+        --border: #e1e4e0;
+        --border-subtle: #ebede9;
 
-        --brass-300: #e6c878;
-        --brass-400: #d4ab4a;
-        --brass-500: #bd9032;
-        --brass-600: #9c7325;
-        --brass-700: #7a591c;
+        /* Text */
+        --text: #171b1a;
+        --text-secondary: #4c5450;
+        --text-muted: #8a938d;
+        --text-on-accent: #f5f7f4;
 
-        --pine-500: #1f6e5c;
-        --pine-600: #175748;
-        --rose-500: #b3452f;
-        --amber-500: #b9781f;
+        /* Brand / accent — deep institutional teal-ink, paired with a
+         muted brass for secondary emphasis (badges, dividers) */
+        --accent: #1e463f;
+        --accent-hover: #163530;
+        --accent-tint: #e7ede9;
+        --accent-tint-border: #cbdad0;
+        --brass: #a1752f;
+        --brass-tint: #f3ece0;
 
-        --brass-gradient: linear-gradient(
-          135deg,
-          #e6c878 0%,
-          #bd9032 55%,
-          #9c7325 100%
-        );
-        --ink-gradient: linear-gradient(
-          160deg,
-          #1b2140 0%,
-          #131730 60%,
-          #0d1120 100%
-        );
+        /* Status */
+        --success: #1f7a4d;
+        --success-tint: #e7f4ec;
+        --warning: #a3661f;
+        --warning-tint: #f7ecdc;
+        --danger: #ac3b34;
+        --danger-tint: #f8e9e8;
+        --info: #2b5f8a;
+        --info-tint: #e8eff5;
+        --rose: #8a4a52;
+        --rose-tint: #f5e9ea;
 
-        --sidebar-width: 280px;
-        --sidebar-collapsed-width: 84px;
+        /* Radius scale — deliberate, not uniform */
+        --radius-xs: 4px;
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+
+        /* Shadow scale — soft, low-contrast, architectural rather than dramatic */
+        --shadow-xs: 0 1px 2px rgba(15, 23, 20, 0.04);
+        --shadow-sm:
+          0 1px 3px rgba(15, 23, 20, 0.06), 0 1px 2px rgba(15, 23, 20, 0.04);
+        --shadow-md: 0 6px 16px rgba(15, 23, 20, 0.08);
+        --shadow-lg: 0 16px 40px rgba(15, 23, 20, 0.14);
+
+        /* Restrained glass — reserved for nav/overlay surfaces only */
+        --glass-bg: rgba(255, 255, 255, 0.88);
+        --glass-border: rgba(30, 70, 63, 0.1);
+
+        /* Sidebar — a fixed deep-ink surface, independent of theme toggle,
+         so the navigation reads as a stable anchor against the lighter
+         workspace either way. This is the one deliberate contrast move
+         in the system. */
+        --side-bg: #12211d;
+        --side-bg-elevated: #182d27;
+        --side-active-bg: #1c362e;
+        --side-border: #24392f;
+        --side-text: #cfd8d1;
+        --side-text-muted: #7d9088;
+        --side-accent: #74baa8;
+        --side-brass: #dcae6b;
+
+        --sidebar-width: 264px;
+        --sidebar-collapsed-width: 76px;
+      }
+
+      .dark {
+        --bg: #0e1210;
+        --surface: #161b19;
+        --surface-elevated: #1c2220;
+        --surface-sunken: #0b0f0d;
+
+        --border: #2a322e;
+        --border-subtle: #232a27;
+
+        --text: #e9ece8;
+        --text-secondary: #aab3ac;
+        --text-muted: #778078;
+        --text-on-accent: #f5f7f4;
+
+        --accent: #4f9184;
+        --accent-hover: #64a596;
+        --accent-tint: #1a2b26;
+        --accent-tint-border: #2c433c;
+        --brass: #c99a5a;
+        --brass-tint: #2c2419;
+
+        --success: #4caf7d;
+        --success-tint: #16261c;
+        --warning: #cf9a4e;
+        --warning-tint: #2b2114;
+        --danger: #d97a72;
+        --danger-tint: #2c1918;
+        --info: #6fa3cc;
+        --info-tint: #16232c;
+        --rose: #c98a92;
+        --rose-tint: #2c1c1e;
+
+        --glass-bg: rgba(22, 27, 25, 0.86);
+        --glass-border: rgba(148, 163, 154, 0.12);
       }
 
       * {
-        -webkit-tap-highlight-color: transparent;
+        border-color: var(--border);
+      }
+
+      html,
+      body {
+        background: var(--bg);
       }
 
       body {
@@ -126,99 +204,161 @@
           -apple-system,
           BlinkMacSystemFont,
           sans-serif;
-        background: var(--paper-50);
-        background-image:
-          radial-gradient(
-            circle at 12% 8%,
-            rgba(189, 144, 50, 0.05),
-            transparent 45%
-          ),
-          radial-gradient(
-            circle at 88% 92%,
-            rgba(31, 110, 92, 0.04),
-            transparent 40%
-          );
-        background-attachment: fixed;
+        color: var(--text);
         min-height: 100vh;
-        color: #1b2140;
+        overflow-x: hidden;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Ccircle cx='1' cy='1' r='1' fill='%231e463f' fill-opacity='0.09'/%3E%3C/svg%3E");
       }
 
       .dark body {
-        background: var(--ink-950);
-        background-image:
-          radial-gradient(
-            circle at 12% 8%,
-            rgba(212, 171, 74, 0.06),
-            transparent 45%
-          ),
-          radial-gradient(
-            circle at 88% 92%,
-            rgba(31, 110, 92, 0.06),
-            transparent 40%
-          );
-        background-attachment: fixed;
-        color: #ece9e0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Ccircle cx='1' cy='1' r='1' fill='%2394a39a' fill-opacity='0.08'/%3E%3C/svg%3E");
       }
 
-      .font-display {
-        font-family: "Fraunces", Georgia, serif;
-        font-optical-sizing: auto;
+      h1,
+      h2,
+      h3,
+      .font-serif-display {
+        font-family: "Source Serif 4", Georgia, serif;
       }
 
-      .code-font {
-        font-family: "JetBrains Mono", "Fira Code", monospace;
-        letter-spacing: 0.02em;
-      }
-
+      /* ==========================================================
+       MOTION — one deliberate register, not decoration everywhere
+       ========================================================== */
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
         *::after {
           animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
           transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
         }
       }
 
-      @keyframes slideInFromLeft {
+      @keyframes fade-in {
         from {
-          transform: translateX(-16px);
           opacity: 0;
         }
         to {
-          transform: translateX(0);
           opacity: 1;
         }
       }
 
-      @keyframes fadeUp {
-        from {
-          transform: translateY(10px);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
-      }
-
-      @keyframes pulse-dot {
+      @keyframes dot-pulse {
         0%,
         100% {
-          box-shadow: 0 0 0 0 rgba(31, 110, 92, 0.45);
+          opacity: 0.5;
         }
-        70% {
-          box-shadow: 0 0 0 6px rgba(31, 110, 92, 0);
+        50% {
+          opacity: 1;
         }
       }
 
-      /* Sidebar */
+      /* ==========================================================
+       SURFACES
+       ========================================================== */
+      .glass {
+        background: var(--glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+      }
+
+      .glass-strong {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-bottom-color: var(--border);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .surface {
+        background: var(--surface);
+        border: 1px solid var(--border);
+      }
+
+      .surface-elevated {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .professional-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        position: relative;
+        animation: fade-in 0.25s ease-out;
+      }
+
+      .professional-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: var(--radius-lg);
+        right: var(--radius-lg);
+        height: 1px;
+        background: rgba(255, 255, 255, 0.6);
+      }
+
+      .dark .professional-card::before {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      /* ==========================================================
+       TEXT UTILITIES
+       ========================================================== */
+      .text-primary {
+        color: var(--text);
+      }
+      .text-secondary {
+        color: var(--text-secondary);
+      }
+      .text-muted {
+        color: var(--text-muted);
+      }
+      .text-accent {
+        color: var(--accent);
+      }
+      .text-on-accent {
+        color: var(--text-on-accent);
+      }
+      .text-danger {
+        color: var(--danger);
+      }
+      .text-info {
+        color: var(--info);
+      }
+      .text-rose {
+        color: var(--rose);
+      }
+      .text-success {
+        color: var(--success);
+      }
+
+      .gradient-text {
+        color: var(--accent);
+        font-family: "Source Serif 4", Georgia, serif;
+        font-weight: 600;
+      }
+
+      .code-font {
+        font-family: "JetBrains Mono", "Fira Code", monospace;
+      }
+
+      /* ==========================================================
+       SIDEBAR
+       ========================================================== */
       .sidebar {
         width: var(--sidebar-width);
+        background: var(--side-bg);
+        border-right: 1px solid var(--side-border);
+        box-shadow: var(--shadow-lg);
         transition:
-          width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-          transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        animation: slideInFromLeft 0.35s ease-out forwards;
-        background: var(--ink-gradient);
+          transform 0.25s ease,
+          width 0.25s ease;
       }
 
       .sidebar.collapsed {
@@ -227,221 +367,42 @@
 
       .sidebar-item {
         position: relative;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.7rem 1rem 0.7rem 1.1rem;
-        margin: 0.15rem 0.6rem;
-        border-radius: 0.6rem;
+        padding: 0.6rem 0.9rem;
+        border-radius: var(--radius-sm);
+        margin: 0.125rem 0.5rem;
         font-weight: 500;
-        font-size: 0.9rem;
-        color: rgba(236, 233, 224, 0.62);
+        font-size: 0.875rem;
+        color: var(--side-text-muted);
+        border-left: 2px solid transparent;
         transition:
-          background 0.2s ease,
-          color 0.2s ease,
-          padding-left 0.2s ease;
+          background-color 0.15s ease,
+          color 0.15s ease,
+          border-color 0.15s ease,
+          transform 0.15s ease;
       }
 
       .sidebar-item:hover {
-        background: rgba(212, 171, 74, 0.1);
-        color: #f4f0e6;
-        padding-left: 1.35rem;
+        background: var(--side-bg-elevated);
+        color: var(--side-text);
+        transform: translateX(2px);
       }
 
       .sidebar-item.active {
-        background: rgba(212, 171, 74, 0.14);
-        color: #f4e9c9;
-      }
-
-      .sidebar-item.active::before {
-        content: "";
-        position: absolute;
-        left: -0.6rem;
-        top: 0.35rem;
-        bottom: 0.35rem;
-        width: 3px;
-        border-radius: 2px;
-        background: var(--brass-gradient);
-      }
-
-      .sidebar-icon {
-        flex-shrink: 0;
-        width: 1.35rem;
-        height: 1.35rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0.85;
-      }
-
-      .sidebar-item.active .sidebar-icon {
-        opacity: 1;
-      }
-
-      .sidebar-eyebrow {
-        font-size: 0.65rem;
+        background: var(--side-active-bg);
+        color: var(--side-accent);
+        border-left-color: var(--side-accent);
         font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: rgba(236, 233, 224, 0.35);
-        padding: 0 1.35rem;
-        margin-top: 1.1rem;
-        margin-bottom: 0.4rem;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
       }
 
       .content-area {
         margin-left: var(--sidebar-width);
-        transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: margin-left 0.25s ease;
         min-height: 100vh;
       }
 
       .content-area.sidebar-collapsed {
         margin-left: var(--sidebar-collapsed-width);
-      }
-
-      /* Surfaces */
-      .surface {
-        background: #ffffff;
-        border: 1px solid var(--paper-200);
-        box-shadow: 0 1px 2px rgba(19, 23, 48, 0.04);
-      }
-
-      .dark .surface {
-        background: var(--ink-900);
-        border: 1px solid rgba(212, 171, 74, 0.09);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-      }
-
-      .surface-strong {
-        background: rgba(250, 248, 242, 0.86);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border-bottom: 1px solid var(--paper-200);
-      }
-
-      .dark .surface-strong {
-        background: rgba(19, 23, 48, 0.86);
-        border-bottom: 1px solid rgba(212, 171, 74, 0.08);
-      }
-
-      .doc-card {
-        background: #ffffff;
-        border: 1px solid var(--paper-200);
-        border-radius: 1rem;
-        position: relative;
-        animation: fadeUp 0.35s ease-out forwards;
-      }
-
-      .dark .doc-card {
-        background: var(--ink-900);
-        border-color: rgba(212, 171, 74, 0.1);
-      }
-
-      /* Corner mark — signature device, used sparingly on the primary content card */
-      .doc-card.marked::before,
-      .doc-card.marked::after {
-        content: "";
-        position: absolute;
-        width: 18px;
-        height: 18px;
-        top: -1px;
-        border-top: 2px solid var(--brass-400);
-        opacity: 0.7;
-      }
-
-      .doc-card.marked::before {
-        left: -1px;
-        border-left: 2px solid var(--brass-400);
-        border-top-left-radius: 0.6rem;
-      }
-
-      .doc-card.marked::after {
-        right: -1px;
-        border-right: 2px solid var(--brass-400);
-        border-top-right-radius: 0.6rem;
-      }
-
-      .hover-lift {
-        transition:
-          transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-          box-shadow 0.2s ease;
-      }
-
-      .hover-lift:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(19, 23, 48, 0.08);
-      }
-
-      .dark .hover-lift:hover {
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
-      }
-
-      .interactive:active {
-        transform: scale(0.97);
-      }
-
-      .btn-primary {
-        background: var(--ink-900);
-        color: #f4f0e6;
-        border: 1px solid var(--ink-900);
-        transition:
-          background 0.2s ease,
-          box-shadow 0.2s ease,
-          transform 0.15s ease;
-      }
-
-      .btn-primary:hover {
-        background: var(--ink-700);
-        box-shadow: 0 8px 18px rgba(19, 23, 48, 0.18);
-      }
-
-      .dark .btn-primary {
-        background: var(--brass-gradient);
-        color: #1b2140;
-        border-color: transparent;
-      }
-
-      .status-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--pine-500);
-        animation: pulse-dot 2.4s infinite;
-      }
-
-      .gradient-text {
-        background: var(--brass-gradient);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      /* Scrollbars */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: rgba(157, 130, 60, 0.35);
-        border-radius: 4px;
-      }
-      .dark ::-webkit-scrollbar-thumb {
-        background: rgba(212, 171, 74, 0.25);
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: rgba(157, 130, 60, 0.55);
-      }
-
-      /* Focus states */
-      a:focus-visible,
-      button:focus-visible,
-      input:focus-visible {
-        outline: 2px solid var(--brass-500);
-        outline-offset: 2px;
-        border-radius: 0.3rem;
       }
 
       @media (max-width: 1024px) {
@@ -460,6 +421,493 @@
           margin-left: 0;
         }
       }
+
+      /* ==========================================================
+       STATUS DOT
+       ========================================================== */
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--success);
+        animation: dot-pulse 2.4s ease-in-out infinite;
+      }
+
+      /* ==========================================================
+       INTERACTIVE ELEMENTS
+       ========================================================== */
+      .interactive:active {
+        transform: scale(0.98);
+      }
+
+      .hover-lift {
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .stat-tile {
+        box-shadow: var(--shadow-sm);
+      }
+
+      .icon-btn {
+        padding: 0.5rem;
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        box-shadow: var(--shadow-xs);
+        transition:
+          background-color 0.15s ease,
+          border-color 0.15s ease,
+          color 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .icon-btn:hover {
+        background: var(--surface-sunken);
+        color: var(--text);
+        border-color: var(--accent-tint-border);
+        box-shadow: var(--shadow-sm);
+      }
+
+      /* ==========================================================
+       INPUTS
+       ========================================================== */
+      .input-field {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: var(--radius-sm);
+        transition:
+          border-color 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .input-field::placeholder {
+        color: var(--text-muted);
+      }
+
+      .input-field:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-tint);
+      }
+
+      .spinner-accent {
+        color: var(--accent);
+      }
+
+      /* ==========================================================
+       DROPDOWNS / MENUS
+       ========================================================== */
+      .dropdown-panel {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .dropdown-section-label {
+        background: var(--surface-sunken);
+        border-bottom: 1px solid var(--border-subtle);
+        color: var(--text-muted);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+
+      .dropdown-row {
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background-color 0.12s ease;
+      }
+
+      .dropdown-row:hover {
+        background: var(--surface-sunken);
+      }
+
+      .menu-link {
+        color: var(--text-secondary);
+        border-radius: var(--radius-sm);
+        transition:
+          background-color 0.12s ease,
+          color 0.12s ease;
+      }
+
+      .menu-link:hover {
+        background: var(--surface-sunken);
+        color: var(--text);
+      }
+
+      .menu-link-danger {
+        color: var(--danger);
+        border-radius: var(--radius-sm);
+        transition: background-color 0.12s ease;
+      }
+
+      .menu-link-danger:hover {
+        background: var(--danger-tint);
+      }
+
+      /* ==========================================================
+       BADGES
+       ========================================================== */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        padding: 0.15rem 0.55rem;
+        border-radius: var(--radius-xs);
+      }
+
+      .badge-accent {
+        background: var(--accent-tint);
+        color: var(--accent);
+      }
+
+      .badge-brass {
+        background: var(--brass-tint);
+        color: var(--brass);
+      }
+
+      .badge-success {
+        background: var(--success-tint);
+        color: var(--success);
+      }
+
+      .badge-danger {
+        background: var(--danger-tint);
+        color: var(--danger);
+      }
+
+      .badge-warning {
+        background: var(--warning-tint);
+        color: var(--warning);
+      }
+
+      .badge-info {
+        background: var(--info-tint);
+        color: var(--info);
+      }
+
+      .badge-neutral {
+        background: var(--surface-sunken);
+        color: var(--text-secondary);
+      }
+
+      .badge-rose {
+        background: var(--rose-tint);
+        color: var(--rose);
+      }
+
+      /* ==========================================================
+       ICON TILES — metric/action icon chips used across dashboards
+       ========================================================== */
+      .icon-tile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-md);
+        flex-shrink: 0;
+        transition: background-color 0.15s ease;
+      }
+
+      .icon-tile-accent {
+        background: var(--accent-tint);
+        color: var(--accent);
+      }
+      .icon-tile-brass {
+        background: var(--brass-tint);
+        color: var(--brass);
+      }
+      .icon-tile-success {
+        background: var(--success-tint);
+        color: var(--success);
+      }
+      .icon-tile-warning {
+        background: var(--warning-tint);
+        color: var(--warning);
+      }
+      .icon-tile-danger {
+        background: var(--danger-tint);
+        color: var(--danger);
+      }
+      .icon-tile-info {
+        background: var(--info-tint);
+        color: var(--info);
+      }
+      .icon-tile-rose {
+        background: var(--rose-tint);
+        color: var(--rose);
+      }
+
+      /* ==========================================================
+       PROGRESS BAR
+       ========================================================== */
+      .progress-track {
+        background: var(--surface-sunken);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        background: var(--accent);
+        border-radius: 999px;
+      }
+
+      /* ==========================================================
+       TILE ROWS — bordered rows/cards used for lists, quick actions
+       ========================================================== */
+      .tile-row {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        transition:
+          border-color 0.15s ease,
+          background-color 0.15s ease;
+      }
+
+      .tile-row:hover {
+        border-color: var(--accent-tint-border);
+        background: var(--surface-sunken);
+      }
+
+      .activity-row {
+        border-radius: var(--radius-sm);
+        transition: background-color 0.15s ease;
+      }
+
+      .activity-row:hover {
+        background: var(--surface-sunken);
+      }
+
+      .link-accent {
+        color: var(--accent);
+        transition: color 0.15s ease;
+      }
+
+      .link-accent:hover {
+        color: var(--accent-hover);
+      }
+
+      /* ==========================================================
+       BUTTONS
+       ========================================================== */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        border-radius: var(--radius-sm);
+        padding: 0.65rem 1.1rem;
+        font-size: 0.875rem;
+        transition:
+          background-color 0.15s ease,
+          border-color 0.15s ease,
+          color 0.15s ease,
+          box-shadow 0.15s ease,
+          filter 0.15s ease;
+      }
+
+      .btn-sm {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.75rem;
+        border-radius: var(--radius-xs);
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: var(--text-on-accent);
+        box-shadow: var(--shadow-xs);
+      }
+
+      .btn-primary:hover {
+        background: var(--accent-hover);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .btn-secondary {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+
+      .btn-secondary:hover {
+        background: var(--surface-sunken);
+        border-color: var(--accent-tint-border);
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: var(--text-on-accent);
+      }
+
+      .btn-danger:hover {
+        filter: brightness(0.92);
+      }
+
+      .btn-brass {
+        background: var(--brass);
+        color: var(--text-on-accent);
+      }
+
+      .btn-brass:hover {
+        filter: brightness(0.94);
+      }
+
+      .btn-success {
+        background: var(--success);
+        color: var(--text-on-accent);
+      }
+
+      .btn-success:hover {
+        filter: brightness(0.92);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-secondary);
+      }
+
+      .btn-ghost:hover {
+        background: var(--surface-sunken);
+        color: var(--text);
+      }
+
+      /* ==========================================================
+       SEGMENTED CONTROL — e.g. grid/table view toggles
+       ========================================================== */
+      .segmented {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 2px;
+        display: inline-flex;
+      }
+
+      .segmented-btn {
+        padding: 0.5rem 1rem;
+        border-radius: calc(var(--radius-sm) - 2px);
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        transition:
+          background-color 0.15s ease,
+          color 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .segmented-btn:hover {
+        color: var(--text);
+      }
+
+      .segmented-btn.active {
+        background: var(--surface);
+        color: var(--accent);
+        box-shadow: var(--shadow-xs);
+      }
+
+      /* ==========================================================
+       DATA TABLE
+       ========================================================== */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table thead {
+        background: var(--surface-sunken);
+      }
+
+      .data-table th {
+        padding: 0.85rem 1.5rem;
+        text-align: left;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      .data-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-subtle);
+        font-size: 0.875rem;
+        color: var(--text);
+        vertical-align: middle;
+      }
+
+      .data-table tbody tr {
+        transition: background-color 0.12s ease;
+      }
+
+      .data-table tbody tr:hover {
+        background: var(--surface-sunken);
+      }
+
+      .data-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* ==========================================================
+       MODAL
+       ========================================================== */
+      .modal-backdrop {
+        background: rgba(15, 23, 20, 0.5);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+
+      .avatar-tile {
+        background: var(--accent-tint);
+        color: var(--accent);
+      }
+
+      .avatar-tile-brass {
+        background: var(--brass-tint);
+        color: var(--brass);
+      }
+
+      .avatar-solid {
+        background: var(--accent);
+        color: var(--text-on-accent);
+      }
+
+      /* ==========================================================
+       FOOTER
+       ========================================================== */
+      .app-footer {
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ==========================================================
+       SCROLLBARS
+       ========================================================== */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+      }
     </style>
   </head>
 
@@ -469,25 +917,26 @@
     <div class="min-h-screen relative">
       <!-- Left Sidebar Navigation -->
       <aside
-        class="sidebar fixed top-0 left-0 h-full z-40 flex flex-col border-r border-black/10 no-print"
+        class="sidebar fixed top-0 left-0 h-full z-40 flex flex-col no-print"
         :class="{ 'open': mobileMenuOpen }"
       >
         <!-- Sidebar Header -->
-        <div class="px-5 py-6 border-b border-white/10">
-          <div class="flex items-center space-x-3 group">
-            <div class="relative flex-shrink-0">
+        <div class="p-5 border-b" style="border-color: var(--side-border)">
+          <div class="flex items-center space-x-3">
+            <div class="relative">
               <a
                 href="{{ url_for('main.index') }}"
-                class="block rounded-lg overflow-hidden ring-1 ring-white/10 group-hover:ring-[var(--brass-400)] transition-all duration-300"
+                class="block rounded-md overflow-hidden"
+                style="box-shadow: 0 0 0 1px var(--side-border)"
               >
                 <video
                   autoplay
                   loop
                   muted
                   playsinline
-                  width="40"
-                  height="70"
-                  class="object-contain"
+                  width="36"
+                  height="60"
+                  class="rounded-md object-contain"
                 >
                   <source
                     src="{{ url_for('static', filename='videos/EduSync_Logo_Animated.mp4') }}"
@@ -503,30 +952,33 @@
             </div>
             <div>
               <h1
-                class="font-display text-lg font-semibold text-[#f4f0e6] leading-tight tracking-tight"
+                class="text-base font-semibold leading-tight"
+                style="
+                  font-family: &quot;Source Serif 4&quot;, Georgia, serif;
+                  color: var(--side-brass);
+                "
               >
                 EduSync
               </h1>
               <p
-                class="text-[0.68rem] uppercase tracking-[0.14em] text-white/40 font-medium"
+                class="text-xs font-medium"
+                style="color: var(--side-text-muted)"
               >
-                School Management
+                School Management System
               </p>
             </div>
           </div>
         </div>
 
         <!-- Navigation Menu -->
-        <nav class="flex-1 px-1 py-4 overflow-y-auto no-print">
-          <div class="sidebar-eyebrow">Overview</div>
-
+        <nav class="flex-1 px-1 py-4 space-y-0.5 overflow-y-auto no-print">
           <a
             href="{{ url_for('main.index') }}"
-            class="sidebar-item {% if request.path == url_for('main.index') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('main.index') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
               <svg
-                class="w-[1.1rem] h-[1.1rem]"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -548,15 +1000,13 @@
             <span>Dashboard</span>
           </a>
 
-          <div class="sidebar-eyebrow">People</div>
-
           <a
             href="{{ url_for('students.index') }}"
-            class="sidebar-item {% if request.path == url_for('students.index') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('students.index') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
               <svg
-                class="w-[1.1rem] h-[1.1rem]"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -574,23 +1024,21 @@
 
           <a
             href="{{ url_for('teachers.index') }}"
-            class="sidebar-item {% if request.path == url_for('teachers.index') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('teachers.index') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
-              <div class="fas fa-person-chalkboard text-[0.95rem]"></div>
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+              <div class="fas fa-person-chalkboard w-4 h-4"></div>
             </div>
             <span>Teachers</span>
           </a>
 
-          <div class="sidebar-eyebrow">Academics</div>
-
           <a
             href="{{ url_for('classes.index') }}"
-            class="sidebar-item {% if request.path == url_for('classes.index') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('classes.index') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
               <svg
-                class="w-[1.1rem] h-[1.1rem]"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -608,11 +1056,11 @@
 
           <a
             href="{{ url_for('attendance.attendance_dashboard') }}"
-            class="sidebar-item {% if request.path == url_for('attendance.attendance_dashboard') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('attendance.attendance_dashboard') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
               <svg
-                class="w-[1.1rem] h-[1.1rem]"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -627,24 +1075,23 @@
             </div>
             <span>Students Attendance</span>
           </a>
-
           <a
             href="{{ url_for('teacher_attendance.index') }}"
-            class="sidebar-item {% if request.path == url_for('teacher_attendance.index') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('teacher_attendance.index') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
-              <div class="fas fa-check-to-slot text-[0.95rem]"></div>
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+              <div class="fas fa-check-to-slot w-4 h-4"></div>
             </div>
             <span>Teachers Attendance</span>
           </a>
 
           <a
             href="{{ url_for('exams_grading.index') }}"
-            class="sidebar-item {% if request.path == url_for('exams_grading.index') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('exams_grading.index') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
               <svg
-                class="w-[1.1rem] h-[1.1rem]"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -662,21 +1109,21 @@
 
           <a
             href="{{ url_for('student_promotion.index') }}"
-            class="sidebar-item {% if request.path == url_for('student_promotion.index') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('student_promotion.index') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
-              <div class="fas fa-sort-up text-[0.95rem]"></div>
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+              <div class="fas fa-sort-up w-4 h-4"></div>
             </div>
             <span>Promotions</span>
           </a>
 
           <a
             href="{{ url_for('graduation.graduation_management') }}"
-            class="sidebar-item {% if request.path == url_for('graduation.alumni_list') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('graduation.alumni_list') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
               <svg
-                class="w-[1.1rem] h-[1.1rem]"
+                class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
@@ -690,15 +1137,21 @@
             <span>Alumni</span>
           </a>
 
-          <div class="sidebar-eyebrow">System</div>
+          <!-- Divider -->
+          <div
+            class="my-4 mx-3 border-t"
+            style="border-color: var(--side-border)"
+          ></div>
+
+          <!-- Additional Menu Items -->
 
           <a
             href="{{ url_for('exams_grading.school_info') }}"
-            class="sidebar-item {% if request.path == url_for('exams_grading.school_info') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('exams_grading.school_info') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
               <svg
-                class="w-[1.1rem] h-[1.1rem]"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -722,29 +1175,36 @@
 
           <a
             href="{{url_for('main.backup_dashboard')}}"
-            class="sidebar-item {% if request.path == url_for('students.export_csv') %}active{% endif %}"
+            class="sidebar-item flex items-center space-x-3 {% if request.path == url_for('students.export_csv') %} active {% endif %}"
           >
-            <div class="sidebar-icon">
-              <div class="fas fa-hard-drive text-[0.95rem]"></div>
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+              <div
+                class="fas fa-hard-drive w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              ></div>
             </div>
             <span>Database Backup</span>
           </a>
 
+          <!-- In your navigation template -->
           <a
             href="{{ url_for('main.contact_developer') }}"
-            class="sidebar-item"
+            class="sidebar-item flex items-center space-x-3"
           >
-            <div class="sidebar-icon">
-              <div class="fas fa-user text-[0.95rem]"></div>
+            <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+              <div class="fas fa-user w-4 h-4"></div>
             </div>
             <span>Contact Developer</span>
           </a>
         </nav>
 
         <!-- Sidebar Footer -->
-        <div class="px-5 py-3 border-t border-white/10">
+        <div class="p-4 border-t" style="border-color: var(--side-border)">
           <div
-            class="flex items-center justify-between text-[0.68rem] text-white/40"
+            class="flex items-center justify-between text-xs"
+            style="color: var(--side-text-muted)"
           >
             <span class="code-font">v1.1.0</span>
             <span class="current-time code-font"></span>
@@ -755,17 +1215,19 @@
       <!-- Main Content Area -->
       <div class="content-area">
         <!-- Top Header -->
-        <header class="sticky top-0 z-30 surface-strong">
-          <div class="px-6 py-3.5">
-            <div class="flex justify-between items-center gap-4">
+        <header class="sticky top-0 z-30 glass-strong">
+          <div class="px-6 py-4">
+            <div class="flex justify-between items-center">
               <!-- Mobile Menu Toggle -->
               <button
                 @click="mobileMenuOpen = !mobileMenuOpen"
-                class="p-2 rounded-lg surface hover:border-[var(--brass-400)] transition-all duration-200 lg:hidden interactive"
+                class="icon-btn lg:hidden interactive"
+                aria-label="Toggle navigation menu"
+                :aria-expanded="mobileMenuOpen.toString()"
               >
                 <svg
                   x-show="!mobileMenuOpen"
-                  class="w-5 h-5 text-[#1b2140] dark:text-white"
+                  class="w-5 h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -779,7 +1241,7 @@
                 </svg>
                 <svg
                   x-show="mobileMenuOpen"
-                  class="w-5 h-5 text-[#1b2140] dark:text-white"
+                  class="w-5 h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -794,22 +1256,18 @@
               </button>
 
               <!-- Page Title -->
-              <div class="flex-1 min-w-0">
-                <h1
-                  class="font-display text-xl md:text-2xl font-semibold text-[#131730] dark:text-white truncate"
-                >
+              <div class="flex-1 lg:ml-0 ml-4">
+                <h1 class="text-xl font-semibold text-primary">
                   {% block page_title %}Dashboard{% endblock %}
                 </h1>
-                <p
-                  class="text-sm text-[#4a4f6e] dark:text-white/50 mt-0.5 truncate"
-                >
+                <p class="text-sm text-secondary mt-0.5">
                   {% block page_description %}Welcome to the management
                   dashboard{% endblock %}
                 </p>
               </div>
 
               <!-- Header Actions -->
-              <div class="flex items-center space-x-3 flex-shrink-0">
+              <div class="flex items-center space-x-3">
                 <!-- Search -->
                 <div class="hidden md:flex items-center">
                   <div
@@ -819,8 +1277,9 @@
                   >
                     <input
                       type="text"
-                      placeholder="Search students or teachers…"
-                      class="w-64 px-4 py-2 pl-9 text-sm text-[#1b2140] dark:text-white bg-white dark:bg-[var(--ink-800)] border border-[var(--paper-200)] dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--brass-400)] focus:border-transparent transition-all duration-200"
+                      placeholder="Search students or teachers..."
+                      aria-label="Search students or teachers"
+                      class="input-field w-64 px-4 py-2 pl-10 text-sm"
                       x-model="query"
                       x-on:input.debounce.300ms="search()"
                       x-on:focus="showResults = true"
@@ -828,7 +1287,7 @@
                       x-ref="searchInput"
                     />
                     <svg
-                      class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#8a8fb0]"
+                      class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -847,7 +1306,7 @@
                       class="absolute right-3 top-1/2 transform -translate-y-1/2"
                     >
                       <svg
-                        class="animate-spin h-4 w-4 text-[var(--brass-500)]"
+                        class="animate-spin h-4 w-4 spinner-accent"
                         fill="none"
                         viewBox="0 0 24 24"
                       >
@@ -870,19 +1329,16 @@
                     <!-- Search Results Dropdown -->
                     <div
                       x-show="showResults && (students.length > 0 || teachers.length > 0 || query.length > 0)"
-                      class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[var(--ink-800)] rounded-xl shadow-lg border border-[var(--paper-200)] dark:border-white/10 max-h-96 overflow-y-auto z-50"
+                      class="dropdown-panel absolute top-full left-0 right-0 mt-2 max-h-96 overflow-y-auto z-50"
                       x-on:click.outside="showResults = false"
                     >
                       <!-- Students Section -->
                       <template x-if="students.length > 0">
                         <div>
                           <div
-                            class="px-4 py-2 bg-[var(--paper-50)] dark:bg-white/5 border-b border-[var(--paper-200)] dark:border-white/10"
+                            class="dropdown-section-label px-4 py-2 uppercase"
                           >
-                            <span
-                              class="text-xs font-semibold text-[#6b7094] dark:text-white/40 uppercase tracking-wide"
-                              >Students</span
-                            >
+                            <span>Students</span>
                           </div>
                           <template
                             x-for="student in students"
@@ -890,29 +1346,25 @@
                           >
                             <a
                               :href="`/students/${student.id}`"
-                              class="flex items-center px-4 py-3 hover:bg-[var(--paper-50)] dark:hover:bg-white/5 border-b border-[var(--paper-200)] dark:border-white/5 transition-colors duration-150"
+                              class="dropdown-row flex items-center px-4 py-3"
                             >
                               <div
-                                class="flex-shrink-0 w-8 h-8 bg-[var(--pine-500)]/10 rounded-full flex items-center justify-center mr-3"
+                                class="avatar-tile flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3"
                               >
-                                <i
-                                  class="fas fa-user-graduate text-[var(--pine-500)] text-xs"
-                                ></i>
+                                <i class="fas fa-user-graduate text-xs"></i>
                               </div>
                               <div class="flex-1 min-w-0">
                                 <p
-                                  class="text-sm font-medium text-[#1b2140] dark:text-white truncate"
+                                  class="text-sm font-medium text-primary truncate"
                                   x-text="student.full_name"
                                 ></p>
                                 <p
-                                  class="text-xs text-[#6b7094] dark:text-white/40 truncate"
+                                  class="text-xs text-muted truncate"
                                   x-text="student.guardian_name || 'No guardian'"
                                 ></p>
                               </div>
                               <div class="flex-shrink-0 ml-2">
-                                <span
-                                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--pine-500)]/10 text-[var(--pine-600)] dark:text-[var(--pine-500)]"
-                                >
+                                <span class="badge badge-accent">
                                   Student
                                 </span>
                               </div>
@@ -925,12 +1377,9 @@
                       <template x-if="teachers.length > 0">
                         <div>
                           <div
-                            class="px-4 py-2 bg-[var(--paper-50)] dark:bg-white/5 border-b border-[var(--paper-200)] dark:border-white/10"
+                            class="dropdown-section-label px-4 py-2 uppercase"
                           >
-                            <span
-                              class="text-xs font-semibold text-[#6b7094] dark:text-white/40 uppercase tracking-wide"
-                              >Teachers</span
-                            >
+                            <span>Teachers</span>
                           </div>
                           <template
                             x-for="teacher in teachers"
@@ -938,31 +1387,27 @@
                           >
                             <a
                               :href="`/teachers/${teacher.id}`"
-                              class="flex items-center px-4 py-3 hover:bg-[var(--paper-50)] dark:hover:bg-white/5 border-b border-[var(--paper-200)] dark:border-white/5 transition-colors duration-150"
+                              class="dropdown-row flex items-center px-4 py-3"
                             >
                               <div
-                                class="flex-shrink-0 w-8 h-8 bg-[var(--brass-500)]/10 rounded-full flex items-center justify-center mr-3"
+                                class="avatar-tile-brass flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3"
                               >
                                 <i
-                                  class="fas fa-chalkboard-teacher text-[var(--brass-600)] dark:text-[var(--brass-400)] text-xs"
+                                  class="fas fa-chalkboard-teacher text-xs"
                                 ></i>
                               </div>
                               <div class="flex-1 min-w-0">
                                 <p
-                                  class="text-sm font-medium text-[#1b2140] dark:text-white truncate"
+                                  class="text-sm font-medium text-primary truncate"
                                   x-text="teacher.full_name"
                                 ></p>
                                 <p
-                                  class="text-xs text-[#6b7094] dark:text-white/40 truncate"
+                                  class="text-xs text-muted truncate"
                                   x-text="teacher.staff_id || 'No staff ID'"
                                 ></p>
                               </div>
                               <div class="flex-shrink-0 ml-2">
-                                <span
-                                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--brass-500)]/10 text-[var(--brass-700)] dark:text-[var(--brass-400)]"
-                                >
-                                  Teacher
-                                </span>
+                                <span class="badge badge-brass"> Teacher </span>
                               </div>
                             </a>
                           </template>
@@ -974,19 +1419,15 @@
                         x-if="!loading && students.length === 0 && teachers.length === 0 && query.length > 0"
                       >
                         <div class="px-4 py-8 text-center">
-                          <i
-                            class="fas fa-search text-3xl text-[var(--paper-200)] dark:text-white/10 mb-2"
-                          ></i>
-                          <p class="text-[#6b7094] dark:text-white/40 text-sm">
+                          <i class="fas fa-search text-2xl text-muted mb-2"></i>
+                          <p class="text-secondary text-sm">
                             No results found for "<span
                               x-text="query"
                               class="font-medium"
                             ></span
                             >"
                           </p>
-                          <p
-                            class="text-xs text-[#8a8fb0] dark:text-white/30 mt-1"
-                          >
+                          <p class="text-xs text-muted mt-1">
                             Try searching by name, guardian, or staff ID
                           </p>
                         </div>
@@ -995,9 +1436,13 @@
                       <!-- Search Tips -->
                       <template x-if="query.length === 0">
                         <div
-                          class="px-4 py-3 bg-[var(--paper-50)] dark:bg-white/5 border-t border-[var(--paper-200)] dark:border-white/10"
+                          class="px-4 py-3"
+                          style="
+                            background: var(--surface-sunken);
+                            border-top: 1px solid var(--border-subtle);
+                          "
                         >
-                          <p class="text-xs text-[#6b7094] dark:text-white/40">
+                          <p class="text-xs text-muted">
                             <i class="fas fa-lightbulb mr-1"></i>
                             Search by name, guardian name, or staff ID
                           </p>
@@ -1010,11 +1455,12 @@
                 <!-- Theme Toggle -->
                 <button
                   @click="$store.theme.toggle()"
-                  class="p-2 rounded-lg surface hover:border-[var(--brass-400)] transition-all duration-200 interactive"
+                  class="icon-btn interactive"
+                  aria-label="Toggle dark mode"
                 >
                   <svg
                     x-show="!$store.theme.dark"
-                    class="w-[1.1rem] h-[1.1rem] text-[#1b2140]"
+                    class="w-5 h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -1028,7 +1474,7 @@
                   </svg>
                   <svg
                     x-show="$store.theme.dark"
-                    class="w-[1.1rem] h-[1.1rem] text-[var(--brass-400)]"
+                    class="w-5 h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -1046,19 +1492,25 @@
                 <div class="relative" x-data="{ open: false }">
                   <button
                     @click="open = !open"
-                    class="flex items-center space-x-2.5 p-1.5 pr-3 rounded-lg surface hover:border-[var(--brass-400)] transition-all duration-200 interactive"
+                    class="flex items-center space-x-3 p-2 rounded-md interactive"
+                    style="
+                      border: 1px solid var(--border);
+                      background: var(--surface);
+                    "
+                    aria-haspopup="true"
+                    :aria-expanded="open.toString()"
+                    aria-label="Account menu"
                   >
                     <div
-                      class="w-8 h-8 rounded-md bg-[var(--ink-900)] dark:bg-[var(--brass-gradient)] flex items-center justify-center text-[#f4f0e6] dark:text-[#1b2140] font-display font-semibold text-sm"
+                      class="avatar-solid w-8 h-8 rounded-md flex items-center justify-center font-semibold text-sm"
                     >
                       A
                     </div>
-                    <span
-                      class="text-[#1b2140] dark:text-white font-medium text-sm hidden md:block"
+                    <span class="text-primary font-medium hidden md:block"
                       >Admin</span
                     >
                     <svg
-                      class="w-4 h-4 text-[#8a8fb0] transition-transform duration-200"
+                      class="w-4 h-4 text-muted transition-transform duration-200"
                       :class="{ 'rotate-180': open }"
                       fill="none"
                       stroke="currentColor"
@@ -1083,25 +1535,22 @@
                     x-transition:leave="transition ease-in duration-75"
                     x-transition:leave-start="opacity-100 scale-100"
                     x-transition:leave-end="opacity-0 scale-95"
-                    class="absolute right-0 mt-2 w-60 bg-white dark:bg-[var(--ink-800)] rounded-xl shadow-xl border border-[var(--paper-200)] dark:border-white/10 overflow-hidden"
+                    class="dropdown-panel absolute right-0 mt-3 w-56 overflow-hidden"
                   >
-                    <div class="p-1.5">
+                    <div class="p-2">
                       <div
-                        class="px-3.5 py-3 border-b border-[var(--paper-200)] dark:border-white/10"
+                        class="px-3 py-3 border-b"
+                        style="border-color: var(--border-subtle)"
                       >
-                        <p
-                          class="text-sm text-[#1b2140] dark:text-white font-medium"
-                        >
+                        <p class="text-sm text-primary font-medium">
                           Admin: ({{current_user.username}})
                         </p>
-                        <p class="text-xs text-[#6b7094] dark:text-white/40">
-                          {{current_user.email}}
-                        </p>
+                        <p class="text-xs text-muted">{{current_user.email}}</p>
                       </div>
-                      <div class="mt-1.5 space-y-0.5">
+                      <div class="mt-1 space-y-0.5">
                         <a
                           href="{{url_for('auth.register')}}"
-                          class="flex items-center space-x-3 px-3.5 py-2.5 text-sm text-[#333c68] dark:text-white/70 hover:bg-[var(--brass-500)]/10 rounded-lg transition-colors duration-150"
+                          class="menu-link flex items-center space-x-3 px-3 py-2.5 text-sm"
                         >
                           <svg
                             class="w-4 h-4"
@@ -1119,11 +1568,12 @@
                           <span>Add New User</span>
                         </a>
                         <div
-                          class="border-t border-[var(--paper-200)] dark:border-white/10 my-1"
+                          class="border-t my-1"
+                          style="border-color: var(--border-subtle)"
                         ></div>
                         <a
                           href="/logout"
-                          class="flex items-center space-x-3 px-3.5 py-2.5 text-sm text-[var(--rose-500)] hover:bg-[var(--rose-500)]/10 rounded-lg transition-colors duration-150"
+                          class="menu-link-danger flex items-center space-x-3 px-3 py-2.5 text-sm"
                         >
                           <svg
                             class="w-4 h-4"
@@ -1152,15 +1602,16 @@
         <!-- Main Content -->
         <main class="flex-1 p-6">
           <!-- Content Container -->
-          <div class="doc-card marked p-8 min-h-[calc(100vh-12rem)]">
+          <div class="professional-card p-8 min-h-[calc(100vh-12rem)]">
             {% block content %}
             <!-- Default content if no content block is provided -->
             <div class="text-center py-20">
               <div
-                class="w-24 h-24 mx-auto mb-8 rounded-2xl bg-[var(--ink-900)] dark:bg-[var(--brass-gradient)] flex items-center justify-center shadow-lg"
+                class="avatar-solid w-16 h-16 mx-auto mb-8 rounded-lg flex items-center justify-center"
+                style="box-shadow: var(--shadow-md)"
               >
                 <svg
-                  class="w-11 h-11 text-[var(--brass-400)] dark:text-[#1b2140]"
+                  class="w-8 h-8"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1169,55 +1620,99 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="1.5"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
                   ></path>
                 </svg>
               </div>
-              <h2
-                class="font-display text-3xl md:text-4xl font-semibold text-[#131730] dark:text-white mb-4"
-              >
+              <h2 class="text-3xl font-semibold text-primary mb-4">
                 Welcome to <span class="gradient-text">EduSync SMS</span>
               </h2>
               <p
-                class="text-[#4a4f6e] dark:text-white/50 text-lg max-w-2xl mx-auto leading-relaxed"
+                class="text-secondary text-lg max-w-2xl mx-auto leading-relaxed"
               >
-                School management for daily administration — students, staff,
-                attendance, and academic records in one place.
+                Professional School Management System designed for excellence in
+                education administration and student success.
               </p>
 
               <!-- Quick Stats -->
               <div
                 class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-12 max-w-4xl mx-auto"
               >
-                <div class="p-6 surface rounded-xl hover-lift text-left">
+                <div
+                  class="stat-tile hover-lift p-6 surface rounded-lg text-left"
+                  style="border-left: 3px solid var(--accent)"
+                >
                   <div
-                    class="font-display text-3xl font-semibold text-[#131730] dark:text-white"
+                    class="avatar-tile w-9 h-9 rounded-md flex items-center justify-center mb-4"
                   >
-                    250+
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                      ></path>
+                    </svg>
                   </div>
-                  <div class="text-sm text-[#6b7094] dark:text-white/40 mt-1">
+                  <div class="text-3xl font-semibold text-accent">250+</div>
+                  <div class="text-sm text-secondary mt-1">
                     Students Enrolled
                   </div>
                 </div>
-                <div class="p-6 surface rounded-xl hover-lift text-left">
+                <div
+                  class="stat-tile hover-lift p-6 surface rounded-lg text-left"
+                  style="border-left: 3px solid var(--brass)"
+                >
                   <div
-                    class="font-display text-3xl font-semibold text-[var(--brass-600)] dark:text-[var(--brass-400)]"
+                    class="avatar-tile-brass w-9 h-9 rounded-md flex items-center justify-center mb-4"
+                  >
+                    <div class="fas fa-person-chalkboard w-4 h-4 text-sm"></div>
+                  </div>
+                  <div
+                    class="text-3xl font-semibold"
+                    style="color: var(--brass)"
                   >
                     25+
                   </div>
-                  <div class="text-sm text-[#6b7094] dark:text-white/40 mt-1">
-                    Teaching Staff
-                  </div>
+                  <div class="text-sm text-secondary mt-1">Teaching Staff</div>
                 </div>
-                <div class="p-6 surface rounded-xl hover-lift text-left">
+                <div
+                  class="stat-tile hover-lift p-6 surface rounded-lg text-left"
+                  style="border-left: 3px solid var(--success)"
+                >
                   <div
-                    class="font-display text-3xl font-semibold text-[var(--pine-600)] dark:text-[var(--pine-500)]"
+                    class="w-9 h-9 rounded-md flex items-center justify-center mb-4"
+                    style="
+                      background: var(--success-tint);
+                      color: var(--success);
+                    "
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div
+                    class="text-3xl font-semibold"
+                    style="color: var(--success)"
                   >
                     15+
                   </div>
-                  <div class="text-sm text-[#6b7094] dark:text-white/40 mt-1">
-                    Active Classes
-                  </div>
+                  <div class="text-sm text-secondary mt-1">Active Classes</div>
                 </div>
               </div>
             </div>
@@ -1225,17 +1720,16 @@
           </div>
         </main>
 
-        <!-- Footer -->
-        <footer
-          class="surface-strong border-t border-[var(--paper-200)] dark:border-white/10 mt-auto"
-        >
+        <!-- Professional Footer -->
+        <footer class="app-footer mt-auto">
           <div class="px-6 py-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
               <!-- Brand Section -->
               <div class="md:col-span-2">
                 <div class="flex items-center space-x-3 mb-4">
                   <div
-                    class="p-1.5 bg-white dark:bg-white/5 rounded-lg border border-[var(--paper-200)] dark:border-white/10"
+                    class="p-2 rounded-md"
+                    style="background: var(--surface-sunken)"
                   >
                     <a href="{{ url_for('main.index') }}">
                       <img
@@ -1247,13 +1741,11 @@
                     </a>
                   </div>
                   <div>
-                    <h3
-                      class="font-display text-lg font-semibold text-[#131730] dark:text-white"
-                    >
+                    <h3 class="text-base font-semibold gradient-text">
                       Namong SDA JHS
                     </h3>
-                    <p class="text-[#6b7094] dark:text-white/40 text-xs">
-                      Administrative Records System
+                    <p class="text-muted text-xs">
+                      Professional Administrative Tool
                     </p>
                   </div>
                 </div>
@@ -1261,30 +1753,28 @@
 
               <!-- Quick Links -->
               <div>
-                <h4
-                  class="text-[#131730] dark:text-white font-semibold mb-4 text-sm"
-                >
+                <h4 class="text-primary font-semibold mb-4 text-sm">
                   Quick Access
                 </h4>
                 <ul class="space-y-3">
                   <li>
                     <a
                       href="/dashboard"
-                      class="text-[#6b7094] dark:text-white/40 hover:text-[var(--brass-600)] dark:hover:text-[var(--brass-400)] text-sm transition-colors duration-200"
+                      class="text-secondary hover:text-accent text-sm transition-colors duration-150"
                       >Dashboard</a
                     >
                   </li>
                   <li>
                     <a
                       href="/students"
-                      class="text-[#6b7094] dark:text-white/40 hover:text-[var(--brass-600)] dark:hover:text-[var(--brass-400)] text-sm transition-colors duration-200"
+                      class="text-secondary hover:text-accent text-sm transition-colors duration-150"
                       >Students</a
                     >
                   </li>
                   <li>
                     <a
                       href="/teachers"
-                      class="text-[#6b7094] dark:text-white/40 hover:text-[var(--brass-600)] dark:hover:text-[var(--brass-400)] text-sm transition-colors duration-200"
+                      class="text-secondary hover:text-accent text-sm transition-colors duration-150"
                       >Teachers</a
                     >
                   </li>
@@ -1293,16 +1783,12 @@
 
               <!-- Support -->
               <div>
-                <h4
-                  class="text-[#131730] dark:text-white font-semibold mb-4 text-sm"
-                >
-                  Support
-                </h4>
+                <h4 class="text-primary font-semibold mb-4 text-sm">Support</h4>
                 <ul class="space-y-3">
                   <li>
                     <a
                       href="{{url_for('main.contact_developer')}}"
-                      class="text-[#6b7094] dark:text-white/40 hover:text-[var(--brass-600)] dark:hover:text-[var(--brass-400)] text-sm transition-colors duration-200"
+                      class="text-secondary hover:text-accent text-sm transition-colors duration-150"
                       >Contact Developer</a
                     >
                   </li>
@@ -1312,22 +1798,17 @@
 
             <!-- Bottom Section -->
             <div
-              class="mt-8 pt-6 border-t border-[var(--paper-200)] dark:border-white/10 flex flex-col md:flex-row justify-between items-center"
+              class="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between items-center"
+              style="border-color: var(--border-subtle)"
             >
-              <p class="text-[#8a8fb0] dark:text-white/30 text-sm">
-                © EduSync. All rights reserved.
-              </p>
+              <p class="text-muted text-sm">© EduSync. All rights reserved.</p>
               <div class="flex items-center space-x-4 mt-4 md:mt-0">
-                <span
-                  class="font-medium text-[#8a8fb0] dark:text-white/30 text-xs code-font mr-2"
-                >
+                <span class="font-semibold text-muted text-xs code-font mr-2">
                   Developer: Evans Adu
                 </span>
                 <div class="flex items-center space-x-2">
                   <div class="status-dot"></div>
-                  <span class="text-[#8a8fb0] dark:text-white/30 text-xs ml-1"
-                    >System Online</span
-                  >
+                  <span class="text-muted text-xs ml-1">System Online</span>
                 </div>
               </div>
             </div>
@@ -1346,7 +1827,7 @@
       x-transition:leave="transition-opacity ease-linear duration-300"
       x-transition:leave-start="opacity-100"
       x-transition:leave-end="opacity-0"
-      class="fixed inset-0 bg-[#0d1120]/50 backdrop-blur-sm z-30 lg:hidden"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
     ></div>
   </body>
 

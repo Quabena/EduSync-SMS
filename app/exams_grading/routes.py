@@ -1,4 +1,5 @@
 import json
+import uuid
 from flask import (
     render_template,
     request,
@@ -10,6 +11,7 @@ from flask import (
     Response,
     make_response,
     abort,
+    send_from_directory,
 )
 from flask_login import login_required, current_user
 from app import db
@@ -1463,38 +1465,102 @@ def report_card_pdf(student_id, term, year):
     return response
 
 
-# Route for admin/headteacher's interface for managing school information and term dates
+ALLOWED_LOGO_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
+MAX_LOGO_BYTES = 2 * 1024 * 1024  # 2 MB
+
+
+def _logo_extension(filename: str) -> str | None:
+    """Return the lowercase extension (without dot) if allowed, else None."""
+    if "." not in filename:
+        return None
+    ext = filename.rsplit(".", 1)[1].lower()
+    return ext if ext in ALLOWED_LOGO_EXTENSIONS else None
+
+
 @bp.route("/school-info", methods=["GET", "POST"])
 @login_required
 @role_required(["admin", "headteacher"])
 def school_info():
-    """Manage school information"""
+    """Manage school information."""
     school = SchoolInfo.query.first()
     form = SchoolInfoForm(obj=school)
 
     if form.validate_on_submit():
         if not school:
             school = SchoolInfo()
+            db.session.add(school)
 
         form.populate_obj(school)
 
-        # Handle logo upload
-        if "logo" in request.files:
-            logo = request.files["logo"]
-            if logo and logo.filename != "":
-                filename = secure_filename(logo.filename)  # type: ignore
-                logo_path = os.path.join(current_app.config["DOCUMENT_DIR"], filename)
-                logo.save(logo_path)
-                school.logo_path = filename
+        logo = request.files.get("logo")
+        if logo and logo.filename:
+            ext = _logo_extension(logo.filename)
+            if not ext:
+                flash("Logo must be a PNG, JPG, or WebP image.", "error")
+                return redirect(url_for("exams_grading.school_info"))
 
-        if not SchoolInfo.query.first():
-            db.session.add(school)
+            # Reject oversized files without trusting the client
+            logo.seek(0, os.SEEK_END)
+            size = logo.tell()
+            logo.seek(0)
+            if size > MAX_LOGO_BYTES:
+                flash("Logo must be smaller than 2 MB.", "error")
+                return redirect(url_for("exams_grading.school_info"))
+
+            # Unique filename on every upload — this is the cache-buster.
+            # The old file (if any) gets removed so we don't leak disk space.
+            new_filename = f"school_logo_{uuid.uuid4().hex[:12]}.{ext}"
+            document_dir = current_app.config["DOCUMENT_DIR"]
+            os.makedirs(document_dir, exist_ok=True)
+
+            old_filename = school.logo_path
+            logo.save(os.path.join(document_dir, new_filename))
+            school.logo_path = new_filename
+
+            if old_filename and old_filename != new_filename:
+                old_path = os.path.join(document_dir, old_filename)
+                try:
+                    if os.path.isfile(old_path):
+                        os.remove(old_path)
+                except OSError:
+                    current_app.logger.warning(
+                        "Could not remove old logo: %s", old_path
+                    )
 
         db.session.commit()
         flash("School information updated successfully!", "success")
         return redirect(url_for("exams_grading.school_info"))
 
-    return render_template("exams_grading/school_info.html", form=form, school=school)
+    return render_template(
+        "exams_grading/school_info.html",
+        form=form,
+        school=school,
+    )
+
+
+@bp.route("/school-info/logo")
+def school_logo():
+    """Serve the current school logo.
+
+    No @login_required because the logo may appear on login pages,
+    receipts, PDF reports, etc. Long cache is safe because the URL
+    is versioned via ?v=<filename> — a new upload produces a new
+    filename, which produces a new URL, which forces a fresh fetch.
+    """
+    school = SchoolInfo.query.first()
+    if not school or not school.logo_path:
+        abort(404)
+
+    document_dir = current_app.config["DOCUMENT_DIR"]
+    response = send_from_directory(
+        document_dir,
+        school.logo_path,
+        max_age=31536000,  # 1 year — safe because URL changes on update
+    )
+    # Belt-and-braces: tell intermediaries this is fine to cache
+    # aggressively only when the query string matches the filename.
+    response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    return response
 
 
 # ---Term Dates---

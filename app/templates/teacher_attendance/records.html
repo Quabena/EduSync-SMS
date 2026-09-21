@@ -1,457 +1,1677 @@
-{% extends 'base.html' %}
-
-{% block title %}Attendance Records • Staff Portal{% endblock %}
-
-{% block head %}
-<!-- Font Awesome Icons -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+{% extends 'base.html' %} {% block title %}Attendance Records • Staff Portal{%
+endblock %} {% block content %}
 
 <style>
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+  .records-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
-  
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+
+  .dark .records-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
   }
-  
-  @keyframes pulseSubtle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
+
+  .records-page *,
+  .records-page *::before,
+  .records-page *::after {
+    box-sizing: border-box;
   }
-  
-  .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
+  .records-page a {
+    color: inherit;
+    text-decoration: none;
   }
-  
-  .animate-slide-in-right {
-    animation: slideInRight 0.5s ease-out;
+  .records-page .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
-  
-  .animate-pulse-subtle {
-    animation: pulseSubtle 2s infinite;
-  }
-  
-  .glass-morphism {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .gradient-border {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2px;
-    border-radius: 16px;
-  }
-  
-  .gradient-border-inner {
-    background: white;
-    border-radius: 14px;
-    padding: 1.5rem;
-  }
-  
-  .status-indicator {
+
+  /* ---------- Hero ---------- */
+  .records-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 26px 22px 30px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
     position: relative;
-    overflow: hidden;
   }
-  
-  .status-indicator::before {
-    content: '';
+  .records-hero::before {
+    content: "";
     position: absolute;
     top: 0;
-    left: -100%;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--brass);
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .records-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3.2vw, 34px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .records-hero p {
+    margin: 0;
+    max-width: 620px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin-top: 14px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .hero-meta .hero-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--green-edge);
+    border-radius: 3px;
+    background: var(--green-wash);
+    color: var(--green);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .hero-meta .hero-stamp.brass {
+    border-color: var(--brass-edge);
+    background: var(--brass-wash);
+    color: var(--brass);
+  }
+  .hero-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .dash-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .dash-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .dash-btn:hover {
+    border-color: var(--ink);
+  }
+  .dash-btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .dash-btn.primary {
+    color: #131817;
+  }
+  .dash-btn.primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .dash-btn.primary:hover {
+    color: #131817;
+  }
+
+  /* ---------- Flash ---------- */
+  .flash-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0 0;
+  }
+  .flash {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .flash.is-error {
+    border-color: var(--red-edge);
+    background: var(--red-wash);
+    color: var(--red);
+  }
+  .flash.is-success {
+    border-color: var(--green-edge);
+    background: var(--green-wash);
+    color: var(--green);
+  }
+  .flash svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ---------- Summary strip ---------- */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 16px 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .summary-card {
+    padding: 16px 20px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .summary-card:last-child {
+    border-right: 0;
+  }
+  .summary-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--ink);
+  }
+  .summary-card:nth-child(1)::before {
+    background: var(--ink);
+  }
+  .summary-card:nth-child(2)::before {
+    background: var(--green);
+  }
+  .summary-card:nth-child(3)::before {
+    background: var(--brass);
+  }
+  .summary-card:nth-child(4)::before {
+    background: var(--red);
+  }
+  .summary-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .summary-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Layout grid ---------- */
+  .records-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.78fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .records-main,
+  .records-side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+  .dash-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .dash-card-head {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .dash-card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .dash-card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ---------- Filter form ---------- */
+  .filter-form {
+    padding: 18px 20px 20px;
+  }
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    align-items: end;
+  }
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .filter-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .filter-input,
+  .filter-select {
     width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    transition: left 0.5s;
+    min-height: 40px;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
   }
-  
-  .status-indicator:hover::before {
-    left: 100%;
+  .filter-input:focus,
+  .filter-select:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
+  }
+  .filter-select {
+    cursor: pointer;
   }
 
-  /* Custom scrollbar for table */
-  .table-container {
+  /* Quick date chips */
+  .quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .chip-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--copy);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .chip-btn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+    background: var(--surface-alt);
+  }
+  .chip-btn svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Records table ---------- */
+  .table-wrap {
+    overflow-x: auto;
     scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 #f1f5f9;
+    scrollbar-color: var(--line) var(--surface-alt);
   }
-
-  .table-container::-webkit-scrollbar {
+  .table-wrap::-webkit-scrollbar {
     height: 8px;
   }
-
-  .table-container::-webkit-scrollbar-track {
-    background: #f1f5f9;
+  .table-wrap::-webkit-scrollbar-track {
+    background: var(--surface-alt);
+  }
+  .table-wrap::-webkit-scrollbar-thumb {
+    background: var(--line);
     border-radius: 4px;
   }
 
-  .table-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+  .records-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+  }
+  .records-table thead {
+    background: var(--surface-muted, var(--surface-alt));
+    position: sticky;
+    top: 0;
+  }
+  .records-table th {
+    padding: 12px 18px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .records-table th .th-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .records-table th svg {
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .records-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .records-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .records-table tbody tr:hover {
+    background: var(--surface-alt);
+  }
+
+  /* Date cell */
+  .date-cell .date-main {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .date-cell .date-sub {
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Teacher cell */
+  .teacher-cell {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+  .teacher-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
     border-radius: 4px;
+    background: var(--green-wash);
+    border: 1px solid var(--green-edge);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+  .teacher-meta {
+    min-width: 0;
+  }
+  .teacher-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .teacher-id {
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
 
-  .table-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+  /* Status pill */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .status-pill.is-present {
+    background: var(--green-wash);
+    color: var(--green);
+    border-color: var(--green-edge);
+  }
+  .status-pill.is-absent {
+    background: var(--red-wash);
+    color: var(--red);
+    border-color: var(--red-edge);
+  }
+  .status-pill.is-late {
+    background: var(--brass-wash);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+  .status-pill.is-excused {
+    background: var(--slate-wash);
+    color: var(--slate);
+    border-color: var(--slate-edge);
+  }
+  .status-pill svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
   }
 
-  /* Hover effects for table rows */
-  .table-row-hover {
-    transition: all 0.3s ease;
+  .excuse-note {
+    margin-top: 7px;
+    padding: 7px 9px;
+    max-width: 240px;
+    background: var(--surface-alt);
+    border: 1px solid var(--line-soft);
+    border-radius: 3px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--copy);
   }
 
-  .table-row-hover:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  /* Time cell */
+  .time-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .time-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+  .time-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+    background: var(--surface-alt);
+    color: var(--muted);
+  }
+  .time-badge.is-in {
+    color: var(--green);
+    background: var(--green-wash);
+    border-color: var(--green-edge);
+  }
+  .time-badge.is-out {
+    color: var(--red);
+    background: var(--red-wash);
+    border-color: var(--red-edge);
+  }
+  .time-badge svg {
+    display: block;
+  }
+
+  /* Late cell */
+  .late-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    background: var(--brass-wash);
+    border: 1px solid var(--brass-edge);
+    border-radius: 3px;
+    color: var(--brass);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .late-pill svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+  }
+  .late-empty {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  /* Notes cell */
+  .notes-cell {
+    max-width: 240px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--copy);
+    overflow-wrap: anywhere;
+  }
+  .notes-empty {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  /* Empty state */
+  .table-empty {
+    padding: 60px 24px;
+    text-align: center;
+  }
+  .table-empty svg {
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .table-empty h3 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .table-empty p {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* Table footer */
+  .table-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-alt);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+  }
+  .table-footer .footer-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .table-footer strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .table-footer .footer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--copy);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .table-footer .footer-btn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .table-footer .footer-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ---------- Side panel: register summary ---------- */
+  .side-stat-list {
+    padding: 4px 20px 16px;
+    margin: 0;
+    list-style: none;
+  }
+  .side-stat-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .side-stat-list li:last-child {
+    border-bottom: 0;
+  }
+  .side-stat-list dt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--copy);
+  }
+  .side-stat-list dt .swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    flex-shrink: 0;
+    background: var(--green);
+  }
+  .side-stat-list dt .swatch.brass {
+    background: var(--brass);
+  }
+  .side-stat-list dt .swatch.red {
+    background: var(--red);
+  }
+  .side-stat-list dt .swatch.ink {
+    background: var(--ink);
+  }
+  .side-stat-list dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Side panel: active filters */
+  .filter-pills {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 20px 18px;
+  }
+  .filter-pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    font-family: var(--font-sans);
+    font-size: 12px;
+  }
+  .filter-pill .pill-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .filter-pill .pill-value {
+    font-weight: 600;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
+  }
+  .filter-pill .pill-value.is-empty {
+    color: var(--muted);
+    font-weight: 500;
+    font-style: italic;
+  }
+  .no-filters {
+    padding: 8px 20px 20px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* Shortcut list */
+  .quick-list {
+    padding: 4px 20px 8px;
+  }
+  .quick-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line-soft);
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+  .quick-action:last-child {
+    border-bottom: 0;
+  }
+  .quick-action:hover .quick-title {
+    color: var(--green);
+  }
+  .quick-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--green);
+  }
+  .quick-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .quick-title {
+    display: block;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .quick-copy {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 11px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .records-grid {
+      grid-template-columns: 1fr;
+    }
+    .filter-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 700px) {
+    .records-page {
+      padding: 20px 14px 40px;
+    }
+    .records-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .hero-actions {
+      width: 100%;
+    }
+    .hero-actions .dash-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .summary-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .summary-card:nth-child(2) {
+      border-right: 0;
+    }
+    .summary-card:nth-child(1),
+    .summary-card:nth-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+    .dash-card-head {
+      padding: 14px 16px 12px;
+    }
+    .filter-form {
+      padding: 16px;
+    }
+    .filter-grid {
+      grid-template-columns: 1fr;
+    }
+    .records-table th,
+    .records-table td {
+      padding: 12px 14px;
+    }
+    .side-stat-list,
+    .filter-pills,
+    .quick-list {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+  @media (max-width: 460px) {
+    .summary-grid {
+      grid-template-columns: 1fr;
+    }
+    .summary-card {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .summary-card:last-child {
+      border-bottom: 0;
+    }
   }
 </style>
-{% endblock %}
 
-{% block content %}
-<!-- Background Elements -->
-<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-  <div class="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle"></div>
-  <div class="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle" style="animation-delay: 1s;"></div>
-  <div class="absolute bottom-0 left-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle" style="animation-delay: 2s;"></div>
-</div>
-
-<!-- Navigation -->
-<nav class="glass-morphism sticky top-0 z-50 mb-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="flex justify-between items-center h-16">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-          <i class="fas fa-chalkboard-teacher text-white text-lg"></i>
-        </div>
-        <a href="{{ url_for('teacher_attendance.index') }}">
-        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Staff Attendance
+<div class="records-page">
+  <!-- Hero -->
+  <header class="records-hero">
+    <div class="hero-copy">
+      <p class="dash-kicker">Staff records · Attendance office</p>
+      <h1>Attendance records</h1>
+      <p>Comprehensive history of teacher attendance across the school.</p>
+      <div class="hero-meta">
+        <span class="hero-stamp">Namong SDA JHS</span>
+        <span class="hero-stamp brass">
+          {{ records|length }} record{% if records|length != 1 %}s{% endif %}
+          shown
         </span>
-        </a>
-      </div>
-      <div class="flex space-x-1">
-        <a href="{{ url_for('teacher_attendance.mark_teacher_attendance') }}" 
-           class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center">
-          <i class="fas fa-edit mr-2"></i>
-          Mark Attendance
-        </a>
-        <a href="{{ url_for('teacher_attendance.teacher_attendance_records') }}" 
-           class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium text-sm shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex items-center">
-          <i class="fas fa-database mr-2"></i>
-          Records
-        </a>
-        <a href="{{ url_for('teacher_attendance.teacher_attendance_analytics') }}" 
-           class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center">
-          <i class="fas fa-chart-bar mr-2"></i>
-          Analytics
-        </a>
-        <a href="{{ url_for('teacher_attendance.attendance_settings') }}" 
-           class="px-4 py-2 text-gray-600 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-white/50 hover:shadow-lg flex items-center">
-          <i class="fas fa-cog mr-2"></i>
-          Settings
-        </a>
       </div>
     </div>
-  </div>
-</nav>
-
-<div class="max-w-7xl mx-auto px-4 pb-12">
-  <!-- Header Section -->
-  <div class="text-center mb-12 animate-fade-in-up">
-    <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-2xl mb-6">
-      <i class="fas fa-history text-white text-2xl"></i>
+    <div class="hero-actions">
+      <a
+        href="{{ url_for('teacher_attendance.mark_teacher_attendance') }}"
+        class="dash-btn primary"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+          />
+        </svg>
+        Mark attendance
+      </a>
+      <a href="{{ url_for('teacher_attendance.index') }}" class="dash-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        Back to hub
+      </a>
     </div>
-    <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
-      Attendance Records
-    </h1>
-    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-      Comprehensive history of teacher attendance
-    </p>
+  </header>
+
+  <!-- Flash -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <div class="flash-stack">
+    {% for category, message in messages %}
+    <div
+      class="flash {% if category == 'error' %}is-error{% else %}is-success{% endif %}"
+    >
+      {% if category == 'error' %}
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+        />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+      {% else %}
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </svg>
+      {% endif %}
+      <span>{{ message }}</span>
+    </div>
+    {% endfor %}
   </div>
+  {% endif %} {% endwith %}
 
-  <!-- Flash Messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="max-w-4xl mx-auto mb-8 animate-slide-in-right">
-        {% for category, message in messages %}
-          <div class="glass-morphism rounded-2xl p-4 shadow-lg border-l-4 {% if category == 'error' %}border-red-500{% else %}border-green-500{% endif %}">
-            <div class="flex items-center">
-              <i class="fas {% if category == 'error' %}fa-exclamation-triangle text-red-500{% else %}fa-check-circle text-green-500{% endif %} text-lg mr-3"></i>
-              <span class="text-gray-800">{{ message }}</span>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+  <!-- Summary strip -->
+  <section class="summary-grid" aria-label="Records summary">
+    <div class="summary-card">
+      <span class="summary-label">Total records</span>
+      <strong class="summary-value">{{ records|length }}</strong>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Present</span>
+      <strong class="summary-value">
+        {{ records|selectattr('status', 'equalto', 'present')|list|length }}
+      </strong>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Late</span>
+      <strong class="summary-value">
+        {{ records|selectattr('status', 'equalto', 'late')|list|length }}
+      </strong>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Absent</span>
+      <strong class="summary-value">
+        {{ records|selectattr('status', 'equalto', 'absent')|list|length }}
+      </strong>
+    </div>
+  </section>
 
-  <!-- Main Content -->
-  <div class="space-y-8">
-    <!-- Filters Card -->
-    <div class="gradient-border animate-fade-in-up">
-      <div class="gradient-border-inner">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            <i class="fas fa-filter mr-3 text-purple-500"></i>
-            Filter Records
-          </h2>
-          <div class="flex items-center space-x-2 text-sm text-gray-500">
-            <i class="fas fa-info-circle text-blue-500"></i>
-            <span>{{ records|length }} records found</span>
+  <!-- Main grid -->
+  <div class="records-grid">
+    <!-- Main column -->
+    <main class="records-main">
+      <!-- Filter card -->
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Filters</p>
+            <h2>Narrow the register</h2>
           </div>
+          <span class="head-meta tabular">
+            {{ records|length }} record{% if records|length != 1 %}s{% endif %}
+          </span>
         </div>
-
-        <form method="GET" class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <!-- Teacher Filter -->
-            <div>
-              <label for="teacher_id" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <i class="fas fa-user-tie mr-2 text-blue-500"></i>
-                Teacher
-              </label>
-              <select id="teacher_id" name="teacher_id" 
-                      class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer">
-                <option value="">All Teachers</option>
+        <!-- prettier-ignore -->
+        <form method="GET" class="filter-form">
+          <div class="filter-grid">
+            <!-- Teacher -->
+            <div class="filter-field">
+              <label class="filter-label" for="teacher_id">Teacher</label>
+              <select id="teacher_id" name="teacher_id" class="filter-select">
+                <option value="">All teachers</option>
                 {% for t in teachers %}
-                <option value="{{ t.id }}" {% if teacher_id == t.id %}selected{% endif %}>{{ t.full_name }}</option>
+                <option
+                  value="{{ t.id }}"
+                  {%
+                  if
+                  teacher_id=="t.id"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  {{ t.full_name }}
+                </option>
                 {% endfor %}
               </select>
             </div>
 
-            <!-- Start Date -->
-            <div>
-              <label for="start_date" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <i class="fas fa-calendar-plus mr-2 text-green-500"></i>
-                Start Date
-              </label>
-              <input type="date" id="start_date" name="start_date" value="{{ start_date or '' }}"
-                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer">
+            <!-- Start date -->
+            <div class="filter-field">
+              <label class="filter-label" for="start_date">Start date</label>
+              <input
+                type="date"
+                id="start_date"
+                name="start_date"
+                value="{{ start_date or '' }}"
+                class="filter-input"
+              />
             </div>
 
-            <!-- End Date -->
-            <div>
-              <label for="end_date" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <i class="fas fa-calendar-minus mr-2 text-red-500"></i>
-                End Date
-              </label>
-              <input type="date" id="end_date" name="end_date" value="{{ end_date or '' }}"
-                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer">
+            <!-- End date -->
+            <div class="filter-field">
+              <label class="filter-label" for="end_date">End date</label>
+              <input
+                type="date"
+                id="end_date"
+                name="end_date"
+                value="{{ end_date or '' }}"
+                class="filter-input"
+              />
             </div>
 
-            <!-- Status Filter -->
-            <div>
-              <label for="status" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <i class="fas fa-tag mr-2 text-purple-500"></i>
-                Status
-              </label>
-              <select id="status" name="status" 
-                      class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white cursor-pointer">
-                <option value="">All Status</option>
-                <option value="present" {% if status == 'present' %}selected{% endif %}>Present</option>
-                <option value="absent" {% if status == 'absent' %}selected{% endif %}>Absent</option>
-                <option value="late" {% if status == 'late' %}selected{% endif %}>Late</option>
-                <option value="excused" {% if status == 'excused' %}selected{% endif %}>Excused</option>
+            <!-- Status -->
+            <div class="filter-field">
+              <label class="filter-label" for="status">Status</label>
+              <select id="status" name="status" class="filter-select">
+                <option value="">All statuses</option>
+                <option
+                  value="present"
+                  {%
+                  if
+                  status=="present"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Present
+                </option>
+                <option
+                  value="absent"
+                  {%
+                  if
+                  status=="absent"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Absent
+                </option>
+                <option
+                  value="late"
+                  {%
+                  if
+                  status=="late"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Late
+                </option>
+                <option
+                  value="excused"
+                  {%
+                  if
+                  status=="excused"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Excused
+                </option>
               </select>
-            </div>
-
-            <!-- Filter Button -->
-            <div class="flex items-end">
-              <button type="submit" 
-                      class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center cursor-pointer">
-                <i class="fas fa-search mr-2"></i>
-                Apply Filters
-              </button>
             </div>
           </div>
 
-          <!-- Quick Date Filters -->
-          <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
-            <button type="button" onclick="setDateRange('today')" 
-                    class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
-              <i class="fas fa-calendar-day mr-2"></i>
+          <!-- Quick chips -->
+          <div class="quick-chips">
+            <button
+              type="submit"
+              class="chip-btn"
+              style="
+                border-color: var(--green-edge);
+                background: var(--green-wash);
+                color: var(--green);
+              "
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Apply filters
+            </button>
+
+            <button
+              type="button"
+              class="chip-btn"
+              onclick="setDateRange('today')"
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
               Today
             </button>
-            <button type="button" onclick="setDateRange('week')" 
-                    class="px-4 py-2 bg-green-50 text-green-700 rounded-lg font-medium hover:bg-green-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
-              <i class="fas fa-calendar-week mr-2"></i>
-              This Week
+
+            <button
+              type="button"
+              class="chip-btn"
+              onclick="setDateRange('week')"
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              This week
             </button>
-            <button type="button" onclick="setDateRange('month')" 
-                    class="px-4 py-2 bg-purple-50 text-purple-700 rounded-lg font-medium hover:bg-purple-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
-              <i class="fas fa-calendar-alt mr-2"></i>
-              This Month
+
+            <button
+              type="button"
+              class="chip-btn"
+              onclick="setDateRange('month')"
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <polyline points="8 15 10 17 16 13" />
+              </svg>
+              This month
             </button>
-            <button type="button" onclick="clearFilters()" 
-                    class="px-4 py-2 bg-gray-50 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
-              <i class="fas fa-eraser mr-2"></i>
-              Clear All
+
+            <button type="button" class="chip-btn" onclick="clearFilters()">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                />
+              </svg>
+              Clear
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </section>
 
-    <!-- Records Table Card -->
-    <div class="gradient-border animate-fade-in-up mt-5" style="animation-delay: 0.2s;">
-      <div class="gradient-border-inner">
-        <!-- Table Header -->
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            <i class="fas fa-table mr-3 text-blue-500"></i>
-            Attendance History
-          </h2>
-          <div class="flex items-center space-x-4">
-            <div class="text-sm text-gray-500 flex items-center">
-              <i class="fas fa-sort-amount-down mr-2"></i>
-              <span>Sorted by Date (Newest First)</span>
-            </div>
-            <!-- <button onclick="exportToCSV()" 
-                    class="px-4 py-2 bg-green-50 text-green-700 rounded-lg font-medium hover:bg-green-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
-              <i class="fas fa-download mr-2"></i>
-              Export CSV
-            </button> -->
+      <!-- Records table -->
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Register</p>
+            <h2>Attendance history</h2>
           </div>
+          <span class="head-meta">
+            Newest first · {{ records|length }} shown
+          </span>
         </div>
 
-        <!-- Records Table -->
-        <div class="table-container overflow-x-auto rounded-xl border border-gray-200">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <div class="table-wrap">
+          <table class="records-table">
+            <thead>
               <tr>
-                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <i class="fas fa-calendar mr-2"></i>
-                  Date
+                <th>
+                  <span class="th-inner">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    Date
+                  </span>
                 </th>
-                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <i class="fas fa-user-tie mr-2"></i>
-                  Teacher
+                <th>
+                  <span class="th-inner">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    Teacher
+                  </span>
                 </th>
-                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <i class="fas fa-tag mr-2"></i>
-                  Status
+                <th>
+                  <span class="th-inner">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6" />
+                      <path d="M20 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v2" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                    </svg>
+                    Status
+                  </span>
                 </th>
-                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <i class="fas fa-clock mr-2"></i>
-                  Time
+                <th>
+                  <span class="th-inner">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15.5 14" />
+                    </svg>
+                    Time
+                  </span>
                 </th>
-                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <i class="fas fa-hourglass-half mr-2"></i>
-                  Late
+                <th>
+                  <span class="th-inner">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="12" x2="15" y2="15" />
+                    </svg>
+                    Late
+                  </span>
                 </th>
-                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <i class="fas fa-sticky-note mr-2"></i>
-                  Notes
+                <th>
+                  <span class="th-inner">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                      />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="8" y1="13" x2="16" y2="13" />
+                      <line x1="8" y1="17" x2="13" y2="17" />
+                    </svg>
+                    Notes
+                  </span>
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
               {% for record in records %}
-              <tr class="table-row-hover status-indicator">
+              <tr>
                 <!-- Date -->
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-semibold text-gray-900">{{ record.date.strftime('%Y-%m-%d') }}</div>
-                  <div class="text-xs text-gray-500">{{ record.date.strftime('%A') }}</div>
+                <td>
+                  <div class="date-cell">
+                    <div class="date-main">
+                      {{ record.date.strftime('%Y-%m-%d') }}
+                    </div>
+                    <div class="date-sub">{{ record.date.strftime('%A') }}</div>
+                  </div>
                 </td>
 
-                <!-- Teacher Info -->
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center shadow-sm">
-                      <i class="fas fa-user-tie text-blue-600 text-sm"></i>
-                    </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-semibold text-gray-900">{{ record.teacher.full_name }}</div>
-                      <div class="text-sm text-gray-500">{{ record.teacher.staff_id }}</div>
+                <!-- Teacher -->
+                <td>
+                  <div class="teacher-cell">
+                    <span class="teacher-avatar">
+                      {{ record.teacher.first_name[0] }}{{
+                      record.teacher.surname[0] }}
+                    </span>
+                    <div class="teacher-meta">
+                      <div class="teacher-name">
+                        {{ record.teacher.full_name }}
+                      </div>
+                      <div class="teacher-id">
+                        {{ record.teacher.staff_id }}
+                      </div>
                     </div>
                   </div>
                 </td>
 
                 <!-- Status -->
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="space-y-1">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-                      {% if record.status == 'present' %}bg-green-100 text-green-800
-                      {% elif record.status == 'absent' %}bg-red-100 text-red-800
-                      {% elif record.status == 'late' %}bg-yellow-100 text-yellow-800
-                      {% else %}bg-blue-100 text-blue-800{% endif %}">
-                      <i class="fas 
-                        {% if record.status == 'present' %}fa-check-circle
-                        {% elif record.status == 'absent' %}fa-times-circle
-                        {% elif record.status == 'late' %}fa-clock
-                        {% else %}fa-calendar-check{% endif %} mr-1"></i>
-                      {{ record.status|title }}
-                    </span>
-                    {% if record.excuse_reason %}
-                    <div class="text-xs text-gray-600 bg-gray-50 rounded-lg p-2 max-w-xs">
-                      <i class="fas fa-comment-alt mr-1 text-gray-400"></i>
-                      {{ record.excuse_reason }}
-                    </div>
-                    {% endif %}
-                  </div>
+                <td>
+                  <span class="status-pill is-{{ record.status }}">
+                    {% if record.status == 'present' %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {% elif record.status == 'absent' %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                    {% elif record.status == 'late' %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15.5 14" />
+                    </svg>
+                    {% else %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <polyline points="8 14 11 17 16 12" />
+                    </svg>
+                    {% endif %} {{ record.status|title }}
+                  </span>
+                  {% if record.excuse_reason %}
+                  <div class="excuse-note">{{ record.excuse_reason }}</div>
+                  {% endif %}
                 </td>
 
                 <!-- Time -->
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="space-y-1">
+                <td>
+                  <div class="time-cell">
                     {% if record.check_in_time %}
-                    <div class="flex items-center text-sm text-gray-600">
-                      <i class="fas fa-sign-in-alt text-green-500 mr-2 text-xs"></i>
+                    <div class="time-line">
+                      <span class="time-badge is-in">
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                          <polyline points="10 17 15 12 10 7" />
+                          <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                      </span>
                       {{ record.check_in_time.strftime('%H:%M') }}
                     </div>
-                    {% endif %}
-                    {% if record.check_out_time %}
-                    <div class="flex items-center text-sm text-gray-600">
-                      <i class="fas fa-sign-out-alt text-blue-500 mr-2 text-xs"></i>
+                    {% endif %} {% if record.check_out_time %}
+                    <div class="time-line">
+                      <span class="time-badge is-out">
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                          <polyline points="16 17 21 12 16 7" />
+                          <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                      </span>
                       {{ record.check_out_time.strftime('%H:%M') }}
                     </div>
+                    {% endif %} {% if not record.check_in_time and not
+                    record.check_out_time %}
+                    <span class="late-empty">—</span>
                     {% endif %}
                   </div>
                 </td>
 
-                <!-- Late Minutes -->
-                <td class="px-6 py-4 whitespace-nowrap">
-                  {% if record.late_minutes > 0 %}
-                  <div class="flex items-center text-sm font-semibold text-yellow-600 bg-yellow-50 rounded-full px-3 py-1">
-                    <i class="fas fa-running mr-2 text-xs"></i>
+                <!-- Late -->
+                <td>
+                  {% if record.late_minutes and record.late_minutes > 0 %}
+                  <span class="late-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15.5 14" />
+                    </svg>
                     {{ record.late_minutes }} min
-                  </div>
+                  </span>
                   {% else %}
-                  <span class="text-sm text-gray-400">-</span>
+                  <span class="late-empty">—</span>
                   {% endif %}
                 </td>
 
                 <!-- Notes -->
-                <td class="px-6 py-4">
+                <td>
                   {% if record.notes %}
-                  <div class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 max-w-xs">
-                    <i class="fas fa-sticky-note text-gray-400 mr-2 text-xs"></i>
-                    {{ record.notes }}
-                  </div>
+                  <div class="notes-cell">{{ record.notes }}</div>
                   {% else %}
-                  <span class="text-sm text-gray-400">-</span>
+                  <span class="notes-empty">—</span>
                   {% endif %}
                 </td>
               </tr>
               {% else %}
               <tr>
-                <td colspan="6" class="px-6 py-12 text-center">
-                  <div class="flex flex-col items-center justify-center text-gray-400">
-                    <i class="fas fa-inbox text-4xl mb-4"></i>
-                    <p class="text-lg font-medium text-gray-500">No attendance records found</p>
-                    <p class="text-sm text-gray-400 mt-2">Try adjusting your filters or check back later</p>
+                <td colspan="6">
+                  <div class="table-empty">
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                      />
+                    </svg>
+                    <h3>No attendance records found</h3>
+                    <p>Try adjusting your filters or check back later.</p>
                   </div>
                 </td>
               </tr>
@@ -460,167 +1680,248 @@
           </table>
         </div>
 
-        <!-- Table Footer -->
-        <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-          <div class="text-sm text-gray-500 flex items-center">
-            <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-            Showing {{ records|length }} records
+        <div class="table-footer">
+          <div class="footer-left">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            Showing <strong>{{ records|length }}</strong> record{% if
+            records|length != 1 %}s{% endif %}
           </div>
-          <div class="flex items-center space-x-4">
-            <button onclick="scrollToTop()" 
-                    class="px-4 py-2 bg-gray-50 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-all duration-300 flex items-center cursor-pointer text-sm">
-              <i class="fas fa-arrow-up mr-2"></i>
-              Back to Top
-            </button>
-          </div>
+          <button type="button" class="footer-btn" onclick="scrollToTop()">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
+            Back to top
+          </button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
 
-    <!-- Summary Card -->
-    {% if records %}
-    <div class="glass-morphism rounded-2xl p-6 shadow-lg animate-fade-in-up" style="animation-delay: 0.4s;">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-        <i class="fas fa-chart-bar mr-2 text-purple-500"></i>
-        Filter Summary
-      </h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-blue-50 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-blue-600">{{ records|length }}</div>
-          <div class="text-sm text-blue-600 font-medium">Total Records</div>
-        </div>
-        <div class="bg-green-50 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-green-600">
-            {{ records|selectattr('status', 'equalto', 'present')|list|length }}
+    <!-- Sidebar -->
+    <aside class="records-side">
+      <!-- Register summary -->
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Breakdown</p>
+            <h2>Register summary</h2>
           </div>
-          <div class="text-sm text-green-600 font-medium">Present</div>
         </div>
-        <div class="bg-yellow-50 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-yellow-600">
-            {{ records|selectattr('status', 'equalto', 'late')|list|length }}
+        <dl class="side-stat-list">
+          <li>
+            <dt><span class="swatch ink"></span>Total records</dt>
+            <dd>{{ records|length }}</dd>
+          </li>
+          <li>
+            <dt><span class="swatch"></span>Present</dt>
+            <dd>
+              {{ records|selectattr('status', 'equalto', 'present')|list|length
+              }}
+            </dd>
+          </li>
+          <li>
+            <dt><span class="swatch brass"></span>Late</dt>
+            <dd>
+              {{ records|selectattr('status', 'equalto', 'late')|list|length }}
+            </dd>
+          </li>
+          <li>
+            <dt><span class="swatch red"></span>Absent</dt>
+            <dd>
+              {{ records|selectattr('status', 'equalto', 'absent')|list|length
+              }}
+            </dd>
+          </li>
+        </dl>
+      </section>
+
+      <!-- Active filters -->
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Currently applied</p>
+            <h2>Active filters</h2>
           </div>
-          <div class="text-sm text-yellow-600 font-medium">Late</div>
         </div>
-        <div class="bg-red-50 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-red-600">
-            {{ records|selectattr('status', 'equalto', 'absent')|list|length }}
+
+        {% set has_filters = teacher_id or start_date or end_date or status %}
+        {% if has_filters %}
+        <div class="filter-pills">
+          <div class="filter-pill">
+            <span class="pill-label">Teacher</span>
+            <span class="pill-value {% if not teacher_id %}is-empty{% endif %}">
+              {% if teacher_id %} {% for t in teachers %}{% if t.id ==
+              teacher_id %}{{ t.full_name }}{% endif %}{% endfor %} {% else
+              %}Any{% endif %}
+            </span>
           </div>
-          <div class="text-sm text-red-600 font-medium">Absent</div>
+          <div class="filter-pill">
+            <span class="pill-label">From</span>
+            <span class="pill-value {% if not start_date %}is-empty{% endif %}"
+              >{{ start_date or 'Any' }}</span
+            >
+          </div>
+          <div class="filter-pill">
+            <span class="pill-label">To</span>
+            <span class="pill-value {% if not end_date %}is-empty{% endif %}"
+              >{{ end_date or 'Any' }}</span
+            >
+          </div>
+          <div class="filter-pill">
+            <span class="pill-label">Status</span>
+            <span class="pill-value {% if not status %}is-empty{% endif %}"
+              >{{ status|title if status else 'Any' }}</span
+            >
+          </div>
         </div>
-      </div>
-    </div>
-    {% endif %}
+        {% else %}
+        <p class="no-filters">
+          No filters applied — showing every record in the register.
+        </p>
+        {% endif %}
+      </section>
+
+      <!-- Shortcuts -->
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <div>
+            <p class="section-kicker">Shortcuts</p>
+            <h2>Quick actions</h2>
+          </div>
+        </div>
+        <div class="quick-list">
+          <a
+            class="quick-action"
+            href="{{ url_for('teacher_attendance.mark_teacher_attendance') }}"
+          >
+            <span class="quick-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">Mark attendance</span>
+              <span class="quick-copy">Record today's register</span>
+            </span>
+          </a>
+
+          <a
+            class="quick-action"
+            href="{{ url_for('teacher_attendance.teacher_attendance_analytics') }}"
+          >
+            <span class="quick-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 17l6-6 4 4 8-8M21 7h-6m6 0v6"
+                />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">View analytics</span>
+              <span class="quick-copy">Trends and patterns</span>
+            </span>
+          </a>
+
+          <button type="button" class="quick-action" onclick="clearFilters()">
+            <span class="quick-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">Reset filters</span>
+              <span class="quick-copy">Show every record again</span>
+            </span>
+          </button>
+        </div>
+      </section>
+    </aside>
   </div>
 </div>
 
 <script>
-// Initialize interactive elements
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Attendance records system loaded');
-  
-  // Add animation delays for staggered effects
-  const cards = document.querySelectorAll('.gradient-border, .glass-morphism');
-  cards.forEach((card, index) => {
-    card.style.animationDelay = `${index * 0.1}s`;
+  function setDateRange(range) {
+    const today = new Date();
+    let startDate, endDate;
+
+    switch (range) {
+      case "today":
+        startDate = today.toISOString().split("T")[0];
+        endDate = startDate;
+        break;
+      case "week":
+        startDate = new Date(today.setDate(today.getDate() - 7))
+          .toISOString()
+          .split("T")[0];
+        endDate = new Date().toISOString().split("T")[0];
+        break;
+      case "month":
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1)
+          .toISOString()
+          .split("T")[0];
+        endDate = new Date().toISOString().split("T")[0];
+        break;
+      default:
+        return;
+    }
+
+    document.getElementById("start_date").value = startDate;
+    document.getElementById("end_date").value = endDate;
+  }
+
+  function clearFilters() {
+    document.getElementById("teacher_id").value = "";
+    document.getElementById("start_date").value = "";
+    document.getElementById("end_date").value = "";
+    document.getElementById("status").value = "";
+  }
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && e.key === "f") {
+      e.preventDefault();
+      document.getElementById("teacher_id").focus();
+    }
+    if (e.key === "Escape") {
+      clearFilters();
+    }
   });
-});
-
-// Quick date range functions
-function setDateRange(range) {
-  const today = new Date();
-  let startDate, endDate;
-
-  switch(range) {
-    case 'today':
-      startDate = today.toISOString().split('T')[0];
-      endDate = startDate;
-      break;
-    case 'week':
-      startDate = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
-      endDate = new Date().toISOString().split('T')[0];
-      break;
-    case 'month':
-      startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-      endDate = new Date().toISOString().split('T')[0];
-      break;
-  }
-
-  document.getElementById('start_date').value = startDate;
-  document.getElementById('end_date').value = endDate;
-  
-  showNotification(`Date range set to ${range}`, 'info');
-}
-
-function clearFilters() {
-  document.getElementById('teacher_id').value = '';
-  document.getElementById('start_date').value = '';
-  document.getElementById('end_date').value = '';
-  document.getElementById('status').value = '';
-  
-  showNotification('All filters cleared', 'info');
-}
-
-function exportToCSV() {
-  // In a real implementation, this would generate and download a CSV file
-  showNotification('Export feature would generate CSV file in production', 'info');
-}
-
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function showNotification(message, type = 'info') {
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 translate-x-full ${
-    type === 'success' ? 'bg-green-500 text-white' : 
-    type === 'error' ? 'bg-red-500 text-white' : 
-    'bg-blue-500 text-white'
-  }`;
-  notification.innerHTML = `
-    <div class="flex items-center">
-      <i class="fas ${
-        type === 'success' ? 'fa-check-circle' : 
-        type === 'error' ? 'fa-exclamation-circle' : 
-        'fa-info-circle'
-      } mr-2"></i>
-      <span>${message}</span>
-    </div>
-  `;
-  
-  // Add to page
-  document.body.appendChild(notification);
-  
-  // Animate in
-  setTimeout(() => {
-    notification.style.transform = 'translateX(0)';
-  }, 10);
-  
-  // Remove after 3 seconds
-  setTimeout(() => {
-    notification.style.transform = 'translateX(100%)';
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 300);
-  }, 3000);
-}
-
-// Add keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-  // Ctrl + F to focus on search
-  if (e.ctrlKey && e.key === 'f') {
-    e.preventDefault();
-    document.getElementById('teacher_id').focus();
-  }
-  
-  // Escape to clear filters
-  if (e.key === 'Escape') {
-    clearFilters();
-  }
-});
-
-console.log('Attendance records management system ready!');
 </script>
+
 {% endblock %}

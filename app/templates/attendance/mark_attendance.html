@@ -1,536 +1,1562 @@
-{% extends "base.html" %}
-{% block title %}Mark Attendance - {{ class_.name }} - EduSync SMS{% endblock %}
+{% extends "base.html" %} {% block title %}Mark Attendance - {{ class_.name }} -
+EduSync SMS{% endblock %} {% block page_title %}Mark Attendance{% endblock %} {%
+block page_description %}Record student attendance for {{ class_.name }} on {{
+attendance_date.strftime('%A, %B %d, %Y') }}{% endblock %} {% block content %}
 
-{% block page_title %}Mark Attendance{% endblock %}
-{% block page_description %}Record student attendance for {{ class_.name }} on {{ attendance_date.strftime('%A, %B %d, %Y') }}{% endblock %}
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
-{% block content %}
-<div class="max-w-7xl mx-auto">
-  <!-- Header Section -->
-  <div class="professional-card p-8 mb-8">
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-      <div class="flex items-center space-x-4 mb-6 lg:mb-0">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-          <i class="fas fa-clipboard-check text-white text-2xl"></i>
-        </div>
-        <div>
-          <h1 class="text-3xl font-bold text-slate-800 dark:text-white">Mark Attendance</h1>
-          <div class="flex items-center space-x-4 mt-2">
-            <span class="text-slate-600 dark:text-slate-400 font-medium">{{ class_.name }}</span>
-            <span class="text-slate-400">•</span>
-            <span class="text-slate-600 dark:text-slate-400">{{ attendance_date.strftime('%A, %B %d, %Y') }}</span>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200">
-              {{ term }} {{ year }}
-            </span>
-          </div>
-        </div>
+  /* ==========================================================
+     Mark Attendance — Fraunces + Inter + JetBrains Mono.
+     Fraunces  → header title, stat values, register heading, modal
+     Inter     → body copy, student names, buttons, segmented control
+     JetBrains → kickers, labels, stamps, IDs, counts, all meta
+     Includes dark mode.
+     ========================================================== */
+  :root {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --paper: #f4f5f3;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+    --input-bg: #ffffff;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-hover: #6f4f24;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    --check-border: #b5c2bd;
+    --last-never: #adb6b2;
+    --modal-backdrop: rgba(20, 30, 29, 0.5);
+  }
+
+  .dark {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --paper: #131817;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --line: #33403e;
+    --line-soft: #2a3533;
+    --input-bg: #1e2524;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-hover: #c79a55;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --check-border: #4a5459;
+    --last-never: #55605c;
+    --modal-backdrop: rgba(0, 0, 0, 0.65);
+  }
+
+  .mark-attendance {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 22px 56px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  .mark-attendance *,
+  .mark-attendance *::before,
+  .mark-attendance *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---------- Header ---------- */
+  .ma-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 22px 20px 26px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 18px;
+  }
+  .ma-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--green);
+  }
+  .ma-header-copy {
+    min-width: 0;
+  }
+  .ma-kicker {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .ma-header h1 {
+    margin: 0 0 10px;
+    color: var(--ink);
+    font-family: var(--display);
+    font-size: clamp(22px, 2.6vw, 28px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .ma-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .ma-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--green-edge);
+    border-radius: 3px;
+    background: var(--green-wash);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .ma-stamp.brass {
+    border-color: var(--brass-edge);
+    background: var(--brass-wash);
+    color: var(--brass);
+  }
+  .ma-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .ma-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .ma-btn:hover {
+    border-color: var(--ink);
+    background: var(--surface-alt);
+  }
+  .ma-btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .ma-btn.primary {
+    color: #131817;
+  }
+  .ma-btn.primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+    color: #fff;
+  }
+  .dark .ma-btn.primary:hover {
+    color: #131817;
+  }
+  .ma-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ---------- Stat strip ---------- */
+  .ma-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-bottom: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .ma-stat {
+    padding: 14px 18px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .ma-stat:last-child {
+    border-right: 0;
+  }
+  .ma-stat::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--green);
+  }
+  .ma-stat.t-absent::before {
+    background: var(--red);
+  }
+  .ma-stat.t-late::before {
+    background: var(--brass);
+  }
+  .ma-stat.t-excused::before {
+    background: var(--slate);
+  }
+
+  .ma-stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .ma-stat-value {
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--ink);
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+  .ma-stat-value .unit {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0;
+  }
+
+  /* ---------- Bulk actions ---------- */
+  .ma-bulk {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .ma-bulk-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 4px;
+  }
+  .ma-bulk .sep {
+    width: 1px;
+    height: 20px;
+    background: var(--line);
+    margin: 0 4px;
+  }
+  .ma-bulk-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ma-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .ma-chip svg {
+    width: 12px;
+    height: 12px;
+  }
+  .ma-chip:hover {
+    border-color: var(--ink);
+  }
+  .ma-chip.c-present:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-wash);
+  }
+  .ma-chip.c-absent:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: var(--red-wash);
+  }
+  .ma-chip.c-late:hover {
+    border-color: var(--brass);
+    color: var(--brass);
+    background: var(--brass-wash);
+  }
+  .ma-chip.c-selected:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-wash);
+  }
+  .ma-chip.c-clear:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: var(--red-wash);
+  }
+  .ma-chip[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .ma-chip[disabled]:hover {
+    border-color: var(--line);
+    color: var(--ink);
+    background: var(--surface);
+  }
+  .ma-bulk-spacer {
+    flex: 1;
+  }
+  .ma-bulk-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .ma-bulk-count strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* ---------- Register ---------- */
+  .ma-register {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .ma-register-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--line);
+  }
+  .ma-register-head-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .ma-register-title {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin: 0;
+  }
+  .ma-register-head .count {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+  }
+  .ma-register-kbd {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+  }
+  .ma-register-kbd kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 3px;
+    margin-right: 3px;
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 2px;
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 10px;
+    color: var(--ink);
+  }
+  @media (min-width: 900px) {
+    .ma-register-kbd {
+      display: flex;
+    }
+  }
+
+  /* Custom checkbox */
+  .ma-check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--check-border);
+    border-radius: 2px;
+    background: var(--surface);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .ma-check:hover {
+    border-color: var(--green);
+  }
+  .ma-check:checked {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .ma-check:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .dark .ma-check:checked::after {
+    border-color: #131817;
+  }
+  .ma-check:indeterminate {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .ma-check:indeterminate::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    width: 8px;
+    height: 2px;
+    background: #fff;
+  }
+  .dark .ma-check:indeterminate::after {
+    background: #131817;
+  }
+
+  /* Row layout */
+  .ma-row {
+    display: grid;
+    grid-template-columns: 24px 40px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--line-soft);
+    border-left: 3px solid transparent;
+    transition:
+      background-color 0.12s ease,
+      border-left-color 0.12s ease;
+  }
+  .ma-row:last-child {
+    border-bottom: 0;
+  }
+  .ma-row:hover {
+    background: var(--surface-alt);
+  }
+  .ma-row[data-status="present"] {
+    border-left-color: var(--green);
+  }
+  .ma-row[data-status="late"] {
+    border-left-color: var(--brass);
+  }
+  .ma-row[data-status="excused"] {
+    border-left-color: var(--slate);
+  }
+  .ma-row[data-status="absent"] {
+    border-left-color: var(--red);
+  }
+  .ma-row.is-selected {
+    background: var(--green-wash);
+  }
+
+  .ma-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--green-wash);
+    color: var(--green);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .ma-row:nth-child(2n) .ma-avatar {
+    background: var(--brass-wash);
+    color: var(--brass);
+  }
+
+  .ma-identity {
+    min-width: 0;
+  }
+  .ma-name {
+    display: block;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ma-sub {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- Segmented status control ---------- */
+  .ma-segment {
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .ma-segment label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 13px;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--copy);
+    cursor: pointer;
+    border-right: 1px solid var(--line);
+    transition:
+      background-color 0.12s ease,
+      color 0.12s ease;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .ma-segment label:last-child {
+    border-right: 0;
+  }
+  .ma-segment label:hover {
+    background: var(--surface-alt);
+  }
+  .ma-segment input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ma-segment input:focus-visible + span {
+    outline: 2px solid var(--green);
+    outline-offset: -2px;
+  }
+  .ma-segment label span {
+    display: inline-flex;
+    align-items: center;
+    margin: -7px -13px;
+    padding: 7px 13px;
+    transition:
+      background-color 0.12s ease,
+      color 0.12s ease;
+  }
+  .ma-segment input[value="present"]:checked + span {
+    background: var(--green);
+    color: #fff;
+  }
+  .dark .ma-segment input[value="present"]:checked + span {
+    color: #131817;
+  }
+  .ma-segment input[value="late"]:checked + span {
+    background: var(--brass);
+    color: #fff;
+  }
+  .dark .ma-segment input[value="late"]:checked + span {
+    color: #131817;
+  }
+  .ma-segment input[value="excused"]:checked + span {
+    background: var(--slate);
+    color: #fff;
+  }
+  .dark .ma-segment input[value="excused"]:checked + span {
+    color: #131817;
+  }
+  .ma-segment input[value="absent"]:checked + span {
+    background: var(--red);
+    color: #fff;
+  }
+  .dark .ma-segment input[value="absent"]:checked + span {
+    color: #131817;
+  }
+
+  .ma-last {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    text-align: right;
+    white-space: nowrap;
+    min-width: 68px;
+  }
+  .ma-last.is-never {
+    font-style: italic;
+    color: var(--last-never);
+  }
+
+  /* ---------- Footer ---------- */
+  .ma-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 20px;
+    background: var(--surface-alt);
+    border-top: 1px solid var(--line);
+  }
+  .ma-footer-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .ma-footer-note.warn {
+    color: var(--brass);
+    background: var(--brass-wash);
+    border: 1px solid var(--brass-edge);
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+  .ma-footer-note svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .ma-footer-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ---------- Modal ---------- */
+  .ma-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--modal-backdrop);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 60;
+  }
+  .ma-modal-backdrop.hidden {
+    display: none;
+  }
+  .ma-modal {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 440px;
+    overflow: hidden;
+  }
+  .ma-modal-head {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .ma-modal-head h3 {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin: 0;
+  }
+  .ma-modal-head p {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .ma-modal-body {
+    padding: 16px 18px;
+  }
+  .ma-modal-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0 18px 18px;
+  }
+  .ma-modal-actions > * {
+    flex: 1;
+  }
+
+  .ma-status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .ma-status-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 11px 13px;
+    border-radius: 3px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    color: #fff;
+    transition: filter 0.15s ease;
+  }
+  .dark .ma-status-btn {
+    color: #131817;
+  }
+  .ma-status-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .ma-status-btn:hover {
+    filter: brightness(0.94);
+  }
+  .ma-status-btn.s-present {
+    background: var(--green);
+  }
+  .ma-status-btn.s-absent {
+    background: var(--red);
+  }
+  .ma-status-btn.s-late {
+    background: var(--brass);
+  }
+  .ma-status-btn.s-excused {
+    background: var(--slate);
+  }
+
+  /* ---------- Toast ---------- */
+  .ma-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 14px;
+    border-radius: 3px;
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+    transform: translateX(120%);
+    transition: transform 0.22s ease;
+    max-width: 360px;
+  }
+  .dark .ma-toast {
+    color: #131817;
+  }
+  .ma-toast.show {
+    transform: translateX(0);
+  }
+  .ma-toast.success {
+    background: var(--green);
+  }
+  .ma-toast.warning {
+    background: var(--brass);
+  }
+  .ma-toast.error {
+    background: var(--red);
+  }
+  .ma-toast.info {
+    background: var(--ink);
+  }
+  .dark .ma-toast.info {
+    color: #fff;
+  }
+  .ma-toast svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 720px) {
+    .ma-row {
+      grid-template-columns: 24px 34px minmax(0, 1fr);
+      grid-template-areas:
+        "check avatar identity"
+        ".      .      segment";
+      row-gap: 10px;
+      padding: 12px 14px;
+    }
+    .ma-row > .ma-check {
+      grid-area: check;
+    }
+    .ma-row > .ma-avatar {
+      grid-area: avatar;
+      width: 30px;
+      height: 30px;
+      font-size: 11px;
+    }
+    .ma-row > .ma-identity {
+      grid-area: identity;
+    }
+    .ma-row > .ma-segment {
+      grid-area: segment;
+      width: 100%;
+    }
+    .ma-row > .ma-segment label {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 11px;
+    }
+    .ma-row > .ma-segment label span {
+      margin: -8px -4px;
+      padding: 8px 4px;
+    }
+    .ma-row > .ma-last {
+      display: none;
+    }
+
+    .mark-attendance {
+      padding: 18px 14px 40px;
+    }
+    .ma-header {
+      padding: 18px 16px 18px 20px;
+    }
+    .ma-header-actions {
+      width: 100%;
+    }
+    .ma-header-actions .ma-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .ma-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .ma-stat:nth-child(2) {
+      border-right: 0;
+    }
+    .ma-stat:nth-child(1),
+    .ma-stat:nth-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+    .ma-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .ma-footer-actions {
+      width: 100%;
+    }
+    .ma-footer-actions .ma-btn {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+  @media (max-width: 460px) {
+    .ma-stats {
+      grid-template-columns: 1fr;
+    }
+    .ma-stat {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .ma-stat:last-child {
+      border-bottom: 0;
+    }
+    .ma-bulk .sep {
+      display: none;
+    }
+  }
+</style>
+
+<div class="mark-attendance">
+  <!-- Header -->
+  <header class="ma-header">
+    <div class="ma-header-copy">
+      <p class="ma-kicker">Attendance Register</p>
+      <h1>Mark Attendance</h1>
+      <div class="ma-meta">
+        <span class="ma-stamp">{{ class_.name }}</span>
+        <span>{{ attendance_date.strftime('%A, %B %d, %Y') }}</span>
+        <span class="ma-stamp brass">Term {{ term }} · {{ year }}</span>
       </div>
-      
-      <div class="flex space-x-3">
-        <a href="{{ url_for('attendance.select_attendance_date') }}" 
-           class="inline-flex items-center space-x-2 px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 font-medium">
-          <i class="fas fa-calendar-alt"></i>
-          <span>Change Date</span>
-        </a>
-      </div>
+    </div>
+    <div class="ma-header-actions">
+      <a
+        href="{{ url_for('attendance.select_attendance_date') }}"
+        class="ma-btn"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0h6m-6 0l-2 2m8-2l2 2m-2-2v6a2 2 0 01-2 2H8a2 2 0 01-2-2v-6"
+          />
+        </svg>
+        Change date
+      </a>
+    </div>
+  </header>
+
+  <!-- Stat strip -->
+  <section class="ma-stats" aria-label="Attendance totals">
+    <div class="ma-stat">
+      <p class="ma-stat-label">Present</p>
+      <p class="ma-stat-value" id="present-count">
+        0<span class="unit">students</span>
+      </p>
+    </div>
+    <div class="ma-stat t-absent">
+      <p class="ma-stat-label">Absent</p>
+      <p class="ma-stat-value" id="absent-count">
+        0<span class="unit">students</span>
+      </p>
+    </div>
+    <div class="ma-stat t-late">
+      <p class="ma-stat-label">Late</p>
+      <p class="ma-stat-value" id="late-count">
+        0<span class="unit">students</span>
+      </p>
+    </div>
+    <div class="ma-stat t-excused">
+      <p class="ma-stat-label">Excused</p>
+      <p class="ma-stat-value" id="excused-count">
+        0<span class="unit">students</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Bulk actions -->
+  <div class="ma-bulk">
+    <span class="ma-bulk-label">Bulk</span>
+    <div class="ma-bulk-actions">
+      <button
+        type="button"
+        onclick="markAll('present')"
+        class="ma-chip c-present"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.5"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        All present
+      </button>
+      <button
+        type="button"
+        onclick="markAll('absent')"
+        class="ma-chip c-absent"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.5"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+        All absent
+      </button>
+      <button type="button" onclick="markAll('late')" class="ma-chip c-late">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        All late
+      </button>
+    </div>
+
+    <span class="sep"></span>
+
+    <div class="ma-bulk-actions">
+      <button
+        type="button"
+        id="mark-selected-btn"
+        onclick="showMarkSelectedModal()"
+        class="ma-chip c-selected"
+        disabled
+      >
+        Mark selected
+      </button>
+      <button type="button" onclick="clearSelection()" class="ma-chip c-clear">
+        Clear
+      </button>
+    </div>
+
+    <div class="ma-bulk-spacer"></div>
+    <div class="ma-bulk-count">
+      <strong id="selected-count">0</strong> selected
     </div>
   </div>
 
-  <!-- Quick Stats -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-    <div class="professional-card p-6 text-center">
-      <div class="text-3xl font-bold text-emerald-600" id="present-count">0</div>
-      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">Present</div>
-    </div>
-    <div class="professional-card p-6 text-center">
-      <div class="text-3xl font-bold text-red-600" id="absent-count">0</div>
-      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">Absent</div>
-    </div>
-    <div class="professional-card p-6 text-center">
-      <div class="text-3xl font-bold text-amber-600" id="late-count">0</div>
-      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">Late</div>
-    </div>
-    <div class="professional-card p-6 text-center">
-      <div class="text-3xl font-bold text-blue-600" id="excused-count">0</div>
-      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">Excused</div>
-    </div>
-  </div>
+  <!-- Register -->
+  <form method="POST" id="attendanceForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-  <!-- Bulk Actions -->
-  <div class="professional-card p-6 mb-8">
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-          <i class="fas fa-bolt text-white"></i>
+    <div class="ma-register">
+      <div class="ma-register-head">
+        <div class="ma-register-head-left">
+          <input
+            type="checkbox"
+            id="select-all"
+            class="ma-check"
+            onchange="toggleSelectAll(this)"
+            aria-label="Select all students"
+          />
+          <h2 class="ma-register-title">Student attendance</h2>
+          <span class="count">{{ class_.students.count() }} students</span>
         </div>
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Quick Actions</h3>
-      </div>
-      <div class="flex items-center space-x-2">
-        <span class="text-sm text-slate-600 dark:text-slate-400" id="selected-count">0</span>
-        <span class="text-sm text-slate-600 dark:text-slate-400">selected</span>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-      <button onclick="markAll('present')" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-emerald-500/30 transition-all duration-200">
-        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors duration-200 flex items-center justify-center">
-          <i class="fas fa-check text-emerald-600 dark:text-emerald-400 text-sm"></i>
-        </div>
-        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">All Present</span>
-      </button>
-
-      <button onclick="markAll('absent')" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-red-500/30 transition-all duration-200">
-        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-red-100 dark:bg-red-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-200 flex items-center justify-center">
-          <i class="fas fa-times text-red-600 dark:text-red-400 text-sm"></i>
-        </div>
-        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">All Absent</span>
-      </button>
-
-      <button onclick="markAll('late')" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-amber-500/30 transition-all duration-200">
-        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-amber-100 dark:bg-amber-900/30 group-hover:bg-amber-200 dark:group-hover:bg-amber-800/50 transition-colors duration-200 flex items-center justify-center">
-          <i class="fas fa-clock text-amber-600 dark:text-amber-400 text-sm"></i>
-        </div>
-        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">All Late</span>
-      </button>
-
-      <button onclick="showMarkSelectedModal()" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-blue-500/30 transition-all duration-200">
-        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors duration-200 flex items-center justify-center">
-          <i class="fas fa-edit text-blue-600 dark:text-blue-400 text-sm"></i>
-        </div>
-        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Mark Selected</span>
-      </button>
-
-      <button onclick="clearSelection()" class="professional-card p-4 text-center group hover-lift border-2 border-transparent hover:border-slate-500/30 transition-all duration-200">
-        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors duration-200 flex items-center justify-center">
-          <i class="fas fa-undo text-slate-600 dark:text-slate-400 text-sm"></i>
-        </div>
-        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Clear All</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Attendance Form -->
-  <form method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    
-    <div class="professional-card p-0 overflow-hidden">
-      <!-- Table Header -->
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)" class="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600">
-            <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Student Attendance</h3>
-          </div>
-          <div class="text-sm text-slate-600 dark:text-slate-400">
-            {{ class_.students.count() }} students
-          </div>
+        <div class="ma-register-kbd">
+          <span><kbd>1</kbd>present</span>
+          <span><kbd>2</kbd>late</span>
+          <span><kbd>3</kbd>excused</span>
+          <span><kbd>4</kbd>absent</span>
         </div>
       </div>
 
-      <!-- Students List -->
-      <div class="divide-y divide-slate-200 dark:divide-slate-700">
-        {% for student in class_.students %}
-        <div class="student-row p-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors duration-150"
-             data-student-id="{{ student.id }}">
-          <div class="flex items-center space-x-4">
-            <!-- Checkbox -->
-            <input type="checkbox" class="student-checkbox w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600"
-                   value="{{ student.id }}" onchange="updateSelection()">
-            
-            <!-- Student Avatar and Info -->
-            <div class="flex-1 flex items-center space-x-4">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                {{ student.first_name[0] }}{{ student.surname[0] }}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="font-medium text-slate-800 dark:text-white">{{ student.full_name }}</p>
-                <p class="text-sm text-slate-600 dark:text-slate-400">ID: {{ student.id }}</p>
-              </div>
-            </div>
+      <!-- prettier-ignore -->
+      <div class="ma-list">
+        {% for student in class_.students %} {% set current =
+        attendance_dict.get(student.id) %} {% set current_status =
+        current.status if current else 'absent' %}
+        <div
+          class="ma-row"
+          data-student-id="{{ student.id }}"
+          data-status="{{ current_status }}"
+        >
+          <input
+            type="checkbox"
+            class="student-checkbox ma-check"
+            value="{{ student.id }}"
+            onchange="updateSelection()"
+            aria-label="Select {{ student.full_name }}"
+          />
 
-            <!-- Status Selector -->
-            <div class="w-48">
-              <select name="status_{{ student.id }}" 
-                      class="status-select w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      onchange="updateStats(); updateRowStyle(this, {{ student.id }})"
-                      data-student-id="{{ student.id }}">
-                <option value="present" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'present' %}selected{% endif %}>Present</option>
-                <option value="absent" {% if not attendance_dict.get(student.id) or attendance_dict[student.id].status == 'absent' %}selected{% endif %}>Absent</option>
-                <option value="late" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'late' %}selected{% endif %}>Late</option>
-                <option value="excused" {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'excused' %}selected{% endif %}>Excused</option>
-              </select>
-            </div>
-
-            <!-- Last Marked -->
-            <div class="w-32 text-sm text-slate-600 dark:text-slate-400">
-              {% if attendance_dict.get(student.id) %}
-                {{ attendance_dict[student.id].date.strftime('%m/%d/%Y') }}
-              {% else %}
-                Never
-              {% endif %}
-            </div>
-
-            <!-- Actions -->
-            <div class="w-20">
-              {% if attendance_dict.get(student.id) and attendance_dict[student.id].status == 'absent' %}
-              <button type="button" onclick="excuseAbsence({{ student.id }})" 
-                      class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium">
-                Excuse
-              </button>
-              {% else %}
-              <span class="text-slate-400 text-sm">—</span>
-              {% endif %}
-            </div>
+          <div class="ma-avatar">
+            {{ student.first_name[0] }}{{ student.surname[0] }}
           </div>
+
+          <div class="ma-identity">
+            <span class="ma-name">{{ student.full_name }}</span>
+            <span class="ma-sub">ID {{ student.id }}</span>
+          </div>
+
+          <div
+            class="ma-segment"
+            role="radiogroup"
+            aria-label="Attendance for {{ student.full_name }}"
+          >
+            <label>
+              <input
+                type="radio"
+                name="status_{{ student.id }}"
+                value="present"
+                {%
+                if
+                current_status=="present"
+                %}checked{%
+                endif
+                %}
+                onchange="onStatusChange(this)"
+              />
+              <span>Present</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="status_{{ student.id }}"
+                value="late"
+                {%
+                if
+                current_status=="late"
+                %}checked{%
+                endif
+                %}
+                onchange="onStatusChange(this)"
+              />
+              <span>Late</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="status_{{ student.id }}"
+                value="excused"
+                {%
+                if
+                current_status=="excused"
+                %}checked{%
+                endif
+                %}
+                onchange="onStatusChange(this)"
+              />
+              <span>Excused</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="status_{{ student.id }}"
+                value="absent"
+                {%
+                if
+                current_status=="absent"
+                %}checked{%
+                endif
+                %}
+                onchange="onStatusChange(this)"
+              />
+              <span>Absent</span>
+            </label>
+          </div>
+
+          {% if current %}
+          <span class="ma-last">{{ current.date.strftime('%m/%d/%y') }}</span>
+          {% else %}
+          <span class="ma-last is-never">never</span>
+          {% endif %}
         </div>
         {% endfor %}
       </div>
 
-      <!-- Form Actions -->
-      <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <div class="text-sm text-slate-600 dark:text-slate-400">
-            {% if attendance_date < now().date() %}
-            <div class="flex items-center space-x-2 text-amber-600 dark:text-amber-400">
-              <i class="fas fa-exclamation-triangle"></i>
-              <span>You are marking attendance for a past date</span>
-            </div>
-            {% endif %}
-          </div>
-          
-          <div class="flex space-x-3">
-            <a href="{{ url_for('attendance.attendance_dashboard') }}" 
-               class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 font-medium">
-              Cancel
-            </a>
-            <button type="submit" 
-                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium flex items-center space-x-2">
-              <i class="fas fa-save"></i>
-              <span>Save Attendance</span>
-            </button>
-          </div>
+      <div class="ma-footer">
+        <div
+          class="ma-footer-note {% if attendance_date < now().date() %}warn{% endif %}"
+        >
+          {% if attendance_date < now().date() %}
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          Marking a past date — changes will be recorded retroactively. {% else
+          %}
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4"
+            />
+          </svg>
+          Ready to save. {{ class_.students.count() }} record(s) will be
+          updated. {% endif %}
+        </div>
+        <div class="ma-footer-actions">
+          <a
+            href="{{ url_for('attendance.attendance_dashboard') }}"
+            class="ma-btn"
+            >Cancel</a
+          >
+          <button type="submit" class="ma-btn primary">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Save attendance
+          </button>
         </div>
       </div>
     </div>
   </form>
 </div>
 
-<!-- Mark Selected Modal -->
-<div id="markSelectedModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-  <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 mx-4 max-w-md w-full">
-    <div class="flex items-center space-x-3 mb-4">
-      <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-        <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xl"></i>
-      </div>
-      <div>
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Mark Selected Students</h3>
-        <p class="text-slate-600 dark:text-slate-400 text-sm" id="selectedStudentsCount">0 students selected</p>
+<!-- Mark selected modal -->
+<div id="markSelectedModal" class="ma-modal-backdrop hidden">
+  <div
+    class="ma-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="msmTitle"
+  >
+    <div class="ma-modal-head">
+      <h3 id="msmTitle">Mark selected students</h3>
+      <p id="selectedStudentsCount">0 students selected</p>
+    </div>
+    <div class="ma-modal-body">
+      <div class="ma-status-grid">
+        <button
+          type="button"
+          onclick="applyStatusToSelected('present')"
+          class="ma-status-btn s-present"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          Present
+        </button>
+        <button
+          type="button"
+          onclick="applyStatusToSelected('absent')"
+          class="ma-status-btn s-absent"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+          Absent
+        </button>
+        <button
+          type="button"
+          onclick="applyStatusToSelected('late')"
+          class="ma-status-btn s-late"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          Late
+        </button>
+        <button
+          type="button"
+          onclick="applyStatusToSelected('excused')"
+          class="ma-status-btn s-excused"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4"
+            />
+          </svg>
+          Excused
+        </button>
       </div>
     </div>
-    
-    <div class="grid grid-cols-2 gap-3 mb-6">
-      <button onclick="applyStatusToSelected('present')" class="p-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
-        <i class="fas fa-check"></i>
-        <span>Present</span>
-      </button>
-      <button onclick="applyStatusToSelected('absent')" class="p-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
-        <i class="fas fa-times"></i>
-        <span>Absent</span>
-      </button>
-      <button onclick="applyStatusToSelected('late')" class="p-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
-        <i class="fas fa-clock"></i>
-        <span>Late</span>
-      </button>
-      <button onclick="applyStatusToSelected('excused')" class="p-4 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
-        <i class="fas fa-user-check"></i>
-        <span>Excused</span>
-      </button>
-    </div>
-    
-    <button onclick="closeModal()" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200">
-      Cancel
-    </button>
-  </div>
-</div>
-
-<!-- Excuse Modal -->
-<div id="excuseModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-  <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 mx-4 max-w-md w-full">
-    <div class="flex items-center space-x-3 mb-4">
-      <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-        <i class="fas fa-comment-medical text-blue-600 dark:text-blue-400 text-xl"></i>
-      </div>
-      <div>
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Excuse Absence</h3>
-        <p class="text-slate-600 dark:text-slate-400 text-sm">Provide a reason for excusing this absence</p>
-      </div>
-    </div>
-    
-    <textarea id="excuseReason" rows="3" 
-              class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
-              placeholder="Enter excuse reason..."></textarea>
-    
-    <div class="flex space-x-3">
-      <button onclick="closeModal()" class="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200">
+    <div class="ma-modal-actions">
+      <button type="button" onclick="closeModal()" class="ma-btn">
         Cancel
-      </button>
-      <button onclick="submitExcuse()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
-        Excuse
       </button>
     </div>
   </div>
 </div>
 
 <script>
-let currentStudentId = null;
-let selectedStudents = new Set();
+  let currentStudentId = null;
+  const selectedStudents = new Set();
 
-// Selection Management
-function toggleSelectAll(checkbox) {
-  const checkboxes = document.querySelectorAll('.student-checkbox');
-  checkboxes.forEach(cb => {
-    cb.checked = checkbox.checked;
-    if (checkbox.checked) {
-      selectedStudents.add(cb.value);
-    } else {
-      selectedStudents.delete(cb.value);
-    }
-  });
-  updateSelection();
-}
-
-function updateSelection() {
-  const checkboxes = document.querySelectorAll('.student-checkbox');
-  selectedStudents.clear();
-  
-  checkboxes.forEach(cb => {
-    if (cb.checked) {
-      selectedStudents.add(cb.value);
-    }
-  });
-  
-  document.getElementById('selected-count').textContent = selectedStudents.size;
-  
-  // Update select-all checkbox state
-  const selectAll = document.getElementById('select-all');
-  selectAll.checked = selectedStudents.size === checkboxes.length;
-  selectAll.indeterminate = selectedStudents.size > 0 && selectedStudents.size < checkboxes.length;
-  
-  // Update row styles
-  document.querySelectorAll('.student-row').forEach(row => {
-    const studentId = row.dataset.studentId;
-    const checkbox = row.querySelector('.student-checkbox');
-    if (checkbox.checked) {
-      row.classList.add('bg-blue-50', 'dark:bg-blue-900/20', 'border-l-4', 'border-blue-500');
-    } else {
-      row.classList.remove('bg-blue-50', 'dark:bg-blue-900/20', 'border-l-4', 'border-blue-500');
-    }
-  });
-}
-
-function clearSelection() {
-  selectedStudents.clear();
-  document.querySelectorAll('.student-checkbox').forEach(cb => {
-    cb.checked = false;
-  });
-  updateSelection();
-}
-
-// Status Management
-function markAll(status) {
-  const selects = document.querySelectorAll('select[name^="status_"]');
-  selects.forEach(select => {
-    select.value = status;
-    updateRowStyle(select, select.dataset.studentId);
-  });
-  updateStats();
-  showNotification(`All students marked as ${status}`, 'success');
-}
-
-function showMarkSelectedModal() {
-  if (selectedStudents.size === 0) {
-    showNotification('Please select at least one student', 'warning');
-    return;
+  function toggleSelectAll(checkbox) {
+    document.querySelectorAll(".student-checkbox").forEach(function (cb) {
+      cb.checked = checkbox.checked;
+      if (checkbox.checked) selectedStudents.add(cb.value);
+      else selectedStudents.delete(cb.value);
+    });
+    updateSelection();
   }
-  
-  document.getElementById('selectedStudentsCount').textContent = `${selectedStudents.size} students selected`;
-  document.getElementById('markSelectedModal').classList.remove('hidden');
-}
 
-function applyStatusToSelected(status) {
-  selectedStudents.forEach(studentId => {
-    const select = document.querySelector(`select[name="status_${studentId}"]`);
-    if (select) {
-      select.value = status;
-      updateRowStyle(select, studentId);
+  function updateSelection() {
+    const checkboxes = document.querySelectorAll(".student-checkbox");
+    selectedStudents.clear();
+    checkboxes.forEach(function (cb) {
+      if (cb.checked) selectedStudents.add(cb.value);
+    });
+
+    document.getElementById("selected-count").textContent =
+      selectedStudents.size;
+
+    const markSelectedBtn = document.getElementById("mark-selected-btn");
+    if (markSelectedBtn) markSelectedBtn.disabled = selectedStudents.size === 0;
+
+    const selectAll = document.getElementById("select-all");
+    if (selectAll) {
+      selectAll.checked =
+        checkboxes.length > 0 && selectedStudents.size === checkboxes.length;
+      selectAll.indeterminate =
+        selectedStudents.size > 0 && selectedStudents.size < checkboxes.length;
     }
-  });
-  updateStats();
-  closeModal();
-  showNotification(`Marked ${selectedStudents.size} students as ${status}`, 'success');
-}
 
-function updateRowStyle(select, studentId) {
-  const row = document.querySelector(`.student-row[data-student-id="${studentId}"]`);
-  if (!row) return;
-  
-  // Remove existing status borders
-  row.classList.remove('border-emerald-500', 'border-red-500', 'border-amber-500', 'border-blue-500');
-  
-  // Add appropriate status border
-  const status = select.value;
-  const borderColors = {
-    'present': 'border-emerald-500',
-    'absent': 'border-red-500',
-    'late': 'border-amber-500',
-    'excused': 'border-blue-500'
-  };
-  
-  if (borderColors[status]) {
-    row.classList.add('border-l-4', borderColors[status]);
+    document.querySelectorAll(".ma-row").forEach(function (row) {
+      const cb = row.querySelector(".student-checkbox");
+      if (cb && cb.checked) row.classList.add("is-selected");
+      else row.classList.remove("is-selected");
+    });
   }
-}
 
-function updateStats() {
-  const statusCounts = {
-    present: 0,
-    absent: 0,
-    late: 0,
-    excused: 0
-  };
-  
-  document.querySelectorAll('select[name^="status_"]').forEach(select => {
-    statusCounts[select.value]++;
-  });
-  
-  // Update counter elements
-  Object.keys(statusCounts).forEach(status => {
-    const element = document.getElementById(`${status}-count`);
-    if (element) {
-      element.textContent = statusCounts[status];
-      // Add animation
-      element.style.transform = 'scale(1.1)';
-      setTimeout(() => {
-        element.style.transform = 'scale(1)';
-      }, 150);
-    }
-  });
-}
-
-// Excuse Management
-function excuseAbsence(studentId) {
-  currentStudentId = studentId;
-  document.getElementById('excuseReason').value = '';
-  document.getElementById('excuseModal').classList.remove('hidden');
-}
-
-function submitExcuse() {
-  const reason = document.getElementById('excuseReason').value.trim();
-  if (!reason) {
-    showNotification('Please enter a reason for the excuse', 'warning');
-    return;
+  function clearSelection() {
+    selectedStudents.clear();
+    document.querySelectorAll(".student-checkbox").forEach(function (cb) {
+      cb.checked = false;
+    });
+    updateSelection();
   }
-  
-  const select = document.querySelector(`select[name="status_${currentStudentId}"]`);
-  if (select) {
-    select.value = 'excused';
-    updateRowStyle(select, currentStudentId);
+
+  function onStatusChange(input) {
+    const row = input.closest(".ma-row");
+    if (row) row.dataset.status = input.value;
     updateStats();
   }
-  
-  closeModal();
-  showNotification('Absence excused successfully', 'success');
-  currentStudentId = null;
-}
 
-// Modal Management
-function closeModal() {
-  document.querySelectorAll('#markSelectedModal, #excuseModal').forEach(modal => {
-    modal.classList.add('hidden');
-  });
-  currentStudentId = null;
-}
+  function setStatus(studentId, status) {
+    const input = document.querySelector(
+      'input[name="status_' + studentId + '"][value="' + status + '"]',
+    );
+    if (input) {
+      input.checked = true;
+      onStatusChange(input);
+    }
+  }
 
-// Notification System
-function showNotification(message, type = 'info') {
-  const notification = document.createElement('div');
-  const colors = {
-    success: 'bg-emerald-500',
-    warning: 'bg-amber-500',
-    error: 'bg-red-500',
-    info: 'bg-blue-500'
-  };
-  
-  notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
-  notification.textContent = message;
-  
-  document.body.appendChild(notification);
-  
-  // Animate in
-  setTimeout(() => {
-    notification.style.transform = 'translateX(0)';
-  }, 100);
-  
-  // Animate out and remove
-  setTimeout(() => {
-    notification.style.transform = 'translateX(100%)';
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-  updateSelection();
-  updateStats();
-  
-  // Initialize row styles
-  document.querySelectorAll('select[name^="status_"]').forEach(select => {
-    updateRowStyle(select, select.dataset.studentId);
-  });
-  
-  // Close modals when clicking outside
-  document.querySelectorAll('#markSelectedModal, #excuseModal').forEach(modal => {
-    modal.addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeModal();
+  function markAll(status) {
+    document.querySelectorAll(".ma-row").forEach(function (row) {
+      const id = row.dataset.studentId;
+      const input = row.querySelector(
+        'input[name="status_' + id + '"][value="' + status + '"]',
+      );
+      if (input) {
+        input.checked = true;
+        row.dataset.status = status;
       }
     });
-  });
-  
-  // Escape key to close modals
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      closeModal();
+    updateStats();
+    showNotification("All students marked as " + status, "success");
+  }
+
+  function showMarkSelectedModal() {
+    if (selectedStudents.size === 0) {
+      showNotification("Please select at least one student", "warning");
+      return;
+    }
+    document.getElementById("selectedStudentsCount").textContent =
+      selectedStudents.size + " students selected";
+    document.getElementById("markSelectedModal").classList.remove("hidden");
+  }
+
+  function applyStatusToSelected(status) {
+    const n = selectedStudents.size;
+    selectedStudents.forEach(function (studentId) {
+      setStatus(studentId, status);
+    });
+    updateStats();
+    closeModal();
+    showNotification(
+      "Marked " + n + " student" + (n === 1 ? "" : "s") + " as " + status,
+      "success",
+    );
+  }
+
+  function updateStats() {
+    const counts = { present: 0, absent: 0, late: 0, excused: 0 };
+    document.querySelectorAll(".ma-row").forEach(function (row) {
+      const checked = row.querySelector('input[type="radio"]:checked');
+      if (checked && counts[checked.value] !== undefined)
+        counts[checked.value]++;
+    });
+
+    Object.keys(counts).forEach(function (status) {
+      const el = document.getElementById(status + "-count");
+      if (el) {
+        const unit = el.querySelector(".unit");
+        el.textContent = counts[status];
+        if (unit) el.appendChild(unit);
+      }
+    });
+  }
+
+  function closeModal() {
+    document.querySelectorAll("#markSelectedModal").forEach(function (m) {
+      m.classList.add("hidden");
+    });
+    currentStudentId = null;
+  }
+
+  function showNotification(message, type) {
+    type = type || "info";
+    const el = document.createElement("div");
+    el.className = "ma-toast " + type;
+    const icons = {
+      success:
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />',
+      warning:
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5 19h14a2 2 0 001.732-3L13.732 4a2 2 0 00-3.464 0L3.268 16A2 2 0 005 19z" />',
+      error:
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />',
+      info: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />',
+    };
+    el.innerHTML =
+      '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+      (icons[type] || icons.info) +
+      "</svg><span></span>";
+    el.querySelector("span").textContent = message;
+    document.body.appendChild(el);
+    requestAnimationFrame(function () {
+      el.classList.add("show");
+    });
+    setTimeout(function () {
+      el.classList.remove("show");
+      setTimeout(function () {
+        el.remove();
+      }, 260);
+    }, 3000);
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (
+      e.target.matches(
+        'input[type="text"], input[type="email"], textarea, select',
+      )
+    )
+      return;
+    if (e.target.matches('input[type="radio"], input[type="checkbox"]')) return;
+
+    const map = { 1: "present", 2: "late", 3: "excused", 4: "absent" };
+    if (map[e.key] && selectedStudents.size > 0) {
+      e.preventDefault();
+      applyStatusToSelected(map[e.key]);
     }
   });
-});
+
+  document.addEventListener("DOMContentLoaded", function () {
+    updateSelection();
+    updateStats();
+
+    document.querySelectorAll("#markSelectedModal").forEach(function (m) {
+      m.addEventListener("click", function (e) {
+        if (e.target === this) closeModal();
+      });
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeModal();
+    });
+  });
 </script>
-
-<style>
-.student-row {
-  transition: all 0.2s ease-in-out;
-}
-
-.status-select {
-  transition: all 0.2s ease-in-out;
-}
-
-.status-select:focus {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-}
-
-.student-checkbox:checked {
-  accent-color: #3b82f6;
-}
-
-/* Smooth animations */
-.professional-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px);
-}
-</style>
 {% endblock %}

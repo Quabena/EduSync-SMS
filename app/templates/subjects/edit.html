@@ -1,288 +1,702 @@
 {% extends 'base.html' %} {% block title %}Edit Subject{% endblock %} {% block
 content %}
-<div
-  class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50/30 to-cyan-50"
->
-  <div class="container mx-auto px-4 py-8 max-w-3xl">
-    <div class="mb-6">
-      <a
-        href="{{ url_for('subjects.index') }}"
-        class="inline-flex items-center text-slate-600 hover:text-sky-600 transition-colors duration-200 group"
-      >
-        <svg
-          class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          ></path>
-        </svg>
-        Back to Subjects
-      </a>
+
+<style>
+  /* ==========================================================
+     Edit Subject — same warm paper/green/gold palette used
+     across the create subject, classes, and student pages.
+     ========================================================== */
+  .edit-subject {
+    --ink: #202a2d;
+    --ink-soft: #4a5658;
+    --ink-faint: #718084;
+    --page: #f7f5f0;
+    --surface: #fffefa;
+    --surface-alt: #fbfcf8;
+    --surface-muted: #eef4f0;
+    --line: #d5dfda;
+    --line-soft: #e3ebe6;
+    --border-strong: #b9cbc5;
+
+    --green: #1f6259;
+    --green-dark: #174d47;
+    --green-tint: #e6f0ed;
+
+    --gold: #b78643;
+    --gold-dark: #8a632e;
+    --gold-tint: #f4eadb;
+
+    --clay: #aa604a;
+    --clay-dark: #8e4b39;
+    --clay-tint: #f3e3df;
+
+    position: relative;
+    color: var(--ink);
+    padding: 32px 24px 56px;
+    min-height: 100vh;
+    background: var(--page);
+  }
+  .edit-subject::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 320px;
+    background: radial-gradient(
+      ellipse at 50% 0,
+      rgba(183, 134, 67, 0.1),
+      transparent 68%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+  .edit-subject > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .dark .edit-subject {
+    --page: #131817;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --surface-muted: #232b2a;
+    --line: #33403e;
+    --line-soft: #2a3533;
+    --border-strong: #465653;
+    --ink: #eef2ef;
+    --ink-soft: #b8c1bd;
+    --ink-faint: #7f8b87;
+    --green: #6fbfa7;
+    --green-dark: #8ed4bd;
+    --green-tint: #1c2b27;
+    --gold: #d9b273;
+    --gold-dark: #c79a55;
+    --gold-tint: #2c2620;
+    --clay: #e0907a;
+    --clay-dark: #c9755e;
+    --clay-tint: #2e211d;
+  }
+  .dark .edit-subject::before {
+    background: radial-gradient(
+      ellipse at 50% 0,
+      rgba(217, 178, 115, 0.08),
+      transparent 68%
+    );
+  }
+
+  .edit-subject * {
+    box-sizing: border-box;
+  }
+
+  /* ---------- Header ---------- */
+  .es-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 26px;
+  }
+  .es-header-copy {
+    min-width: 0;
+  }
+  .es-eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .es-eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 22px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+  .es-header h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 3.6vw, 2.75rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--ink);
+    margin: 0;
+  }
+  .es-header p {
+    margin: 10px 0 0;
+    font-size: 1rem;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    max-width: 54ch;
+  }
+  .es-header p strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .es-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(28, 47, 45, 0.03);
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .es-back-btn:hover {
+    background: var(--surface-muted);
+    border-color: var(--border-strong);
+  }
+  .es-back-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ---------- Layout ---------- */
+  .es-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.9fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ---------- Form shell ---------- */
+  .es-form-shell {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow:
+      0 1px 3px rgba(28, 47, 45, 0.04),
+      0 8px 22px rgba(28, 47, 45, 0.04);
+    overflow: hidden;
+  }
+
+  .es-form-band {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 28px;
+    background: linear-gradient(135deg, #f7ead4, #f2e0c1);
+    border-bottom: 1px solid #ddc9a9;
+  }
+  .es-form-band-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: var(--gold);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(138, 99, 46, 0.2);
+  }
+  .es-form-band-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  .es-form-band-copy .label {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin: 0 0 2px;
+  }
+  .es-form-band-copy h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .es-form-body {
+    padding: 26px 28px 30px;
+  }
+
+  .es-form-body form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  /* ---------- Fields ---------- */
+  .es-field {
+    display: flex;
+    flex-direction: column;
+  }
+  .es-field label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .es-field label::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.75;
+    flex-shrink: 0;
+  }
+  .es-field label .req {
+    color: var(--clay);
+    margin-left: 2px;
+  }
+  .es-field label .optional {
+    color: var(--ink-faint);
+    font-weight: 500;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    margin-left: 4px;
+    text-transform: none;
+  }
+  .es-field input,
+  .es-field select,
+  .es-field textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-size: 0.95rem;
+    box-shadow: inset 0 1px 1px rgba(28, 47, 45, 0.03);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .es-field input::placeholder {
+    color: #9aa6a2;
+  }
+  .es-field input:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: #fff;
+    box-shadow:
+      0 0 0 3px rgba(31, 98, 89, 0.13),
+      inset 0 1px 1px rgba(28, 47, 45, 0.02);
+  }
+  .es-field .hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    margin-top: 7px;
+    line-height: 1.45;
+  }
+  .es-field .hint svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Update note ---------- */
+  .es-update-note {
+    display: flex;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--gold-tint);
+    border: 1px solid #ddc9a9;
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+  }
+  .es-update-note svg {
+    width: 18px;
+    height: 18px;
+    color: var(--gold-dark);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .es-update-note h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gold-dark);
+    margin: 0 0 5px;
+    letter-spacing: -0.005em;
+  }
+  .es-update-note p {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  /* ---------- Actions ---------- */
+  .es-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 22px;
+    margin-top: 6px;
+    border-top: 1px solid var(--line);
+  }
+  .es-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .es-actions .btn-cancel {
+    background: var(--surface-alt);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .es-actions .btn-cancel:hover {
+    background: var(--surface-muted);
+    border-color: var(--border-strong);
+  }
+  .es-actions .btn-submit {
+    background: linear-gradient(135deg, #28766b, var(--green-dark));
+    color: #fff;
+    border-color: var(--green-dark);
+    box-shadow: 0 1px 2px rgba(28, 47, 45, 0.08);
+  }
+  .es-actions .btn-submit:hover {
+    background: var(--green-dark);
+  }
+
+  /* ---------- Sidebar ---------- */
+  .es-sidebar {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .es-side-label {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .es-side-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* Stat tiles inside sidebar */
+  .es-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .es-stat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 16px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .es-stat::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--green);
+    opacity: 0.85;
+  }
+  .es-stat:nth-child(2)::before {
+    background: var(--gold);
+  }
+  .es-stat-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 8px;
+  }
+  .es-stat-value {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.65rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+    margin: 0;
+  }
+  .es-stat-unit {
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--ink-faint);
+    letter-spacing: 0;
+    margin-left: 4px;
+  }
+
+  /* Manage links panel */
+  .es-manage {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(28, 47, 45, 0.03);
+    overflow: hidden;
+  }
+  .es-manage-head {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .es-manage-list {
+    padding: 4px 18px 10px;
+  }
+  .es-manage-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line-soft);
+    text-decoration: none;
+    color: var(--ink);
+    transition: color 0.15s ease;
+  }
+  .es-manage-link:last-child {
+    border-bottom: 0;
+  }
+  .es-manage-link:hover {
+    color: var(--green);
+  }
+  .es-manage-link:hover .es-manage-arrow {
+    transform: translateX(3px);
+  }
+  .es-manage-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    background: var(--green-tint);
+    border: 1px solid #c5d9d1;
+    color: var(--green-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .es-manage-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .es-manage-link:nth-child(2) .es-manage-icon {
+    background: var(--gold-tint);
+    border-color: #ddc9a9;
+    color: var(--gold-dark);
+  }
+  .es-manage-body {
+    min-width: 0;
+    flex: 1;
+  }
+  .es-manage-body strong {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: inherit;
+    letter-spacing: -0.005em;
+  }
+  .es-manage-body span {
+    display: block;
+    font-size: 0.76rem;
+    color: var(--ink-faint);
+    margin-top: 2px;
+  }
+  .es-manage-arrow {
+    color: var(--ink-faint);
+    font-size: 14px;
+    transition: transform 0.15s ease;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1000px) {
+    .es-layout {
+      grid-template-columns: 1fr;
+    }
+    .es-sidebar {
+      position: static;
+      order: -1;
+    }
+  }
+  @media (max-width: 640px) {
+    .edit-subject {
+      padding: 20px 14px 40px;
+    }
+    .es-form-band {
+      padding: 16px 20px;
+    }
+    .es-form-body {
+      padding: 22px 20px 26px;
+    }
+    .es-actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
+    .es-actions .btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="edit-subject">
+  <!-- Header -->
+  <header class="es-header">
+    <div class="es-header-copy">
+      <h1>Edit Subject</h1>
+      <p>
+        Update information for
+        <strong>{{ subject.name }}</strong>. Changes apply immediately across
+        all related records.
+      </p>
     </div>
+    <a href="{{ url_for('subjects.index') }}" class="es-back-btn">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+      Back to Subjects
+    </a>
+  </header>
 
-    <div class="relative mb-8">
-      <div
-        class="absolute inset-0 bg-gradient-to-r from-sky-300/40 to-cyan-300/40 rounded-3xl blur-xl opacity-60"
-      ></div>
-
-      <div
-        class="relative bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-white/60 shadow-2xl"
-      >
-        <div class="flex items-center mb-6">
-          <div
-            class="w-16 h-16 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-2xl flex items-center justify-center mr-5 shadow-lg"
-          >
-            <svg
-              class="w-8 h-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              ></path>
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-3xl font-bold text-slate-800 mb-1">Edit Subject</h1>
-            <p class="text-slate-600">Update subject information and details</p>
-          </div>
+  <!-- Layout -->
+  <div class="es-layout">
+    <!-- Form -->
+    <div class="es-form-shell">
+      <div class="es-form-band">
+        <div class="es-form-band-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
         </div>
-
-        <div class="grid grid-cols-2 gap-4 mb-8">
-          <div class="relative group">
-            <div
-              class="absolute inset-0 bg-gradient-to-br from-sky-300/30 to-blue-300/30 rounded-2xl blur opacity-50 group-hover:opacity-70 transition-opacity duration-300"
-            ></div>
-            <div
-              class="relative bg-white/50 backdrop-blur-md rounded-2xl p-5 border border-white/60 shadow-lg"
-            >
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-slate-500 font-medium mb-1">
-                    Enrolled Students
-                  </p>
-                  <!-- <p class="text-3xl font-bold text-sky-600">
-                    {{ subject.students|length }}
-                  </p> -->
-                  <p class="text-3xl font-bold text-sky-600">
-                    {{ active_students_count }}
-                  </p>
-                </div>
-                <div
-                  class="w-12 h-12 bg-gradient-to-br from-sky-400 to-blue-500 rounded-xl flex items-center justify-center"
-                >
-                  <svg
-                    class="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="relative group">
-            <div
-              class="absolute inset-0 bg-gradient-to-br from-cyan-300/30 to-blue-300/30 rounded-2xl blur opacity-50 group-hover:opacity-70 transition-opacity duration-300"
-            ></div>
-            <div
-              class="relative bg-white/50 backdrop-blur-md rounded-2xl p-5 border border-white/60 shadow-lg"
-            >
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-slate-500 font-medium mb-1">
-                    Assigned Teachers
-                  </p>
-                  <p class="text-3xl font-bold text-cyan-600">
-                    {{ subject.teachers|length }}
-                  </p>
-                </div>
-                <div
-                  class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center"
-                >
-                  <svg
-                    class="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="es-form-band-copy">
+          <p class="label">Subject Details</p>
+          <h2>Subject Information</h2>
         </div>
+      </div>
 
-        <form method="POST" class="space-y-6">
+      <div class="es-form-body">
+        <form method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-          <div>
-            <label
-              for="name"
-              class="block text-sm font-semibold text-slate-700 mb-2 flex items-center"
-            >
-              Subject Name
-              <span class="ml-1 text-red-500">*</span>
+          <div class="es-field">
+            <label for="name"> Subject Name <span class="req">*</span> </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value="{{ subject.name }}"
+              required
+              placeholder="e.g., Mathematics, English Literature, Physics"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="es-field">
+            <label for="code">
+              Subject Code <span class="optional">Optional</span>
             </label>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
-              >
-                <svg
-                  class="w-5 h-5 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  ></path>
-                </svg>
-              </div>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value="{{ subject.name }}"
-                required
-                class="w-full pl-12 pr-4 py-3.5 bg-white/60 backdrop-blur-sm border-2 border-white/80 rounded-xl focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition-all duration-200 placeholder-slate-400 shadow-inner"
-                placeholder="e.g., Mathematics, English Literature, Physics"
-              />
-            </div>
-            <p class="mt-2 text-sm text-slate-500">
-              The full name of the subject
-            </p>
+            <input
+              type="text"
+              id="code"
+              name="code"
+              value="{{ subject.code or '' }}"
+              placeholder="e.g., MATH101, ENG201, PHY301"
+              autocomplete="off"
+            />
           </div>
 
-          <div>
-            <label
-              for="code"
-              class="block text-sm font-semibold text-slate-700 mb-2 flex items-center"
-            >
-              Subject Code
-              <span class="ml-2 text-xs text-slate-500 font-normal"
-                >(Optional)</span
+          <div class="es-actions">
+            <a href="{{ url_for('subjects.index') }}" class="btn btn-cancel">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-            </label>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
-              >
-                <svg
-                  class="w-5 h-5 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-                  ></path>
-                </svg>
-              </div>
-              <input
-                type="text"
-                id="code"
-                name="code"
-                value="{{ subject.code or '' }}"
-                class="w-full pl-12 pr-4 py-3.5 bg-white/60 backdrop-blur-sm border-2 border-white/80 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-200 placeholder-slate-400 shadow-inner"
-                placeholder="e.g., MATH101, ENG201, PHY301"
-              />
-            </div>
-            <p class="mt-2 text-sm text-slate-500">
-              A unique identifier or abbreviation for the subject
-            </p>
-          </div>
-
-          <div class="relative">
-            <div
-              class="absolute inset-0 bg-gradient-to-r from-sky-200/30 to-cyan-200/30 rounded-2xl blur"
-            ></div>
-            <div
-              class="relative bg-gradient-to-r from-sky-50/80 to-cyan-50/80 backdrop-blur-sm border-l-4 border-sky-400 p-5 rounded-r-2xl"
-            >
-              <div class="flex items-start">
-                <svg
-                  class="w-5 h-5 text-sky-500 mr-3 flex-shrink-0 mt-0.5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-                <div>
-                  <h3 class="font-semibold text-sky-900 text-sm mb-1">
-                    Update Information
-                  </h3>
-                  <p class="text-sky-800 text-sm">
-                    Changes will be saved immediately and reflected across all
-                    related records. Student and teacher assignments remain
-                    unchanged.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="flex items-center justify-end space-x-4 pt-8 border-t border-white/50"
-          >
-            <a
-              href="{{ url_for('subjects.index') }}"
-              class="px-6 py-3 bg-white/70 backdrop-blur-sm text-slate-700 font-medium rounded-xl border-2 border-white/80 hover:bg-white/90 hover:border-slate-300 transition-all duration-200 shadow-lg"
-            >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
               Cancel
             </a>
-            <button
-              type="submit"
-              class="px-8 py-3 bg-gradient-to-r from-sky-500 to-cyan-600 text-white font-semibold rounded-xl hover:from-sky-600 hover:to-cyan-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center group"
-            >
+            <button type="submit" class="btn btn-submit">
               <svg
-                class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-200"
+                width="16"
+                height="16"
                 fill="none"
-                stroke="currentColor"
                 viewBox="0 0 24 24"
+                stroke="currentColor"
               >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M5 13l4 4L19 7"
-                ></path>
+                />
               </svg>
               Update Subject
             </button>
@@ -291,117 +705,74 @@ content %}
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="relative group">
-        <div
-          class="absolute inset-0 bg-gradient-to-r from-sky-300/30 to-blue-300/30 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-opacity duration-300"
-        ></div>
-        <div
-          class="relative bg-white/40 backdrop-blur-lg rounded-2xl p-5 border border-white/60 shadow-lg hover:shadow-xl transition-shadow duration-300"
-        >
-          <div class="flex items-center">
-            <div
-              class="w-12 h-12 bg-gradient-to-br from-sky-400 to-blue-500 rounded-xl flex items-center justify-center mr-4"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+    <!-- Sidebar -->
+    <aside class="es-sidebar">
+      <!-- Stats -->
+      <div>
+        <div class="es-side-label">Record Summary</div>
+        <div class="es-stats">
+          <div class="es-stat">
+            <p class="es-stat-label">Students</p>
+            <p class="es-stat-value">
+              {{ active_students_count }}<span class="es-stat-unit"
+                >enrolled</span
               >
+            </p>
+          </div>
+          <div class="es-stat">
+            <p class="es-stat-label">Teachers</p>
+            <p class="es-stat-value">
+              {{ subject.teachers|length }}<span class="es-stat-unit"
+                >assigned</span
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage links -->
+      <div class="es-manage">
+        <div class="es-manage-head">Manage Related</div>
+        <div class="es-manage-list">
+          <a href="#" class="es-manage-link" aria-label="Manage students">
+            <span class="es-manage-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                ></path>
+                />
               </svg>
-            </div>
-            <div>
-              <p class="text-sm text-slate-500 font-medium">Manage Students</p>
-              <p class="text-slate-700 font-semibold">Add or remove students</p>
-            </div>
-            <svg
-              class="w-5 h-5 text-slate-400 ml-auto group-hover:translate-x-1 transition-transform duration-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              ></path>
-            </svg>
-          </div>
-        </div>
-      </div>
+            </span>
+            <span class="es-manage-body">
+              <strong>Manage Students</strong>
+              <span>Add or remove students</span>
+            </span>
+            <span class="es-manage-arrow">→</span>
+          </a>
 
-      <div class="relative group">
-        <div
-          class="absolute inset-0 bg-gradient-to-r from-cyan-300/30 to-blue-300/30 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-opacity duration-300"
-        ></div>
-        <div
-          class="relative bg-white/40 backdrop-blur-lg rounded-2xl p-5 border border-white/60 shadow-lg hover:shadow-xl transition-shadow duration-300"
-        >
-          <div class="flex items-center">
-            <div
-              class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center mr-4"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+          <a href="#" class="es-manage-link" aria-label="Manage teachers">
+            <span class="es-manage-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                ></path>
+                />
               </svg>
-            </div>
-            <div>
-              <p class="text-sm text-slate-500 font-medium">Manage Teachers</p>
-              <p class="text-slate-700 font-semibold">
-                Assign or update teachers
-              </p>
-            </div>
-            <svg
-              class="w-5 h-5 text-slate-400 ml-auto group-hover:translate-x-1 transition-transform duration-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              ></path>
-            </svg>
-          </div>
+            </span>
+            <span class="es-manage-body">
+              <strong>Manage Teachers</strong>
+              <span>Assign or update teachers</span>
+            </span>
+            <span class="es-manage-arrow">→</span>
+          </a>
         </div>
       </div>
-    </div>
+    </aside>
   </div>
 </div>
 
-<style>
-  @keyframes pulse-glow {
-    0%,
-    100% {
-      opacity: 0.5;
-    }
-    50% {
-      opacity: 0.8;
-    }
-  }
-
-  .group:hover .absolute.inset-0 {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-</style>
 {% endblock %}

@@ -2,464 +2,540 @@
 Settings{% endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
-  :root {
-    --primary: #1e40af;
-    --primary-light: #3b82f6;
-    --secondary: #059669;
-    --accent: #7c3aed;
-    --warning: #f59e0b;
-    --error: #ef4444;
-    --success: #10b981;
-    --gray-50: #f8fafc;
-    --gray-100: #f1f5f9;
-    --gray-200: #e2e8f0;
-    --gray-300: #cbd5e1;
-    --gray-400: #94a3b8;
-    --gray-500: #64748b;
-    --gray-600: #475569;
-    --gray-700: #334155;
-    --gray-800: #1e293b;
-    --gray-900: #0f172a;
-    --border-radius: 16px;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
+  /* ==========================================================
+     School Information — Dashboard design language.
+     Fraunces (display), Inter (body), JetBrains Mono (labels).
+     ========================================================== */
+  .school-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
 
-  * {
-    box-sizing: border-box;
-  }
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
 
-  body {
-    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-      sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    color: var(--gray-800);
-    line-height: 1.6;
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  .main-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    position: relative;
-    overflow-x: hidden;
+  .dark .school-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
   }
 
-  .main-container::before {
+  .school-page *,
+  .school-page *::before,
+  .school-page *::after {
+    box-sizing: border-box;
+  }
+  .school-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ---------- Hero ---------- */
+  .page-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 26px 22px 30px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .page-hero::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
     bottom: 0;
-    background: radial-gradient(
-        circle at 20% 80%,
-        rgba(120, 119, 198, 0.3) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        circle at 80% 20%,
-        rgba(255, 255, 255, 0.1) 0%,
-        transparent 50%
-      );
-    pointer-events: none;
+    width: 4px;
+    background: var(--violet);
   }
-
-  .content-wrapper {
-    position: relative;
-    z-index: 1;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
+  .hero-copy {
+    min-width: 0;
   }
-
-  .header-card {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.98) 0%,
-      rgba(248, 250, 252, 0.95) 100%
-    );
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 24px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15),
-      0 0 0 1px rgba(255, 255, 255, 0.3) inset;
-    animation: slideInDown 0.8s ease-out;
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
   }
-
-  .page-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 15px 35px rgba(30, 64, 175, 0.3);
-    position: relative;
-    overflow: hidden;
+  .page-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
   }
-
-  .page-icon::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-      45deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent
-    );
-    transform: rotate(45deg);
-    animation: shimmer 3s infinite;
-  }
-
-  .page-icon svg {
-    width: 40px;
-    height: 40px;
-    color: white;
-    z-index: 1;
-  }
-
-  .page-title {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800;
-    background: linear-gradient(
-      135deg,
-      var(--gray-900) 0%,
-      var(--primary) 50%,
-      var(--accent) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .page-hero p {
     margin: 0;
-    letter-spacing: -0.02em;
+    max-width: 620px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
   }
 
-  .page-subtitle {
-    font-size: 1.125rem;
-    color: var(--gray-600);
-    margin: 0.5rem 0 0 0;
-    font-weight: 500;
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .card-body {
+    padding: 22px;
   }
 
-  .form-card {
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    box-shadow: var(--shadow-lg);
-    animation: slideInUp 0.8s ease-out;
-  }
-
+  /* ---------- Section head ---------- */
   .form-section {
-    margin-bottom: 2rem;
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--line-soft);
   }
-
-  .form-section:last-child {
+  .form-section:last-of-type {
+    padding-bottom: 0;
     margin-bottom: 0;
+    border-bottom: 0;
   }
 
-  .form-section-title {
-    font-size: 1.25rem;
+  .form-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .form-section-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
     font-weight: 700;
-    color: var(--gray-900);
-    margin: 0 0 1.5rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--gray-100);
+    letter-spacing: 0.1em;
+    color: var(--violet);
+  }
+  .form-section-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0;
   }
 
-  .form-section-icon {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(
-      135deg,
-      var(--success) 0%,
-      var(--secondary) 100%
-    );
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* ---------- Form fields ---------- */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
   }
-
+  .form-grid.single {
+    grid-template-columns: 1fr;
+  }
   .form-group {
-    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
   }
-
   .form-label {
     display: block;
-    font-size: 0.875rem;
+    font-family: var(--font-mono);
+    font-size: 10px;
     font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 0.5rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
   }
-
+  .form-label .req {
+    color: var(--red);
+    margin-left: 2px;
+  }
   .form-control {
     width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    border: 2px solid var(--gray-200);
-    border-radius: 12px;
-    background: white;
-    transition: all 0.2s ease;
-    font-family: inherit;
+    min-height: 40px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
   }
-
+  .form-control::placeholder {
+    color: var(--muted);
+  }
   .form-control:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: 0;
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
   }
-
-  .form-control[type="file"] {
-    padding: 0.5rem;
+  .form-control.is-invalid {
+    border-color: var(--red);
+    background: var(--red-wash);
   }
-
+  .form-control.is-invalid:focus {
+    box-shadow: 0 0 0 2px var(--red-wash);
+  }
   textarea.form-control {
     resize: vertical;
-    min-height: 100px;
+    min-height: 96px;
+    line-height: 1.55;
+  }
+  .form-control[type="file"] {
+    padding: 8px 10px;
+    cursor: pointer;
+  }
+  .form-control[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .form-hint {
+    margin: 7px 0 0;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--muted);
   }
 
+  /* ---------- Logo preview ---------- */
+  .logo-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border: 1px dashed var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+  }
+  .logo-preview-thumb {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    object-fit: contain;
+    padding: 6px;
+  }
+  .logo-preview-meta {
+    min-width: 0;
+  }
+  .logo-preview-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .logo-preview-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- Actions ---------- */
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 18px 22px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
     font-weight: 600;
-    border-radius: 12px;
-    border: none;
+    white-space: nowrap;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-    margin-right: 0.75rem;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    border-color: var(--ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .btn.primary {
+    color: #131817;
+  }
+  .btn.primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .btn.primary:hover {
+    color: #131817;
+  }
+  .btn[aria-busy="true"] {
+    opacity: 0.6;
+    cursor: progress;
   }
 
-  .btn::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
-    transition: left 0.5s ease;
+  /* ---------- Toast ---------- */
+  .toast-region {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    --ink: #1a2226;
+    --surface: #ffffff;
+    --line: #d7dfdb;
+    --green: #1f6259;
+    --red: #9a5148;
+    --slate: #5d7076;
+  }
+  .dark .toast-region {
+    --ink: #eef2ef;
+    --surface: #1a201f;
+    --line: #33403e;
+    --green: #6fbfa7;
+    --red: #e0907a;
+    --slate: #8fa2a8;
+  }
+  .toast {
+    padding: 11px 16px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+    border-left-width: 3px;
+    background: var(--surface);
+    box-shadow: 0 8px 24px rgba(28, 47, 45, 0.15);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--ink);
+    max-width: 340px;
+    transform: translateX(calc(100% + 30px));
+    transition: transform 0.25s ease;
+  }
+  .toast.is-visible {
+    transform: translateX(0);
+  }
+  .toast.is-error {
+    border-left-color: var(--red);
+  }
+  .toast.is-success {
+    border-left-color: var(--green);
+  }
+  .toast.is-info {
+    border-left-color: var(--slate);
   }
 
-  .btn:hover::before {
-    left: 100%;
-  }
-
-  .btn-primary {
-    background: linear-gradient(
-      135deg,
-      var(--primary) 0%,
-      var(--primary-light) 100%
-    );
-    color: white;
-    box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4);
-  }
-
-  .btn-secondary {
-    background: linear-gradient(
-      135deg,
-      var(--gray-400) 0%,
-      var(--gray-500) 100%
-    );
-    color: white;
-    box-shadow: 0 4px 15px rgba(148, 163, 184, 0.3);
-  }
-
-  .btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(148, 163, 184, 0.4);
-  }
-
-  .logo-preview {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: var(--gray-50);
-    border-radius: 12px;
-    border: 2px dashed var(--gray-200);
-  }
-
-  .logo-preview img {
-    max-height: 120px;
-    max-width: 200px;
-    border-radius: 8px;
-    box-shadow: var(--shadow-md);
-  }
-
-  .logo-preview-text {
-    font-size: 0.875rem;
-    color: var(--gray-600);
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
-
-  /* Grid Layout */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .form-grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-  }
-
-  /* Animations */
-  @keyframes slideInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-30px);
+  /* ---------- Responsive ---------- */
+  @media (max-width: 700px) {
+    .school-page {
+      padding: 20px 14px 40px;
     }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
+    .page-hero {
+      padding: 20px 18px 20px 22px;
     }
-  }
-
-  @keyframes slideInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
+    .card-head {
+      padding: 14px 16px 12px;
     }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
+    .card-body {
+      padding: 18px;
     }
-  }
-
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%) rotate(45deg);
-    }
-
-    100% {
-      transform: translateX(100%) rotate(45deg);
-    }
-  }
-
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .content-wrapper {
-      padding: 1rem;
-    }
-
-    .header-card {
-      padding: 1.5rem;
-    }
-
-    .page-title {
-      font-size: 2rem;
-    }
-
-    .form-grid,
-    .form-grid-2 {
+    .form-grid {
       grid-template-columns: 1fr;
     }
-
-    .btn {
+    .form-actions {
+      flex-direction: column-reverse;
+      padding: 14px 16px;
+    }
+    .form-actions .btn {
       width: 100%;
-      margin-right: 0;
-      margin-bottom: 0.75rem;
+    }
+    .logo-preview {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 </style>
 
-<div class="main-container">
-  <div class="content-wrapper">
-    <!-- Professional Header -->
-    <div class="header-card">
-      <div style="display: flex; align-items: center; gap: 1.5rem">
-        <div class="page-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h10M7 15h10"
-            />
-          </svg>
-        </div>
-        <div>
-          <h1 class="page-title">School Information</h1>
-          <p class="page-subtitle">
-            Manage your institution's profile and branding
-          </p>
-        </div>
-      </div>
+<div class="school-page">
+  <!-- Hero -->
+  <header class="page-hero">
+    <div class="hero-copy">
+      <p class="dash-kicker">System settings · Institution profile</p>
+      <h1>School information</h1>
+      <p>Manage your institution's profile, contact details, and branding.</p>
     </div>
+  </header>
 
-    <!-- School Information Form -->
-    <div class="form-card">
-      <form method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        {{ form.hidden_tag() }}
+  <!-- Form -->
+  <form method="POST" enctype="multipart/form-data" id="school-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {{ form.hidden_tag() }}
 
-        <!-- Basic Information Section -->
+    <!-- Basic information -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <p class="section-kicker">01 · Identity</p>
+          <h2>Basic information</h2>
+        </div>
+        <span class="head-meta">Required fields marked *</span>
+      </div>
+
+      <div class="card-body">
         <div class="form-section">
-          <div class="form-section-title">
-            <div class="form-section-icon">
-              <svg
-                style="width: 16px; height: 16px; color: white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            Basic Information
+          <div class="form-section-head">
+            <span class="form-section-num">A</span>
+            <h3 class="form-section-title">School name and motto</h3>
           </div>
 
           <div class="form-grid">
             <div class="form-group">
-              <label for="name" class="form-label">School Name *</label>
+              <label class="form-label" for="name"
+                >School name <span class="req">*</span></label
+              >
               <input
                 class="form-control"
                 type="text"
@@ -468,11 +544,12 @@ Settings{% endblock %} {% block content %}
                 value="{{ school.name if school else '' }}"
                 placeholder="Enter your school's full name"
                 required
+                maxlength="200"
               />
             </div>
 
             <div class="form-group">
-              <label for="motto" class="form-label">School Motto</label>
+              <label class="form-label" for="motto">School motto</label>
               <input
                 class="form-control"
                 type="text"
@@ -480,278 +557,306 @@ Settings{% endblock %} {% block content %}
                 name="motto"
                 value="{{ school.motto if school else '' }}"
                 placeholder="Enter your school's motto"
+                maxlength="200"
               />
             </div>
           </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-head">
+            <span class="form-section-num">B</span>
+            <h3 class="form-section-title">Address</h3>
+          </div>
 
           <div class="form-group">
-            <label for="address" class="form-label">Address</label>
+            <label class="form-label" for="address">Full address</label>
             <textarea
               class="form-control"
               id="address"
               name="address"
               placeholder="Enter the complete school address"
             >
-{{ school.address if school else '' }}</textarea
+{{ school.address if school and school.address else '' }}</textarea
             >
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <div class="form-section-title">
-            <div class="form-section-icon">
-              <svg
-                style="width: 16px; height: 16px; color: white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                />
-              </svg>
-            </div>
-            Contact Information
-          </div>
+    <!-- Contact information -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <p class="section-kicker">02 · Contact</p>
+          <h2>Contact information</h2>
+        </div>
+      </div>
 
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="phone" class="form-label">Phone Number</label>
-              <input
-                class="form-control"
-                type="tel"
-                id="phone"
-                name="phone"
-                value="{{ school.phone if school else '' }}"
-                placeholder="0244123456"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="email" class="form-label">Email Address</label>
-              <input
-                class="form-control"
-                type="email"
-                id="email"
-                name="email"
-                value="{{ school.email if school else '' }}"
-                placeholder="info@yourschool.edu"
-              />
-            </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone number</label>
+            <input
+              class="form-control"
+              type="tel"
+              id="phone"
+              name="phone"
+              value="{{ school.phone if school else '' }}"
+              placeholder="024 412 3456"
+              autocomplete="tel"
+            />
           </div>
 
           <div class="form-group">
-            <label for="website" class="form-label">Website</label>
+            <label class="form-label" for="email">Email address</label>
             <input
               class="form-control"
-              type="url"
-              id="website"
-              name="website"
-              value="{{ school.website if school else '' }}"
-              placeholder="https://www.yourschool.edu"
+              type="email"
+              id="email"
+              name="email"
+              value="{{ school.email if school else '' }}"
+              placeholder="info@yourschool.edu"
+              autocomplete="email"
             />
           </div>
         </div>
 
-        <!-- Branding Section -->
-        <div class="form-section">
-          <div class="form-section-title">
-            <div class="form-section-icon">
-              <svg
-                style="width: 16px; height: 16px; color: white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            School Branding
-          </div>
+        <div class="form-group" style="margin-top: 16px">
+          <label class="form-label" for="website">Website</label>
+          <input
+            class="form-control"
+            type="url"
+            id="website"
+            name="website"
+            value="{{ school.website if school else '' }}"
+            placeholder="https://www.yourschool.edu"
+            autocomplete="url"
+          />
+          <p class="form-hint">
+            Include the protocol (https://) so the link opens correctly.
+          </p>
+        </div>
+      </div>
+    </section>
 
-          <div class="form-group">
-            <label for="logo" class="form-label">School Logo</label>
-            <input
-              class="form-control"
-              type="file"
-              id="logo"
-              name="logo"
-              accept="image/*"
-            />
-            <small
-              style="
-                color: var(--gray-500);
-                font-size: 0.75rem;
-                margin-top: 0.5rem;
-                display: block;
-              "
-            >
-              Recommended: PNG or JPG format, maximum 2MB, square aspect ratio
-              for best results
-            </small>
+    <!-- Branding -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <p class="section-kicker">03 · Branding</p>
+          <h2>School logo</h2>
+        </div>
+        <span class="head-meta">PNG or JPG · max 2 MB</span>
+      </div>
 
-            {% if school and school.logo_path %}
-            <div class="logo-preview">
-              <div class="logo-preview-text">Current Logo:</div>
-              <img
-                src="{{ url_for('static', filename='images/sda_logo-2.png') }}"
-                alt="School Logo"
-              />
-            </div>
-            {% endif %}
-          </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label" for="logo">Upload logo</label>
+          <input
+            class="form-control"
+            type="file"
+            id="logo"
+            name="logo"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+          />
+          <p class="form-hint">
+            Square aspect ratio recommended. Maximum file size 2 MB.
+          </p>
         </div>
 
-        <!-- Action Buttons -->
-        <div style="padding-top: 1.5rem; border-top: 2px solid var(--gray-100)">
-          <button type="submit" class="btn btn-primary">
-            <svg
-              style="width: 20px; height: 20px; margin-right: 0.5rem"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-            Save School Information
-          </button>
-          <a
-            href="{{ url_for('exams_grading.index') }}"
-            class="btn btn-secondary"
+        <div
+          class="logo-preview"
+          id="logo-preview"
+          {%
+          if
+          not
+          (school
+          and
+          school.logo_path)
+          %}hidden{%
+          endif
+          %}
+        >
+          <img
+            class="logo-preview-thumb"
+            id="logo-preview-thumb"
+            {%
+            if
+            school
+            and
+            school.logo_path
+            %}
+            src="{{ url_for('exams_grading.school_logo') }}?v={{ school.logo_path }}"
+            {%
+            endif
+            %}
+            alt="School logo preview"
+          />
+          <div class="logo-preview-meta">
+            <span class="logo-preview-label">Current logo</span>
+            <span class="logo-preview-name" id="logo-preview-name">
+              {% if school and school.logo_path %}Uploaded logo{% else %}No
+              logo{% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{{ url_for('exams_grading.index') }}" class="btn">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
           >
-            <svg
-              style="width: 20px; height: 20px; margin-right: 0.5rem"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Cancel
-          </a>
-        </div>
-      </form>
-    </div>
-  </div>
+            <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Cancel
+        </a>
+        <button type="submit" class="btn primary" id="submit-btn">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+            />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          Save school information
+        </button>
+      </div>
+    </section>
+  </form>
 </div>
 
+<!-- Toast region -->
+<div
+  class="toast-region"
+  id="toast-region"
+  aria-live="polite"
+  aria-atomic="true"
+></div>
+
 <script>
-  // Form enhancement and validation
-  document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form");
+  "use strict";
+
+  (function () {
+    const MAX_LOGO_BYTES = 2 * 1024 * 1024; // 2 MB
+    const ALLOWED_TYPES = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+    ];
+
+    const form = document.getElementById("school-form");
     const logoInput = document.getElementById("logo");
-    const phoneInput = document.getElementById("phone");
-    const websiteInput = document.getElementById("website");
+    const preview = document.getElementById("logo-preview");
+    const previewThumb = document.getElementById("logo-preview-thumb");
+    const previewName = document.getElementById("logo-preview-name");
+    const submitBtn = document.getElementById("submit-btn");
+    const toastRegion = document.getElementById("toast-region");
 
-    // Logo preview functionality
-    logoInput.addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (file) {
-        // Validate file size (2MB limit)
-        if (file.size > 2 * 1024 * 1024) {
-          alert("Logo file size must be less than 2MB");
-          this.value = "";
-          return;
+    if (!form || !logoInput || !preview || !previewThumb || !previewName)
+      return;
+
+    /* ---------- Logo file validation + preview ---------- */
+    let previousObjectUrl = null;
+
+    logoInput.addEventListener("change", function () {
+      const file = logoInput.files && logoInput.files[0];
+      if (!file) {
+        // Reset to whatever the server-side logo was
+        if (previousObjectUrl) {
+          URL.revokeObjectURL(previousObjectUrl);
+          previousObjectUrl = null;
         }
+        return;
+      }
 
-        // Validate file type
-        if (!file.type.startsWith("image/")) {
-          alert("Please select a valid image file");
-          this.value = "";
-          return;
-        }
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        showToast("Please choose a PNG, JPG, or WebP image", "error");
+        logoInput.value = "";
+        return;
+      }
 
-        // Create preview
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          let preview = document.querySelector(".logo-preview");
-          if (!preview) {
-            preview = document.createElement("div");
-            preview.className = "logo-preview";
-            logoInput.parentNode.appendChild(preview);
-          }
+      if (file.size > MAX_LOGO_BYTES) {
+        showToast("Logo exceeds 2 MB. Choose a smaller file.", "error");
+        logoInput.value = "";
+        return;
+      }
 
-          preview.innerHTML = `
-          <div class="logo-preview-text">New Logo Preview:</div>
-          <img src="${e.target.result}" alt="Logo Preview" style="max-height: 120px; max-width: 200px; border-radius: 8px; box-shadow: var(--shadow-md);">
-        `;
-        };
-        reader.readAsDataURL(file);
+      // Clean up previous object URL to avoid leaking memory
+      if (previousObjectUrl) {
+        URL.revokeObjectURL(previousObjectUrl);
+      }
+      previousObjectUrl = URL.createObjectURL(file);
+      previewThumb.src = previousObjectUrl;
+      previewName.textContent = file.name;
+      preview.hidden = false;
+    });
+
+    /* ---------- Submit loading state ---------- */
+    form.addEventListener("submit", function () {
+      // Let browser-native validation run first (required, type, etc.)
+      if (!form.checkValidity()) return;
+      if (submitBtn) {
+        submitBtn.setAttribute("aria-busy", "true");
+        submitBtn.disabled = true;
       }
     });
 
-    // Phone number formatting
-    phoneInput.addEventListener("input", function (e) {
-      let value = e.target.value.replace(/\D/g, "");
-      if (value.length >= 10) {
-        value = value.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
-      }
-      e.target.value = value;
-    });
+    /* ---------- Toast ---------- */
+    function showToast(message, type = "info") {
+      const toast = document.createElement("div");
+      toast.className = `toast is-${type}`;
+      toast.setAttribute("role", "status");
+      toast.textContent = message;
+      toastRegion.appendChild(toast);
 
-    // Website URL validation
-    websiteInput.addEventListener("blur", function (e) {
-      let value = e.target.value.trim();
-      if (
-        value &&
-        !value.startsWith("http://") &&
-        !value.startsWith("https://")
-      ) {
-        e.target.value = "https://" + value;
-      }
-    });
+      requestAnimationFrame(() => toast.classList.add("is-visible"));
 
-    // Form submission enhancement
-    form.addEventListener("submit", function (e) {
-      const requiredFields = form.querySelectorAll("[required]");
-      let isValid = true;
+      setTimeout(() => {
+        toast.classList.remove("is-visible");
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
 
-      requiredFields.forEach((field) => {
+    /* ---------- Validation styling ---------- */
+    // Mark required fields that are empty on blur, clear on input.
+    const requiredFields = form.querySelectorAll("[required]");
+    requiredFields.forEach((field) => {
+      field.addEventListener("blur", function () {
         if (!field.value.trim()) {
-          field.style.borderColor = "var(--error)";
-          isValid = false;
+          field.classList.add("is-invalid");
         } else {
-          field.style.borderColor = "var(--gray-200)";
+          field.classList.remove("is-invalid");
         }
       });
-
-      if (!isValid) {
-        e.preventDefault();
-        alert("Please fill in all required fields");
-      }
-    });
-
-    // Real-time validation feedback
-    const inputs = form.querySelectorAll(".form-control");
-    inputs.forEach((input) => {
-      input.addEventListener("input", function () {
-        if (this.hasAttribute("required") && this.value.trim()) {
-          this.style.borderColor = "var(--success)";
-        } else if (this.hasAttribute("required")) {
-          this.style.borderColor = "var(--gray-200)";
-        }
+      field.addEventListener("input", function () {
+        if (field.value.trim()) field.classList.remove("is-invalid");
       });
     });
-  });
+
+    // Clear any lingering validation state on submit
+    form.addEventListener("submit", function () {
+      form.querySelectorAll(".is-invalid").forEach((el) => {
+        el.classList.remove("is-invalid");
+      });
+    });
+  })();
 </script>
 
 {% endblock %}

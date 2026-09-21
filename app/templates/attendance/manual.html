@@ -2,441 +2,907 @@
 }}{% endblock %} {% block page_title %}Manual Attendance{% endblock %} {% block
 page_description %}Mark attendance for {{ class_.name }}{% endblock %} {% block
 content %}
-<div class="space-y-6">
-  <!-- Header Section -->
-  <div class="professional-card p-8">
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-      <div class="mb-4 lg:mb-0">
-        <h1 class="text-3xl font-bold gradient-text mb-2">Manual Attendance</h1>
-        <div class="flex flex-wrap items-center gap-3">
-          <span
-            class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-medium text-sm"
-          >
-            <svg
-              class="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              ></path>
-            </svg>
-            {{ class_.name }}
-          </span>
-          <span
-            class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-medium text-sm"
-          >
-            <svg
-              class="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V8a1 1 0 011-1h3z"
-              ></path>
-            </svg>
-            {{ today.strftime('%A, %B %d, %Y') }}
-          </span>
-        </div>
-      </div>
-      <div class="flex space-x-3">
-        <a
-          href="{{ url_for('attendance.scanner') }}"
-          class="inline-flex items-center px-4 py-2 glass hover:bg-white/20 transition-all duration-300 rounded-xl interactive"
-        >
-          <svg
-            class="w-4 h-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+  /* ==========================================================
+     Manual Attendance — Fraunces + Inter + JetBrains Mono.
+     Fraunces  → header title, section headings
+     Inter     → body copy, student names, buttons, radio labels
+     JetBrains → kickers, labels, stamps, IDs, meta
+     Includes dark mode.
+     ========================================================== */
+  :root {
+    --ma-ink: #1a2226;
+    --ma-copy: #4a5459;
+    --ma-muted: #7a8589;
+    --ma-paper: #f4f5f3;
+    --ma-surface: #ffffff;
+    --ma-surface-alt: #f5f7f5;
+    --ma-line: #d7dfdb;
+    --ma-line-soft: #e8ecea;
+    --ma-input-bg: #ffffff;
+    --ma-radio-border: #b5c2bd;
+
+    --ma-green: #1f6259;
+    --ma-green-hover: #185048;
+    --ma-green-wash: #e6efe9;
+    --ma-green-edge: #c2d5c8;
+
+    --ma-red: #9a5148;
+    --ma-red-hover: #7f4139;
+    --ma-red-wash: #f3e5e1;
+    --ma-red-edge: #dcc1b9;
+
+    --ma-brass: #8a632e;
+    --ma-brass-hover: #6f4f24;
+    --ma-brass-wash: #f2ead8;
+    --ma-brass-edge: #d9c8a4;
+
+    --ma-slate: #5d7076;
+    --ma-slate-wash: #ebefee;
+    --ma-slate-edge: #c5d0d0;
+
+    --ma-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --ma-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --ma-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+  }
+
+  .dark {
+    --ma-ink: #eef2ef;
+    --ma-copy: #b8c1bd;
+    --ma-muted: #8f9a96;
+    --ma-paper: #131817;
+    --ma-surface: #1a201f;
+    --ma-surface-alt: #1e2524;
+    --ma-line: #33403e;
+    --ma-line-soft: #2a3533;
+    --ma-input-bg: #1e2524;
+    --ma-radio-border: #4a5459;
+
+    --ma-green: #6fbfa7;
+    --ma-green-hover: #8ed4bd;
+    --ma-green-wash: #1c2b27;
+    --ma-green-edge: #2d5a4b;
+
+    --ma-red: #e0907a;
+    --ma-red-hover: #c9755e;
+    --ma-red-wash: #3a251f;
+    --ma-red-edge: #5a3a2f;
+
+    --ma-brass: #d9b273;
+    --ma-brass-hover: #c79a55;
+    --ma-brass-wash: #2c2620;
+    --ma-brass-edge: #4a3e2d;
+
+    --ma-slate: #8fa2a8;
+    --ma-slate-wash: #253032;
+    --ma-slate-edge: #3d4d51;
+  }
+
+  .manual-attendance {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ma-ink);
+    background: var(--ma-paper);
+    font-family: var(--ma-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  .manual-attendance *,
+  .manual-attendance *::before,
+  .manual-attendance *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---------- Header ---------- */
+  .ma-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 24px 22px 28px;
+    background: var(--ma-surface);
+    border: 1px solid var(--ma-line);
+    border-radius: 4px;
+    position: relative;
+  }
+  .ma-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--ma-green);
+  }
+  .ma-header-copy {
+    min-width: 0;
+  }
+  .ma-kicker {
+    font-family: var(--ma-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ma-muted);
+    margin: 0 0 6px;
+  }
+  .ma-header h1 {
+    margin: 0 0 12px;
+    color: var(--ma-ink);
+    font-family: var(--ma-display);
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .ma-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    color: var(--ma-muted);
+    font-family: var(--ma-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .ma-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border: 1px solid var(--ma-green-edge);
+    border-radius: 3px;
+    background: var(--ma-green-wash);
+    color: var(--ma-green);
+    font-family: var(--ma-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .ma-stamp svg {
+    width: 12px;
+    height: 12px;
+  }
+  .ma-stamp.brass {
+    border-color: var(--ma-brass-edge);
+    background: var(--ma-brass-wash);
+    color: var(--ma-brass);
+  }
+
+  .ma-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .ma-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border: 1px solid var(--ma-line);
+    border-radius: 3px;
+    background: var(--ma-surface);
+    color: var(--ma-ink);
+    text-decoration: none;
+    font-family: var(--ma-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .ma-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .ma-btn:hover {
+    border-color: var(--ma-ink);
+    background: var(--ma-surface-alt);
+  }
+
+  /* ---------- Control panel ---------- */
+  .ma-control {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--ma-surface);
+    border: 1px solid var(--ma-line);
+    border-radius: 4px;
+  }
+  .ma-control-copy {
+    min-width: 0;
+  }
+  .ma-control-copy h2 {
+    margin: 0 0 4px;
+    font-family: var(--ma-display);
+    font-size: 16px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ma-ink);
+  }
+  .ma-control-copy p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ma-muted);
+  }
+  .ma-control-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ma-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid var(--ma-line);
+    border-radius: 3px;
+    background: var(--ma-surface);
+    color: var(--ma-ink);
+    font-family: var(--ma-sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .ma-action svg {
+    width: 12px;
+    height: 12px;
+  }
+  .ma-action:hover {
+    border-color: var(--ma-ink);
+  }
+  .ma-action.a-present:hover {
+    border-color: var(--ma-green);
+    color: var(--ma-green);
+    background: var(--ma-green-wash);
+  }
+  .ma-action.a-absent:hover {
+    border-color: var(--ma-red);
+    color: var(--ma-red);
+    background: var(--ma-red-wash);
+  }
+  .ma-action.a-late:hover {
+    border-color: var(--ma-brass);
+    color: var(--ma-brass);
+    background: var(--ma-brass-wash);
+  }
+
+  /* ---------- Register (form) ---------- */
+  .ma-register {
+    padding: 22px 24px 24px;
+    background: var(--ma-surface);
+    border: 1px solid var(--ma-line);
+    border-radius: 4px;
+  }
+  .ma-register-head {
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--ma-line);
+  }
+  .ma-register-head h2 {
+    margin: 0 0 6px;
+    font-family: var(--ma-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ma-ink);
+  }
+  .ma-register-head p {
+    margin: 0;
+    font-family: var(--ma-mono);
+    font-size: 11px;
+    color: var(--ma-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* Student grid */
+  .ma-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .ma-student {
+    padding: 16px 18px;
+    background: var(--ma-surface);
+    border: 1px solid var(--ma-line);
+    border-radius: 4px;
+    position: relative;
+    transition: border-color 0.15s ease;
+  }
+  .ma-student:hover {
+    border-color: var(--ma-muted);
+  }
+
+  .ma-student-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--ma-line-soft);
+  }
+
+  .ma-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ma-green-wash);
+    color: var(--ma-green);
+    font-family: var(--ma-sans);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    overflow: hidden;
+  }
+  .ma-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .ma-student:nth-child(3n + 2) .ma-avatar {
+    background: var(--ma-brass-wash);
+    color: var(--ma-brass);
+  }
+  .ma-student:nth-child(3n + 3) .ma-avatar {
+    background: var(--ma-slate-wash);
+    color: var(--ma-slate);
+  }
+
+  .ma-student-identity {
+    min-width: 0;
+    flex: 1;
+  }
+  .ma-student-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ma-ink);
+    font-family: var(--ma-sans);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .ma-student-id {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--ma-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ma-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* Radio rows */
+  .ma-options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ma-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    transition:
+      background-color 0.12s ease,
+      border-color 0.12s ease;
+  }
+  .ma-option:hover {
+    background: var(--ma-surface-alt);
+  }
+  .ma-option input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--ma-radio-border);
+    border-radius: 50%;
+    background: var(--ma-surface);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: border-color 0.15s ease;
+  }
+  .ma-option input[type="radio"]:checked {
+    border-width: 4px;
+  }
+  .ma-option.o-present input[type="radio"]:checked {
+    border-color: var(--ma-green);
+  }
+  .ma-option.o-absent input[type="radio"]:checked {
+    border-color: var(--ma-red);
+  }
+  .ma-option.o-late input[type="radio"]:checked {
+    border-color: var(--ma-brass);
+  }
+
+  .ma-option.o-present:hover {
+    background: var(--ma-green-wash);
+    border-color: var(--ma-green-edge);
+  }
+  .ma-option.o-absent:hover {
+    background: var(--ma-red-wash);
+    border-color: var(--ma-red-edge);
+  }
+  .ma-option.o-late:hover {
+    background: var(--ma-brass-wash);
+    border-color: var(--ma-brass-edge);
+  }
+
+  .ma-option.o-present input[type="radio"]:checked + .ma-option-label {
+    color: var(--ma-green);
+  }
+  .ma-option.o-absent input[type="radio"]:checked + .ma-option-label {
+    color: var(--ma-red);
+  }
+  .ma-option.o-late input[type="radio"]:checked + .ma-option-label {
+    color: var(--ma-brass);
+  }
+
+  .ma-option-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ma-sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ma-copy);
+    transition: color 0.12s ease;
+  }
+
+  /* ---------- Footer ---------- */
+  .ma-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--ma-line);
+  }
+  .ma-footer-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    font-family: var(--ma-mono);
+    font-size: 11px;
+    color: var(--ma-muted);
+    letter-spacing: 0.02em;
+  }
+  .ma-footer-summary .label {
+    font-family: var(--ma-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ma-muted);
+    margin-right: 4px;
+  }
+  .ma-footer-summary strong {
+    font-weight: 700;
+  }
+  .ma-footer-summary .s-present {
+    color: var(--ma-green);
+  }
+  .ma-footer-summary .s-absent {
+    color: var(--ma-red);
+  }
+  .ma-footer-summary .s-late {
+    color: var(--ma-brass);
+  }
+  .ma-footer-summary .sep {
+    color: var(--ma-line);
+  }
+
+  .ma-footer-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .ma-footer-actions .ma-btn.primary {
+    background: var(--ma-green);
+    color: #fff;
+    border-color: var(--ma-green);
+  }
+  .dark .ma-footer-actions .ma-btn.primary {
+    color: #131817;
+  }
+  .ma-footer-actions .ma-btn.primary:hover {
+    background: var(--ma-green-hover);
+    border-color: var(--ma-green-hover);
+  }
+  .dark .ma-footer-actions .ma-btn.primary:hover {
+    color: #131817;
+  }
+
+  /* ---------- Empty state ---------- */
+  .ma-empty {
+    padding: 56px 24px;
+    background: var(--ma-surface);
+    border: 1px solid var(--ma-line);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .ma-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    border: 1px dashed var(--ma-line);
+    border-radius: 4px;
+    background: var(--ma-surface-alt);
+    color: var(--ma-muted);
+  }
+  .ma-empty-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+  .ma-empty h3 {
+    margin: 0 0 8px;
+    font-family: var(--ma-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ma-ink);
+  }
+  .ma-empty p {
+    margin: 0 0 22px;
+    font-family: var(--ma-sans);
+    font-size: 14px;
+    color: var(--ma-muted);
+    max-width: 46ch;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.55;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1000px) {
+    .ma-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .manual-attendance {
+      padding: 18px 14px 40px;
+    }
+    .ma-header {
+      padding: 18px 16px 18px 20px;
+    }
+    .ma-header-actions {
+      width: 100%;
+    }
+    .ma-header-actions .ma-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .ma-grid {
+      grid-template-columns: 1fr;
+    }
+    .ma-control {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .ma-control-actions {
+      width: 100%;
+    }
+    .ma-control-actions .ma-action {
+      flex: 1;
+      justify-content: center;
+    }
+    .ma-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .ma-footer-actions {
+      width: 100%;
+    }
+    .ma-footer-actions .ma-btn {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="manual-attendance">
+  <!-- Header -->
+  <header class="ma-header">
+    <div class="ma-header-copy">
+      <p class="ma-kicker">Attendance Register</p>
+      <h1>Manual Attendance</h1>
+      <div class="ma-meta">
+        <span class="ma-stamp">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-            ></path>
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+            />
           </svg>
-          QR Scanner
-        </a>
-        <a
-          href="{{ url_for('attendance.attendance_dashboard') }}"
-          class="inline-flex items-center px-4 py-2 glass hover:bg-white/20 transition-all duration-300 rounded-xl interactive"
-        >
-          <svg
-            class="w-4 h-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          {{ class_.name }}
+        </span>
+        <span class="ma-stamp brass">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            ></path>
+              d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V8a1 1 0 011-1h3z"
+            />
           </svg>
-          Dashboard
-        </a>
+          {{ today.strftime('%A, %B %d, %Y') }}
+        </span>
       </div>
     </div>
-  </div>
+    <div class="ma-header-actions">
+      <a href="{{ url_for('attendance.scanner') }}" class="ma-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+          />
+        </svg>
+        QR scanner
+      </a>
+      <a href="{{ url_for('attendance.attendance_dashboard') }}" class="ma-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        Dashboard
+      </a>
+    </div>
+  </header>
 
   {% if class_.students %}
-  <!-- Control Panel -->
-  <div class="professional-card p-6">
-    <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-    >
-      <div>
-        <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-1">
-          Attendance Control
-        </h2>
-        <p class="text-sm text-slate-600 dark:text-slate-300">
-          Use bulk actions or mark individual students
-        </p>
+  <!-- Control panel -->
+  <section class="ma-control">
+    <div class="ma-control-copy">
+      <h2>Attendance control</h2>
+      <p>Use bulk actions or mark individual students below.</p>
+    </div>
+    <div class="ma-control-actions">
+      <button
+        type="button"
+        onclick="markAll('present')"
+        class="ma-action a-present"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.5"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        All present
+      </button>
+      <button
+        type="button"
+        onclick="markAll('absent')"
+        class="ma-action a-absent"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.5"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+        All absent
+      </button>
+      <button type="button" onclick="markAll('late')" class="ma-action a-late">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        All late
+      </button>
+    </div>
+  </section>
+
+  <!-- Register -->
+  <form method="POST" class="ma-register">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+    <div class="ma-register-head">
+      <h2>Student attendance</h2>
+      <p id="summary">Review attendance before saving.</p>
+    </div>
+
+    <div class="ma-grid">
+      {% for student in class_.students %} {% set current =
+      attendance_dict.get(student.id) %} {% set current_status = current.status
+      if current else 'absent' %}
+      <article class="ma-student">
+        <header class="ma-student-head">
+          <div class="ma-avatar">
+            {% if student.photo_path %}
+            <img
+              src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
+              alt="{{ student.full_name }}"
+            />
+            {% else %} {{ student.first_name[0] }}{{ student.surname[0] }} {%
+            endif %}
+          </div>
+          <div class="ma-student-identity">
+            <span class="ma-student-name">{{ student.full_name }}</span>
+            <span class="ma-student-id">ID {{ student.id }}</span>
+          </div>
+        </header>
+        <!-- prettier-ignore -->
+        <div
+          class="ma-options"
+          role="radiogroup"
+          aria-label="Attendance for {{ student.full_name }}"
+        >
+          <label class="ma-option o-present">
+            <input
+              type="radio"
+              name="status_{{ student.id }}"
+              value="present"
+              {%
+              if
+              current_status=="present"
+              %}checked{%
+              endif
+              %}
+            />
+            <span class="ma-option-label">Present</span>
+          </label>
+          <label class="ma-option o-absent">
+            <input
+              type="radio"
+              name="status_{{ student.id }}"
+              value="absent"
+              {%
+              if
+              current_status=="absent"
+              %}checked{%
+              endif
+              %}
+            />
+            <span class="ma-option-label">Absent</span>
+          </label>
+          <label class="ma-option o-late">
+            <input
+              type="radio"
+              name="status_{{ student.id }}"
+              value="late"
+              {%
+              if
+              current_status=="late"
+              %}checked{%
+              endif
+              %}
+            />
+            <span class="ma-option-label">Late</span>
+          </label>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="ma-footer">
+      <div class="ma-footer-summary">
+        <span class="label">Live summary</span>
+        <span id="live-summary">
+          <strong class="s-present">0 present</strong>
+          <span class="sep">·</span>
+          <strong class="s-absent">0 absent</strong>
+          <span class="sep">·</span>
+          <strong class="s-late">0 late</strong>
+        </span>
       </div>
-      <div class="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onclick="markAll('present')"
-          class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-md hover:shadow-lg font-medium text-sm interactive"
+      <div class="ma-footer-actions">
+        <a
+          href="{{ url_for('attendance.attendance_dashboard') }}"
+          class="ma-btn"
         >
-          <svg
-            class="w-4 h-4 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7"
-            ></path>
-          </svg>
-          All Present
-        </button>
-        <button
-          type="button"
-          onclick="markAll('absent')"
-          class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl hover:from-red-600 hover:to-rose-600 transition-all duration-200 shadow-md hover:shadow-lg font-medium text-sm interactive"
-        >
-          <svg
-            class="w-4 h-4 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M6 18L18 6M6 6l12 12"
-            ></path>
+            />
           </svg>
-          All Absent
-        </button>
-        <button
-          type="button"
-          onclick="markAll('late')"
-          class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 shadow-md hover:shadow-lg font-medium text-sm interactive"
-        >
-          <svg
-            class="w-4 h-4 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          Cancel
+        </a>
+        <button type="submit" class="ma-btn primary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-          All Late
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Student Grid Form -->
-  <form method="POST" class="professional-card p-8">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-    <!-- Form Header -->
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">
-        Student Attendance
-      </h2>
-      <p class="text-slate-600 dark:text-slate-300" id="summary">
-        Review attendance before saving
-      </p>
-    </div>
-
-    <!-- Student Cards Grid -->
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-    >
-      {% for student in class_.students %}
-      <div class="group relative glass rounded-2xl p-6 hover-lift">
-        <!-- Student Info Header -->
-        <div class="flex items-center mb-6">
-          <div class="relative">
-            {% if student.photo_path %}
-            <img
-              class="w-14 h-14 rounded-2xl object-cover shadow-md group-hover:shadow-lg transition-shadow"
-              src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
-              alt="{{ student.full_name }}"
+              d="M5 13l4 4L19 7"
             />
-            {% else %}
-            <div
-              class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow"
-            >
-              <span class="text-lg font-bold text-white"
-                >{{ student.first_name[0] }}{{ student.surname[0] }}</span
-              >
-            </div>
-            {% endif %}
-            <div
-              class="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md"
-            >
-              <div
-                class="w-3 h-3 bg-green-400 rounded-full animate-pulse"
-              ></div>
-            </div>
-          </div>
-          <div class="ml-4 flex-1">
-            <h3
-              class="font-bold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
-            >
-              {{ student.full_name }}
-            </h3>
-            <p
-              class="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md mt-1"
-            >
-              ID: {{ student.id }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Attendance Options -->
-        {% set current_status = attendance_dict.get(student.id, 'absent') %}
-        <div class="space-y-3">
-          <label
-            class="group/option flex items-center p-3 rounded-xl hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer transition-all duration-200 border border-transparent hover:border-green-200 dark:hover:border-green-700"
-          >
-            <input type="radio" name="status_{{ student.id }}" value="present"
-            class="form-radio h-4 w-4 text-green-500 border-slate-300
-            dark:border-slate-600 focus:ring-green-500 focus:ring-offset-0" {%
-            if current_status == 'present' %}checked{% endif %}>
-            <div class="ml-3 flex items-center flex-1">
-              <div
-                class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mr-3 group-hover/option:bg-green-200 dark:group-hover/option:bg-green-800/50 transition-colors"
-              >
-                <svg
-                  class="w-4 h-4 text-green-600 dark:text-green-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  ></path>
-                </svg>
-              </div>
-              <span
-                class="font-medium text-slate-700 dark:text-slate-300 group-hover/option:text-green-700 dark:group-hover/option:text-green-400"
-                >Present</span
-              >
-            </div>
-          </label>
-
-          <label
-            class="group/option flex items-center p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer transition-all duration-200 border border-transparent hover:border-red-200 dark:hover:border-red-700"
-          >
-            <input type="radio" name="status_{{ student.id }}" value="absent"
-            class="form-radio h-4 w-4 text-red-500 border-slate-300
-            dark:border-slate-600 focus:ring-red-500 focus:ring-offset-0" {% if
-            current_status == 'absent' %}checked{% endif %}>
-            <div class="ml-3 flex items-center flex-1">
-              <div
-                class="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center mr-3 group-hover/option:bg-red-200 dark:group-hover/option:bg-red-800/50 transition-colors"
-              >
-                <svg
-                  class="w-4 h-4 text-red-600 dark:text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </div>
-              <span
-                class="font-medium text-slate-700 dark:text-slate-300 group-hover/option:text-red-700 dark:group-hover/option:text-red-400"
-                >Absent</span
-              >
-            </div>
-          </label>
-
-          <label
-            class="group/option flex items-center p-3 rounded-xl hover:bg-yellow-50 dark:hover:bg-yellow-900/20 cursor-pointer transition-all duration-200 border border-transparent hover:border-yellow-200 dark:hover:border-yellow-700"
-          >
-            <input type="radio" name="status_{{ student.id }}" value="late"
-            class="form-radio h-4 w-4 text-yellow-500 border-slate-300
-            dark:border-slate-600 focus:ring-yellow-500 focus:ring-offset-0" {%
-            if current_status == 'late' %}checked{% endif %}>
-            <div class="ml-3 flex items-center flex-1">
-              <div
-                class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center mr-3 group-hover/option:bg-yellow-200 dark:group-hover/option:bg-yellow-800/50 transition-colors"
-              >
-                <svg
-                  class="w-4 h-4 text-yellow-600 dark:text-yellow-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-              </div>
-              <span
-                class="font-medium text-slate-700 dark:text-slate-300 group-hover/option:text-yellow-700 dark:group-hover/option:text-yellow-400"
-                >Late</span
-              >
-            </div>
-          </label>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-
-    <!-- Form Footer -->
-    <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
-      <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-      >
-        <div class="flex items-center space-x-6">
-          <div class="text-sm">
-            <span class="text-slate-600 dark:text-slate-300"
-              >Live Summary:</span
-            >
-            <span
-              id="live-summary"
-              class="font-bold text-slate-800 dark:text-white ml-2"
-              >Loading...</span
-            >
-          </div>
-        </div>
-        <div class="flex space-x-3">
-          <a
-            href="{{ url_for('attendance.attendance_dashboard') }}"
-            class="inline-flex items-center px-6 py-3 glass hover:bg-white/20 text-slate-700 dark:text-slate-300 rounded-xl transition-all duration-200 interactive"
-          >
-            <svg
-              class="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
-            </svg>
-            Cancel
-          </a>
-          <button
-            type="submit"
-            class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium interactive"
-          >
-            <svg
-              class="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              ></path>
-            </svg>
-            Save Attendance
-          </button>
-        </div>
+          </svg>
+          Save attendance
+        </button>
       </div>
     </div>
   </form>
   {% else %}
-  <!-- Empty State -->
-  <div class="professional-card p-12 text-center">
-    <div
-      class="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-6"
-    >
-      <svg
-        class="w-10 h-10 text-slate-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+  <!-- Empty state -->
+  <div class="ma-empty">
+    <span class="ma-empty-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="2"
           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-        ></path>
+        />
       </svg>
-    </div>
-    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">
-      No Students Enrolled
-    </h3>
-    <p class="text-slate-600 dark:text-slate-300 mb-6">
+    </span>
+    <h3>No students enrolled</h3>
+    <p>
       This class doesn't have any students enrolled yet. Add students to start
       taking attendance.
     </p>
-    <a
-      href="#"
-      class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-200 shadow-lg font-medium interactive"
-    >
-      <svg
-        class="w-5 h-5 mr-2"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+    <a href="#" class="ma-btn primary">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="2"
           d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-        ></path>
+        />
       </svg>
-      Add Students
+      Add students
     </a>
   </div>
   {% endif %}
@@ -444,52 +910,45 @@ content %}
 
 <script>
   function markAll(status) {
-    const radios = document.querySelectorAll(
-      `input[type="radio"][value="${status}"]`
-    );
-    radios.forEach((radio) => {
-      radio.checked = true;
-      // Add visual feedback
-      radio.closest(".group").classList.add("ring-2", "ring-opacity-50");
-      setTimeout(() => {
-        radio.closest(".group").classList.remove("ring-2", "ring-opacity-50");
-      }, 300);
-    });
+    document
+      .querySelectorAll('input[type="radio"][value="' + status + '"]')
+      .forEach(function (radio) {
+        radio.checked = true;
+      });
     updateSummary();
   }
 
   function updateSummary() {
     const presentCount = document.querySelectorAll(
-      'input[value="present"]:checked'
+      'input[value="present"]:checked',
     ).length;
     const absentCount = document.querySelectorAll(
-      'input[value="absent"]:checked'
+      'input[value="absent"]:checked',
     ).length;
     const lateCount = document.querySelectorAll(
-      'input[value="late"]:checked'
+      'input[value="late"]:checked',
     ).length;
 
-    const summaryElement = document.getElementById("live-summary");
-    if (summaryElement) {
-      summaryElement.innerHTML = `
-        <span class="text-green-600">Present: ${presentCount}</span> • 
-        <span class="text-red-600">Absent: ${absentCount}</span> • 
-        <span class="text-yellow-600">Late: ${lateCount}</span>
-      `;
+    const live = document.getElementById("live-summary");
+    if (live) {
+      live.innerHTML =
+        '<strong class="s-present">' +
+        presentCount +
+        " present</strong>" +
+        '<span class="sep"> · </span>' +
+        '<strong class="s-absent">' +
+        absentCount +
+        " absent</strong>" +
+        '<span class="sep"> · </span>' +
+        '<strong class="s-late">' +
+        lateCount +
+        " late</strong>";
     }
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    const radios = document.querySelectorAll('input[type="radio"]');
-    radios.forEach((radio) => {
-      radio.addEventListener("change", function () {
-        // Add visual feedback for selection
-        this.closest(".group").classList.add("scale-105");
-        setTimeout(() => {
-          this.closest(".group").classList.remove("scale-105");
-        }, 150);
-        updateSummary();
-      });
+    document.querySelectorAll('input[type="radio"]').forEach(function (radio) {
+      radio.addEventListener("change", updateSummary);
     });
     updateSummary();
   });

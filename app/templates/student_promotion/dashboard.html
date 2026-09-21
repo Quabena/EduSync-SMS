@@ -2,257 +2,1016 @@
 endblock %} {% block page_title %}Promotion Dashboard{% endblock %} {% block
 page_description %}Overview of classes and students ready for promotion{%
 endblock %} {% block content %}
-<div class="max-w-7xl mx-auto">
-  <!-- Header with Stats -->
-  <div class="mb-8">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-      <div class="professional-card p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-              Total Students
-            </p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">
-              {{ total_students }}
-            </p>
-          </div>
-          <div
-            class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center"
-          >
-            <i class="fas fa-users text-blue-600 dark:text-blue-400"></i>
-          </div>
-        </div>
-      </div>
 
-      <div class="professional-card p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-              Active Classes
-            </p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">
-              {{ classes_with_students|length }}
-            </p>
-          </div>
-          <div
-            class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
-          >
-            <i class="fas fa-chalkboard text-green-600 dark:text-green-400"></i>
-          </div>
-        </div>
-      </div>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
-      <div class="professional-card p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-              Promotion Paths
-            </p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">
-              {% set path_count = [] %} {% for class_data in
-              classes_with_students %} {% set _ =
-              path_count.append(class_data.promotion_paths|length) %} {% endfor
-              %} {{ path_count|sum }}
-            </p>
-          </div>
-          <div
-            class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"
-          >
-            <i class="fas fa-route text-purple-600 dark:text-purple-400"></i>
-          </div>
-        </div>
-      </div>
+  /* ==========================================================
+     Promotion Dashboard — Dashboard design language.
+     Fraunces (display), Inter (body), JetBrains Mono (labels).
+     ========================================================== */
+  .promo-dash {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
 
-      <div class="professional-card p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">
-              Ready for Promotion
-            </p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">
-              {% set ready_count = [] %} {% for class_data in
-              classes_with_students %} {% if class_data.student_count > 0 and
-              class_data.promotion_paths|length > 0 %} {% set _ =
-              ready_count.append(1) %} {% endif %} {% endfor %} {{
-              ready_count|sum }}
-            </p>
-          </div>
-          <div
-            class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center"
-          >
-            <i
-              class="fas fa-graduation-cap text-amber-600 dark:text-amber-400"
-            ></i>
-          </div>
-        </div>
-      </div>
+    --green: #1f6259;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .dark .promo-dash {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
+  }
+
+  .promo-dash *,
+  .promo-dash *::before,
+  .promo-dash *::after {
+    box-sizing: border-box;
+  }
+  .promo-dash a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ---------- Hero ---------- */
+  .page-hero {
+    padding: 24px 28px 22px 32px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--violet);
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .page-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.8vw, 28px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .page-hero p {
+    margin: 0;
+    max-width: 660px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .hero-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--copy);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .hero-stamp.violet {
+    border-color: var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+  }
+
+  /* ---------- Stats strip ---------- */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .stats-cell {
+    padding: 20px 24px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .stats-cell:last-child {
+    border-right: 0;
+  }
+  .stats-cell::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--violet);
+  }
+  .stats-cell:nth-child(1)::before {
+    background: var(--violet);
+  }
+  .stats-cell:nth-child(2)::before {
+    background: var(--green);
+  }
+  .stats-cell:nth-child(3)::before {
+    background: var(--slate);
+  }
+  .stats-cell:nth-child(4)::before {
+    background: var(--brass);
+  }
+  .stats-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+  .stats-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Section head ---------- */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 26px 0 14px;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.018em;
+    color: var(--ink);
+  }
+  .section-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  /* ---------- Class grid ---------- */
+  .class-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .class-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .class-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
+  .class-id {
+    min-width: 0;
+  }
+  .class-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .class-sub {
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .level-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .class-body {
+    padding: 16px 20px 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .path-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .path-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .path-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--line-soft);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    font-size: 13px;
+  }
+  .path-item .path-target {
+    font-weight: 500;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .path-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--green-edge);
+    background: var(--green-wash);
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .path-status .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .path-empty {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px 12px;
+    border: 1px solid var(--brass-edge);
+    border-radius: 3px;
+    background: var(--brass-wash);
+    color: var(--brass);
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+  .path-empty svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .class-actions {
+    display: flex;
+    gap: 8px;
+    padding: 14px 20px 16px;
+    border-top: 1px solid var(--line-soft);
+    background: var(--surface);
+    margin-top: auto;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    border-color: var(--ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .btn.primary {
+    color: #131817;
+  }
+  .btn.primary:hover {
+    background: #185048;
+    border-color: #185048;
+  }
+  .dark .btn.primary:hover {
+    color: #131817;
+  }
+  .btn.icon-only {
+    padding: 8px 10px;
+    flex: 0 0 auto;
+  }
+  .btn.grow {
+    flex: 1 1 auto;
+  }
+
+  /* ---------- Hierarchy ---------- */
+  .hierarchy-wrap {
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) var(--surface-alt);
+  }
+  .hierarchy-wrap::-webkit-scrollbar {
+    height: 8px;
+  }
+  .hierarchy-wrap::-webkit-scrollbar-track {
+    background: var(--surface-alt);
+  }
+  .hierarchy-wrap::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 4px;
+  }
+
+  .hierarchy-grid {
+    display: flex;
+    gap: 20px;
+    min-width: max-content;
+  }
+
+  .hierarchy-col {
+    width: 260px;
+    flex-shrink: 0;
+  }
+  .hierarchy-source {
+    padding: 14px 16px;
+    background: var(--surface-alt);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  .hierarchy-source h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    text-align: center;
+  }
+  .hierarchy-source .count {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .hierarchy-targets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hierarchy-target {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: 3px;
+  }
+  .hierarchy-arrow {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--green-wash);
+    border: 1px solid var(--green-edge);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hierarchy-arrow svg {
+    width: 11px;
+    height: 11px;
+  }
+  .hierarchy-target-copy {
+    min-width: 0;
+    flex: 1;
+  }
+  .hierarchy-target-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .hierarchy-target-level {
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- Empty states ---------- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .panel-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .panel-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .panel-body {
+    padding: 22px;
+  }
+
+  .empty {
+    padding: 48px 24px;
+    text-align: center;
+  }
+  .empty svg {
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .empty h3 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .empty p {
+    margin: 0 0 14px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .empty .empty-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Screen-reader helper */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .class-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .stats-cell:nth-child(2) {
+      border-right: 0;
+    }
+    .stats-cell:nth-child(1),
+    .stats-cell:nth-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+  }
+  @media (max-width: 700px) {
+    .promo-dash {
+      padding: 20px 14px 40px;
+    }
+    .page-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .class-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .panel-head {
+      padding: 14px 16px 12px;
+    }
+    .panel-body {
+      padding: 18px;
+    }
+    .hierarchy-col {
+      width: 240px;
+    }
+  }
+  @media (max-width: 460px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .stats-cell {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-cell:last-child {
+      border-bottom: 0;
+    }
+  }
+</style>
+
+{# ---------- Derived values ---------- #} {% set path_total =
+namespace(count=0) %} {% set ready_total = namespace(count=0) %} {% for
+class_data in classes_with_students %} {% set path_total.count =
+path_total.count + (class_data.promotion_paths|length) %} {% if
+class_data.student_count > 0 and class_data.promotion_paths|length > 0 %} {% set
+ready_total.count = ready_total.count + 1 %} {% endif %} {% endfor %}
+
+<div class="promo-dash">
+  <!-- Hero -->
+  <header class="page-hero">
+    <p class="dash-kicker">Academic records · Progression pipeline</p>
+    <h1>Promotion dashboard</h1>
+    <p>
+      Classes with students, their configured promotion pathways, and the
+      current state of the progression pipeline.
+    </p>
+    <div class="hero-meta">
+      <span class="hero-stamp violet"
+        >{{ classes_with_students|length }} class{% if
+        classes_with_students|length != 1 %}es{% endif %}</span
+      >
+      <span class="hero-stamp">{{ ready_total.count }} ready</span>
     </div>
+  </header>
+
+  <!-- Stats strip -->
+  <section class="stats-grid" aria-label="Promotion overview">
+    <div class="stats-cell">
+      <span class="stats-label">Total students</span>
+      <strong class="stats-value"
+        >{{ total_students if total_students is not none else 0 }}</strong
+      >
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Active classes</span>
+      <strong class="stats-value">{{ classes_with_students|length }}</strong>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Promotion paths</span>
+      <strong class="stats-value">{{ path_total.count }}</strong>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Ready for promotion</span>
+      <strong class="stats-value">{{ ready_total.count }}</strong>
+    </div>
+  </section>
+
+  <!-- Classes with students -->
+  <div class="section-head">
+    <h2>Classes with students</h2>
+    <span class="head-meta"
+      >{{ classes_with_students|length }} class{% if
+      classes_with_students|length != 1 %}es{% endif %}</span
+    >
   </div>
 
-  <!-- Classes with Students -->
-  <div class="mb-8">
-    <h3 class="text-xl font-semibold text-slate-800 dark:text-white mb-4">
-      Classes with Students
-    </h3>
-
-    {% if classes_with_students %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {% for class_data in classes_with_students %}
-      <div class="professional-card p-6">
-        <div class="flex items-start justify-between mb-4">
-          <div>
-            <h4 class="text-lg font-semibold text-slate-800 dark:text-white">
-              {{ class_data.class.name }}
-            </h4>
-            <p class="text-slate-600 dark:text-slate-400 text-sm">
-              {{ class_data.student_count }} students
-            </p>
+  {% if classes_with_students %}
+  <div class="class-grid">
+    {% for class_data in classes_with_students %}
+    <article class="class-card">
+      <header class="class-head">
+        <div class="class-id">
+          <h3 class="class-name">{{ class_data.class.name }}</h3>
+          <div class="class-sub">
+            {{ class_data.student_count }} student{% if class_data.student_count
+            != 1 %}s{% endif %}
           </div>
-          <span
-            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200"
-          >
-            {{ class_data.class.level }}
-          </span>
         </div>
+        {% if class_data.class.level %}
+        <span class="level-pill">{{ class_data.class.level }}</span>
+        {% endif %}
+      </header>
 
+      <div class="class-body">
         {% if class_data.promotion_paths %}
-        <div class="mb-4">
-          <p class="text-sm text-slate-600 dark:text-slate-400 mb-2">
-            Promotion Paths:
-          </p>
-          <div class="space-y-2">
+        <div>
+          <span class="path-label">Promotion paths</span>
+          <ul class="path-list">
             {% for path in class_data.promotion_paths %}
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-slate-700 dark:text-slate-300"
-                >{{ path.to_class.name }}</span
-              >
-              <span
-                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
-              >
+            <li class="path-item">
+              <span class="path-target">{{ path.to_class.name }}</span>
+              <span class="path-status">
+                <span class="dot" aria-hidden="true"></span>
                 Active
               </span>
-            </div>
+            </li>
             {% endfor %}
-          </div>
+          </ul>
         </div>
         {% else %}
-        <div
-          class="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
-        >
-          <p class="text-amber-800 dark:text-amber-200 text-sm">
-            No promotion paths configured
-          </p>
+        <div class="path-empty">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <span>No promotion paths configured for this class.</span>
         </div>
         {% endif %}
-
-        <div class="flex space-x-2">
-          <a
-            href="{{ url_for('student_promotion.bulk_promotion', class_id=class_data.class.id) }}"
-            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg transition-colors duration-200 text-sm font-medium"
-          >
-            Bulk Promote
-          </a>
-          <a
-            href="{{ url_for('student_promotion.manage_promotion_paths') }}"
-            class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 py-2 px-3 rounded-lg transition-colors duration-200"
-          >
-            <i class="fas fa-cog text-sm"></i>
-          </a>
-        </div>
       </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="professional-card p-8 text-center">
-      <i
-        class="fas fa-users text-4xl text-slate-300 dark:text-slate-600 mb-4"
-      ></i>
-      <h4 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-        No Classes with Students
-      </h4>
-      <p class="text-slate-500 dark:text-slate-400 mb-4">
-        There are no active classes with students available for promotion.
-      </p>
-      <a
-        href="{{ url_for('students.index') }}"
-        class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+
+      <div class="class-actions">
+        <a
+          href="{{ url_for('student_promotion.bulk_promotion', class_id=class_data.class.id) }}"
+          class="btn primary grow"
+        >
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          Bulk promote
+        </a>
+        <a
+          href="{{ url_for('student_promotion.manage_promotion_paths') }}"
+          class="btn icon-only"
+          aria-label="Manage promotion paths for {{ class_data.class.name }}"
+          title="Manage promotion paths"
+        >
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+            />
+          </svg>
+        </a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <section class="panel">
+    <div class="empty">
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
       >
-        <i class="fas fa-user-plus"></i>
-        <span>Manage Students</span>
-      </a>
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+      <h3>No classes with students</h3>
+      <p>
+        There are no active classes with enrolled students available for
+        promotion yet.
+      </p>
+      <div class="empty-actions">
+        <a href="{{ url_for('students.index') }}" class="btn primary">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Manage students
+        </a>
+      </div>
     </div>
-    {% endif %}
+  </section>
+  {% endif %}
+
+  <!-- Hierarchy -->
+  <div class="section-head">
+    <h2>Promotion hierarchy</h2>
+    <span class="head-meta">Class pathways</span>
   </div>
 
-  <!-- Promotion Hierarchy Visualization -->
-  <div class="professional-card p-6">
-    <h3 class="text-xl font-semibold text-slate-800 dark:text-white mb-4">
-      Promotion Hierarchy
-    </h3>
+  <section class="panel" aria-labelledby="hierarchy-heading">
+    <h2 id="hierarchy-heading" class="sr-only">Promotion hierarchy</h2>
 
     {% if hierarchy %}
-    <div class="overflow-x-auto">
-      <div class="flex space-x-6 min-w-max pb-4">
-        {% for from_class_id, to_classes in hierarchy.items() %} {% set
-        from_class = classes | selectattr("id", "equalto", from_class_id) |
-        first %} {% if from_class %}
-        <div class="flex-shrink-0 w-64">
-          <div class="bg-slate-100 dark:bg-slate-800 rounded-xl p-4 mb-3">
-            <h4
-              class="font-semibold text-slate-800 dark:text-white text-center"
-            >
-              {{ from_class.name }}
-            </h4>
-            <p class="text-slate-600 dark:text-slate-400 text-sm text-center">
-              {{ from_class.students|length }} students
-            </p>
-          </div>
-
-          <div class="space-y-3">
-            {% for to_class in to_classes %}
-            <div
-              class="flex items-center space-x-3 bg-white dark:bg-slate-700 rounded-lg p-3 border border-slate-200 dark:border-slate-600"
-            >
-              <div
-                class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0"
-              >
-                <i
-                  class="fas fa-arrow-right text-green-600 dark:text-green-400 text-xs"
-                ></i>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p
-                  class="text-sm font-medium text-slate-800 dark:text-white truncate"
-                >
-                  {{ to_class.name }}
-                </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">
-                  {{ to_class.level }}
-                </p>
-              </div>
+    <div class="panel-body" style="padding: 20px 22px 22px">
+      <div class="hierarchy-wrap">
+        <div class="hierarchy-grid">
+          {% for from_class_id, to_classes in hierarchy.items() %} {% set
+          from_class = classes | selectattr("id", "equalto", from_class_id) |
+          first %} {% if from_class %}
+          <div class="hierarchy-col">
+            <div class="hierarchy-source">
+              <h3>{{ from_class.name }}</h3>
+              <span class="count">
+                {{ from_class.students|length }} student{% if
+                from_class.students|length != 1 %}s{% endif %}
+              </span>
             </div>
-            {% endfor %}
+
+            {% if to_classes %}
+            <div class="hierarchy-targets">
+              {% for to_class in to_classes %}
+              <div class="hierarchy-target">
+                <span class="hierarchy-arrow" aria-hidden="true">
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+                <div class="hierarchy-target-copy">
+                  <div class="hierarchy-target-name">{{ to_class.name }}</div>
+                  {% if to_class.level %}
+                  <div class="hierarchy-target-level">{{ to_class.level }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
           </div>
+          {% endif %} {% endfor %}
         </div>
-        {% endif %} {% endfor %}
       </div>
     </div>
     {% else %}
-    <div class="text-center py-8">
-      <i
-        class="fas fa-route text-4xl text-slate-300 dark:text-slate-600 mb-3"
-      ></i>
-      <p class="text-slate-500 dark:text-slate-400">
-        No promotion hierarchy configured
-      </p>
-      <a
-        href="{{ url_for('student_promotion.manage_promotion_paths') }}"
-        class="inline-block mt-3 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+    <div class="empty">
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
       >
-        Configure Promotion Paths
-      </a>
+        <circle cx="6" cy="19" r="3" />
+        <circle cx="18" cy="5" r="3" />
+        <path d="M6 16V9a4 4 0 0 1 4-4h8" />
+        <path d="M18 8v7a4 4 0 0 1-4 4H6" />
+      </svg>
+      <h3>No hierarchy configured</h3>
+      <p>
+        Promotion paths determine where students go when they are promoted.
+        Configure them once and every future promotion resolves automatically.
+      </p>
+      <div class="empty-actions">
+        <a
+          href="{{ url_for('student_promotion.manage_promotion_paths') }}"
+          class="btn primary"
+        >
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Configure promotion paths
+        </a>
+      </div>
     </div>
     {% endif %}
-  </div>
+  </section>
 </div>
+
 {% endblock %}

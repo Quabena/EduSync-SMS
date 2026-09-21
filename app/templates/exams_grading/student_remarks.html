@@ -2,271 +2,742 @@
 student.full_name }}{% endblock %} {% block page_title %}Student Remarks{%
 endblock %} {% block page_description %}Add personalized remarks for {{
 student.full_name }} - {{ term }} {{ year }}{% endblock %} {% block content %}
-<div class="max-w-6xl mx-auto space-y-6">
-  <!-- Student Info Header -->
-  <div class="professional-card p-8">
-    <div
-      class="flex flex-col lg:flex-row lg:items-center justify-between gap-6"
-    >
-      <div class="flex items-center space-x-4">
-        <div
-          class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-lg"
-        >
-          {{ student.full_name[0] }}
-        </div>
-        <div>
-          <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
-            {{ student.full_name }}
-          </h2>
-          <div class="flex flex-wrap gap-4 mt-2">
-            <div class="flex items-center space-x-2">
-              <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
-              <span class="text-sm text-slate-600 dark:text-slate-300">
-                Class: {{ student.classroom.name if student.classroom else 'N/A'
-                }}
-              </span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span class="text-sm text-slate-600 dark:text-slate-300">
-                Term: {{ term }}
-              </span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span class="text-sm text-slate-600 dark:text-slate-300">
-                Year: {{ year }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="flex items-center space-x-3">
-        <div class="status-dot"></div>
-        <span class="text-sm text-slate-600 dark:text-slate-300"
-          >Editing Remarks</span
-        >
-      </div>
-    </div>
-  </div>
-
-  <!-- Remarks Form -->
-  <div class="professional-card p-8">
-    <form method="POST" class="space-y-8">
-      {{ form.hidden_tag() }}
-
-      <!-- Conduct Section -->
-      <div class="space-y-4">
-        <div class="flex items-center space-x-3">
-          <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <label
-            for="conduct"
-            class="text-lg font-semibold text-slate-800 dark:text-white"
-            >Student Conduct</label
-          >
-        </div>
-        <div class="relative">
-          <textarea
-            class="w-full px-6 py-4 text-slate-700 dark:text-white bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none glass"
-            id="conduct"
-            name="conduct"
-            rows="4"
-            placeholder="Describe the student's behavior, discipline, and overall conduct in the school environment..."
-          >
-{% if remarks %}{{ remarks.conduct }}{% endif %}</textarea
-          >
-          <div class="absolute bottom-3 right-3 text-xs text-slate-400">
-            <i class="fas fa-user-shield mr-1"></i>
-            Conduct Evaluation
-          </div>
-        </div>
-      </div>
-
-      <!-- Attitude Section -->
-      <div class="space-y-4">
-        <div class="flex items-center space-x-3">
-          <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
-          <label
-            for="attitude"
-            class="text-lg font-semibold text-slate-800 dark:text-white"
-            >Learning Attitude</label
-          >
-        </div>
-        <div class="relative">
-          <textarea
-            class="w-full px-6 py-4 text-slate-700 dark:text-white bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 resize-none glass"
-            id="attitude"
-            name="attitude"
-            rows="4"
-            placeholder="Describe the student's attitude towards learning, participation in class, and academic enthusiasm..."
-          >
-{% if remarks %}{{ remarks.attitude }}{% endif %}</textarea
-          >
-          <div class="absolute bottom-3 right-3 text-xs text-slate-400">
-            <i class="fas fa-brain mr-1"></i>
-            Learning Mindset
-          </div>
-        </div>
-      </div>
-
-      <!-- Interests Section -->
-      <div class="space-y-4">
-        <div class="flex items-center space-x-3">
-          <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
-          <label
-            for="interests"
-            class="text-lg font-semibold text-slate-800 dark:text-white"
-            >Interests & Talents</label
-          >
-        </div>
-        <div class="relative">
-          <textarea
-            class="w-full px-6 py-4 text-slate-700 dark:text-white bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 resize-none glass"
-            id="interests"
-            name="interests"
-            rows="4"
-            placeholder="Highlight the student's interests, extracurricular activities, special talents, and areas of passion..."
-          >
-{% if remarks %}{{ remarks.interests }}{% endif %}</textarea
-          >
-          <div class="absolute bottom-3 right-3 text-xs text-slate-400">
-            <i class="fas fa-star mr-1"></i>
-            Special Talents
-          </div>
-        </div>
-      </div>
-
-      <!-- General Remarks Section -->
-      <div class="space-y-4">
-        <div class="flex items-center space-x-3">
-          <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
-          <label
-            for="remarks"
-            class="text-lg font-semibold text-slate-800 dark:text-white"
-            >General Remarks</label
-          >
-        </div>
-        <div class="relative">
-          <textarea
-            class="w-full px-6 py-4 text-slate-700 dark:text-white bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 resize-none glass"
-            id="remarks"
-            name="remarks"
-            rows="5"
-            placeholder="Provide overall remarks about the student's performance, growth areas, strengths, and recommendations for improvement..."
-          >
-{% if remarks %}{{ remarks.remarks }}{% endif %}</textarea
-          >
-          <div class="absolute bottom-3 right-3 text-xs text-slate-400">
-            <i class="fas fa-edit mr-1"></i>
-            Overall Assessment
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div
-        class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/10"
-      >
-        <button
-          type="submit"
-          class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3"
-        >
-          <i class="fas fa-save"></i>
-          <span>Save Remarks</span>
-        </button>
-
-        <a
-          href="{{ url_for('exams_grading.student_term_report', student_id=student.id, term=term, year=year) }}"
-          class="flex-1 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3"
-        >
-          <i class="fas fa-file-alt"></i>
-          <span>View Report Card</span>
-        </a>
-
-        <a
-          href="{{ url_for('exams_grading.index') }}"
-          class="flex-1 px-8 py-4 bg-gradient-to-r from-slate-500 to-gray-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3"
-        >
-          <i class="fas fa-arrow-left"></i>
-          <span>Back to Grading</span>
-        </a>
-      </div>
-    </form>
-  </div>
-
-  <!-- Quick Tips -->
-  <div class="professional-card p-6">
-    <div class="flex items-center space-x-3 mb-4">
-      <div
-        class="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center"
-      >
-        <i class="fas fa-lightbulb text-white text-sm"></i>
-      </div>
-      <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
-        Remarks Writing Tips
-      </h3>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="p-4 glass rounded-xl hover-lift">
-        <div class="text-blue-500 text-lg mb-2">
-          <i class="fas fa-user-check"></i>
-        </div>
-        <p class="text-sm text-slate-600 dark:text-slate-300">
-          Be specific and provide examples of behavior
-        </p>
-      </div>
-      <div class="p-4 glass rounded-xl hover-lift">
-        <div class="text-emerald-500 text-lg mb-2">
-          <i class="fas fa-balance-scale"></i>
-        </div>
-        <p class="text-sm text-slate-600 dark:text-slate-300">
-          Balance strengths with constructive feedback
-        </p>
-      </div>
-      <div class="p-4 glass rounded-xl hover-lift">
-        <div class="text-purple-500 text-lg mb-2">
-          <i class="fas fa-chart-line"></i>
-        </div>
-        <p class="text-sm text-slate-600 dark:text-slate-300">
-          Focus on growth and development areas
-        </p>
-      </div>
-      <div class="p-4 glass rounded-xl hover-lift">
-        <div class="text-amber-500 text-lg mb-2">
-          <i class="fas fa-hands-helping"></i>
-        </div>
-        <p class="text-sm text-slate-600 dark:text-slate-300">
-          Include actionable recommendations
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
 
 <style>
-  textarea {
-    min-height: 120px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+  /* ==========================================================
+     Student Remarks — Dashboard design language.
+     Fraunces (display), Inter (body), JetBrains Mono (labels).
+     ========================================================== */
+  .remarks-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  textarea:focus {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 40px rgba(14, 165, 233, 0.15);
+  .dark .remarks-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
   }
 
-  .professional-card {
-    animation: slideInFromTop 0.6s ease-out forwards;
+  .remarks-page *,
+  .remarks-page *::before,
+  .remarks-page *::after {
+    box-sizing: border-box;
+  }
+  .remarks-page a {
+    color: inherit;
+    text-decoration: none;
   }
 
-  @keyframes slideInFromTop {
-    from {
-      transform: translateY(-20px);
-      opacity: 0;
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .card-body {
+    padding: 22px;
+  }
+
+  /* ---------- Hero ---------- */
+  .page-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 26px 22px 30px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--violet);
+  }
+  .hero-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+  }
+  .hero-avatar {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: var(--violet-wash);
+    border: 1px solid var(--violet-edge);
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 0.03em;
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .page-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.8vw, 28px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .hero-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--copy);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .hero-stamp.violet {
+    border-color: var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+  }
+
+  /* ---------- Form fields ---------- */
+  .field {
+    margin-bottom: 26px;
+  }
+  .field:last-child {
+    margin-bottom: 0;
+  }
+
+  .field-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .field-marker {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .field-marker.is-violet {
+    background: var(--violet);
+  }
+  .field-marker.is-green {
+    background: var(--green);
+  }
+  .field-marker.is-brass {
+    background: var(--brass);
+  }
+  .field-marker.is-slate {
+    background: var(--slate);
+  }
+
+  .field-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .field-desc {
+    margin-left: auto;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .field-textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    line-height: 1.55;
+    resize: vertical;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field-textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.85;
+  }
+  .field-textarea:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
+  }
+
+  /* ---------- Actions ---------- */
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 22px;
+    margin-top: 6px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+    flex: 1 1 200px;
+  }
+  .btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    border-color: var(--ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .btn.primary {
+    color: #131817;
+  }
+  .btn.primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .btn.primary:hover {
+    color: #131817;
+  }
+
+  /* ---------- Tips strip ---------- */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+  .tip {
+    display: flex;
+    gap: 12px;
+    padding: 16px 22px;
+    border-right: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+    align-items: flex-start;
+  }
+  .tip:nth-child(even) {
+    border-right: 0;
+  }
+  .tip:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+  .tip-icon {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid;
+  }
+  .tip-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .tip-icon.is-violet {
+    background: var(--violet-wash);
+    color: var(--violet);
+    border-color: var(--violet-edge);
+  }
+  .tip-icon.is-green {
+    background: var(--green-wash);
+    color: var(--green);
+    border-color: var(--green-edge);
+  }
+  .tip-icon.is-brass {
+    background: var(--brass-wash);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+  .tip-icon.is-slate {
+    background: var(--slate-wash);
+    color: var(--slate);
+    border-color: var(--slate-edge);
+  }
+  .tip-copy {
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--copy);
+    margin: 0;
+    min-width: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 700px) {
+    .remarks-page {
+      padding: 20px 14px 40px;
     }
-    to {
-      transform: translateY(0);
-      opacity: 1;
+    .page-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .hero-avatar {
+      width: 52px;
+      height: 52px;
+      font-size: 18px;
+    }
+    .card-head {
+      padding: 14px 16px 12px;
+    }
+    .card-body {
+      padding: 18px;
+    }
+    .field-desc {
+      display: none;
+    }
+    .form-actions {
+      flex-direction: column;
+    }
+    .btn {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+    .tips-grid {
+      grid-template-columns: 1fr;
+    }
+    .tip {
+      border-right: 0;
+      padding: 14px 18px;
+    }
+    .tip:nth-last-child(-n + 2) {
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .tip:last-child {
+      border-bottom: 0;
     }
   }
 </style>
+
+<div class="remarks-page">
+  <!-- Hero -->
+  <header class="page-hero">
+    <div class="hero-main">
+      <span class="hero-avatar" aria-hidden="true">
+        {{ student.full_name[0] }}
+      </span>
+      <div class="hero-copy">
+        <p class="dash-kicker">Academic records · Term remarks</p>
+        <h1>{{ student.full_name }}</h1>
+        <div class="hero-meta">
+          <span class="hero-stamp violet">
+            {{ student.classroom.name if student.classroom else 'No class' }}
+          </span>
+          <span class="hero-stamp">{{ term }}</span>
+          <span class="hero-stamp">{{ year }}</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Remarks form -->
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <p class="section-kicker">01 · Written assessment</p>
+        <h2>Term remarks</h2>
+      </div>
+      <span class="head-meta">
+        {% if remarks %}Editing existing{% else %}New entry{% endif %}
+      </span>
+    </div>
+
+    <div class="card-body">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <!-- Conduct -->
+        <div class="field">
+          <div class="field-head">
+            <span class="field-marker is-violet" aria-hidden="true"></span>
+            <label class="field-label" for="conduct">Student conduct</label>
+            <span class="field-desc">Behaviour and discipline</span>
+          </div>
+          <textarea
+            class="field-textarea"
+            id="conduct"
+            name="conduct"
+            rows="4"
+            placeholder="Describe the student's behaviour, discipline, and overall conduct in the school environment…"
+          >
+{{ remarks.conduct if remarks and remarks.conduct else '' }}</textarea
+          >
+        </div>
+
+        <!-- Attitude -->
+        <div class="field">
+          <div class="field-head">
+            <span class="field-marker is-green" aria-hidden="true"></span>
+            <label class="field-label" for="attitude">Learning attitude</label>
+            <span class="field-desc">Participation and enthusiasm</span>
+          </div>
+          <textarea
+            class="field-textarea"
+            id="attitude"
+            name="attitude"
+            rows="4"
+            placeholder="Describe the student's attitude towards learning, participation in class, and academic enthusiasm…"
+          >
+{{ remarks.attitude if remarks and remarks.attitude else '' }}</textarea
+          >
+        </div>
+
+        <!-- Interests -->
+        <div class="field">
+          <div class="field-head">
+            <span class="field-marker is-brass" aria-hidden="true"></span>
+            <label class="field-label" for="interests"
+              >Interests &amp; talents</label
+            >
+            <span class="field-desc">Extracurricular strengths</span>
+          </div>
+          <textarea
+            class="field-textarea"
+            id="interests"
+            name="interests"
+            rows="4"
+            placeholder="Highlight the student's interests, extracurricular activities, special talents, and areas of passion…"
+          >
+{{ remarks.interests if remarks and remarks.interests else '' }}</textarea
+          >
+        </div>
+
+        <!-- General remarks -->
+        <div class="field">
+          <div class="field-head">
+            <span class="field-marker is-slate" aria-hidden="true"></span>
+            <label class="field-label" for="remarks">General remarks</label>
+            <span class="field-desc">Overall assessment</span>
+          </div>
+          <textarea
+            class="field-textarea"
+            id="remarks"
+            name="remarks"
+            rows="5"
+            placeholder="Provide overall remarks about the student's performance, growth areas, strengths, and recommendations for improvement…"
+          >
+{{ remarks.remarks if remarks and remarks.remarks else '' }}</textarea
+          >
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="submit" class="btn primary">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+              />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            Save remarks
+          </button>
+
+          <a
+            href="{{ url_for('exams_grading.student_term_report', student_id=student.id, term=term, year=year) }}"
+            class="btn"
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            View report card
+          </a>
+
+          <a href="{{ url_for('exams_grading.index') }}" class="btn">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to grading
+          </a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Writing tips -->
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <p class="section-kicker">Reference</p>
+        <h2>Remarks writing guide</h2>
+      </div>
+      <span class="head-meta">Four principles</span>
+    </div>
+
+    <div class="tips-grid">
+      <div class="tip">
+        <span class="tip-icon is-violet" aria-hidden="true">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 12l2 2 4-4" />
+            <circle cx="12" cy="12" r="9" />
+          </svg>
+        </span>
+        <p class="tip-copy">
+          Be specific and provide examples of behaviour rather than general
+          praise.
+        </p>
+      </div>
+
+      <div class="tip">
+        <span class="tip-icon is-green" aria-hidden="true">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5" />
+          </svg>
+        </span>
+        <p class="tip-copy">
+          Balance genuine strengths with constructive, actionable feedback.
+        </p>
+      </div>
+
+      <div class="tip">
+        <span class="tip-icon is-brass" aria-hidden="true">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 17l6-6 4 4 8-8M21 7h-6m6 0v6" />
+          </svg>
+        </span>
+        <p class="tip-copy">
+          Focus on growth and development across the whole term, not just exams.
+        </p>
+      </div>
+
+      <div class="tip">
+        <span class="tip-icon is-slate" aria-hidden="true">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 11l3 3L22 4" />
+            <path
+              d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+            />
+          </svg>
+        </span>
+        <p class="tip-copy">
+          End with concrete recommendations the student and family can act on.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+
 {% endblock %}

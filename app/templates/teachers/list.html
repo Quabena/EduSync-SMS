@@ -3,72 +3,693 @@ endblock %} {% block page_title %}Teacher{% endblock %} {% block
 page_description %}Manage teacher info - add and view teacher information{%
 endblock %} {% block content %}
 
-<div class="min-h-screen">
-  <!-- Header Section -->
-  <div class="glass-strong border-b border-white/20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<style>
+  /* ==========================================================
+     Faculty Directory — same warm paper/green/gold palette as
+     the student and classes pages, but with a distinct faculty
+     "badge" card: top band, centered circular avatar, serif name,
+     gold rule, meta row. Different shape, same language.
+     ========================================================== */
+  .registry {
+    --page: #f7f5f0;
+    --surface: #fffefa;
+    --surface-alt: #fbfcf8;
+    --surface-muted: #eef4f0;
+    --line: #d5dfda;
+    --line-soft: #e3ebe6;
+    --border-strong: #b9cbc5;
+
+    --ink: #202a2d;
+    --ink-soft: #4a5658;
+    --ink-faint: #718084;
+
+    --green: #1f6259;
+    --green-dark: #174d47;
+    --green-tint: #e6f0ed;
+
+    --gold: #b78643;
+    --gold-dark: #8a632e;
+    --gold-tint: #f4eadb;
+
+    --clay: #aa604a;
+    --clay-dark: #8e4b39;
+    --clay-tint: #f3e3df;
+
+    --text: var(--ink);
+    --text-secondary: var(--ink-soft);
+    --text-muted: var(--ink-faint);
+    --border: var(--line);
+    --border-subtle: var(--line-soft);
+    --accent: var(--green);
+    --accent-dark: var(--green-dark);
+    --accent-soft: var(--green-tint);
+    --danger: var(--clay);
+    --danger-soft: var(--clay-tint);
+    --success: #28745a;
+    --warning: #8a632e;
+
+    background: var(--page);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .dark .registry {
+    --page: #131817;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --surface-muted: #232b2a;
+    --line: #33403e;
+    --line-soft: #2a3533;
+    --border-strong: #465653;
+
+    --ink: #eef2ef;
+    --ink-soft: #b8c1bd;
+    --ink-faint: #7f8b87;
+
+    --green: #6fbfa7;
+    --green-dark: #8ed4bd;
+    --green-tint: #1c2b27;
+
+    --gold: #d9b273;
+    --gold-dark: #c79a55;
+    --gold-tint: #2c2620;
+
+    --clay: #e0907a;
+    --clay-dark: #c9755e;
+    --clay-tint: #2e211d;
+  }
+
+  .registry * {
+    box-sizing: border-box;
+  }
+
+  /* ---------- Cover header ---------- */
+  .registry-cover {
+    background: var(--surface);
+    padding: 3rem 0 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .registry-cover-inner {
+    max-width: 100rem;
+    margin: 0 auto;
+    padding: 0 1.5rem 2.25rem;
+  }
+  .registry-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 0.7rem;
+  }
+  .registry-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+  }
+  .registry-tagline {
+    color: var(--ink-soft);
+    margin-top: 0.7rem;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  /* ---------- Tally strip ---------- */
+  .tally-strip {
+    display: flex;
+    background: var(--surface-alt);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .tally-item {
+    min-width: 120px;
+    padding: 1rem 1.3rem;
+    border-right: 1px solid var(--line);
+  }
+  .tally-item:last-child {
+    border-right: 0;
+  }
+  .tally-number {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .tally-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-top: 0.5rem;
+  }
+
+  /* ---------- Control strip ---------- */
+  .control-strip {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(28, 47, 45, 0.04);
+    padding: 1.4rem 1.5rem;
+  }
+  .field-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.5rem;
+  }
+  .underline-field {
+    width: 100%;
+    background: var(--surface-alt);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .underline-field::placeholder {
+    color: #9aa6a2;
+  }
+  .underline-field:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(31, 98, 89, 0.13);
+  }
+  .select-wrap {
+    position: relative;
+  }
+  .select-wrap::after {
+    content: "▾";
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-55%);
+    color: var(--ink-faint);
+    font-size: 0.7rem;
+    pointer-events: none;
+  }
+  select.underline-field {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 1.4rem;
+  }
+
+  /* ---------- View toggle ---------- */
+  .registry-toggle {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface-muted);
+  }
+  .registry-toggle-btn {
+    padding: 0.5rem 0.85rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .registry-toggle-btn.active {
+    color: var(--ink);
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(28, 47, 45, 0.08);
+  }
+
+  /* ---------- Buttons ---------- */
+  .registry .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .registry .btn-sm {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  .registry .btn-primary {
+    background: linear-gradient(135deg, #28766b, var(--green-dark));
+    color: #fff;
+    border-color: var(--green-dark);
+  }
+  .registry .btn-primary:hover {
+    background: var(--green-dark);
+  }
+  .registry .btn-secondary {
+    background: var(--surface-alt);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .registry .btn-secondary:hover {
+    background: var(--surface-muted);
+    border-color: var(--border-strong);
+  }
+  .registry .btn-danger {
+    background: var(--clay);
+    color: #fff;
+    border-color: var(--clay-dark);
+  }
+  .registry .btn-danger:hover {
+    background: var(--clay-dark);
+  }
+  .registry .btn-brass {
+    background: var(--gold-tint);
+    color: var(--gold-dark);
+    border-color: #ddc9a9;
+  }
+  .registry .btn-brass:hover {
+    background: #efe0c6;
+  }
+
+  .registry-status {
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+  }
+
+  /* ==========================================================
+     Faculty badge card — distinct from student index card.
+     Vertical layout, top band, centered circular avatar.
+     ========================================================== */
+  #gridView {
+    align-items: start;
+    gap: 1.2rem !important;
+  }
+
+  .teacher-card {
+    display: block;
+    position: relative;
+  }
+  .teacher-card summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .teacher-card summary::-webkit-details-marker,
+  .teacher-card summary::marker {
+    display: none;
+    content: "";
+  }
+
+  .teacher-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(28, 47, 45, 0.04);
+    overflow: hidden;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .teacher-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 4px 14px rgba(28, 47, 45, 0.07);
+  }
+
+  /* Top band — reads like a faculty name badge header */
+  .teacher-band {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, #eaf3ef, #dcece6);
+    border-bottom: 1px solid #c5d9d1;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green-dark);
+  }
+  .teacher-band-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    flex: 1;
+  }
+  .teacher-band-label {
+    padding: 0.15rem 0.45rem;
+    background: var(--surface);
+    border: 1px solid #c5d9d1;
+    border-radius: 3px;
+    letter-spacing: 0.12em;
+  }
+  .teacher-band-role {
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--green-dark);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .teacher-band-chevron {
+    color: var(--green-dark);
+    flex-shrink: 0;
+    transition: transform 0.18s ease;
+  }
+  details[open] > .teacher-summary .teacher-band-chevron {
+    transform: rotate(180deg);
+  }
+
+  .teacher-summary {
+    display: block;
+    padding: 0;
+  }
+
+  .teacher-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.65rem 1.25rem 1.35rem;
+    gap: 0.75rem;
+  }
+
+  /* Circular avatar */
+  .teacher-avatar-wrap {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    padding: 2px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(28, 47, 45, 0.05);
+  }
+  .teacher-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+  .teacher-avatar-initials {
+    background: var(--green);
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: 1.55rem;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .teacher-name {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.08rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    color: var(--ink);
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  /* Short gold rule under the name */
+  .teacher-rule {
+    width: 44px;
+    height: 2px;
+    background: var(--gold);
+    opacity: 0.55;
+    border-radius: 2px;
+    margin: 0.1rem auto 0;
+  }
+
+  /* Meta row — staff ID · classes */
+  .teacher-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+  .teacher-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .teacher-meta-item strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .teacher-meta-sep {
+    color: var(--gold);
+    opacity: 0.7;
+    font-weight: 700;
+  }
+
+  /* ---------- Expanded body ---------- */
+  .file-body {
+    border-top: 1px solid var(--line);
+    padding: 1.2rem 1.3rem 1.4rem;
+    background: var(--surface-alt);
+  }
+  .file-body-inner {
+    min-width: 0;
+  }
+  .signature-line {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.3rem;
+  }
+
+  /* ---------- Ledger (table) view ---------- */
+  .ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+  }
+  .ledger-table thead {
+    background: var(--surface-muted);
+  }
+  .ledger-table th {
+    padding: 0.85rem 1.2rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .ledger-table td {
+    padding: 0.95rem 1.2rem;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 0.9rem;
+    color: var(--ink);
+    vertical-align: middle;
+  }
+  .ledger-table tbody tr:hover {
+    background: var(--surface-alt);
+  }
+  .ledger-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .ledger-table img,
+  .ledger-table .avatar-solid {
+    width: 46px !important;
+    height: 46px !important;
+  }
+  .ledger-table .avatar-solid {
+    background: var(--green-tint);
+    color: var(--green-dark);
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 600;
+  }
+
+  /* ---------- Badges and stamps ---------- */
+  .registry .badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.22rem 0.55rem;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    letter-spacing: 0.02em;
+  }
+  .registry .badge-accent {
+    background: var(--green-tint);
+    color: var(--green-dark);
+    border-color: #c5d9d1;
+  }
+  .registry .badge-info {
+    background: var(--gold-tint);
+    color: var(--gold-dark);
+    border-color: #ddc9a9;
+  }
+  .registry .badge-neutral {
+    background: var(--surface-muted);
+    color: var(--ink-soft);
+    border-color: var(--line);
+  }
+  .id-stamp {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    background: var(--surface-alt);
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+
+  /* ---------- Empty state ---------- */
+  .blank-card {
+    background: var(--surface);
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+  }
+
+  /* ---------- Delete modal ---------- */
+  .registry .modal-backdrop {
+    background: rgba(20, 30, 29, 0.45) !important;
+    backdrop-filter: none !important;
+  }
+  .registry .professional-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 20px 50px rgba(28, 47, 45, 0.18);
+  }
+  .registry .icon-tile-danger {
+    background: var(--clay-tint);
+    color: var(--clay-dark);
+  }
+  .void-stamp {
+    display: inline-block;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--clay);
+    border: 2px solid var(--clay);
+    border-radius: 3px;
+    padding: 0.15rem 0.45rem;
+    transform: rotate(-6deg);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 640px) {
+    .registry-cover {
+      padding-top: 2.2rem;
+    }
+    .registry-cover-inner {
+      padding: 0 1rem 1.5rem;
+    }
+    .registry-title {
+      font-size: 2.05rem;
+    }
+    .tally-strip {
+      width: 100%;
+    }
+    .tally-item {
+      min-width: 0;
+      flex: 1;
+      padding: 0.8rem 0.6rem;
+    }
+    .tally-number {
+      font-size: 1.3rem;
+    }
+    .tally-label {
+      font-size: 0.6rem;
+    }
+    .control-strip {
+      padding: 1rem;
+    }
+    #gridView {
+      gap: 0.9rem !important;
+    }
+    .teacher-identity {
+      padding: 1.35rem 1rem 1.15rem;
+    }
+    .teacher-avatar-wrap {
+      width: 72px;
+      height: 72px;
+    }
+    .teacher-avatar-initials {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+
+<div class="min-h-screen registry">
+  <!-- Cover Header -->
+  <div class="registry-cover">
+    <div class="registry-cover-inner">
       <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+        class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6"
       >
-        <!-- Title and Description -->
-        <div class="flex items-center space-x-4">
-          <div
-            class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg"
-          >
-            <svg
-              class="w-8 h-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-4xl font-bold gradient-text">Faculty</h1>
-            <p class="text-slate-600 dark:text-slate-300 mt-1">
-              Manage teaching staff and subject assignments
-            </p>
-          </div>
+        <div>
+          <div class="registry-eyebrow">Teaching Staff</div>
+          <h1 class="registry-title">Faculty Directory</h1>
+          <p class="registry-tagline">
+            Manage teaching staff and subject assignments
+          </p>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="glass rounded-xl p-4">
-            <div class="text-2xl font-bold gradient-text">
-              {{ teachers|length }}
-            </div>
-            <div class="text-sm text-slate-600 dark:text-slate-400">
-              Total Faculty
-            </div>
+        <!-- Tally Strip -->
+        <div class="tally-strip w-full lg:w-auto">
+          <div class="tally-item">
+            <div class="tally-number">{{ teachers|length }}</div>
+            <div class="tally-label">Total</div>
           </div>
-          <div class="glass rounded-xl p-4">
-            <div
-              class="text-2xl font-bold text-primary-600 dark:text-primary-400"
-            >
-              {{ specializations|length }}
-            </div>
-            <div class="text-sm text-slate-600 dark:text-slate-400">
-              Subjects
-            </div>
+          <div class="tally-item">
+            <div class="tally-number">{{ specializations|length }}</div>
+            <div class="tally-label">Subjects</div>
           </div>
-          <div class="glass rounded-xl p-4">
-            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <div class="tally-item">
+            <div class="tally-number">
               {{ teachers|selectattr('gender', 'equalto', 'Male')|list|length }}
             </div>
-            <div class="text-sm text-slate-600 dark:text-slate-400">Male</div>
+            <div class="tally-label">Male</div>
           </div>
-          <div class="glass rounded-xl p-4">
-            <div class="text-2xl font-bold text-pink-600 dark:text-pink-400">
+          <div class="tally-item">
+            <div class="tally-number">
               {{ teachers|selectattr('gender', 'equalto', 'Female')|list|length
               }}
             </div>
-            <div class="text-sm text-slate-600 dark:text-slate-400">Female</div>
+            <div class="tally-label">Female</div>
           </div>
         </div>
       </div>
@@ -76,115 +697,63 @@ endblock %} {% block content %}
   </div>
 
   <!-- Controls Section -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="glass-strong rounded-2xl p-6">
+  <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="control-strip">
       <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+        class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6"
       >
         <!-- Search and Filters -->
-        <div class="flex flex-col sm:flex-row gap-4 flex-1">
-          <!-- Search Input -->
-          <div class="relative flex-1 max-w-md">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
-              <svg
-                class="h-5 w-5 text-slate-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+        <div class="flex flex-col sm:flex-row gap-5 flex-1">
+          <div class="flex-1 max-w-xs">
+            <label class="field-label" for="searchInput">Search</label>
             <input
               type="text"
               id="searchInput"
-              placeholder="Search faculty..."
-              class="block w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl glass text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="Name…"
+              class="underline-field"
             />
           </div>
 
-          <!-- Filters -->
-          <div class="flex gap-3">
-            <select
-              id="specializationFilter"
-              class="px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl glass text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          <div class="w-full sm:w-44">
+            <label class="field-label" for="specializationFilter"
+              >Subject</label
             >
-              <option value="">All Subjects</option>
-              {% for specialization in specializations %}
-              <option value="{{ specialization.name }}">
-                {{ specialization.name }}
-              </option>
-              {% endfor %}
-            </select>
+            <div class="select-wrap">
+              <select id="specializationFilter" class="underline-field">
+                <option value="">All Subjects</option>
+                {% for specialization in specializations %}
+                <option value="{{ specialization.name|lower }}">
+                  {{ specialization.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
 
-            <select
-              id="genderFilter"
-              class="px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl glass text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="">All Genders</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
+          <div class="w-full sm:w-32">
+            <label class="field-label" for="genderFilter">Gender</label>
+            <div class="select-wrap">
+              <select id="genderFilter" class="underline-field">
+                <option value="">All</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-3">
-          <!-- View Toggle -->
-          <div class="glass rounded-xl p-1 flex">
-            <button
-              id="gridViewBtn"
-              class="flex items-center px-4 py-2 rounded-lg bg-primary-600 text-blue-600 shadow-sm transition-all duration-200"
-            >
-              <svg
-                class="w-4 h-4 mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                />
-              </svg>
+        <div class="flex items-end gap-3">
+          <div class="registry-toggle mr-1">
+            <button id="gridViewBtn" class="registry-toggle-btn active">
               Cards
             </button>
-            <button
-              id="tableViewBtn"
-              class="flex items-center px-4 py-2 rounded-lg text-blue dark:text-white hover:bg-blue/20 transition-all duration-200"
-            >
-              <svg
-                class="w-4 h-4 mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                />
-              </svg>
-              Table
-            </button>
+            <button id="tableViewBtn" class="registry-toggle-btn">Table</button>
           </div>
 
-          <button
-            id="exportBtn"
-            class="flex items-center px-4 py-3 bg-accent-emerald bg-emerald-500 hover:bg-emerald-700 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
-          >
+          <button id="exportBtn" class="btn btn-secondary">
             <svg
-              class="w-4 w-4 mr-2"
+              class="w-4 h-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -199,12 +768,9 @@ endblock %} {% block content %}
             Export
           </button>
 
-          <a
-            href="{{ url_for('teachers.create') }}"
-            class="flex items-center px-6 py-3 bg-gradient-to-r from-indigo-400 to-cyan-300 hover:from-indigo-500 hover:to-cyan-400 text-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg font-medium"
-          >
+          <a href="{{ url_for('teachers.create') }}" class="btn btn-primary">
             <svg
-              class="w-4 h-4 mr-2"
+              class="w-4 h-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -221,144 +787,97 @@ endblock %} {% block content %}
         </div>
       </div>
 
-      <!-- Results Counter -->
-      <div class="mt-4 pt-4 border-t border-white/10">
-        <div
-          class="flex items-center text-sm text-slate-600 dark:text-slate-400"
-        >
-          <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-          <span id="resultCount">{{ teachers|length }}</span>
-          <span class="ml-1">faculty members found</span>
+      <!-- Results counter -->
+      <div class="mt-5 pt-4 border-t" style="border-color: var(--line-soft)">
+        <div class="registry-status">
+          <span id="resultCount">{{ teachers|length }}</span> faculty member(s)
+          on file
         </div>
       </div>
     </div>
   </div>
 
   <!-- Teachers Display -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+  <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
     <!-- Grid View -->
-    <div
-      id="gridView"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-    >
+    <div id="gridView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       {% for teacher in teachers %}
-      <div
-        class="teacher-card relative h-96 perspective-1000 group"
+      <details
+        class="teacher-card"
         data-name="{{ teacher.full_name|lower }}"
-        data-specialization="{{ teacher.specialization.name if teacher.specialization else 'none' }}"
+        data-specialization="{{ teacher.specialization.name|lower if teacher.specialization else 'none' }}"
         data-gender="{{ teacher.gender|lower }}"
       >
-        <!-- Flip Card Container -->
-        <div
-          class="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d"
-        >
-          <!-- Front Side -->
-          <div
-            class="absolute w-full h-full professional-card rounded-2xl p-6 backface-hidden flex flex-col"
-          >
-            <!-- Teacher Avatar with Badge -->
-            <div class="flex justify-center mb-6 relative">
+        <summary class="teacher-summary">
+          <!-- Faculty band -->
+          <div class="teacher-band">
+            <div class="teacher-band-left">
+              <span class="teacher-band-label">Faculty</span>
+              <span class="teacher-band-role">
+                {{ teacher.specialization.name if teacher.specialization else
+                'General' }}
+              </span>
+            </div>
+            <svg
+              class="teacher-band-chevron"
+              width="12"
+              height="12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+
+          <!-- Centered identity block -->
+          <div class="teacher-identity">
+            <div class="teacher-avatar-wrap">
               {% if teacher.photo_path %}
               <img
+                class="teacher-avatar"
                 src="{{ url_for('teachers.teacher_photo', filename=teacher.photo_path) }}"
                 alt="{{ teacher.full_name }}"
-                class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-slate-700 shadow-lg"
               />
               {% else %}
-              <div
-                class="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-slate-600 font-bold text-3xl shadow-lg"
-              >
+              <div class="teacher-avatar teacher-avatar-initials">
                 {{ teacher.first_name[0] }}{{ teacher.surname[0] }}
               </div>
               {% endif %}
-              <!-- Verification Badge -->
-              <div
-                class="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center shadow-md"
+            </div>
+
+            <h3 class="teacher-name">{{ teacher.full_name }}</h3>
+
+            <div class="teacher-rule"></div>
+
+            <div class="teacher-meta">
+              <span class="teacher-meta-item"
+                >Staff <strong>{{ teacher.staff_id }}</strong></span
               >
-                <svg
-                  class="h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            <!-- Teacher Info -->
-            <div class="text-center mb-4">
-              <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">
-                {{ teacher.full_name }}
-              </h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400">
-                ID: {{ teacher.staff_id }}
-              </p>
-            </div>
-
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-2 gap-3 mb-6">
-              <div class="glass rounded-lg p-3 text-center">
-                <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                  Subject
-                </div>
-                <div class="font-medium text-slate-900 dark:text-white">
-                  {{ teacher.specialization.name if teacher.specialization else
-                  'General' }}
-                </div>
-              </div>
-              <div class="glass rounded-lg p-3 text-center">
-                <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                  Classes
-                </div>
-                <div class="font-medium text-slate-900 dark:text-white">
-                  {{ teacher.classes|length }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Hover Indicator -->
-            <div class="mt-auto text-center">
-              <div
-                class="inline-flex items-center text-sm text-slate-600 dark:text-slate-800"
-              >
-                <span>View Credentials</span>
-                <svg
-                  class="w-4 h-4 ml-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </div>
+              <span class="teacher-meta-sep">·</span>
+              <span class="teacher-meta-item">
+                {{ teacher.classes|length }} class{{ 'es' if
+                teacher.classes|length != 1 else '' }}
+              </span>
             </div>
           </div>
+        </summary>
 
-          <!-- Back Side - Professional Credentials -->
-          <div
-            class="absolute w-full h-full bg-gradient-to-br from-primary-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl shadow-lg border border-primary-200 dark:border-slate-700 p-6 backface-hidden transform rotate-y-180 flex flex-col"
-          >
-            <!-- Detailed Info -->
+        <div class="file-body">
+          <div class="file-body-inner">
+            <!-- Contact Info -->
             <div class="mb-4">
-              <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                {{ teacher.full_name }}
-              </h3>
               <div
-                class="flex items-center text-sm text-slate-600 dark:text-slate-400 mb-1"
+                class="flex items-center text-sm mb-1"
+                style="color: var(--ink-soft)"
               >
                 <svg
-                  class="w-4 h-4 mr-2"
+                  class="w-4 h-4 mr-2 flex-shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -370,13 +889,14 @@ endblock %} {% block content %}
                     d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6z"
                   />
                 </svg>
-                {{ teacher.staff_id }}
+                Staff ID: {{ teacher.staff_id }}
               </div>
               <div
-                class="flex items-center text-sm text-slate-600 dark:text-slate-400"
+                class="flex items-center text-sm"
+                style="color: var(--ink-soft)"
               >
                 <svg
-                  class="w-4 h-4 mr-2"
+                  class="w-4 h-4 mr-2 flex-shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -394,49 +914,40 @@ endblock %} {% block content %}
             </div>
 
             <!-- Qualifications -->
-            <div class="mb-4">
-              <h4
-                class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
-              >
+            <div class="mb-4 signature-line">
+              <div class="text-xs mb-1" style="color: var(--ink-faint)">
                 Qualifications
-              </h4>
-              <p class="text-sm text-slate-600 dark:text-slate-400">
+              </div>
+              <div class="text-sm font-medium" style="color: var(--ink)">
                 {{ teacher.academic_certificate if teacher.academic_certificate
                 else 'No qualifications listed' }}
-              </p>
+              </div>
             </div>
 
             <!-- Assigned Classes -->
             {% if teacher.classes %}
             <div class="mb-4">
-              <h4
-                class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
-              >
-                Teaching
-              </h4>
+              <h4 class="field-label">Class Teacher</h4>
               <div class="flex flex-wrap gap-1">
                 {% for class in teacher.classes %}
-                <span
-                  class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-slate-600 dark:text-slate-800"
-                >
-                  {{ class.name }}
-                </span>
+                <span class="badge badge-accent">{{ class.name }}</span>
                 {% endfor %}
               </div>
             </div>
             {% endif %}
 
             <!-- Action Buttons -->
-            <div class="mt-auto flex space-x-2">
+            <div class="flex space-x-2 pt-1">
               <a
                 href="{{ url_for('teachers.detail', teacher_id=teacher.id) }}"
-                class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-primary-600 hover:bg-primary-700 text-blue-500 text-sm font-medium rounded-lg transition-colors duration-200"
+                class="btn btn-primary btn-sm flex-1"
               >
                 Full Profile
               </a>
               <button
                 onclick="deleteTeacher({{ teacher.id }}, '{{ teacher.full_name }}')"
-                class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+                class="btn btn-danger btn-sm"
+                aria-label="Delete {{ teacher.full_name }}"
               >
                 <svg
                   class="w-4 h-4"
@@ -455,161 +966,122 @@ endblock %} {% block content %}
             </div>
           </div>
         </div>
-      </div>
+      </details>
       {% endfor %}
     </div>
 
     <!-- Table View -->
     <div
       id="tableView"
-      class="hidden professional-card rounded-2xl overflow-hidden"
+      class="hidden"
+      style="
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(28, 47, 45, 0.04);
+        overflow: hidden;
+      "
     >
       <div class="overflow-x-auto">
-        <table
-          class="min-w-full divide-y divide-slate-200 dark:divide-slate-700"
-        >
-          <thead class="glass">
+        <table class="ledger-table">
+          <thead>
             <tr>
-              <th
-                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-              >
-                Faculty Member
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-              >
-                Staff ID
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-              >
-                Specialization
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-              >
-                Classes
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-              >
-                Contact
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-              >
-                Actions
-              </th>
+              <th>Faculty Member</th>
+              <th>Staff ID</th>
+              <th>Specialization</th>
+              <th>Classes</th>
+              <th>Contact</th>
+              <th>Actions</th>
             </tr>
           </thead>
-          <tbody
-            class="divide-y divide-slate-200 dark:divide-slate-700"
-            id="teachersTable"
-          >
+          <tbody id="teachersTable">
             {% for teacher in teachers %}
             <tr
-              class="teacher-row hover:bg-white/10"
+              class="teacher-row"
               data-name="{{ teacher.full_name|lower }}"
-              data-specialization="{{ teacher.specialization.name if teacher.specialization else 'none' }}"
+              data-specialization="{{ teacher.specialization.name|lower if teacher.specialization else 'none' }}"
               data-gender="{{ teacher.gender|lower }}"
             >
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center space-x-3">
+              <td class="whitespace-nowrap">
+                <div class="flex items-center">
                   {% if teacher.photo_path %}
                   <img
                     src="{{ url_for('teachers.teacher_photo', filename=teacher.photo_path) }}"
                     alt="{{ teacher.full_name }}"
-                    class="w-10 h-10 rounded-full object-cover"
+                    class="rounded-full object-cover"
+                    style="border: 1px solid var(--line)"
                   />
                   {% else %}
                   <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm"
+                    class="avatar-solid rounded-full flex items-center justify-center font-semibold"
                   >
                     {{ teacher.first_name[0] }}{{ teacher.surname[0] }}
                   </div>
                   {% endif %}
-                  <div>
-                    <div
-                      class="text-sm font-medium text-slate-900 dark:text-white"
-                    >
+                  <div class="ml-3">
+                    <div class="text-sm font-medium" style="color: var(--ink)">
                       {{ teacher.full_name }}
                     </div>
-                    <div class="text-sm text-slate-500 dark:text-slate-400">
+                    <div class="text-xs" style="color: var(--ink-faint)">
                       {{ teacher.email if teacher.email else 'No email' }}
                     </div>
                   </div>
                 </div>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200"
-                >
-                  {{ teacher.staff_id }}
-                </span>
+              <td class="whitespace-nowrap">
+                <span class="id-stamp">{{ teacher.staff_id }}</span>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap">
                 {% if teacher.specialization %}
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200"
+                <span class="badge badge-accent"
+                  >{{ teacher.specialization.name }}</span
                 >
-                  {{ teacher.specialization.name }}
-                </span>
                 {% else %}
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
-                >
-                  General
-                </span>
+                <span class="badge badge-neutral">General</span>
                 {% endif %}
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap">
                 <div class="flex flex-wrap gap-1">
                   {% for class in teacher.classes %}
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200"
-                  >
-                    {{ class.name }}
-                  </span>
+                  <span class="badge badge-info">{{ class.name }}</span>
                   {% else %}
-                  <span class="text-slate-400 dark:text-slate-500 text-xs"
+                  <span style="color: var(--ink-faint); font-size: 0.8rem"
                     >No classes assigned</span
                   >
                   {% endfor %}
                 </div>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap">
                 {% if teacher.phone_number %}
                 <div>
-                  <div class="font-medium">{{ teacher.phone_number }}</div>
+                  <div class="text-sm font-medium" style="color: var(--ink)">
+                    {{ teacher.phone_number }}
+                  </div>
                   {% if teacher.email %}
-                  <div class="text-slate-500 dark:text-slate-400 text-xs">
+                  <div class="text-xs" style="color: var(--ink-faint)">
                     {{ teacher.email }}
                   </div>
                   {% endif %}
                 </div>
                 {% else %}
-                <span class="text-slate-400 dark:text-slate-500"
-                  >No contact info</span
-                >
+                <span style="color: var(--ink-faint)">No contact info</span>
                 {% endif %}
               </td>
 
-              <td
-                class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2"
-              >
+              <td class="whitespace-nowrap space-x-2">
                 <a
                   href="{{ url_for('teachers.detail', teacher_id=teacher.id) }}"
-                  class="inline-flex items-center px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors duration-200"
+                  class="btn btn-primary btn-sm"
                 >
                   View
                 </a>
                 <a
                   href="{{ url_for('teachers.edit', teacher_id=teacher.id) }}"
-                  class="inline-flex items-center px-3 py-1.5 bg-accent-amber hover:bg-amber-700 text-white text-xs font-medium rounded-md transition-colors duration-200"
+                  class="btn btn-brass btn-sm"
                 >
                   Edit
                 </a>
@@ -623,36 +1095,17 @@ endblock %} {% block content %}
 
     <!-- Empty State -->
     {% if not teachers %}
-    <div class="professional-card p-12 text-center">
-      <div
-        class="w-24 h-24 mx-auto mb-6 glass rounded-full flex items-center justify-center"
-      >
-        <svg
-          class="w-12 h-12 text-slate-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-      </div>
-      <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+    <div class="blank-card p-14 text-center">
+      <div class="id-stamp mx-auto mb-6">No. —</div>
+      <h3 class="text-xl font-semibold mb-2" style="color: var(--ink)">
         No Faculty Members
       </h3>
-      <p class="text-slate-600 dark:text-slate-400 mb-6">
+      <p class="mb-6" style="color: var(--ink-soft)">
         Add your first faculty member to get started
       </p>
-      <a
-        href="{{ url_for('teachers.create') }}"
-        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium rounded-xl transition-colors duration-200"
-      >
+      <a href="{{ url_for('teachers.create') }}" class="btn btn-primary">
         <svg
-          class="w-5 h-5 mr-2"
+          class="w-5 h-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -674,104 +1127,83 @@ endblock %} {% block content %}
 <!-- Delete Confirmation Modal -->
 <div
   id="deleteModal"
-  class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4"
+  class="modal-backdrop fixed inset-0 hidden z-50 flex items-center justify-center p-4"
 >
   <div
-    class="glass-strong rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all duration-300 scale-95 opacity-0"
+    class="professional-card max-w-md w-full p-6 transform transition-all duration-200 scale-95 opacity-0"
     id="deleteModalContent"
   >
-    <div class="flex items-center mb-4">
-      <div
-        class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mr-4"
-      >
-        <svg
-          class="w-6 h-6 text-red-600 dark:text-red-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center">
+        <div
+          class="icon-tile icon-tile-danger w-11 h-11 rounded-full mr-4 flex items-center justify-center"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-          />
-        </svg>
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold" style="color: var(--ink)">
+            Delete Faculty Member
+          </h3>
+          <p class="text-sm" style="color: var(--ink-soft)">
+            This action cannot be undone
+          </p>
+        </div>
       </div>
-      <div>
-        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-          Delete Faculty Member
-        </h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400">
-          This action cannot be undone
-        </p>
-      </div>
+      <span class="void-stamp">VOID</span>
     </div>
 
     <div class="mb-6">
-      <p class="text-slate-700 dark:text-slate-300">
+      <p class="text-base" style="color: var(--ink-soft)">
         Are you sure you want to delete
         <span
           id="deleteTeacherName"
-          class="font-semibold text-red-600 dark:text-red-400"
+          class="font-semibold"
+          style="color: var(--clay)"
         ></span
         >?
       </p>
     </div>
 
     <div class="flex space-x-3">
-      <button
-        onclick="closeDeleteModal()"
-        class="flex-1 px-4 py-2 glass hover:bg-white/20 text-slate-700 dark:text-slate-300 font-medium rounded-lg transition-colors duration-200"
-      >
+      <button onclick="closeDeleteModal()" class="btn btn-secondary flex-1">
         Cancel
       </button>
-      <button
-        onclick="confirmDelete()"
-        class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200"
-      >
+      <button onclick="confirmDelete()" class="btn btn-danger flex-1">
         Delete
       </button>
     </div>
   </div>
 </div>
 
-<style>
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-  .transform-style-preserve-3d {
-    transform-style: preserve-3d;
-  }
-  .backface-hidden {
-    backface-visibility: hidden;
-  }
-  .rotate-y-180 {
-    transform: rotateY(180deg);
-  }
-
-  .teacher-card:hover .transform-style-preserve-3d {
-    transform: rotateY(180deg);
-    transition: transform 0.6s;
-  }
-</style>
-
 <script>
   let currentTeacherId = null;
   let currentView = "grid";
 
+  const ACTIVE_TOGGLE = "registry-toggle-btn active";
+  const INACTIVE_TOGGLE = "registry-toggle-btn";
+
   document.addEventListener("DOMContentLoaded", function () {
-    // Initialize view toggle
     const gridViewBtn = document.getElementById("gridViewBtn");
     const tableViewBtn = document.getElementById("tableViewBtn");
 
     gridViewBtn.addEventListener("click", () => switchView("grid"));
     tableViewBtn.addEventListener("click", () => switchView("table"));
 
-    // Initialize search and filters
     const searchInput = document.getElementById("searchInput");
     const specializationFilter = document.getElementById(
-      "specializationFilter"
+      "specializationFilter",
     );
     const genderFilter = document.getElementById("genderFilter");
 
@@ -779,7 +1211,6 @@ endblock %} {% block content %}
     specializationFilter.addEventListener("change", filterTeachers);
     genderFilter.addEventListener("change", filterTeachers);
 
-    // Initialize export functionality
     document
       .getElementById("exportBtn")
       .addEventListener("click", exportTeachers);
@@ -796,19 +1227,13 @@ endblock %} {% block content %}
     if (view === "grid") {
       gridView.classList.remove("hidden");
       tableView.classList.add("hidden");
-
-      gridViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white shadow-sm transition-all duration-200";
-      tableViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg text-blue dark:text-slate-300 hover:bg-blue/20 transition-all duration-200";
+      gridViewBtn.className = ACTIVE_TOGGLE;
+      tableViewBtn.className = INACTIVE_TOGGLE;
     } else {
       gridView.classList.add("hidden");
       tableView.classList.remove("hidden");
-
-      tableViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg bg-blue-300 text-blue shadow-sm transition-all duration-200";
-      gridViewBtn.className =
-        "flex items-center px-4 py-2 rounded-lg text-blue-600 dark:text-blue-300 hover:bg-blue/20 transition-all duration-200";
+      tableViewBtn.className = ACTIVE_TOGGLE;
+      gridViewBtn.className = INACTIVE_TOGGLE;
     }
   }
 
@@ -827,7 +1252,6 @@ endblock %} {% block content %}
     const teacherRows = document.querySelectorAll(".teacher-row");
     let visibleCount = 0;
 
-    // Filter grid view
     teacherCards.forEach((card) => {
       const name = card.dataset.name;
       const specialization = card.dataset.specialization;
@@ -846,7 +1270,6 @@ endblock %} {% block content %}
       }
     });
 
-    // Filter table view
     teacherRows.forEach((row) => {
       const name = row.dataset.name;
       const specialization = row.dataset.specialization;
@@ -864,7 +1287,6 @@ endblock %} {% block content %}
       }
     });
 
-    // Update result count
     document.getElementById("resultCount").textContent = visibleCount;
   }
 
@@ -892,12 +1314,11 @@ endblock %} {% block content %}
     setTimeout(() => {
       modal.classList.add("hidden");
       currentTeacherId = null;
-    }, 300);
+    }, 200);
   }
 
   function confirmDelete() {
     if (currentTeacherId) {
-      // Create and submit delete form
       const form = document.createElement("form");
       form.method = "POST";
       form.action = `/teachers/${currentTeacherId}/delete`;
@@ -921,33 +1342,27 @@ endblock %} {% block content %}
     const originalHTML = exportBtn.innerHTML;
 
     exportBtn.innerHTML = `
-      <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
       </svg>
       Exporting...
     `;
 
     setTimeout(() => {
       exportBtn.innerHTML = originalHTML;
-      // Here you would typically trigger the actual export functionality
       alert("Only available in the paid version!");
     }, 2000);
   }
 
-  // Close modal when clicking outside
   document
     .getElementById("deleteModal")
     .addEventListener("click", function (e) {
-      if (e.target === this) {
-        closeDeleteModal();
-      }
+      if (e.target === this) closeDeleteModal();
     });
 
-  // Keyboard shortcuts
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      closeDeleteModal();
-    }
+    if (e.key === "Escape") closeDeleteModal();
     if (e.key === "/" && !e.target.matches("input, textarea, select")) {
       e.preventDefault();
       document.getElementById("searchInput").focus();
