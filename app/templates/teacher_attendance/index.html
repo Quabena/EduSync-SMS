@@ -4,13 +4,6 @@ endblock %} {% block page_description %}Manage teacher attendance - mark
 teachers attendance and view trends{% endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
-
-  /* ==========================================================
-     Teacher Attendance Hub — Dashboard design language.
-     Fraunces (display), Inter (body), JetBrains Mono (labels).
-     Flat surfaces, hairline borders, restrained palette.
-     ========================================================== */
   .staff-register {
     --ink: #1a2226;
     --copy: #4a5459;
@@ -648,10 +641,8 @@ teachers attendance and view trends{% endblock %} {% block content %}
   <!-- Module bar -->
   <div class="module-bar">
     <div>
-      <p class="section-kicker">Workspace</p>
       <h2>Choose a module</h2>
     </div>
-    <p>Four focused tools for the work behind a reliable staff register.</p>
   </div>
 
   <!-- Module list -->
@@ -784,54 +775,6 @@ teachers attendance and view trends{% endblock %} {% block content %}
       </span>
     </a>
   </section>
-
-  <!-- Footer -->
-  <footer class="register-footer">
-    <div class="footer-panel">
-      <span class="footer-icon">
-        <svg
-          width="16"
-          height="16"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-          />
-        </svg>
-      </span>
-      <div>
-        <h3>Start with today's register</h3>
-        <p>Capture the current record while the day is still current.</p>
-      </div>
-    </div>
-    <div class="footer-panel">
-      <span class="footer-icon">
-        <svg
-          width="16"
-          height="16"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 17l6-6 4 4 8-8M21 7h-6m6 0v6"
-          />
-        </svg>
-      </span>
-      <div>
-        <h3>Keep the wider view</h3>
-        <p>Use records and analytics when the context matters.</p>
-      </div>
-    </div>
-  </footer>
 </div>
 
 <script>
@@ -840,7 +783,7 @@ teachers attendance and view trends{% endblock %} {% block content %}
     if (label) {
       const h = new Date().getHours();
       if (h < 12) label.textContent = "Morning register";
-      else if (h < 17) label.textContent = "Afternoon register";
+      else if (h < 17) label.textContent = "Afternoon checks";
       else label.textContent = "Evening review";
     }
   });

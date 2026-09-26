@@ -2,11 +2,11 @@
   "name": "edusync",
   "author": "Evans Adu",
   "description": "EduSync SMS Desktop Wrapper",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "main.js",
   "build": {
     "appId": "com.eadev.edusync",
-    "productName": "EduSync SMS",
+    "productName": "EduSync SMS V.2.0.0",
     "directories": {
       "output": "../build"
     },

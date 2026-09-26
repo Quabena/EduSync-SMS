@@ -15,6 +15,23 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>{% block title %}Namong SDA JHS SMS{% endblock %}</title>
 
+    <script>
+      (function () {
+        try {
+          var isDark = localStorage.getItem("darkMode") === "true";
+          var root = document.documentElement;
+          if (isDark) {
+            root.classList.add("dark");
+          }
+          // Tell the browser to render its default canvas (scrollbars,
+          // form controls, pre-CSS background) in the correct scheme.
+          root.style.colorScheme = isDark ? "dark" : "light";
+        } catch (e) {
+          /* localStorage unavailable — fall back to light */
+        }
+      })();
+    </script>
+
     <!-- Local CSS -->
     <link
       rel="stylesheet"
@@ -47,25 +64,28 @@
             this.dark = !this.dark;
             localStorage.setItem("darkMode", this.dark);
             document.documentElement.classList.toggle("dark", this.dark);
+            document.documentElement.style.colorScheme = this.dark
+              ? "dark"
+              : "light";
           },
         });
+      });
 
-        if (localStorage.getItem("darkMode") === "true") {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-
-        // Update time every second
-        setInterval(() => {
-          const timeElements = document.querySelectorAll(".current-time");
+      // Live clock — independent of Alpine so it starts immediately
+      // (previously it was gated behind alpine:init, delaying the first tick).
+      (function () {
+        function tick() {
           const now = new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           });
-          timeElements.forEach((el) => (el.textContent = now));
-        }, 1000);
-      });
+          document
+            .querySelectorAll(".current-time")
+            .forEach((el) => (el.textContent = now));
+        }
+        tick();
+        setInterval(tick, 1000);
+      })();
     </script>
 
     <script

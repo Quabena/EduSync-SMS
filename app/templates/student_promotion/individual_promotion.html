@@ -2,318 +2,1397 @@
 endblock %} {% block page_title %}Individual Student Promotion{% endblock %} {%
 block page_description %}Promote individual students with precision and track
 their progress{% endblock %} {% block content %}
-<div class="max-w-6xl mx-auto">
-  <!-- Student Search and Selection -->
-  <div class="professional-card p-6 mb-6">
-    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
-      Find Student
-    </h3>
 
-    <form method="GET" class="flex flex-col md:flex-row gap-4">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <div class="flex-1">
-        <div class="relative">
+<style>
+  .single-promo {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .dark .single-promo {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
+  }
+
+  .single-promo *,
+  .single-promo *::before,
+  .single-promo *::after {
+    box-sizing: border-box;
+  }
+  .single-promo a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ---------- Hero ---------- */
+  .page-hero {
+    padding: 24px 28px 22px 32px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--violet);
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .page-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.8vw, 28px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .page-hero p {
+    margin: 0;
+    max-width: 660px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card:last-child {
+    margin-bottom: 0;
+  }
+  .card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .card-body {
+    padding: 22px;
+  }
+
+  /* ---------- Search ---------- */
+  .search-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .search-field {
+    position: relative;
+    flex: 1 1 260px;
+    min-width: 0;
+  }
+  .search-field .icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    display: flex;
+  }
+  .search-input {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .search-input::placeholder {
+    color: var(--muted);
+  }
+  .search-input:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    border-color: var(--ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn:disabled:hover {
+    border-color: var(--line);
+  }
+  .btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .btn.primary {
+    color: #131817;
+  }
+  .btn.primary:hover:not(:disabled) {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .btn.primary:hover:not(:disabled) {
+    color: #131817;
+  }
+  .btn.primary:disabled {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  /* ---------- Search results ---------- */
+  .results {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .results-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .results-head h3 {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .results-head .count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) var(--surface-alt);
+  }
+  .results-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  .results-list::-webkit-scrollbar-track {
+    background: var(--surface-alt);
+  }
+  .results-list::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 4px;
+  }
+
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .result-row:hover {
+    border-color: var(--muted);
+  }
+  .result-row.is-selected {
+    border-color: var(--green);
+    background: var(--green-wash);
+    box-shadow: 0 0 0 1px var(--green-edge) inset;
+  }
+  .result-row:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+
+  .result-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: var(--violet-wash);
+    border: 1px solid var(--violet-edge);
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+  }
+  .result-meta {
+    min-width: 0;
+    flex: 1;
+  }
+  .result-name {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .result-class {
+    margin-top: 3px;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+  .result-level {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .result-selected-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+
+  /* ---------- Empty states ---------- */
+  .empty {
+    padding: 48px 24px;
+    text-align: center;
+  }
+  .empty svg {
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .empty h3 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .empty p {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ---------- Two-column layout ---------- */
+  .promo-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.55fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .promo-layout > .card {
+    margin-bottom: 0;
+  }
+
+  /* Student summary sidebar */
+  .student-summary {
+    padding: 22px;
+  }
+  .student-portrait {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line-soft);
+    margin-bottom: 20px;
+  }
+  .student-portrait img {
+    width: 88px;
+    height: 88px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
+  .student-portrait-fallback {
+    width: 88px;
+    height: 88px;
+    border-radius: 4px;
+    background: var(--violet-wash);
+    border: 1px solid var(--violet-edge);
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: 0.03em;
+  }
+  .student-portrait-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .student-portrait-class {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .info-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .info-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .info-list li:last-child {
+    border-bottom: 0;
+  }
+  .info-list dt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .info-list dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--green-edge);
+    background: var(--green-wash);
+    color: var(--green);
+  }
+  .status-pill .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* ---------- Promotion form ---------- */
+  .form-section {
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .form-section:last-of-type {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .form-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .form-section-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--violet);
+  }
+  .form-section-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+
+  /* Current class summary */
+  .current-class {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+  }
+  .current-class-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: var(--slate-wash);
+    border: 1px solid var(--slate-edge);
+    color: var(--slate);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .current-class-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  .current-class-meta {
+    min-width: 0;
+  }
+  .current-class-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .current-class-level {
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Path selection (radio cards) */
+  .path-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .path-option {
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+  .path-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+  .path-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+    height: 100%;
+  }
+  .path-option:hover .path-card {
+    border-color: var(--muted);
+  }
+  .path-option input[type="radio"]:checked + .path-card {
+    border-color: var(--green);
+    background: var(--green-wash);
+    box-shadow: 0 0 0 1px var(--green-edge) inset;
+  }
+  .path-option input[type="radio"]:focus-visible + .path-card {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+
+  .path-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: var(--green-wash);
+    border: 1px solid var(--green-edge);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .path-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .path-option input[type="radio"]:checked + .path-card .path-icon {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+  .dark .path-option input[type="radio"]:checked + .path-card .path-icon {
+    color: #131817;
+  }
+
+  .path-meta {
+    min-width: 0;
+    flex: 1;
+  }
+  .path-name {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .path-level {
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Warning banner */
+  .warning {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--brass-edge);
+    border-radius: 3px;
+    background: var(--brass-wash);
+    color: var(--brass);
+    align-items: flex-start;
+  }
+  .warning svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .warning-copy {
+    min-width: 0;
+  }
+  .warning-copy h3 {
+    margin: 0 0 4px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--brass);
+    letter-spacing: -0.005em;
+  }
+  .warning-copy p {
+    margin: 0 0 8px;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--brass);
+    opacity: 0.9;
+  }
+  .warning-copy a {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brass);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Notes textarea */
+  .field-textarea {
+    width: 100%;
+    min-height: 96px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    line-height: 1.55;
+    resize: vertical;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field-textarea::placeholder {
+    color: var(--muted);
+  }
+  .field-textarea:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
+  }
+
+  /* Form footer */
+  .card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 22px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
+  .card-foot .note {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .card-foot .note svg {
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .card-foot .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* Screen-reader helper */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .promo-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 700px) {
+    .single-promo {
+      padding: 20px 14px 40px;
+    }
+    .page-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .card-head {
+      padding: 14px 16px 12px;
+    }
+    .card-body {
+      padding: 18px;
+    }
+    .student-summary {
+      padding: 18px;
+    }
+    .card-foot {
+      flex-direction: column-reverse;
+      align-items: stretch;
+      padding: 14px 16px;
+    }
+    .card-foot .actions {
+      width: 100%;
+    }
+    .card-foot .actions .btn {
+      flex: 1;
+    }
+    .search-row {
+      flex-direction: column;
+    }
+    .search-row .btn {
+      width: 100%;
+    }
+    .path-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+{# ---------- Initials macro — safe against empty names ---------- #} {% macro
+initials(first, last) -%} {%- set f = (first or '').strip() -%} {%- set l =
+(last or '').strip() -%} {%- if f %}{{ f[0] }}{% endif -%} {%- if l %}{{ l[0]
+}}{% endif -%} {%- if not f and not l %}?{% endif -%} {%- endmacro %} {% set
+selected_id = student.id if student else none %}
+
+<div class="single-promo">
+  <!-- Hero -->
+  <header class="page-hero">
+    <p class="dash-kicker">Academic records · Individual promotion</p>
+    <h1>Promote a student</h1>
+    <p>
+      Search for a student, verify their record, and promote them along a
+      configured pathway.
+    </p>
+  </header>
+
+  <!-- Search card -->
+  <section class="card" aria-labelledby="search-heading">
+    <div class="card-head">
+      <div>
+        <h2 id="search-heading">Search for a student</h2>
+      </div>
+      {% if search_query %}
+      <span class="head-meta">Query: "{{ search_query }}"</span>
+      {% endif %}
+    </div>
+
+    <div class="card-body">
+      <form method="GET" class="search-row" role="search">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="search-field">
+          <span class="icon" aria-hidden="true">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </span>
           <input
-            type="text"
+            type="search"
             name="search"
-            value="{{ search_query }}"
-            placeholder="Search by student name..."
-            class="w-full px-4 py-2 pl-10 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            value="{{ search_query or '' }}"
+            placeholder="Search by student name…"
+            class="search-input"
+            autocomplete="off"
+            aria-label="Search students by name"
           />
-          <i
-            class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
-          ></i>
         </div>
-      </div>
-      <button
-        type="submit"
-        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium"
-      >
-        Search
-      </button>
-    </form>
+        <button type="submit" class="btn primary">Search</button>
+      </form>
 
-    <!-- Search Results -->
-    {% if search_query and students %}
-    <div class="mt-4 border-t border-slate-200 dark:border-slate-700 pt-4">
-      <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-        Search Results
-      </h4>
-      <div class="space-y-2 max-h-60 overflow-y-auto">
-        {% for student in students %}
-        <a
-          href="?student_id={{ student.id }}"
-          class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 {% if student.id == student.id %}bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800{% endif %}"
-        >
-          <div
-            class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+      {% if search_query and students %}
+      <div class="results">
+        <div class="results-head">
+          <h3>Results</h3>
+          <span class="count"
+            >{{ students|length }} match{% if students|length != 1 %}es{% endif
+            %}</span
           >
-            {{ student.first_name[0] }}{{ student.surname[0] }}
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="font-medium text-slate-800 dark:text-white truncate">
-              {{ student.full_name }}
-            </p>
-            <p class="text-sm text-slate-600 dark:text-slate-400 truncate">
-              {{ student.classroom.name if student.classroom else 'No class
-              assigned' }}
-            </p>
-          </div>
-          <div class="flex-shrink-0">
-            <span
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200"
-            >
-              {{ student.classroom.level if student.classroom else 'N/A' }}
-            </span>
-          </div>
-        </a>
-        {% endfor %}
-      </div>
-    </div>
-    {% elif search_query and not students %}
-    <div
-      class="mt-4 border-t border-slate-200 dark:border-slate-700 pt-4 text-center py-6"
-    >
-      <i
-        class="fas fa-search text-2xl text-slate-300 dark:text-slate-600 mb-2"
-      ></i>
-      <p class="text-slate-600 dark:text-slate-400">
-        No students found matching "{{ search_query }}"
-      </p>
-    </div>
-    {% endif %}
-  </div>
-
-  {% if student %}
-  <!-- Student Promotion Form -->
-  <form method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <input type="hidden" name="student_id" value="{{ student.id }}" />
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Student Information -->
-      <div class="professional-card p-6 lg:col-span-1">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
-          Student Information
-        </h3>
-
-        <div class="text-center mb-4">
-          {% if student.photo_path %}
-          <img
-            src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
-            alt="{{ student.full_name }}"
-            class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-white dark:border-slate-800 shadow-lg"
-          />
-          {% else %}
-          <div
-            class="w-24 h-24 rounded-full mx-auto mb-3 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-2xl border-4 border-white dark:border-slate-800 shadow-lg"
-          >
-            {{ student.first_name[0] }}{{ student.surname[0] }}
-          </div>
-          {% endif %}
-          <h4 class="text-xl font-bold text-slate-800 dark:text-white">
-            {{ student.full_name }}
-          </h4>
-          <p class="text-slate-600 dark:text-slate-400">
-            {{ student.classroom.name if student.classroom else 'No class' }}
-          </p>
         </div>
 
-        <div class="space-y-3 text-sm">
-          <div class="flex justify-between">
-            <span class="text-slate-600 dark:text-slate-400">Gender:</span>
-            <span class="font-medium text-slate-800 dark:text-white"
-              >{{ student.gender }}</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-600 dark:text-slate-400">Age:</span>
-            <span class="font-medium text-slate-800 dark:text-white"
-              >{{ student.age }} years</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-600 dark:text-slate-400">Guardian:</span>
-            <span class="font-medium text-slate-800 dark:text-white text-right">
-              {{ student.guardian_name if student.guardian_name else 'Not
-              specified' }}
-            </span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-600 dark:text-slate-400">Status:</span>
-            <span
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
-            >
-              {{ student.status|title }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Promotion Details -->
-      <div class="professional-card p-6 lg:col-span-2">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">
-          Promotion Details
-        </h3>
-
-        <!-- Current Class -->
-        <div
-          class="mb-6 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
-        >
-          <label
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-            >Current Class</label
+        <div class="results-list" role="list">
+          {% for result in students %}
+          <a
+            href="{{ url_for('student_promotion.individual_promotion', student_id=result.id) }}"
+            class="result-row {% if selected_id and result.id == selected_id %}is-selected{% endif %}"
+            role="listitem"
           >
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0"
-            >
-              <i class="fas fa-chalkboard text-blue-600 dark:text-blue-400"></i>
-            </div>
-            <div>
-              <p class="font-semibold text-slate-800 dark:text-white">
-                {{ student.classroom.name if student.classroom else 'Not
+            <span class="result-avatar" aria-hidden="true">
+              {{ initials(result.first_name, result.surname) }}
+            </span>
+            <div class="result-meta">
+              <div class="result-name">{{ result.full_name }}</div>
+              <div class="result-class">
+                {{ result.classroom.name if result.classroom else 'No class
                 assigned' }}
-              </p>
-              <p class="text-sm text-slate-600 dark:text-slate-400">
-                {{ student.classroom.level if student.classroom else 'N/A' }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Target Class Selection -->
-        <div class="mb-6">
-          <label
-            for="target_class_id"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-            >Target Class</label
-          >
-
-          {% if promotion_paths %}
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% for path in promotion_paths %}
-            <div class="relative">
-              <input
-                type="radio"
-                name="target_class_id"
-                value="{{ path.to_class_id }}"
-                id="target_class_{{ path.to_class_id }}"
-                class="hidden peer"
-                required
-              />
-              <label
-                for="target_class_{{ path.to_class_id }}"
-                class="block p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-500 peer-checked:border-blue-500 dark:peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 cursor-pointer transition-all duration-200"
-              >
-                <div class="flex items-center space-x-3">
-                  <div
-                    class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0"
-                  >
-                    <i
-                      class="fas fa-arrow-up text-green-600 dark:text-green-400"
-                    ></i>
-                  </div>
-                  <div>
-                    <p class="font-semibold text-slate-800 dark:text-white">
-                      {{ path.to_class.name }}
-                    </p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">
-                      {{ path.to_class.level }}
-                    </p>
-                  </div>
-                </div>
-              </label>
-            </div>
-            {% endfor %}
-          </div>
-          {% else %}
-          <div
-            class="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
-          >
-            <div class="flex items-center space-x-3">
-              <i class="fas fa-exclamation-triangle text-amber-500"></i>
-              <div>
-                <p class="font-medium text-amber-800 dark:text-amber-200">
-                  No promotion paths available
-                </p>
-                <p class="text-sm text-amber-700 dark:text-amber-300">
-                  Configure promotion paths for this class first
-                </p>
               </div>
             </div>
-            <a
-              href="{{ url_for('student_promotion.manage_promotion_paths') }}"
-              class="inline-block mt-3 text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 font-medium text-sm"
-            >
-              Manage Promotion Paths →
-            </a>
-          </div>
-          {% endif %}
-        </div>
-
-        <!-- Promotion Notes -->
-        <div class="mb-6">
-          <label
-            for="promotion_notes"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-          >
-            Promotion Notes (Optional)
-          </label>
-          <textarea
-            name="promotion_notes"
-            id="promotion_notes"
-            rows="4"
-            class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Add any notes or comments about this promotion..."
-          ></textarea>
-        </div>
-
-        <!-- Action Buttons -->
-        <div
-          class="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700"
-        >
-          <a
-            href="{{ url_for('student_promotion.individual_promotion') }}"
-            class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 font-medium"
-          >
-            Cancel
+            {% if selected_id and result.id == selected_id %}
+            <span class="result-selected-mark" aria-label="Currently selected">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Selected
+            </span>
+            {% elif result.classroom and result.classroom.level %}
+            <span class="result-level">{{ result.classroom.level }}</span>
+            {% endif %}
           </a>
-          <button
-            type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            {%
-            if
-            not
-            promotion_paths
-            %}disabled{%
-            endif
-            %}
-          >
-            <i class="fas fa-graduation-cap"></i>
-            <span>Promote Student</span>
-          </button>
+          {% endfor %}
         </div>
       </div>
+      {% elif search_query %}
+      <div class="empty" style="padding: 32px 24px">
+        <svg
+          width="36"
+          height="36"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <h3>No matches</h3>
+        <p>
+          No students found matching "{{ search_query }}". Try a different name.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if student %}
+  <!-- Promotion form -->
+  <form method="POST" id="promotion-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input type="hidden" name="student_id" value="{{ student.id }}" />
+
+    <div class="promo-layout">
+      <!-- Student summary -->
+      <aside class="card">
+        <div class="card-head">
+          <div>
+            <p class="section-kicker">Record</p>
+            <h2>Student</h2>
+          </div>
+        </div>
+
+        <div class="student-summary">
+          <div class="student-portrait">
+            {% if student.photo_path %}
+            <img
+              src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
+              alt="{{ student.full_name }}"
+            />
+            {% else %}
+            <div class="student-portrait-fallback" aria-hidden="true">
+              {{ initials(student.first_name, student.surname) }}
+            </div>
+            {% endif %}
+            <h3 class="student-portrait-name">{{ student.full_name }}</h3>
+            <p class="student-portrait-class">
+              {{ student.classroom.name if student.classroom else 'No class' }}
+            </p>
+          </div>
+
+          <dl class="info-list">
+            <li>
+              <dt>Gender</dt>
+              <dd>{{ student.gender or '—' }}</dd>
+            </li>
+            <li>
+              <dt>Age</dt>
+              <dd>
+                {{ student.age if student.age is not none else '—' }}{% if
+                student.age %} yrs{% endif %}
+              </dd>
+            </li>
+            <li>
+              <dt>Guardian</dt>
+              <dd>
+                {{ student.guardian_name if student.guardian_name else 'Not
+                specified' }}
+              </dd>
+            </li>
+            <li>
+              <dt>Status</dt>
+              <dd>
+                <span class="status-pill">
+                  <span class="dot" aria-hidden="true"></span>
+                  {{ student.status|title }}
+                </span>
+              </dd>
+            </li>
+          </dl>
+        </div>
+      </aside>
+
+      <!-- Promotion details -->
+      <main class="card">
+        <div class="card-head">
+          <div>
+            <p class="section-kicker">02 · Promote</p>
+            <h2>Promotion details</h2>
+          </div>
+          <span class="head-meta">Select a destination</span>
+        </div>
+
+        <div class="card-body">
+          <!-- Current class -->
+          <div class="form-section">
+            <div class="form-section-head">
+              <span class="form-section-num">A</span>
+              <h3 class="form-section-title">Current class</h3>
+            </div>
+
+            <div class="current-class">
+              <span class="current-class-icon" aria-hidden="true">
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16" />
+                  <path d="M3 21h18" />
+                </svg>
+              </span>
+              <div class="current-class-meta">
+                <div class="current-class-name">
+                  {{ student.classroom.name if student.classroom else 'Not
+                  assigned' }}
+                </div>
+                {% if student.classroom and student.classroom.level %}
+                <div class="current-class-level">
+                  {{ student.classroom.level }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Target class -->
+          <div class="form-section">
+            <div class="form-section-head">
+              <span class="form-section-num">B</span>
+              <h3 class="form-section-title">Target class</h3>
+            </div>
+
+            {% if promotion_paths %}
+            <div
+              class="path-grid"
+              role="radiogroup"
+              aria-label="Select target class"
+            >
+              {% for path in promotion_paths %}
+              <label class="path-option">
+                <input
+                  type="radio"
+                  name="target_class_id"
+                  value="{{ path.to_class_id }}"
+                  required
+                />
+                <span class="path-card">
+                  <span class="path-icon" aria-hidden="true">
+                    <svg
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 19V5M5 12l7-7 7 7" />
+                    </svg>
+                  </span>
+                  <span class="path-meta">
+                    <span class="path-name">{{ path.to_class.name }}</span>
+                    {% if path.to_class.level %}
+                    <span class="path-level">{{ path.to_class.level }}</span>
+                    {% endif %}
+                  </span>
+                </span>
+              </label>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="warning">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <div class="warning-copy">
+                <h3>No promotion paths configured</h3>
+                <p>
+                  This student's class has no destination paths. Configure the
+                  promotion pathway before promoting.
+                </p>
+                <a
+                  href="{{ url_for('student_promotion.manage_promotion_paths') }}"
+                >
+                  Manage promotion paths →
+                </a>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Notes -->
+          <div class="form-section">
+            <div class="form-section-head">
+              <span class="form-section-num">C</span>
+              <h3 class="form-section-title">Promotion notes</h3>
+            </div>
+
+            <label class="field-label" for="promotion_notes">
+              Notes (optional)
+            </label>
+            <textarea
+              class="field-textarea"
+              name="promotion_notes"
+              id="promotion_notes"
+              rows="4"
+              placeholder="Add any context that should be recorded with this promotion…"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="card-foot">
+          <div class="note">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span
+              >Every promotion is recorded with a timestamp and your
+              account.</span
+            >
+          </div>
+          <div class="actions">
+            <a
+              href="{{ url_for('student_promotion.individual_promotion') }}"
+              class="btn"
+            >
+              Cancel
+            </a>
+            <button
+              type="submit"
+              class="btn primary"
+              id="promote-submit"
+              {%
+              if
+              not
+              promotion_paths
+              %}disabled{%
+              endif
+              %}
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M22 10L12 5 2 10l10 5 10-5z" />
+                <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5" />
+              </svg>
+              Promote student
+            </button>
+          </div>
+        </div>
+      </main>
     </div>
   </form>
   {% else %}
-  <!-- No Student Selected State -->
-  <div class="professional-card p-8 text-center">
-    <i
-      class="fas fa-user-graduate text-4xl text-slate-300 dark:text-slate-600 mb-4"
-    ></i>
-    <h4 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-      Select a Student
-    </h4>
-    <p class="text-slate-500 dark:text-slate-400 mb-4">
-      Search for a student to begin the promotion process
-    </p>
-    <div class="w-64 mx-auto bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
-      <p class="text-sm text-slate-600 dark:text-slate-400 text-center">
-        Use the search bar above to find students by name
+  <!-- No student selected -->
+  <section class="card">
+    <div class="empty">
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M22 10L12 5 2 10l10 5 10-5z" />
+        <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5" />
+      </svg>
+      <h3>No student selected</h3>
+      <p>
+        Search for a student above to begin the individual promotion process.
       </p>
     </div>
-  </div>
+  </section>
   {% endif %}
 </div>
+
+<script>
+  "use strict";
+
+  (function () {
+    const form = document.getElementById("promotion-form");
+    if (!form) return;
+
+    const submitBtn = document.getElementById("promote-submit");
+    const radios = Array.from(
+      form.querySelectorAll('input[name="target_class_id"]'),
+    );
+
+    function updateSubmitState() {
+      if (!submitBtn) return;
+      const hasSelection = radios.some((r) => r.checked);
+      submitBtn.disabled = !hasSelection;
+    }
+
+    radios.forEach((r) => r.addEventListener("change", updateSubmitState));
+    updateSubmitState();
+
+    form.addEventListener("submit", function (e) {
+      if (!radios.some((r) => r.checked)) {
+        e.preventDefault();
+        return;
+      }
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.setAttribute("aria-busy", "true");
+      }
+    });
+  })();
+</script>
+
 {% endblock %}

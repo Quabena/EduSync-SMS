@@ -65,7 +65,7 @@ function startBackend() {
     if (app.isPackaged) {
       dialog.showErrorBox(
         "Missing backend",
-        msg + "\nPlease reinstall or contact support."
+        msg + "\nPlease reinstall or contact support.",
       );
     }
 
@@ -109,7 +109,7 @@ function startBackend() {
   });
 
   console.log(
-    `Spawned backend from ${exe} pid=${backendProcess.pid} detached=${shouldDetach}`
+    `Spawned backend from ${exe} pid=${backendProcess.pid} detached=${shouldDetach}`,
   );
 
   return backendProcess;
@@ -177,7 +177,7 @@ async function stopBackend(graceMs = 1500) {
       } catch (groupErr) {
         console.warn(
           "Group SIGTERM failed, fallback to direct SIGTERM:",
-          groupErr
+          groupErr,
         );
         try {
           proc.kill("SIGTERM");
@@ -197,7 +197,7 @@ async function stopBackend(graceMs = 1500) {
         } catch (killGroupErr) {
           console.warn(
             "Group SIGKILL failed, fallback to direct SIGKILL:",
-            killGroupErr
+            killGroupErr,
           );
           try {
             proc.kill("SIGKILL");
@@ -276,7 +276,7 @@ async function createWindow() {
       if (app.isPackaged) {
         dialog.showErrorBox(
           "App error",
-          "Failed to start backend.\n" + String(err)
+          "Failed to start backend.\n" + String(err),
         );
         await stopBackend();
         await gracefulAppQuit(1);
@@ -293,7 +293,7 @@ async function createWindow() {
       if (app.isPackaged) {
         dialog.showErrorBox(
           "Backend startup timeout",
-          "The backend did not respond in time. Please try again or reinstall."
+          "The backend did not respond in time. Please try again or reinstall.",
         );
         await stopBackend();
         await gracefulAppQuit(1);
@@ -302,7 +302,7 @@ async function createWindow() {
     }
   } else {
     console.log(
-      "ELECTRON_START_URL detected; skipping bundled backend spawn (dev mode)"
+      "ELECTRON_START_URL detected; skipping bundled backend spawn (dev mode)",
     );
   }
 
@@ -315,7 +315,7 @@ async function createWindow() {
     if (app.isPackaged) {
       dialog.showErrorBox(
         "Load error",
-        "Failed to load the app UI: " + String(loadErr)
+        "Failed to load the app UI: " + String(loadErr),
       );
     }
   }

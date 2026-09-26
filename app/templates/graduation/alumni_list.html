@@ -2,328 +2,941 @@
 %} {% block page_title %}Alumni Directory{% endblock %} {% block
 page_description %}Browse and manage all graduated students{% endblock %} {%
 block content %}
-<div class="min-h-screen py-8">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Header Section -->
-    <div class="mb-8">
-      <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+
+<style>
+  .alumni-page {
+    --ink: #202a2d;
+    --copy: #526267;
+    --muted: #7b898d;
+    --white: #fffefa;
+    --paper: #f7f5f0;
+    --line: #d7dfdb;
+    --soft: #edf1ee;
+    --green: #1f6259;
+    --deep: #174d47;
+    --wash: #e7f1ed;
+    --brass: #b78643;
+    --brass-wash: #f4eadb;
+    --red: #9a5148;
+    --slate: #71858a;
+    --slate-wash: #eef2f1;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 32px 28px 64px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .dark .alumni-page {
+    --ink: #eef2ef;
+    --copy: #bdc8c3;
+    --muted: #8f9c97;
+    --white: #1a211f;
+    --paper: #121817;
+    --line: #34423f;
+    --soft: #293532;
+    --green: #73c4aa;
+    --deep: #2e7565;
+    --wash: #1d342d;
+    --brass: #d9b273;
+    --brass-wash: #342b20;
+    --red: #df9287;
+    --slate: #9bb0b4;
+    --slate-wash: #253336;
+  }
+
+  .alumni-page *,
+  .alumni-page *::before,
+  .alumni-page *::after {
+    box-sizing: border-box;
+  }
+  .alumni-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ---------- Hero ---------- */
+  .archive-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 25px;
+    padding: 28px 30px 26px 32px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--white);
+    position: relative;
+  }
+  .archive-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--green);
+    border-radius: 8px 0 0 8px;
+  }
+  .archive-kicker,
+  .section-label {
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .archive-hero h1 {
+    margin: 8px 0 10px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.4vw, 48px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+  .archive-hero p {
+    max-width: 610px;
+    margin: 0;
+    color: var(--copy);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 9px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- Buttons ---------- */
+  .archive-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 15px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--white);
+    color: var(--copy);
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .archive-button svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .archive-button:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .archive-button:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .archive-button.primary {
+    border-color: var(--deep);
+    background: var(--deep);
+    color: #fff;
+  }
+  .archive-button.primary:hover {
+    background: #0f3a35;
+    border-color: #0f3a35;
+    color: #fff;
+  }
+  .dark .archive-button.primary {
+    border-color: var(--green);
+    background: var(--green);
+    color: #10211c;
+  }
+  .dark .archive-button.primary:hover {
+    background: #8ed4bd;
+    border-color: #8ed4bd;
+    color: #10211c;
+  }
+
+  /* ---------- Summary rail ---------- */
+  .summary-rail {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin: 18px 0;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--white);
+    overflow: hidden;
+  }
+  .summary-cell {
+    padding: 18px 22px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .summary-cell:last-child {
+    border-right: 0;
+  }
+  .summary-cell::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--green);
+  }
+  .summary-cell:nth-child(2)::before {
+    background: var(--brass);
+  }
+  .summary-cell:nth-child(3)::before {
+    background: var(--slate);
+  }
+  .summary-label {
+    display: block;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+  .summary-value {
+    display: block;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-foot {
+    display: block;
+    margin-top: 7px;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    line-height: 1.45;
+  }
+
+  /* ---------- Filter panel ---------- */
+  .filter-panel,
+  .directory-panel {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--white);
+    overflow: hidden;
+  }
+  .filter-panel {
+    margin-bottom: 16px;
+  }
+
+  .filter-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 20px 22px 14px;
+    flex-wrap: wrap;
+  }
+  .filter-head h2,
+  .directory-head h2 {
+    margin: 5px 0 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .filter-head p {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+  }
+  .filter-count,
+  .directory-count {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 0 22px 18px;
+  }
+  .filter-chip {
+    display: inline-flex;
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--white);
+    color: var(--copy);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .filter-chip:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .filter-chip:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .filter-chip.is-active {
+    border-color: #c5d9d1;
+    background: var(--wash);
+    color: var(--deep);
+  }
+
+  /* ---------- Directory ---------- */
+  .directory-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+
+  .alumni-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .alumni-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    min-height: 96px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--soft);
+    position: relative;
+    transition: background-color 0.15s ease;
+  }
+  .alumni-row:nth-child(odd) {
+    border-right: 1px solid var(--soft);
+  }
+  .alumni-row:hover {
+    background: var(--paper);
+  }
+  .dark .alumni-row:hover {
+    background: #202b29;
+  }
+  .alumni-row:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: -2px;
+  }
+
+  .alumni-avatar {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid #c5d9d1;
+    border-radius: 50%;
+    background: var(--wash);
+    color: var(--deep);
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .alumni-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .alumni-main {
+    min-width: 0;
+  }
+  .alumni-name {
+    display: block;
+    overflow: hidden;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+  .alumni-detail {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .alumni-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 7px;
+  }
+  .alumni-tag {
+    display: inline-flex;
+    padding: 3px 7px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .alumni-tag.class {
+    border-color: #ddc9a9;
+    background: var(--brass-wash);
+    color: #8a632e;
+  }
+  .alumni-tag.gender {
+    border-color: #c9d5d8;
+    background: var(--slate-wash);
+    color: var(--slate);
+  }
+
+  .profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--green);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .profile-link svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Pagination ---------- */
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 22px;
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    flex-wrap: wrap;
+  }
+  .pagination .page-info strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .page-nav {
+    display: flex;
+    gap: 7px;
+  }
+  .page-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--white);
+    color: var(--copy);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .page-btn svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+  }
+  .page-btn:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .page-btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .page-btn[aria-disabled="true"] {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  /* ---------- Empty state ---------- */
+  .empty-state {
+    padding: 56px 24px;
+    text-align: center;
+  }
+  .empty-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--wash);
+    color: var(--green);
+  }
+  .empty-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  .empty-state h3 {
+    margin: 0 0 7px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+  }
+  .empty-state p {
+    max-width: 430px;
+    margin: 0 auto 18px;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* Screen-reader helper */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 780px) {
+    .archive-hero {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .hero-actions {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .archive-button {
+      flex: 1 1 200px;
+    }
+    .alumni-list {
+      grid-template-columns: 1fr;
+    }
+    .alumni-row:nth-child(odd) {
+      border-right: 0;
+    }
+  }
+  @media (max-width: 560px) {
+    .alumni-page {
+      padding: 22px 15px 44px;
+    }
+    .archive-hero {
+      padding: 22px 20px;
+    }
+    .summary-rail {
+      grid-template-columns: 1fr;
+    }
+    .summary-cell {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .summary-cell:last-child {
+      border-bottom: 0;
+    }
+    .filter-head {
+      align-items: flex-start;
+      flex-direction: column;
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    .filter-chips {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    .directory-head {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    .alumni-row {
+      grid-template-columns: 44px minmax(0, 1fr);
+      padding-left: 18px;
+      padding-right: 18px;
+      gap: 12px;
+    }
+    .alumni-row .profile-link {
+      grid-column: 2;
+      justify-content: flex-start;
+      padding-top: 4px;
+    }
+    .pagination {
+      align-items: stretch;
+      flex-direction: column;
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    .page-nav {
+      justify-content: space-between;
+    }
+  }
+</style>
+
+{# ---------- Initials macro — safe against empty names ---------- #} {% macro
+initials(name) -%} {%- set parts = (name or '').strip().split() -%} {%- if parts
+-%} {{ parts[0][0] }}{{ parts[-1][0] if parts|length > 1 else '' }} {%- else
+-%}?{%- endif -%} {%- endmacro %} {# ---------- Derived values ---------- #} {%
+set page_size = 12 %} {% set current_page = page|default(1, true) %} {% set
+alumni_count = alumni|length %} {% set year_count = years|length %} {% set
+page_start = (current_page - 1) * page_size %} {% set page_end = current_page *
+page_size %} {% set is_first_page = current_page <= 1 %} {% set is_last_page =
+page_end >= alumni_count %}
+
+<div class="alumni-page">
+  <!-- Hero -->
+  <header class="archive-hero">
+    <div>
+      <p class="archive-kicker">Academic records · Alumni office</p>
+      <h1>Alumni directory</h1>
+      <p>
+        Browse graduated students by class year, open individual profiles, and
+        keep the school's history easy to navigate.
+      </p>
+    </div>
+    <div class="hero-actions">
+      <a
+        class="archive-button"
+        href="{{ url_for('graduation.alumni_classes') }}"
       >
-        <div>
-          <h1 class="text-4xl font-bold gradient-text mb-2">
-            Alumni Directory
-          </h1>
-          <p class="text-lg text-slate-600 dark:text-slate-300">
-            Browse and manage all graduated students
-          </p>
-        </div>
-        <div class="flex items-center space-x-3">
-          <a
-            href="{{ url_for('graduation.alumni_classes') }}"
-            class="inline-flex items-center px-6 py-3 glass text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-white/20 transition-all duration-300"
-          >
-            <i class="fas fa-users mr-2"></i>
-            View by Class
-          </a>
-          <a
-            href="{{ url_for('graduation.graduation_management') }}"
-            class="inline-flex items-center px-6 py-3 glass-strong text-slate-500 font-medium rounded-xl hover-lift transition-all duration-300"
-          >
-            <i class="fas fa-graduation-cap mr-2"></i>
-            Graduation Management
-          </a>
-        </div>
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 7l9-4 9 4-9 4-9-4z" />
+          <path d="M3 7v10l9 4 9-4V7" />
+          <path d="M3 12l9 4 9-4" />
+        </svg>
+        View by class
+      </a>
+      <a
+        class="archive-button primary"
+        href="{{ url_for('graduation.graduation_management') }}"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M22 10L12 5 2 10l10 5 10-5z" />
+          <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5" />
+        </svg>
+        Graduation management
+      </a>
+    </div>
+  </header>
+
+  <!-- Summary rail -->
+  <section class="summary-rail" aria-label="Alumni summary">
+    <div class="summary-cell">
+      <span class="summary-label">Total alumni</span>
+      <strong class="summary-value">{{ alumni_count }}</strong>
+      <span class="summary-foot">
+        {% if selected_year %} Class of {{ selected_year }} {% else %} Every
+        graduated student on record {% endif %}
+      </span>
+    </div>
+    <div class="summary-cell">
+      <span class="summary-label">Graduation years</span>
+      <strong class="summary-value">{{ year_count }}</strong>
+      <span class="summary-foot">
+        {% if years %}{{ years|join(', ') }}{% else %}No years recorded yet{%
+        endif %}
+      </span>
+    </div>
+    <div class="summary-cell">
+      <span class="summary-label">Archive view</span>
+      <strong class="summary-value">
+        {% if selected_year %}{{ selected_year }}{% else %}All{% endif %}
+      </strong>
+      <span class="summary-foot">Current graduation-year filter</span>
+    </div>
+  </section>
+
+  <!-- Filter panel -->
+  {% if years %}
+  <section class="filter-panel" aria-labelledby="filter-heading">
+    <div class="filter-head">
+      <div>
+        <h2 id="filter-heading">Graduation year</h2>
+        <p>Browse alumni by their class of graduation.</p>
       </div>
+      <span class="filter-count"
+        >{{ year_count }} year{% if year_count != 1 %}s{% endif %}</span
+      >
+    </div>
+    <div
+      class="filter-chips"
+      role="group"
+      aria-label="Filter by graduation year"
+    >
+      <a
+        class="filter-chip {% if not selected_year %}is-active{% endif %}"
+        href="{{ url_for('graduation.alumni_list') }}"
+        >All years</a
+      >
+      {% for y in years %}
+      <a
+        class="filter-chip {% if selected_year == y %}is-active{% endif %}"
+        href="{{ url_for('graduation.alumni_list', year=y) }}"
+        >{{ y }}</a
+      >
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Directory -->
+  <section class="directory-panel" aria-labelledby="directory-heading">
+    <div class="directory-head">
+      <div>
+        <h2 id="directory-heading">Alumni records</h2>
+      </div>
+      <span class="directory-count"
+        >{{ alumni_count }} record{% if alumni_count != 1 %}s{% endif %}</span
+      >
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-      <div class="professional-card p-6 text-center">
-        <div
-          class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
-        >
-          <i class="fas fa-users text-blue-500 text-xl"></i>
-        </div>
-        <div class="text-2xl font-bold text-slate-800 dark:text-white">
-          {{ alumni|length }}
-        </div>
-        <div class="text-sm text-slate-600 dark:text-slate-300">
-          Total Alumni
-        </div>
-      </div>
-
-      <div class="professional-card p-6 text-center">
-        <div
-          class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
-        >
-          <i class="fas fa-calendar-alt text-emerald-500 text-xl"></i>
-        </div>
-        <div class="text-2xl font-bold text-slate-800 dark:text-white">
-          {{ years|length }}
-        </div>
-        <div class="text-sm text-slate-600 dark:text-slate-300">
-          Graduation Years
-        </div>
-      </div>
-
-      <div class="professional-card p-6 text-center">
-        <div
-          class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-3"
-        >
-          <i class="fas fa-trophy text-purple-500 text-xl"></i>
-        </div>
-        <div class="text-2xl font-bold text-slate-800 dark:text-white">
-          100%
-        </div>
-        <div class="text-sm text-slate-600 dark:text-slate-300">
-          Success Rate
-        </div>
-      </div>
+    {% if alumni %}
+    <div class="alumni-list">
+      {% for alum in alumni %}
+      <a
+        class="alumni-row"
+        href="{{ url_for('graduation.alumni_detail', alumni_id=alum.id) }}"
+      >
+        <span class="alumni-avatar" aria-hidden="true">
+          {% if alum.photo_path %}
+          <img
+            src="{{ url_for('students.student_photo', filename=alum.photo_path) }}"
+            alt=""
+          />
+          {% else %} {{ initials(alum.full_name) }} {% endif %}
+        </span>
+        <span class="alumni-main">
+          <span class="alumni-name">{{ alum.full_name }}</span>
+          <span class="alumni-detail">
+            {% if alum.graduation_year %} Class of {{ alum.graduation_year }} {%
+            else %} Year not recorded {% endif %}
+          </span>
+          <span class="alumni-tags">
+            {% if alum.final_class %}
+            <span class="alumni-tag class">{{ alum.final_class }}</span>
+            {% endif %} {% if alum.gender %}
+            <span class="alumni-tag gender">{{ alum.gender }}</span>
+            {% endif %}
+          </span>
+        </span>
+        <span class="profile-link">
+          Profile
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </span>
+      </a>
+      {% endfor %}
     </div>
 
-    <!-- Filter Section -->
-    <div class="professional-card p-6 mb-6 mt-6">
-      <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
-      >
-        <div class="flex items-center space-x-4">
-          <div
-            class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center"
-          >
-            <i class="fas fa-filter text-blue-500"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
-              Filter by Graduation Year
-            </h3>
-            <p class="text-sm text-slate-600 dark:text-slate-300">
-              Browse alumni by their graduation year
-            </p>
-          </div>
-        </div>
-        <div class="flex items-center flex-wrap gap-2">
-          <a
-            href="{{ url_for('graduation.alumni_list') }}"
-            class="inline-flex items-center px-4 py-2 {% if not selected_year %}glass-strong text-slate-500{% else %}glass text-slate-700 dark:text-slate-200 hover:bg-white/20{% endif %} rounded-xl transition-all duration-300 font-medium"
-          >
-            All Years
-          </a>
-          {% for year in years %}
-          <a
-            href="{{ url_for('graduation.alumni_list', year=year) }}"
-            class="inline-flex items-center px-4 py-2 {% if selected_year == year %}glass-strong text-white{% else %}glass text-slate-700 dark:text-slate-200 hover:bg-white/20{% endif %} rounded-xl transition-all duration-300 font-medium"
-          >
-            {{ year }}
-          </a>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Alumni Records -->
-    <div class="professional-card p-6">
-      <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6"
-      >
-        <div>
-          <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
-            Alumni Records
-          </h2>
-          <p class="text-slate-600 dark:text-slate-300 mt-1">
-            {% if selected_year %} Class of {{ selected_year }} - {{
-            alumni|length }} alumni {% else %} All alumni - {{ alumni|length }}
-            total {% endif %}
-          </p>
-        </div>
-      </div>
-
-      {% if alumni %}
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-      >
-        {% for alum in alumni %}
+    {% if alumni_count > page_size %}
+    <nav class="pagination" aria-label="Alumni pagination">
+      <span class="page-info">
+        Showing
+        <strong>{{ page_start + 1 }}</strong>
+        to
+        <strong>{{ [page_end, alumni_count]|min }}</strong>
+        of
+        <strong>{{ alumni_count }}</strong>
+      </span>
+      <span class="page-nav">
         <a
-          href="{{ url_for('graduation.alumni_detail', alumni_id=alum.id) }}"
-          class="professional-card p-6 hover-lift transition-all duration-300 group"
+          class="page-btn"
+          href="?page={{ current_page - 1 }}{% if selected_year %}&year={{ selected_year }}{% endif %}"
+          {%
+          if
+          is_first_page
+          %}aria-disabled="true"
+          tabindex="-1"
+          {%
+          endif
+          %}
         >
-          <div class="flex flex-col items-center text-center">
-            <!-- Alumni Photo -->
-            <div class="relative mb-4">
-              <div
-                class="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600"
-              >
-                {% if alum.photo_path %}
-                <img
-                  src="{{ url_for('students.student_photo', filename=alum.photo_path) }}"
-                  alt="{{ alum.full_name }}"
-                  class="w-full h-full object-cover"
-                />
-                {% else %}
-                <div class="w-full h-full flex items-center justify-center">
-                  <i class="fas fa-user-graduate text-white text-2xl"></i>
-                </div>
-                {% endif %}
-              </div>
-            </div>
-
-            <!-- Alumni Info -->
-            <h3
-              class="font-bold text-slate-800 dark:text-white text-lg mb-2 group-hover:text-blue-500 transition-colors duration-200"
-            >
-              {{ alum.full_name }}
-            </h3>
-
-            <div class="space-y-3 w-full mt-3">
-              <!-- Graduation Year -->
-              <div class="flex items-center justify-center space-x-2">
-                <i class="fas fa-graduation-cap text-emerald-500 text-sm"></i>
-                <span
-                  class="text-sm font-semibold text-emerald-600 dark:text-emerald-400"
-                >
-                  Class of {{ alum.graduation_year }}
-                </span>
-              </div>
-
-              <!-- Final Class -->
-              <div class="glass px-3 py-1.5 rounded-lg">
-                <span
-                  class="text-xs font-medium text-slate-700 dark:text-slate-200"
-                >
-                  {{ alum.final_class }}
-                </span>
-              </div>
-
-              <!-- Gender -->
-              <div
-                class="flex items-center justify-center space-x-4 text-xs text-slate-500 dark:text-slate-400 pt-2"
-              >
-                <span class="flex items-center"> {{ alum.gender }} </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- View Profile CTA -->
-          <div class="mt-4 pt-4 border-t border-white/10">
-            <div
-              class="flex items-center justify-center text-blue-500 font-medium text-sm group-hover:text-blue-600 transition-colors duration-200"
-            >
-              View Profile
-              <i
-                class="fas fa-chevron-right ml-2 group-hover:translate-x-1 transition-transform duration-200"
-              ></i>
-            </div>
-          </div>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Previous
         </a>
-        {% endfor %}
+        <a
+          class="page-btn"
+          href="?page={{ current_page + 1 }}{% if selected_year %}&year={{ selected_year }}{% endif %}"
+          {%
+          if
+          is_last_page
+          %}aria-disabled="true"
+          tabindex="-1"
+          {%
+          endif
+          %}
+        >
+          Next
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="9 6 15 12 9 18" />
+          </svg>
+        </a>
+      </span>
+    </nav>
+    {% endif %} {% else %}
+    <div class="empty-state">
+      <div class="empty-icon" aria-hidden="true">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M22 10L12 5 2 10l10 5 10-5z" />
+          <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5" />
+        </svg>
       </div>
-
-      <!-- Pagination -->
-      {% if alumni|length > 12 %}
-      <div
-        class="flex items-center justify-between border-t border-white/10 pt-6 mt-6"
+      <h3>No alumni records found</h3>
+      <p>
+        {% if selected_year %} No alumni found for the class of {{ selected_year
+        }}. Try a different filter or clear the selection. {% else %} No alumni
+        records are available yet. Students will appear here after graduation.
+        {% endif %}
+      </p>
+      {% if selected_year %}
+      <a class="archive-button" href="{{ url_for('graduation.alumni_list') }}">
+        Clear filter
+      </a>
+      {% else %}
+      <a
+        class="archive-button primary"
+        href="{{ url_for('graduation.graduation_management') }}"
       >
-        <div class="text-sm text-slate-600 dark:text-slate-300">
-          Showing {{ ((page-1)*12)+1 }} to {{ min(page*12, alumni|length) }} of
-          {{ alumni|length }} alumni
-        </div>
-        <div class="flex items-center space-x-2">
-          <a
-            href="?page={{ page-1 }}{% if selected_year %}&year={{ selected_year }}{% endif %}"
-            class="glass px-4 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-white/20 transition-all duration-300 {% if page <= 1 %} opacity-50 cursor-not-allowed {% endif %}"
-            {%
-            if
-            page
-            <="1"
-            %}
-            disabled
-            {%
-            endif
-            %}
-          >
-            <i class="fas fa-chevron-left mr-2"></i>Previous
-          </a>
-          <a
-            href="?page={{ page+1 }}{% if selected_year %}&year={{ selected_year }}{% endif %}"
-            class="glass px-4 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-white/20 transition-all duration-300 {% if page * 12 >= alumni|length %} opacity-50 cursor-not-allowed {% endif %}"
-            {%
-            if
-            page
-            *
-            12
-            >= alumni|length %} disabled {% endif %} > Next<i
-              class="fas fa-chevron-right ml-2"
-            ></i>
-          </a>
-        </div>
-      </div>
-      {% endif %} {% else %}
-      <!-- Empty State -->
-      <div class="text-center py-16">
-        <div
-          class="w-24 h-24 bg-slate-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4"
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
         >
-          <i class="fas fa-user-graduate text-slate-500 text-3xl"></i>
-        </div>
-        <h3
-          class="text-2xl font-semibold text-slate-600 dark:text-slate-300 mb-2"
-        >
-          No Alumni Records Found
-        </h3>
-        <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-          {% if selected_year %} No alumni found for the class of {{
-          selected_year }}. {% else %} No alumni records available yet. Students
-          will appear here after graduation. {% endif %}
-        </p>
-        <div class="mt-6">
-          <a
-            href="{{ url_for('graduation.graduation_management') }}"
-            class="inline-flex items-center px-6 py-3 glass-strong text-white font-medium rounded-xl hover-lift transition-all duration-300"
-          >
-            <i class="fas fa-graduation-cap mr-2"></i>
-            Manage Graduations
-          </a>
-        </div>
-      </div>
+          <path d="M22 10L12 5 2 10l10 5 10-5z" />
+          <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5" />
+        </svg>
+        Manage graduations
+      </a>
       {% endif %}
     </div>
-  </div>
+    {% endif %}
+  </section>
 </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Add loading states to filter buttons
-    const filterButtons = document.querySelectorAll(
-      'a[href*="year="], a[href*="page="]'
-    );
-    filterButtons.forEach((button) => {
-      button.addEventListener("click", function (e) {
-        if (!this.getAttribute("disabled")) {
-          const originalContent = this.innerHTML;
-          this.innerHTML =
-            '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
-          this.style.pointerEvents = "none";
-
-          setTimeout(() => {
-            if (this.innerHTML.includes("Loading...")) {
-              this.innerHTML = originalContent;
-              this.style.pointerEvents = "auto";
-            }
-          }, 3000);
-        }
-      });
-    });
-
-    // Add hover effects to alumni cards
-    const alumniCards = document.querySelectorAll(".professional-card a");
-    alumniCards.forEach((card) => {
-      card.addEventListener("mouseenter", function () {
-        this.style.transform = "translateY(-8px)";
-      });
-
-      card.addEventListener("mouseleave", function () {
-        this.style.transform = "translateY(0)";
-      });
-    });
-  });
-</script>
 {% endblock %}

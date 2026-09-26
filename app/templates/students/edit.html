@@ -2,10 +2,6 @@
 SDA JHS{% endblock %} {% block content %}
 
 <style>
-  /* ==========================================================
-     Continues the "Registry / Case File" system from the students
-     list and student detail pages.
-     ========================================================== */
   .dossier {
     --paper: #faf7ef;
     --paper-line: #e6ddc6;
@@ -185,13 +181,12 @@ SDA JHS{% endblock %} {% block content %}
   <div class="dossier-cover">
     <div class="dossier-cover-band">
       <div>
-        <span class="dossier-eyebrow">Case File · Edit Mode</span>
+        <span class="dossier-eyebrow">Edit Mode</span>
         <h1 class="text-2xl font-semibold text-primary">Edit Student</h1>
         <p class="text-sm text-secondary mt-1">
           Update information for {{ student.full_name }}
         </p>
       </div>
-      <span class="id-stamp">No. {{ student.id }}</span>
     </div>
   </div>
 
@@ -239,12 +234,12 @@ SDA JHS{% endblock %} {% block content %}
           </div>
 
           <!-- Middle Name -->
+          <!-- prettier-ignore -->
           <div>
             <label for="{{ form.middle_name.id }}" class="form-label"
               >Middle Name</label
             >
-            {{ form.middle_name(class="input-field", placeholder="Enter middle
-            name") }} {% for error in form.middle_name.errors %}
+            {{ form.middle_name(class="input-field", placeholder="Enter Middle Name") }} {% for error in form.middle_name.errors %}
             <p class="form-error">{{ error }}</p>
             {% endfor %}
           </div>

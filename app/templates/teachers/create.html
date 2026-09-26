@@ -2,11 +2,6 @@
 endblock %} {% block content %}
 
 <style>
-  /* ==========================================================
-     Add New Teacher — plain document typography.
-     System sans for text, monospace for all numeric data.
-     Color only encodes meaning. Includes dark mode.
-     ========================================================== */
   :root {
     --t-ink: #1a2226;
     --t-copy: #4a5459;
@@ -67,8 +62,8 @@ endblock %} {% block content %}
     padding: 28px 26px 60px;
     color: var(--t-ink);
     font-family: var(--t-sans);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.55;
   }
   .teacher-form-page *,
   .teacher-form-page *::before,
@@ -87,7 +82,7 @@ endblock %} {% block content %}
     gap: 10px;
     color: var(--t-muted);
     font-family: var(--t-mono);
-    font-size: 12px;
+    font-size: 13px;
     margin-bottom: 20px;
   }
   .teacher-crumb a {
@@ -130,38 +125,38 @@ endblock %} {% block content %}
   }
   .teacher-eyebrow {
     font-family: var(--t-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--t-muted);
-    margin: 0 0 6px;
+    margin: 0 0 8px;
   }
   .teacher-hero h1 {
     font-family: var(--t-sans);
-    font-size: clamp(22px, 2.6vw, 28px);
+    font-size: clamp(24px, 2.8vw, 30px);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.15;
     color: var(--t-ink);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
   }
   .teacher-hero p {
     color: var(--t-copy);
     margin: 0;
-    font-size: 14px;
+    font-size: 15px;
     max-width: 62ch;
   }
   .teacher-back {
     display: inline-flex;
     align-items: center;
-    padding: 9px 14px;
+    padding: 10px 16px;
     border: 1px solid var(--t-line);
     border-radius: 3px;
     background: var(--t-surface);
     color: var(--t-ink);
     font-family: var(--t-sans);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     white-space: nowrap;
     transition:
@@ -198,16 +193,16 @@ endblock %} {% block content %}
   .section-head .kicker {
     display: block;
     font-family: var(--t-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--t-muted);
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
   .section-head h2 {
     font-family: var(--t-sans);
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--t-ink);
@@ -215,8 +210,8 @@ endblock %} {% block content %}
   }
   .section-head p {
     color: var(--t-muted);
-    margin: 5px 0 0;
-    font-size: 13px;
+    margin: 6px 0 0;
+    font-size: 13.5px;
   }
 
   /* ---------- Fields ---------- */
@@ -235,12 +230,12 @@ endblock %} {% block content %}
   .field label {
     display: block;
     font-family: var(--t-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--t-muted);
-    margin-bottom: 6px;
+    margin-bottom: 7px;
   }
   .required {
     color: var(--t-red);
@@ -249,21 +244,21 @@ endblock %} {% block content %}
 
   .field-control {
     width: 100%;
-    min-height: 40px;
+    min-height: 42px;
     border: 1px solid var(--t-line);
     border-radius: 3px;
     background: var(--t-input-bg);
     color: var(--t-ink);
-    padding: 9px 12px;
+    padding: 10px 12px;
     font-family: var(--t-sans);
-    font-size: 14px;
-    line-height: 1.35;
+    font-size: 15px;
+    line-height: 1.4;
     transition:
       border-color 0.15s ease,
       box-shadow 0.15s ease;
   }
   textarea.field-control {
-    min-height: 88px;
+    min-height: 92px;
     resize: vertical;
   }
   select.field-control {
@@ -282,10 +277,11 @@ endblock %} {% block content %}
     background-image: none;
     padding-right: 12px;
     padding: 6px;
-    min-height: 120px;
+    min-height: 130px;
+    font-size: 14px;
   }
   select.field-control[multiple] option {
-    padding: 4px 6px;
+    padding: 5px 6px;
   }
   .field-control:hover {
     border-color: var(--t-muted);
@@ -299,10 +295,10 @@ endblock %} {% block content %}
     display: block;
     color: var(--t-muted);
     font-family: var(--t-mono);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.02em;
-    margin-top: 5px;
-    line-height: 1.45;
+    margin-top: 6px;
+    line-height: 1.5;
   }
 
   /* ---------- Subsection ---------- */
@@ -314,13 +310,13 @@ endblock %} {% block content %}
   }
   .subsection-title {
     font-family: var(--t-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--t-muted);
+    color: var(--t-copy);
     margin: 0 0 14px;
-    padding-bottom: 8px;
+    padding-bottom: 9px;
     border-bottom: 1px solid var(--t-line-soft);
   }
 
@@ -329,7 +325,7 @@ endblock %} {% block content %}
     padding: 0;
   }
   .assignment-box .field-control {
-    min-height: 140px;
+    min-height: 150px;
   }
 
   /* ---------- Upload boxes ---------- */
@@ -364,7 +360,7 @@ endblock %} {% block content %}
     background: var(--t-surface);
     color: var(--t-ink);
     font-family: var(--t-sans);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition:
@@ -376,7 +372,7 @@ endblock %} {% block content %}
     border-color: var(--t-muted);
   }
   .upload-box input[type="file"] {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--t-copy);
   }
 
@@ -395,7 +391,7 @@ endblock %} {% block content %}
   .form-footer-note {
     font-family: var(--t-mono);
     color: var(--t-muted);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.02em;
   }
   .form-actions {
@@ -407,14 +403,14 @@ endblock %} {% block content %}
   .btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 18px;
+    gap: 7px;
+    padding: 11px 20px;
     border: 1px solid var(--t-line);
     border-radius: 3px;
     background: var(--t-surface);
     color: var(--t-ink);
     font-family: var(--t-sans);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
@@ -443,8 +439,8 @@ endblock %} {% block content %}
     color: #131817;
   }
   .btn svg {
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
   }
 
   /* ---------- Responsive ---------- */
@@ -508,10 +504,7 @@ endblock %} {% block content %}
     <div class="teacher-hero-copy">
       <p class="teacher-eyebrow">Staff directory · Registration</p>
       <h1>Add a new teacher</h1>
-      <p>
-        Create a complete staff record for Namong SDA JHS. The details entered
-        here will appear across the school directory.
-      </p>
+      <p>Create a complete staff record for Namong SDA JHS.</p>
     </div>
     <a class="teacher-back" href="{{ url_for('teachers.index') }}">
       Cancel and return

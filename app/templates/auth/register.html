@@ -1,638 +1,718 @@
 {% extends "base.html" %} {% block title %}Register New User - Namong SDA JHS{%
 endblock %} {% block content %}
-<div class="min-h-[calc(100vh-16rem)] flex items-center justify-center py-12">
-  <div class="w-full max-w-lg">
-    <!-- Registration Card -->
-    <div
-      class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl shadow-gray-200/20 dark:shadow-gray-900/20 overflow-hidden"
-    >
-      <!-- Header Section -->
-      <div class="px-8 pt-8 pb-6 text-center">
-        <div class="flex justify-center mb-6">
-          <div
-            class="p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg"
-          >
-            <svg
-              class="h-8 w-8 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-              />
-            </svg>
+
+<style>
+  :root {
+    --reg-ink: #202a2d;
+    --reg-copy: #526267;
+    --reg-muted: #7b898d;
+    --reg-paper: #f7f5f0;
+    --reg-white: #fffefa;
+    --reg-line: #d7dfdb;
+    --reg-soft: #edf1ee;
+    --reg-green: #1f6259;
+    --reg-deep: #174d47;
+    --reg-wash: #e7f1ed;
+    --reg-brass: #b78643;
+    --reg-brass-wash: #f4eadb;
+    --reg-red: #9a5148;
+    --reg-red-wash: #f4e4e0;
+    --reg-shadow:
+      0 22px 55px rgba(28, 47, 45, 0.1), 0 3px 9px rgba(28, 47, 45, 0.04);
+    color-scheme: light;
+  }
+  .dark {
+    --reg-ink: #eef2ef;
+    --reg-copy: #bdc8c3;
+    --reg-muted: #8f9c97;
+    --reg-paper: #121817;
+    --reg-white: #1a211f;
+    --reg-line: #34423f;
+    --reg-soft: #293532;
+    --reg-green: #73c4aa;
+    --reg-deep: #2e7565;
+    --reg-wash: #1d342d;
+    --reg-brass: #d9b273;
+    --reg-brass-wash: #342b20;
+    --reg-red: #df9287;
+    --reg-red-wash: #382522;
+    --reg-shadow: 0 22px 55px rgba(0, 0, 0, 0.3), 0 3px 9px rgba(0, 0, 0, 0.2);
+    color-scheme: dark;
+  }
+  .register-page {
+    max-width: 1060px;
+    min-height: calc(100vh - 150px);
+    margin: 0 auto;
+    padding: 42px 28px 70px;
+    display: grid;
+    place-items: center;
+    color: var(--reg-ink);
+    position: relative;
+  }
+  .register-page *,
+  .register-page *:before,
+  .register-page *:after {
+    box-sizing: border-box;
+  }
+  .register-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .register-page:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 6%;
+    width: 88%;
+    height: 245px;
+    background: rgba(31, 98, 89, 0.045);
+    pointer-events: none;
+  }
+  .register-sheet {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.82fr) minmax(400px, 1.18fr);
+    width: 100%;
+    border: 1px solid #c7d6d0;
+    border-radius: 9px;
+    background: var(--reg-white);
+    box-shadow: var(--reg-shadow);
+    overflow: hidden;
+  }
+  .register-aside {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 700px;
+    padding: 32px 30px;
+    background: var(--reg-deep);
+    color: #f0f4ef;
+    position: relative;
+    overflow: hidden;
+  }
+  .register-aside:after {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    right: -130px;
+    bottom: -118px;
+    border: 1px solid rgba(217, 178, 115, 0.3);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 17px rgba(217, 178, 115, 0.08),
+      0 0 0 34px rgba(217, 178, 115, 0.04);
+    pointer-events: none;
+  }
+  .school-mark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #f5f4e9;
+    font:
+      800 11px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+  .school-mark-badge {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(217, 178, 115, 0.75);
+    color: var(--reg-brass);
+    font:
+      600 17px Georgia,
+      serif;
+  }
+  .aside-copy {
+    position: relative;
+    z-index: 1;
+  }
+  .aside-copy h1 {
+    max-width: 275px;
+    margin: 0 0 18px;
+    color: #fffef3;
+    font:
+      600 clamp(37px, 5vw, 61px)/0.96 Georgia,
+      "Times New Roman",
+      serif;
+    letter-spacing: -0.055em;
+  }
+  .aside-copy h1 em {
+    color: #d9b273;
+    font-style: italic;
+    font-weight: 400;
+  }
+  .aside-copy p {
+    max-width: 280px;
+    margin: 0;
+    color: #bed0c7;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .aside-list {
+    position: relative;
+    z-index: 1;
+    margin-top: 35px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(240, 244, 239, 0.2);
+  }
+  .aside-list div {
+    display: flex;
+    gap: 10px;
+    padding: 9px 0;
+    color: #bed0c7;
+    font-size: 11px;
+  }
+  .aside-list i {
+    width: 14px;
+    color: var(--reg-brass);
+    text-align: center;
+  }
+  .aside-footer {
+    position: relative;
+    z-index: 1;
+    padding-top: 20px;
+    border-top: 1px solid rgba(240, 244, 239, 0.2);
+    color: #bed0c7;
+    font-size: 11px;
+    line-height: 1.55;
+  }
+  .aside-footer strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #f5f4e9;
+    font-size: 12px;
+  }
+  .register-main {
+    padding: 41px 47px 36px;
+    background: var(--reg-white);
+  }
+  .form-kicker {
+    margin: 0 0 9px;
+    color: var(--reg-green);
+    font:
+      800 10px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .register-main h2 {
+    margin: 0;
+    color: var(--reg-ink);
+    font:
+      600 31px/1.06 Georgia,
+      "Times New Roman",
+      serif;
+    letter-spacing: -0.04em;
+  }
+  .form-intro {
+    margin: 10px 0 27px;
+    color: var(--reg-copy);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .register-form {
+    display: grid;
+    gap: 17px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .field-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--reg-ink);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .required {
+    color: var(--reg-red);
+  }
+  .field-wrap {
+    position: relative;
+  }
+  .field-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    width: 15px;
+    color: var(--reg-muted);
+    font-size: 12px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .register-input,
+  .register-select {
+    width: 100%;
+    height: 45px;
+    padding: 0 39px 0 36px;
+    border: 1px solid var(--reg-line);
+    border-radius: 4px;
+    background: var(--reg-paper);
+    color: var(--reg-ink);
+    font: 13px inherit;
+  }
+  .register-select {
+    padding-right: 34px;
+    cursor: pointer;
+  }
+  .register-input::placeholder {
+    color: var(--reg-muted);
+  }
+  .register-input:hover,
+  .register-select:hover {
+    border-color: #aebfba;
+  }
+  .register-input:focus,
+  .register-select:focus {
+    outline: 2px solid rgba(31, 98, 89, 0.18);
+    border-color: var(--reg-green);
+    background: var(--reg-white);
+  }
+  .dark .register-input,
+  .dark .register-select {
+    background: #151b1a;
+  }
+  .dark .register-input:hover,
+  .dark .register-select:hover {
+    border-color: #55756b;
+  }
+  .password-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 29px;
+    height: 29px;
+    border: 0;
+    background: none;
+    color: var(--reg-muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+  .password-toggle:hover {
+    color: var(--reg-green);
+  }
+  .field-error {
+    margin-top: 5px;
+    color: var(--reg-red);
+    font-size: 10px;
+  }
+  .strength-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 7px;
+    color: var(--reg-muted);
+    font-size: 10px;
+  }
+  .strength-bars {
+    display: flex;
+    gap: 3px;
+  }
+  .strength-bar {
+    width: 21px;
+    height: 3px;
+    background: var(--reg-line);
+  }
+  .strength-bar.active.weak {
+    background: var(--reg-red);
+  }
+  .strength-bar.active.fair {
+    background: var(--reg-brass);
+  }
+  .strength-bar.active.good {
+    background: var(--reg-green);
+  }
+  .match-note {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    font-size: 10px;
+  }
+  .match-note.match {
+    color: var(--reg-green);
+  }
+  .match-note.no-match {
+    color: var(--reg-red);
+  }
+  .form-submit {
+    width: 100%;
+    min-height: 46px;
+    border: 1px solid var(--reg-deep);
+    border-radius: 4px;
+    background: var(--reg-deep);
+    color: #fff;
+    font: 800 12px inherit;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+  }
+  .form-submit:hover {
+    background: #123f3a;
+  }
+  .dark .form-submit {
+    border-color: var(--reg-green);
+    background: var(--reg-green);
+    color: #10211c;
+  }
+  .dark .form-submit:hover {
+    background: #8bd4ba;
+  }
+  .form-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  .register-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 25px;
+    padding-top: 18px;
+    border-top: 1px solid var(--reg-line);
+    color: var(--reg-muted);
+    font-size: 12px;
+  }
+  .login-link {
+    color: var(--reg-green);
+    font-weight: 800;
+  }
+  .login-link:hover {
+    text-decoration: underline;
+  }
+  .approval-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 20px;
+    padding: 12px 13px;
+    border-left: 3px solid var(--reg-brass);
+    background: var(--reg-brass-wash);
+    color: var(--reg-copy);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .approval-note i {
+    padding-top: 2px;
+    color: var(--reg-brass);
+  }
+  @media (max-width: 760px) {
+    .register-page {
+      min-height: 0;
+      padding: 24px 15px 48px;
+    }
+    .register-sheet {
+      grid-template-columns: 1fr;
+    }
+    .register-aside {
+      min-height: 340px;
+      padding: 25px 22px;
+    }
+    .aside-copy h1 {
+      font-size: 45px;
+    }
+    .aside-list {
+      margin-top: 25px;
+    }
+    .aside-footer {
+      margin-top: 28px;
+    }
+    .register-main {
+      padding: 31px 22px 28px;
+    }
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    .register-foot {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 7px;
+    }
+  }
+</style>
+
+<div class="register-page">
+  <section class="register-sheet" aria-labelledby="register-heading">
+    <aside class="register-aside">
+      <div class="school-mark">
+        <span class="school-mark-badge">N</span><span>Namong SDA JHS</span>
+      </div>
+      <div class="aside-copy">
+        <h1>Arise<br />and <em>shine!..</em></h1>
+
+        <div class="aside-list">
+          <div>
+            <i class="fas fa-book-open"></i
+            ><span>One account for the school management system.</span>
           </div>
         </div>
-
-        <h2
-          class="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent mb-2"
-        >
-          Register New User
-        </h2>
-        <p class="text-gray-600 dark:text-gray-300">
-          Create a new account for the school management system
-        </p>
       </div>
-
-      <!-- Form Section -->
-      <div class="px-8 pb-8">
-        <form
-          method="POST"
-          action="{{ url_for('auth.register') }}"
-          class="space-y-6"
-        >
-          {{ form.hidden_tag() }}
-
-          <!-- Username Field -->
-          <div class="space-y-2">
-            <label
-              for="username"
-              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+      <div class="aside-footer">
+        <strong>New account registration</strong>
+      </div>
+    </aside>
+    <div class="register-main">
+      <p class="form-kicker"></p>
+      <h2 id="register-heading">Create an account</h2>
+      <p class="form-intro"></p>
+      <form
+        method="POST"
+        action="{{ url_for('auth.register') }}"
+        class="register-form"
+        novalidate
+      >
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+          <div class="field-group">
+            <label for="username"
+              >Username <span class="required">*</span></label
             >
-              Username <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-              >
-                <svg
-                  class="h-5 w-5 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </div>
-              {{ form.username(class="w-full pl-10 pr-4 py-3 bg-gray-50/50
-              dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
-              rounded-xl text-gray-900 dark:text-white placeholder-gray-500
-              dark:placeholder-gray-400 focus:outline-none focus:ring-2
-              focus:ring-indigo-500 focus:border-transparent transition-all
-              duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
-              placeholder="Enter username") }}
+            <!-- prettier-ignore -->
+            <div class="field-wrap">
+              <i class="fas fa-user field-icon" aria-hidden="true"></i>{{
+              form.username(class="register-input", placeholder="Enter username", autocomplete="username") }}
             </div>
+            {% if form.username.errors %}{% for error in form.username.errors %}
+            <div class="field-error">{{ error }}</div>
+            {% endfor %}{% endif %}
           </div>
-
-          <!-- Email Field -->
-          <div class="space-y-2">
-            <label
-              for="email"
-              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+          <div class="field-group">
+            <label for="email"
+              >Email address <span class="required">*</span></label
             >
-              Email Address <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-              >
-                <svg
-                  class="h-5 w-5 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                  />
-                </svg>
-              </div>
-              {{ form.email(class="w-full pl-10 pr-4 py-3 bg-gray-50/50
-              dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
-              rounded-xl text-gray-900 dark:text-white placeholder-gray-500
-              dark:placeholder-gray-400 focus:outline-none focus:ring-2
-              focus:ring-indigo-500 focus:border-transparent transition-all
-              duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
-              placeholder="Enter email address") }}
+            <!-- prettier-ignore -->
+            <div class="field-wrap">
+              <i class="fas fa-at field-icon" aria-hidden="true"></i>{{
+              form.email(class="register-input", placeholder="Enter email address", autocomplete="email") }}
             </div>
+            {% if form.email.errors %}{% for error in form.email.errors %}
+            <div class="field-error">{{ error }}</div>
+            {% endfor %}{% endif %}
           </div>
-
-          <!-- Role Field -->
-          <div class="space-y-2">
-            <label
-              for="role"
-              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
-            >
-              User Role <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-              >
-                <svg
-                  class="h-5 w-5 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                  />
-                </svg>
-              </div>
-              {{ form.role(class="w-full pl-10 pr-10 py-3 bg-gray-50/50
-              dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
-              rounded-xl text-gray-900 dark:text-white focus:outline-none
-              focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-              transition-all duration-200 hover:bg-gray-100/50
-              dark:hover:bg-gray-700/50 appearance-none") }}
-              <div
-                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
-              >
-                <svg
-                  class="h-4 w-4 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
+        </div>
+        <div class="field-group">
+          <label for="role">User role <span class="required">*</span></label>
+          <div class="field-wrap">
+            <i class="fas fa-id-badge field-icon" aria-hidden="true"></i>{{
+            form.role(class="register-select",
+            autocomplete="organization-title") }}
           </div>
-
-          <!-- Password Field -->
-          <div class="space-y-2">
-            <label
-              for="password"
-              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+          {% if form.role.errors %}{% for error in form.role.errors %}
+          <div class="field-error">{{ error }}</div>
+          {% endfor %}{% endif %}
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label for="password"
+              >Password <span class="required">*</span></label
             >
-              Password <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-              >
-                <svg
-                  class="h-5 w-5 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-              </div>
-              {{ form.password(class="w-full pl-10 pr-12 py-3 bg-gray-50/50
-              dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600
-              rounded-xl text-gray-900 dark:text-white placeholder-gray-500
-              dark:placeholder-gray-400 focus:outline-none focus:ring-2
-              focus:ring-indigo-500 focus:border-transparent transition-all
-              duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
-              placeholder="Enter password") }}
-              <button
+            <!-- prettier-ignore -->
+            <div class="field-wrap">
+              <i class="fas fa-lock field-icon" aria-hidden="true"></i>{{
+              form.password(class="register-input", placeholder="Create password", autocomplete="new-password") }}<button
                 type="button"
                 id="togglePassword"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                class="password-toggle"
+                aria-label="Show password"
               >
-                <svg
-                  id="eyeOpen"
-                  class="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <i id="eyeOpen" class="fas fa-eye"></i
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-                <svg
-                  id="eyeClosed"
-                  class="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 hidden"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                  />
-                </svg>
               </button>
             </div>
-            <div class="flex items-center space-x-2 text-xs">
-              <div id="passwordStrength" class="flex space-x-1">
-                <div
-                  class="w-2 h-2 bg-gray-200 dark:bg-gray-600 rounded-full"
-                ></div>
-                <div
-                  class="w-2 h-2 bg-gray-200 dark:bg-gray-600 rounded-full"
-                ></div>
-                <div
-                  class="w-2 h-2 bg-gray-200 dark:bg-gray-600 rounded-full"
-                ></div>
-                <div
-                  class="w-2 h-2 bg-gray-200 dark:bg-gray-600 rounded-full"
-                ></div>
-              </div>
-              <span
-                id="passwordStrengthText"
-                class="text-gray-500 dark:text-gray-400"
-                >Password strength</span
-              >
+            <div class="strength-row">
+              <span class="strength-bars" id="passwordStrength"
+                ><i class="strength-bar"></i><i class="strength-bar"></i
+                ><i class="strength-bar"></i><i class="strength-bar"></i></span
+              ><span id="passwordStrengthText">Password strength</span>
             </div>
+            {% if form.password.errors %}{% for error in form.password.errors %}
+            <div class="field-error">{{ error }}</div>
+            {% endfor %}{% endif %}
           </div>
-
-          <!-- Confirm Password Field -->
-          <div class="space-y-2">
-            <label
-              for="confirm_password"
-              class="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+          <div class="field-group">
+            <label for="confirm_password"
+              >Confirm password <span class="required">*</span></label
             >
-              Confirm Password <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-              >
-                <svg
-                  class="h-5 w-5 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              {{ form.confirm_password(class="w-full pl-10 pr-12 py-3
-              bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200
-              dark:border-gray-600 rounded-xl text-gray-900 dark:text-white
-              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
-              focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-              transition-all duration-200 hover:bg-gray-100/50
-              dark:hover:bg-gray-700/50", placeholder="Confirm password") }}
-              <button
+            <!-- prettier-ignore -->
+            <div class="field-wrap">
+              <i class="fas fa-check field-icon" aria-hidden="true"></i>{{
+              form.confirm_password(class="register-input", placeholder="Confirm password", autocomplete="new-password") }}<button
                 type="button"
                 id="toggleConfirmPassword"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                class="password-toggle"
+                aria-label="Show confirmation password"
               >
-                <svg
-                  id="confirmEyeOpen"
-                  class="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <i id="confirmEyeOpen" class="fas fa-eye"></i
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-                <svg
-                  id="confirmEyeClosed"
-                  class="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 hidden"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                  />
-                </svg>
               </button>
             </div>
-            <div id="passwordMatch" class="text-xs hidden">
-              <span class="flex items-center">
-                <svg
-                  class="h-3 w-3 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span id="passwordMatchText">Passwords match</span>
-              </span>
+            <div id="passwordMatch" class="match-note" hidden>
+              <i class="fas fa-circle-check"></i
+              ><span id="passwordMatchText"></span>
             </div>
+            {% if form.confirm_password.errors %}{% for error in
+            form.confirm_password.errors %}
+            <div class="field-error">{{ error }}</div>
+            {% endfor %}{% endif %}
           </div>
-
-          <!-- Submit Button -->
-          <div class="pt-2">
-            {{ form.submit(class="w-full inline-flex items-center justify-center
-            px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600
-            hover:from-indigo-700 hover:to-purple-700 text-white font-semibold
-            rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105
-            transition-all duration-200 focus:outline-none focus:ring-2
-            focus:ring-indigo-500 focus:ring-offset-2") }}
-          </div>
-        </form>
-      </div>
-
-      <!-- Footer Section -->
-      <div
-        class="px-8 py-6 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-200/50 dark:border-gray-700/50"
-      >
-        <div class="text-center">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?
-            <a
-              href="{{ url_for('auth.login') }}"
-              class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium transition-colors duration-200"
-            >
-              Sign in here
-            </a>
-          </p>
         </div>
+        <div>
+          <button type="submit" class="form-submit">Create account</button>
+        </div>
+      </form>
+      <div class="register-foot">
+        <span>Already have an account?</span
+        ><a class="login-link" href="{{ url_for('auth.login') }}"
+          >Sign in here <i class="fas fa-arrow-right"></i
+        ></a>
       </div>
-    </div>
-
-    <!-- Additional Info -->
-    <div class="mt-8 text-center">
-      <div
-        class="bg-blue-50/50 dark:bg-blue-900/20 backdrop-blur-sm rounded-xl border border-blue-200/50 dark:border-blue-700/50 p-4"
-      >
-        <div
-          class="flex items-center justify-center space-x-2 text-blue-700 dark:text-blue-300"
+      <div class="approval-note">
+        <i class="fas fa-circle-info"></i>
+        <span
+          >Account name and password cannot be reset. Keep credentials after
+          account creation</span
         >
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span class="text-sm font-medium">Administrator Registration</span>
-        </div>
-        <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">
-          New user accounts require administrator approval before activation.
-        </p>
       </div>
     </div>
-  </div>
+  </section>
 </div>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Password visibility toggles
-    const togglePassword = document.getElementById("togglePassword");
-    const passwordField = document.querySelector('input[name="password"]');
-    const eyeOpen = document.getElementById("eyeOpen");
-    const eyeClosed = document.getElementById("eyeClosed");
-
-    const toggleConfirmPassword = document.getElementById(
-      "toggleConfirmPassword"
-    );
-    const confirmPasswordField = document.querySelector(
-      'input[name="confirm_password"]'
-    );
-    const confirmEyeOpen = document.getElementById("confirmEyeOpen");
-    const confirmEyeClosed = document.getElementById("confirmEyeClosed");
-
-    if (togglePassword && passwordField) {
-      togglePassword.addEventListener("click", function () {
-        const type =
-          passwordField.getAttribute("type") === "password"
-            ? "text"
-            : "password";
-        passwordField.setAttribute("type", type);
-
-        eyeOpen.classList.toggle("hidden");
-        eyeClosed.classList.toggle("hidden");
-      });
-    }
-
-    if (toggleConfirmPassword && confirmPasswordField) {
-      toggleConfirmPassword.addEventListener("click", function () {
-        const type =
-          confirmPasswordField.getAttribute("type") === "password"
-            ? "text"
-            : "password";
-        confirmPasswordField.setAttribute("type", type);
-
-        confirmEyeOpen.classList.toggle("hidden");
-        confirmEyeClosed.classList.toggle("hidden");
-      });
-    }
-
-    // Password strength indicator
-    const passwordStrengthIndicator =
-      document.getElementById("passwordStrength");
-    const passwordStrengthText = document.getElementById(
-      "passwordStrengthText"
-    );
-
-    if (passwordField && passwordStrengthIndicator) {
-      passwordField.addEventListener("input", function () {
-        const password = this.value;
-        const strength = calculatePasswordStrength(password);
-        updatePasswordStrengthUI(strength);
-      });
-    }
-
-    function calculatePasswordStrength(password) {
-      let score = 0;
-      if (password.length >= 8) score++;
-      if (/[a-z]/.test(password)) score++;
-      if (/[A-Z]/.test(password)) score++;
-      if (/[0-9]/.test(password)) score++;
-      if (/[^A-Za-z0-9]/.test(password)) score++;
-      return Math.min(score, 4);
-    }
-
-    function updatePasswordStrengthUI(strength) {
-      const indicators = passwordStrengthIndicator.children;
-      const strengthTexts = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
-      const strengthColors = [
-        "bg-red-500",
-        "bg-orange-500",
-        "bg-yellow-500",
-        "bg-blue-500",
-        "bg-green-500",
-      ];
-
-      // Reset all indicators
-      Array.from(indicators).forEach((indicator) => {
-        indicator.className =
-          "w-2 h-2 bg-gray-200 dark:bg-gray-600 rounded-full";
-      });
-
-      // Update active indicators
-      for (let i = 0; i < strength; i++) {
-        indicators[i].className = `w-2 h-2 ${
-          strengthColors[strength - 1]
-        } rounded-full`;
+    function wireToggle(buttonId, fieldSelector, openId, closedId, label) {
+      const button = document.getElementById(buttonId);
+      const field = document.querySelector(fieldSelector);
+      const open = document.getElementById(openId);
+      const closed = document.getElementById(closedId);
+      if (button && field) {
+        button.addEventListener("click", function () {
+          const visible = field.type === "password";
+          field.type = visible ? "text" : "password";
+          open.hidden = !visible;
+          closed.hidden = visible;
+          button.setAttribute(
+            "aria-label",
+            visible ? "Hide " + label : "Show " + label,
+          );
+        });
       }
-
-      passwordStrengthText.textContent =
-        strength > 0 ? strengthTexts[strength - 1] : "Password strength";
     }
-
-    // Password match validation
-    const passwordMatch = document.getElementById("passwordMatch");
-    const passwordMatchText = document.getElementById("passwordMatchText");
-
-    function checkPasswordMatch() {
-      if (
-        passwordField &&
-        confirmPasswordField &&
-        passwordField.value &&
-        confirmPasswordField.value
-      ) {
-        const match = passwordField.value === confirmPasswordField.value;
-        passwordMatch.classList.remove("hidden");
-
-        if (match) {
-          passwordMatch.className =
-            "text-xs text-green-600 dark:text-green-400";
-          passwordMatchText.textContent = "Passwords match";
-          passwordMatch.querySelector("svg").className =
-            "h-3 w-3 mr-1 text-green-600 dark:text-green-400";
-        } else {
-          passwordMatch.className = "text-xs text-red-600 dark:text-red-400";
-          passwordMatchText.textContent = "Passwords do not match";
-          passwordMatch.querySelector("svg").className =
-            "h-3 w-3 mr-1 text-red-600 dark:text-red-400";
-        }
+    wireToggle(
+      "togglePassword",
+      'input[name="password"]',
+      "eyeOpen",
+      "eyeClosed",
+      "password",
+    );
+    wireToggle(
+      "toggleConfirmPassword",
+      'input[name="confirm_password"]',
+      "confirmEyeOpen",
+      "confirmEyeClosed",
+      "confirmation password",
+    );
+    const password = document.querySelector('input[name="password"]');
+    const confirm = document.querySelector('input[name="confirm_password"]');
+    const strength = document.getElementById("passwordStrength");
+    const strengthText = document.getElementById("passwordStrengthText");
+    const match = document.getElementById("passwordMatch");
+    const matchText = document.getElementById("passwordMatchText");
+    function score(value) {
+      let result = 0;
+      if (value.length >= 8) result++;
+      if (/[a-z]/.test(value)) result++;
+      if (/[A-Z]/.test(value)) result++;
+      if (/[0-9]/.test(value) || /[^A-Za-z0-9]/.test(value)) result++;
+      return result;
+    }
+    function updateStrength() {
+      if (!password || !strength) return;
+      const value = password.value;
+      const valueScore = score(value);
+      const bars = Array.from(strength.children);
+      bars.forEach((bar) => {
+        bar.className = "strength-bar";
+      });
+      let tone = valueScore <= 1 ? "weak" : valueScore === 2 ? "fair" : "good";
+      bars.slice(0, valueScore).forEach((bar) => {
+        bar.classList.add("active", tone);
+      });
+      strengthText.textContent = valueScore
+        ? ["Very weak", "Weak", "Fair", "Good", "Strong"][
+            Math.min(valueScore, 4) - 1
+          ]
+        : "Password strength";
+    }
+    function updateMatch() {
+      if (!password || !confirm || !match) return;
+      if (password.value && confirm.value) {
+        const same = password.value === confirm.value;
+        match.hidden = false;
+        match.className = "match-note " + (same ? "match" : "no-match");
+        matchText.textContent = same
+          ? "Passwords match"
+          : "Passwords do not match";
       } else {
-        passwordMatch.classList.add("hidden");
+        match.hidden = true;
       }
     }
-
-    if (passwordField && confirmPasswordField) {
-      passwordField.addEventListener("input", checkPasswordMatch);
-      confirmPasswordField.addEventListener("input", checkPasswordMatch);
-    }
-
-    // Form animation on load
-    const registerCard = document.querySelector(".bg-white\\/60");
-    if (registerCard) {
-      registerCard.style.opacity = "0";
-      registerCard.style.transform = "translateY(20px)";
-      setTimeout(() => {
-        registerCard.style.transition = "all 0.6s ease-out";
-        registerCard.style.opacity = "1";
-        registerCard.style.transform = "translateY(0)";
-      }, 200);
-    }
-
-    // Add focus effects to form inputs
-    const inputs = document.querySelectorAll(
-      'input[type="text"], input[type="email"], input[type="password"], select'
-    );
-    inputs.forEach((input) => {
-      input.addEventListener("focus", function () {
-        this.parentElement.classList.add("ring-2", "ring-indigo-500/20");
+    if (password)
+      password.addEventListener("input", function () {
+        updateStrength();
+        updateMatch();
       });
-
-      input.addEventListener("blur", function () {
-        this.parentElement.classList.remove("ring-2", "ring-indigo-500/20");
-      });
-    });
-
-    // Form validation
-    const form = document.querySelector("form");
-    const submitButton = document.querySelector('input[type="submit"]');
-
-    if (form && submitButton) {
-      form.addEventListener("submit", function (e) {
-        const username = document
-          .querySelector('input[name="username"]')
-          .value.trim();
-        const email = document
-          .querySelector('input[name="email"]')
-          .value.trim();
-        const password = document
-          .querySelector('input[name="password"]')
-          .value.trim();
-        const confirmPassword = document
-          .querySelector('input[name="confirm_password"]')
-          .value.trim();
-        const terms = document.querySelector('input[name="terms"]').checked;
-
-        if (!username || !email || !password || !confirmPassword || !terms) {
-          e.preventDefault();
-
-          // Add shake animation to form
-          const registerCard = document.querySelector(".bg-white\\/60");
-          registerCard.classList.add("animate-pulse");
-          setTimeout(() => {
-            registerCard.classList.remove("animate-pulse");
-          }, 600);
-
+    if (confirm) confirm.addEventListener("input", updateMatch);
+    updateStrength();
+    updateMatch();
+    const form = document.querySelector(".register-form");
+    const submit = form && form.querySelector('button[type="submit"]');
+    if (form && submit) {
+      form.addEventListener("submit", function (event) {
+        const username = form.querySelector('input[name="username"]');
+        const email = form.querySelector('input[name="email"]');
+        if (!username.value.trim()) {
+          event.preventDefault();
+          username.focus();
           return;
         }
-
-        if (password !== confirmPassword) {
-          e.preventDefault();
-          confirmPasswordField.focus();
+        if (!email.value.trim()) {
+          event.preventDefault();
+          email.focus();
           return;
         }
-
-        // Add loading state to submit button
-        submitButton.value = "Creating Account...";
-        submitButton.disabled = true;
-        submitButton.classList.add("opacity-75", "cursor-not-allowed");
+        if (!password.value.trim()) {
+          event.preventDefault();
+          password.focus();
+          return;
+        }
+        if (!confirm.value.trim() || password.value !== confirm.value) {
+          event.preventDefault();
+          confirm.focus();
+          return;
+        }
+        const terms = form.querySelector('input[name="terms"]');
+        if (terms && !terms.checked) {
+          event.preventDefault();
+          terms.focus();
+          return;
+        }
+        submit.disabled = true;
+        submit.textContent = "Creating account…";
       });
     }
-
-    // Auto-focus username field
-    const usernameField = document.querySelector('input[name="username"]');
-    if (usernameField) {
-      usernameField.focus();
-    }
+    const username = document.querySelector('input[name="username"]');
+    if (username && !username.value) username.focus();
   });
 </script>
-
 {% endblock %}

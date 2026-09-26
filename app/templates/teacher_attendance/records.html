@@ -2,8 +2,6 @@
 endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
-
   .records-page {
     --ink: #1a2226;
     --copy: #4a5459;
@@ -1137,8 +1135,7 @@ endblock %} {% block content %}
       <section class="dash-card">
         <div class="dash-card-head">
           <div>
-            <p class="section-kicker">Filters</p>
-            <h2>Narrow the register</h2>
+            <h2>Filters</h2>
           </div>
           <span class="head-meta tabular">
             {{ records|length }} record{% if records|length != 1 %}s{% endif %}
@@ -1353,7 +1350,6 @@ endblock %} {% block content %}
       <section class="dash-card">
         <div class="dash-card-head">
           <div>
-            <p class="section-kicker">Register</p>
             <h2>Attendance history</h2>
           </div>
           <span class="head-meta">
@@ -1796,7 +1792,7 @@ endblock %} {% block content %}
         </div>
         {% else %}
         <p class="no-filters">
-          No filters applied — showing every record in the register.
+          No filters applied - showing every record in the register.
         </p>
         {% endif %}
       </section>

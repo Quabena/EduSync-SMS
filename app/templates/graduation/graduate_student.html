@@ -2,614 +2,1315 @@
 EduSync{% endblock %} {% block page_title %}Graduate Student{% endblock %} {%
 block page_description %}Complete the graduation process for {{
 student.full_name }}{% endblock %} {% block content %}
-<div class="min-h-screen py-8">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Header Section -->
-    <div class="mb-8">
-      <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
-      >
-        <div>
-          <h1 class="text-4xl font-bold gradient-text mb-2">
-            Graduate Student
-          </h1>
-          <p class="text-lg text-slate-600 dark:text-slate-300">
-            Complete the graduation process for
-            <span class="font-semibold text-blue-500"
-              >{{ student.full_name }}</span
-            >
-          </p>
-        </div>
-        <div class="flex items-center space-x-4">
-          <div class="flex items-center space-x-2">
-            <div
-              class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"
-            ></div>
-            <span class="text-sm font-medium text-slate-600 dark:text-slate-300"
-              >Ready for Graduation</span
-            >
-          </div>
-          <a
-            href="{{ url_for('graduation.graduation_management') }}"
-            class="inline-flex items-center px-4 py-2 glass text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-white/20 transition-all duration-300"
-          >
-            <i class="fas fa-arrow-left mr-2"></i>
-            Back to Management
-          </a>
-        </div>
-      </div>
+
+<style>
+  .grad-form-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .dark .grad-form-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
+  }
+
+  .grad-form-page *,
+  .grad-form-page *::before,
+  .grad-form-page *::after {
+    box-sizing: border-box;
+  }
+  .grad-form-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ---------- Hero ---------- */
+  .page-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 28px 22px 32px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--violet);
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .page-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.8vw, 28px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .page-hero p {
+    margin: 0;
+    max-width: 660px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .page-hero p strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    border-color: var(--ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: progress;
+  }
+  .btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .btn.primary {
+    color: #131817;
+  }
+  .btn.primary:hover:not(:disabled) {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .btn.primary:hover:not(:disabled) {
+    color: #131817;
+  }
+
+  /* ---------- Stats strip ---------- */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .stats-cell {
+    padding: 18px 22px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .stats-cell:last-child {
+    border-right: 0;
+  }
+  .stats-cell::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--violet);
+  }
+  .stats-cell:nth-child(1)::before {
+    background: var(--violet);
+  }
+  .stats-cell:nth-child(2)::before {
+    background: var(--green);
+  }
+  .stats-cell:nth-child(3)::before {
+    background: var(--slate);
+  }
+  .stats-cell:nth-child(4)::before {
+    background: var(--brass);
+  }
+  .stats-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .stats-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .stats-value.is-sm {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .stats-foot {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* ---------- Layout grid ---------- */
+  .grad-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.65fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .grad-side,
+  .grad-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .card-body {
+    padding: 22px;
+  }
+
+  /* ---------- Student profile ---------- */
+  .profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 22px 20px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 4px;
+    background: var(--violet-wash);
+    border: 1px solid var(--violet-edge);
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 32px;
+    letter-spacing: 0.03em;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .profile-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.018em;
+    color: var(--ink);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .profile-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+  }
+  .profile-status .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .info-list {
+    margin: 0;
+    padding: 4px 22px 18px;
+    list-style: none;
+  }
+  .info-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .info-list li:last-child {
+    border-bottom: 0;
+  }
+  .info-list dt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .info-list dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .info-list .class-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+    white-space: nowrap;
+  }
+  .info-list .gender-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .info-list .gender-tag.is-male {
+    background: var(--slate-wash);
+    color: var(--slate);
+    border-color: var(--slate-edge);
+  }
+  .info-list .gender-tag.is-female {
+    background: var(--brass-wash);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+
+  /* ---------- Readiness card ---------- */
+  .readiness {
+    padding: 18px 22px;
+  }
+  .readiness-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .readiness-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: var(--green-wash);
+    border: 1px solid var(--green-edge);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .readiness-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .readiness-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+  }
+  .readiness-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .readiness-list li {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--copy);
+  }
+  .readiness-list svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--green);
+  }
+
+  /* ---------- Quick actions ---------- */
+  .quick-list {
+    padding: 4px 22px 8px;
+  }
+  .quick-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line-soft);
+    background: transparent;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+  .quick-action:last-child {
+    border-bottom: 0;
+  }
+  .quick-action:hover .quick-title {
+    color: var(--green);
+  }
+  .quick-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--green);
+  }
+  .quick-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .quick-icon.is-violet {
+    color: var(--violet);
+  }
+  .quick-icon.is-slate {
+    color: var(--slate);
+  }
+  .quick-title {
+    display: block;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.15s ease;
+  }
+  .quick-copy {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 11px;
+  }
+
+  /* ---------- Form ---------- */
+  .form-body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .field-label .req {
+    color: var(--red);
+    margin-left: 2px;
+  }
+  .field-input,
+  .field-textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field-input.tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .field-textarea {
+    resize: vertical;
+    min-height: 96px;
+    line-height: 1.55;
+  }
+  .field-input:focus,
+  .field-textarea:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
+  }
+  .field-hint {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin: 7px 0 0;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .field-hint .counter {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .field-hint .counter.is-over {
+    color: var(--red);
+    font-weight: 700;
+  }
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  /* ---------- Form footer ---------- */
+  .card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 22px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
+  .card-foot .note {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .card-foot .note svg {
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .card-foot .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .card-foot .actions .btn {
+    flex: 1 1 auto;
+    min-width: 160px;
+  }
+
+  /* ---------- Info panels ---------- */
+  .notice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .notice {
+    padding: 20px 22px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .notice-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .notice-icon {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid;
+  }
+  .notice-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .notice-icon.is-slate {
+    background: var(--slate-wash);
+    color: var(--slate);
+    border-color: var(--slate-edge);
+  }
+  .notice-icon.is-brass {
+    background: var(--brass-wash);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+  .notice h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .notice-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .notice-list li {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--copy);
+  }
+  .notice-list svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .notice-list .check {
+    color: var(--green);
+  }
+  .notice-list .warn {
+    color: var(--brass);
+  }
+
+  /* Screen-reader helper */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .grad-layout {
+      grid-template-columns: 1fr;
+    }
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .stats-cell:nth-child(2) {
+      border-right: 0;
+    }
+    .stats-cell:nth-child(1),
+    .stats-cell:nth-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+  }
+  @media (max-width: 700px) {
+    .grad-form-page {
+      padding: 20px 14px 40px;
+    }
+    .page-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .hero-actions {
+      width: 100%;
+    }
+    .hero-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .card-head {
+      padding: 14px 16px 12px;
+    }
+    .card-body,
+    .form-body {
+      padding: 18px;
+    }
+    .info-list,
+    .quick-list,
+    .readiness {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+    }
+    .notice-grid {
+      grid-template-columns: 1fr;
+    }
+    .card-foot {
+      flex-direction: column-reverse;
+      align-items: stretch;
+      padding: 14px 16px;
+    }
+    .card-foot .actions {
+      width: 100%;
+    }
+    .card-foot .actions .btn {
+      width: 100%;
+    }
+  }
+  @media (max-width: 460px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .stats-cell {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-cell:last-child {
+      border-bottom: 0;
+    }
+  }
+</style>
+
+{# ---------- Initials macro — safe against empty names ---------- #} {% macro
+initials(first, last) -%} {%- set f = (first or '').strip() -%} {%- set l =
+(last or '').strip() -%} {%- if f %}{{ f[0] }}{% endif -%} {%- if l %}{{ l[0]
+}}{% endif -%} {%- if not f and not l %}?{% endif -%} {%- endmacro %} {#
+---------- Derived values ---------- #} {% set years_at_school =
+(now().date().year - student.admission_date.year) if student.admission_date else
+none %}
+
+<div class="grad-form-page">
+  <!-- Hero -->
+  <header class="page-hero">
+    <div class="hero-copy">
+      <p class="dash-kicker">Academic records · Graduation</p>
+      <h1>Graduate {{ student.full_name }}</h1>
+      <p>
+        Confirm the graduation details below. This moves the student to the
+        alumni register and updates their status to <strong>Graduated</strong>.
+      </p>
     </div>
-
-    <!-- Statistics Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="professional-card p-6">
-        <div class="flex items-center">
-          <div
-            class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mr-4"
-          >
-            <i class="fas fa-id-card text-blue-500 text-xl"></i>
-          </div>
-          <div>
-            <p
-              class="text-sm font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide"
-            >
-              Student ID
-            </p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-white">
-              {{ student.id }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="professional-card p-6">
-        <div class="flex items-center">
-          <div
-            class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mr-4"
-          >
-            <i class="fas fa-clock text-emerald-500 text-xl"></i>
-          </div>
-          <div>
-            <p
-              class="text-sm font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide"
-            >
-              Years at School
-            </p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-white">
-              {% if student.admission_date %} {{ (now().date().year -
-              student.admission_date.year) }} {% else %} N/A {% endif %}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="professional-card p-6">
-        <div class="flex items-center">
-          <div
-            class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mr-4"
-          >
-            <i class="fas fa-chart-line text-purple-500 text-xl"></i>
-          </div>
-          <div>
-            <p
-              class="text-sm font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide"
-            >
-              Academic Status
-            </p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-white">
-              Ready
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="professional-card p-6">
-        <div class="flex items-center">
-          <div
-            class="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center mr-4"
-          >
-            <i class="fas fa-trophy text-amber-500 text-xl"></i>
-          </div>
-          <div>
-            <p
-              class="text-sm font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide"
-            >
-              Graduation Year
-            </p>
-            <p class="text-2xl font-bold text-slate-800 dark:text-white">
-              {{ current_year }}
-            </p>
-          </div>
-        </div>
-      </div>
+    <div class="hero-actions">
+      <a href="{{ url_for('graduation.graduation_management') }}" class="btn">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to management
+      </a>
     </div>
+  </header>
 
-    <!-- Main Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Student Profile Card -->
-      <div class="lg:col-span-1 space-y-6">
-        <!-- Student Profile -->
-        <div class="professional-card p-6">
-          <div class="text-center mb-6">
-            <div class="relative inline-block mb-4">
-              {% if student.photo_path %}
-              <img
-                src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
-                class="w-32 h-32 rounded-2xl object-cover border-4 border-white/20 shadow-xl"
-                alt="{{ student.full_name }}"
-              />
-              {% else %}
-              <div
-                class="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center border-4 border-white/20 shadow-xl"
-              >
-                <span class="text-white text-2xl font-bold">
-                  {{ student.first_name[0] }}{{ student.surname[0] }}
-                </span>
-              </div>
-              {% endif %}
-              <div
-                class="absolute -bottom-2 -right-2 w-6 h-6 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-800"
-              ></div>
-            </div>
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">
-              {{ student.full_name }}
-            </h2>
-            <div
-              class="inline-flex items-center px-3 py-1 bg-blue-500/20 rounded-full"
-            >
-              <i class="fas fa-graduation-cap text-blue-500 mr-2 text-sm"></i>
-              <span class="text-blue-600 dark:text-blue-400 font-medium text-sm"
-                >Graduation Candidate</span
-              >
-            </div>
+  <!-- Stats strip -->
+  <section class="stats-grid" aria-label="Graduation summary">
+    <div class="stats-cell">
+      <span class="stats-label">Student ID</span>
+      <strong class="stats-value">{{ student.id }}</strong>
+      <span class="stats-foot">Unique identifier in the registry</span>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Years at school</span>
+      <strong class="stats-value">
+        {% if years_at_school is not none %}{{ years_at_school }}{% else %}—{%
+        endif %}
+      </strong>
+      <span class="stats-foot">
+        {% if student.admission_date %} Admitted {{
+        student.admission_date.strftime('%b %Y') }} {% else %} Admission date
+        not on record {% endif %}
+      </span>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Current class</span>
+      <strong class="stats-value is-sm">
+        {{ student.classroom.name if student.classroom else 'Unassigned' }}
+      </strong>
+      <span class="stats-foot">
+        {% if student.classroom and student.classroom.level %} {{
+        student.classroom.level }} {% else %} Class level not set {% endif %}
+      </span>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Graduation year</span>
+      <strong class="stats-value">{{ current_year }}</strong>
+      <span class="stats-foot">Defaults to the current academic year</span>
+    </div>
+  </section>
+
+  <div class="grad-layout">
+    <!-- Sidebar -->
+    <aside class="grad-side">
+      <!-- Student profile -->
+      <section class="card" aria-labelledby="profile-heading">
+        <h2 id="profile-heading" class="sr-only">Student profile</h2>
+
+        <div class="profile">
+          <div class="profile-avatar" aria-hidden="true">
+            {% if student.photo_path %}
+            <img
+              src="{{ url_for('students.student_photo', filename=student.photo_path) }}"
+              alt=""
+            />
+            {% else %} {{ initials(student.first_name, student.surname) }} {%
+            endif %}
           </div>
+          <div style="text-align: center">
+            <h3 class="profile-name">{{ student.full_name }}</h3>
+          </div>
+          <span class="profile-status">
+            <span class="dot" aria-hidden="true"></span>
+            Graduation candidate
+          </span>
+        </div>
 
-          <div class="space-y-4">
-            <div
-              class="flex items-center justify-between py-3 border-b border-white/10"
-            >
+        <dl class="info-list">
+          <li>
+            <dt>Class</dt>
+            <dd>
+              {% if student.classroom and student.classroom.name %}
+              <span class="class-tag">{{ student.classroom.name }}</span>
+              {% else %}—{% endif %}
+            </dd>
+          </li>
+          <li>
+            <dt>Gender</dt>
+            <dd>
+              {% if student.gender %}
               <span
-                class="text-slate-600 dark:text-slate-300 font-medium flex items-center"
-              >
-                <i class="fas fa-school mr-2 text-blue-500"></i>
-                Class
-              </span>
-              <span
-                class="text-slate-800 dark:text-white font-semibold bg-blue-500/20 px-3 py-1 rounded-lg text-sm"
-              >
-                {{ student.classroom.name if student.classroom else 'N/A' }}
-              </span>
-            </div>
-            <div
-              class="flex items-center justify-between py-3 border-b border-white/10"
-            >
-              <span
-                class="text-slate-600 dark:text-slate-300 font-medium flex items-center"
-              >
-                <i class="fas fa-venus-mars mr-2 text-pink-500"></i>
-                Gender
-              </span>
-              <span
-                class="text-slate-800 dark:text-white font-semibold {% if student.gender == 'Male' %}bg-blue-500/20 text-blue-600{% else %}bg-pink-500/20 text-pink-600{% endif %} px-3 py-1 rounded-lg text-sm"
+                class="gender-tag {% if student.gender|lower == 'male' %}is-male{% else %}is-female{% endif %}"
               >
                 {{ student.gender }}
               </span>
-            </div>
-            <div
-              class="flex items-center justify-between py-3 border-b border-white/10"
-            >
-              <span
-                class="text-slate-600 dark:text-slate-300 font-medium flex items-center"
-              >
-                <i class="fas fa-birthday-cake mr-2 text-emerald-500"></i>
-                Age
-              </span>
-              <span
-                class="text-slate-800 dark:text-white font-semibold bg-emerald-500/20 px-3 py-1 rounded-lg text-sm"
-              >
-                {{ student.age }} years
-              </span>
-            </div>
-            <div class="flex items-center justify-between py-3">
-              <span
-                class="text-slate-600 dark:text-slate-300 font-medium flex items-center"
-              >
-                <i class="fas fa-calendar-day mr-2 text-purple-500"></i>
-                Admission
-              </span>
-              <span
-                class="text-slate-800 dark:text-white font-semibold bg-purple-500/20 px-3 py-1 rounded-lg text-sm"
-              >
-                {% if student.admission_date %} {{
-                student.admission_date.strftime('%Y') }} {% else %} N/A {% endif
-                %}
-              </span>
-            </div>
+              {% else %}—{% endif %}
+            </dd>
+          </li>
+          <li>
+            <dt>Age</dt>
+            <dd>
+              {% if student.age is not none %}{{ student.age }} years{% else
+              %}—{% endif %}
+            </dd>
+          </li>
+          <li>
+            <dt>Admission</dt>
+            <dd>
+              {% if student.admission_date %} {{
+              student.admission_date.strftime('%Y') }} {% else %}—{% endif %}
+            </dd>
+          </li>
+        </dl>
+      </section>
+
+      <!-- Quick actions -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <p class="section-kicker">Reference</p>
+            <h2>Related actions</h2>
           </div>
         </div>
-
-        <!-- Progress Card -->
-        <div
-          class="professional-card p-6 bg-gradient-to-r from-emerald-500/10 to-teal-600/10 border-emerald-500/20"
-        >
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            >
-              <i class="fas fa-award text-emerald-500 text-2xl"></i>
-            </div>
-            <h3 class="text-slate-800 dark:text-white font-bold text-lg mb-2">
-              Ready to Graduate
-            </h3>
-            <p class="text-slate-600 dark:text-slate-300 text-sm mb-4">
-              All academic requirements have been met
-            </p>
-            <div class="w-full bg-white/20 rounded-full h-2">
-              <div
-                class="bg-emerald-500 h-2 rounded-full w-full animate-pulse"
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="professional-card p-6">
-          <h4
-            class="font-semibold text-slate-800 dark:text-white mb-4 flex items-center"
+        <div class="quick-list">
+          <a
+            href="{{ url_for('students.detail', student_id=student.id) }}"
+            class="quick-action"
           >
-            <i class="fas fa-bolt text-amber-500 mr-2"></i>
-            Quick Actions
-          </h4>
-          <div class="space-y-3">
-            <a
-              href="{{ url_for('students.detail', student_id=student.id) }}"
-              class="flex items-center p-3 glass rounded-xl hover:bg-white/10 transition-all duration-300 group"
-            >
-              <i
-                class="fas fa-eye text-blue-500 mr-3 group-hover:scale-110 transition-transform duration-200"
-              ></i>
-              <span
-                class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >View Full Profile</span
+            <span class="quick-icon is-violet" aria-hidden="true">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               >
-            </a>
-            <a
-              href="#"
-              class="flex items-center p-3 glass rounded-xl hover:bg-white/10 transition-all duration-300 group"
-            >
-              <i
-                class="fas fa-print text-emerald-500 mr-3 group-hover:scale-110 transition-transform duration-200"
-              ></i>
-              <span
-                class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >Print Records</span
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">View full profile</span>
+              <span class="quick-copy">Open the complete student record</span>
+            </span>
+          </a>
+          <a
+            href="{{ url_for('graduation.alumni_list') }}"
+            class="quick-action"
+          >
+            <span class="quick-icon" aria-hidden="true">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               >
-            </a>
-            <a
-              href="#"
-              class="flex items-center p-3 glass rounded-xl hover:bg-white/10 transition-all duration-300 group"
-            >
-              <i
-                class="fas fa-download text-purple-500 mr-3 group-hover:scale-110 transition-transform duration-200"
-              ></i>
-              <span
-                class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >Export Data</span
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">Browse alumni</span>
+              <span class="quick-copy">See every graduated student</span>
+            </span>
+          </a>
+          <a
+            href="{{ url_for('graduation.graduation_statistics') }}"
+            class="quick-action"
+          >
+            <span class="quick-icon is-slate" aria-hidden="true">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               >
-            </a>
-          </div>
+                <path d="M3 17l6-6 4 4 8-8M21 7h-6m6 0v6" />
+              </svg>
+            </span>
+            <span>
+              <span class="quick-title">Graduation statistics</span>
+              <span class="quick-copy">Trends across graduating years</span>
+            </span>
+          </a>
         </div>
-      </div>
+      </section>
+    </aside>
 
-      <!-- Graduation Form -->
-      <div class="lg:col-span-2 space-y-6">
-        <!-- Graduation Form Card -->
-        <div class="professional-card p-6 border-blue-500/30 animate-glow">
-          <div class="flex items-center mb-6">
-            <div
-              class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mr-4"
-            >
-              <i class="fas fa-clipboard-list text-blue-500 text-lg"></i>
+    <!-- Main column -->
+    <main class="grad-main">
+      <!-- Form -->
+      <section class="card" aria-labelledby="form-heading">
+        <div class="card-head">
+          <div>
+            <h2 id="form-heading">Graduation details</h2>
+          </div>
+          <span class="head-meta">Required fields marked *</span>
+        </div>
+
+        <form method="POST" id="graduation-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+          <div class="form-body">
+            <div class="form-grid-2">
+              <div class="field">
+                <label class="field-label" for="graduation_year">
+                  Graduation year <span class="req">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="graduation_year"
+                  name="graduation_year"
+                  value="{{ current_year }}"
+                  required
+                  maxlength="4"
+                  pattern="\d{4}"
+                  class="field-input tabular"
+                  inputmode="numeric"
+                  autocomplete="off"
+                />
+                <p class="field-hint">
+                  <span>Four-digit year the student graduates.</span>
+                </p>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="graduation_date">
+                  Graduation date
+                </label>
+                <input
+                  type="date"
+                  id="graduation_date"
+                  name="graduation_date"
+                  value="{{ now().strftime('%Y-%m-%d') }}"
+                  class="field-input tabular"
+                />
+                <p class="field-hint">
+                  <span>Optional - defaults to today.</span>
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 class="text-xl font-bold text-slate-800 dark:text-white">
-                Graduation Details
-              </h3>
-              <p class="text-slate-600 dark:text-slate-300">
-                Complete the graduation information below
+
+            <div class="field">
+              <label class="field-label" for="final_grade">
+                Final grade or aggregate
+              </label>
+              <input
+                type="text"
+                id="final_grade"
+                name="final_grade"
+                placeholder="e.g. Aggregate 6, Aggregate 9…"
+                maxlength="60"
+                class="field-input"
+                autocomplete="off"
+              />
+              <p class="field-hint">
+                <span>Record the final WASSCE-style aggregate.</span>
+              </p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="remarks">
+                Remarks &amp; notes
+              </label>
+              <textarea
+                id="remarks"
+                name="remarks"
+                rows="4"
+                maxlength="500"
+                placeholder="Any additional remarks, achievements, or special notes about this student…"
+                class="field-textarea"
+              ></textarea>
+              <p class="field-hint">
+                <span>Optional - for recognitions or contextual notes.</span>
+                <span class="counter" id="remarks-counter" aria-live="polite"
+                  >0 / 500</span
+                >
               </p>
             </div>
           </div>
 
-          <form method="POST" class="space-y-6">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Graduation Year -->
-              <div>
-                <label
-                  for="graduation_year"
-                  class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 flex items-center"
-                >
-                  <i class="mr-2 text-blue-500"></i>
-                  Graduation Year
-                  <span class="text-red-500 ml-1">*</span>
-                </label>
-                <div class="relative">
-                  <input
-                    type="text"
-                    class="w-full px-4 py-3 glass rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                    id="graduation_year"
-                    name="graduation_year"
-                    value="{{ current_year }}"
-                    required
-                  />
-                  <div
-                    class="absolute inset-y-0 right-0 flex items-center pr-3"
-                  >
-                    <i class="fas fa-asterisk text-blue-500 text-xs"></i>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Graduation Date -->
-              <div>
-                <label
-                  for="graduation_date"
-                  class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 flex items-center"
-                >
-                  <i class="mr-2 text-blue-500"></i>
-                  Graduation Date
-                </label>
-                <div class="relative">
-                  <input
-                    type="date"
-                    class="w-full px-4 py-3 glass rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                    id="graduation_date"
-                    name="graduation_date"
-                    value="{{ now().strftime('%Y-%m-%d') }}"
-                  />
-                  <div
-                    class="absolute inset-y-0 right-0 flex items-center pr-3"
-                  >
-                    <i class="fas fa-calendar text-slate-400"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Final Grade -->
-            <div class="mt-2">
-              <label
-                for="final_grade"
-                class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 flex items-center"
+          <div class="card-foot">
+            <div class="note">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
               >
-                <i class="mr-2 text-amber-500"></i>
-                Final Grade/Aggregate
-              </label>
-              <div class="relative">
-                <input
-                  type="text"
-                  id="final_grade"
-                  name="final_grade"
-                  placeholder="Aggregate 6, 9, 11, ..."
-                  class="w-full px-4 py-3 glass rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                />
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <i class="fas fa-graduation-cap text-slate-400"></i>
-                </div>
-              </div>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
             </div>
-
-            <!-- Remarks -->
-            <div class="mt-2">
-              <label
-                for="remarks"
-                class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 flex items-center"
-              >
-                <i class="mr-2 text-emerald-500"></i>
-                Remarks & Notes
-              </label>
-              <textarea
-                class="w-full px-4 py-3 glass rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none"
-                id="remarks"
-                name="remarks"
-                rows="4"
-                placeholder="Any additional remarks, achievements, or special notes about this student..."
-              ></textarea>
-              <div class="flex justify-between items-center mt-2">
-                <p class="text-xs text-slate-500 dark:text-slate-400">
-                  Optional: Add any special recognition or notes
-                </p>
-                <span class="text-xs text-slate-400">0/500 characters</span>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div
-              class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/10"
-            >
-              <button
-                type="submit"
-                class="flex-1 inline-flex items-center justify-center px-8 py-4 glass-strong text-white font-semibold rounded-xl hover-lift transition-all duration-300 relative overflow-hidden group"
-                onclick="return confirmGraduation()"
-              >
-                <div
-                  class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
-                ></div>
-                <i class="fas fa-graduation-cap mr-2 relative z-10"></i>
-                <span class="relative z-10">Confirm Graduation</span>
-              </button>
+            <div class="actions">
               <a
                 href="{{ url_for('graduation.graduation_management') }}"
-                class="flex-1 inline-flex items-center justify-center px-8 py-4 glass text-slate-700 dark:text-slate-200 font-semibold rounded-xl hover:bg-white/20 transition-all duration-300"
+                class="btn"
               >
-                <i class="fas fa-times mr-2"></i>
-                Cancel Process
+                Cancel
               </a>
-            </div>
-          </form>
-        </div>
-
-        <!-- Information Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Information Card -->
-          <div class="professional-card p-6">
-            <div class="flex items-start">
-              <div
-                class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center mr-4 flex-shrink-0"
-              >
-                <i class="fas fa-info-circle text-blue-500"></i>
-              </div>
-              <div>
-                <h4 class="font-semibold text-slate-800 dark:text-white mb-3">
-                  Graduation Process
-                </h4>
-                <ul
-                  class="text-sm text-slate-600 dark:text-slate-300 space-y-2"
+              <button type="submit" class="btn primary" id="confirm-btn">
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
                 >
-                  <li class="flex items-start">
-                    <i
-                      class="fas fa-check text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
-                    ></i>
-                    <span>Student will be moved to alumni records</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i
-                      class="fas fa-check text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
-                    ></i>
-                    <span>All academic records will be preserved</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i
-                      class="fas fa-check text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
-                    ></i>
-                    <span>Student status will change to "Graduated"</span>
-                  </li>
-                </ul>
-              </div>
+                  <path d="M22 10L12 5 2 10l10 5 10-5z" />
+                  <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5" />
+                </svg>
+                Confirm graduation
+              </button>
             </div>
           </div>
-
-          <!-- Warning Card -->
-          <div class="professional-card p-6 border-amber-500/30 bg-amber-500/5">
-            <div class="flex items-start">
-              <div
-                class="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center mr-4 flex-shrink-0"
-              >
-                <i class="fas fa-exclamation-triangle text-amber-500"></i>
-              </div>
-              <div>
-                <h4
-                  class="font-semibold text-amber-700 dark:text-amber-400 mb-3"
-                >
-                  Important Notice
-                </h4>
-                <ul
-                  class="text-sm text-amber-600 dark:text-amber-300 space-y-2"
-                >
-                  <li class="flex items-start">
-                    <i
-                      class="fas fa-shield-alt text-amber-500 mr-2 mt-0.5 flex-shrink-0"
-                    ></i>
-                    <span>This action cannot be easily reversed</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i
-                      class="fas fa-database text-amber-500 mr-2 mt-0.5 flex-shrink-0"
-                    ></i>
-                    <span>Student data will be archived in alumni</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i
-                      class="fas fa-sync-alt text-amber-500 mr-2 mt-0.5 flex-shrink-0"
-                    ></i>
-                    <span>Reverting requires administrative access</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        </form>
+      </section>
+    </main>
   </div>
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Form validation and character counter
-    const remarksTextarea = document.getElementById("remarks");
-    const charCounter =
-      remarksTextarea.nextElementSibling.querySelector("span");
+  "use strict";
 
-    remarksTextarea.addEventListener("input", function () {
-      const length = this.value.length;
-      charCounter.textContent = `${length}/500 characters`;
+  (function () {
+    const form = document.getElementById("graduation-form");
+    const remarks = document.getElementById("remarks");
+    const counter = document.getElementById("remarks-counter");
+    const submitBtn = document.getElementById("confirm-btn");
+    const yearInput = document.getElementById("graduation_year");
 
-      if (length > 500) {
-        charCounter.classList.add("text-red-500");
-      } else {
-        charCounter.classList.remove("text-red-500");
+    /* ---------- Character counter ---------- */
+    // The textarea has maxlength="500", so the browser prevents overflow,
+    // but the live counter still gives useful feedback.
+    if (remarks && counter) {
+      const MAX = 500;
+
+      function update() {
+        const length = remarks.value.length;
+        counter.textContent = `${length} / ${MAX}`;
+        counter.classList.toggle("is-over", length >= MAX);
       }
-    });
 
-    // Auto-fill current date if not set
-    const graduationDate = document.getElementById("graduation_date");
-    if (graduationDate && !graduationDate.value) {
-      graduationDate.value = new Date().toISOString().split("T")[0];
+      remarks.addEventListener("input", update);
+      update();
     }
 
-    // Form submission loading state
-    const form = document.querySelector("form");
-    form.addEventListener("submit", function (e) {
-      const submitBtn = this.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
+    /* ---------- Year input guards ---------- */
+    // Restrict to digits as the user types so a stray paste can't insert
+    // letters. The pattern attribute handles final validation.
+    if (yearInput) {
+      yearInput.addEventListener("input", function () {
+        const cleaned = yearInput.value.replace(/\D/g, "").slice(0, 4);
+        if (cleaned !== yearInput.value) yearInput.value = cleaned;
+      });
+    }
 
-      submitBtn.innerHTML = `
-        <div class="flex items-center justify-center">
-          <i class="fas fa-spinner fa-spin mr-2"></i>
-          <span>Processing Graduation...</span>
-        </div>
-      `;
-      submitBtn.disabled = true;
+    /* ---------- Confirm + submit ---------- */
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        // Native validation runs first (required, pattern, maxlength)
+        if (!form.checkValidity()) return;
 
-      setTimeout(() => {
-        if (submitBtn.disabled) {
-          submitBtn.innerHTML = `
-            <div class="flex items-center justify-center">
-              <i class="fas fa-spinner fa-spin mr-2"></i>
-              <span>Finalizing Records...</span>
-            </div>
-          `;
+        const studentName = "{{ student.full_name|e }}";
+        const year = (yearInput && yearInput.value) || "the current year";
+
+        const ok = window.confirm(
+          `Graduate ${studentName} in ${year}?\n\n` +
+            `This will:\n` +
+            `• Move the student to alumni records\n` +
+            `• Change their status to "Graduated"\n` +
+            `• Archive all academic data\n\n` +
+            `This action cannot be easily undone.`,
+        );
+
+        if (!ok) {
+          e.preventDefault();
+          return;
         }
-      }, 2000);
-    });
-  });
 
-  function confirmGraduation() {
-    const studentName = "{{ student.full_name }}";
-    const graduationYear = document.getElementById("graduation_year").value;
-
-    return confirm(
-      `Are you sure you want to graduate ${studentName} in ${graduationYear}?\n\nThis action will:\n• Move the student to alumni records\n• Change status to "Graduated"\n• Archive all academic data\n\nThis action cannot be easily undone.`
-    );
-  }
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.setAttribute("aria-busy", "true");
+        }
+      });
+    }
+  })();
 </script>
 
-<style>
-  @keyframes glow {
-    0%,
-    100% {
-      box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 30px rgba(14, 165, 233, 0.5);
-    }
-  }
-
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite;
-  }
-</style>
 {% endblock %}

@@ -2,8 +2,6 @@
 Calendar{% endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
-
   :root {
     --primary: #1e40af;
     --primary-light: #3b82f6;
@@ -25,12 +23,12 @@ Calendar{% endblock %} {% block content %}
     --border-radius: 16px;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
 
   * {
@@ -38,7 +36,11 @@ Calendar{% endblock %} {% block content %}
   }
 
   body {
-    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
       sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
@@ -63,7 +65,8 @@ Calendar{% endblock %} {% block content %}
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(
+    background:
+      radial-gradient(
         circle at 20% 80%,
         rgba(120, 119, 198, 0.3) 0%,
         transparent 50%
@@ -103,7 +106,8 @@ Calendar{% endblock %} {% block content %}
     border-radius: 24px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15),
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.3) inset;
     animation: slideInDown 0.8s ease-out;
   }
@@ -707,7 +711,11 @@ Calendar{% endblock %} {% block content %}
                     type="submit"
                     class="btn btn-danger"
                     style="padding: 0.5rem 1rem; font-size: 0.75rem"
-                    onclick="return confirm('Are you sure you want to delete these term dates?')"
+                    onclick="
+                      return confirm(
+                        'Are you sure you want to delete these term dates?',
+                      );
+                    "
                   >
                     <svg
                       style="width: 16px; height: 16px; margin-right: 0.25rem"
@@ -775,7 +783,7 @@ Calendar{% endblock %} {% block content %}
       if (endDate.value && vacationDate.value) {
         if (new Date(vacationDate.value) < new Date(endDate.value)) {
           vacationDate.setCustomValidity(
-            "Vacation date should be on or after end date"
+            "Vacation date should be on or after end date",
           );
         } else {
           vacationDate.setCustomValidity("");
@@ -785,7 +793,7 @@ Calendar{% endblock %} {% block content %}
       if (vacationDate.value && reopeningDate.value) {
         if (new Date(reopeningDate.value) <= new Date(vacationDate.value)) {
           reopeningDate.setCustomValidity(
-            "Reopening date must be after vacation date"
+            "Reopening date must be after vacation date",
           );
         } else {
           reopeningDate.setCustomValidity("");

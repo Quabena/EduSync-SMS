@@ -1,311 +1,675 @@
-{% extends "base.html" %} {% block title %}Contact Me - EduSync SMS{% endblock
-%} {% block head %}
+{% extends "base.html" %} {% block title %}Contact - Evans Adu{% endblock %} {%
+block page_title %}Correspondence{% endblock %} {% block page_description
+%}Reach Evans Adu — software engineer{% endblock %} {% block content %}
 
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        animation: {
-          float: "float 3s ease-in-out infinite",
-          "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        },
-      },
-    },
-  };
-</script>
 <style>
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
+  :root {
+    --c-ink: #202a2d;
+    --c-copy: #526267;
+    --c-muted: #7b898d;
+    --c-paper: #f7f5f0;
+    --c-white: #fffefa;
+    --c-line: #d7dfdb;
+    --c-soft: #edf1ee;
+    --c-green: #1f6259;
+    --c-deep: #174d47;
+    --c-wash: #e7f1ed;
+    --c-brass: #b78643;
+    --c-brass-wash: #f4eadb;
+    --c-shadow:
+      0 18px 42px rgba(28, 47, 45, 0.08), 0 2px 6px rgba(28, 47, 45, 0.04);
+    color-scheme: light;
+  }
+  .dark {
+    --c-ink: #eef2ef;
+    --c-copy: #bdc8c3;
+    --c-muted: #8f9c97;
+    --c-paper: #121817;
+    --c-white: #1a211f;
+    --c-line: #34423f;
+    --c-soft: #293532;
+    --c-green: #73c4aa;
+    --c-deep: #2e7565;
+    --c-wash: #1d342d;
+    --c-brass: #d9b273;
+    --c-brass-wash: #342b20;
+    --c-shadow: 0 20px 48px rgba(0, 0, 0, 0.28), 0 2px 7px rgba(0, 0, 0, 0.2);
+    color-scheme: dark;
+  }
+  .correspondence {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 28px 70px;
+    color: var(--c-ink);
+    position: relative;
+  }
+  .correspondence *,
+  .correspondence *:before,
+  .correspondence *:after {
+    box-sizing: border-box;
+  }
+  .correspondence a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .correspondence:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 10%;
+    width: 230px;
+    height: 230px;
+    border: 1px solid rgba(183, 134, 67, 0.15);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 18px rgba(183, 134, 67, 0.035),
+      0 0 0 36px rgba(183, 134, 67, 0.02);
+    pointer-events: none;
+  }
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 13px;
+    border-bottom: 1px solid var(--c-line);
+    color: var(--c-muted);
+    font:
+      800 10px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .masthead-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .masthead-mark:before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: var(--c-brass);
+    transform: rotate(45deg);
+  }
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+    gap: 60px;
+    padding: 68px 0 54px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .intro-kicker {
+    margin: 0 0 18px;
+    color: var(--c-green);
+    font:
+      800 11px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .intro h1 {
+    max-width: 700px;
+    margin: 0;
+    color: var(--c-ink);
+    font:
+      600 clamp(64px, 11vw, 144px)/0.79 Georgia,
+      "Times New Roman",
+      serif;
+    letter-spacing: -0.085em;
+  }
+  .intro h1 span {
+    display: block;
+    color: var(--c-green);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.08em;
+  }
+  .intro-copy {
+    max-width: 430px;
+    margin: 29px 0 0;
+    color: var(--c-copy);
+    font:
+      italic 20px/1.45 Georgia,
+      "Times New Roman",
+      serif;
+  }
+  .intro-copy strong {
+    color: var(--c-ink);
+    font-style: normal;
+  }
+  .intro-side {
+    align-self: end;
+    padding: 0 0 4px 23px;
+    border-left: 1px solid var(--c-line);
+  }
+  .side-entry {
+    padding: 0 0 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--c-soft);
+  }
+  .side-entry:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: 0;
+  }
+  .side-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--c-muted);
+    font:
+      800 10px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .side-value {
+    display: block;
+    color: var(--c-ink);
+    font:
+      500 18px/1.25 Georgia,
+      "Times New Roman",
+      serif;
+  }
+  .side-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 7px;
+    color: var(--c-green);
+    font:
+      800 10px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .side-status:before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--c-green);
+  }
+  .section-heading {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr) auto;
+    gap: 20px;
+    align-items: baseline;
+    padding: 43px 0 19px;
+  }
+  .section-number {
+    color: var(--c-brass);
+    font:
+      800 11px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.12em;
+  }
+  .section-number:after {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    margin: 0 0 3px 10px;
+    background: var(--c-brass);
+  }
+  .section-heading h2 {
+    margin: 0;
+    color: var(--c-ink);
+    font:
+      600 clamp(28px, 3.6vw, 42px)/1.03 Georgia,
+      "Times New Roman",
+      serif;
+    letter-spacing: -0.045em;
+  }
+  .section-note {
+    color: var(--c-muted);
+    font:
+      800 10px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .contact-list {
+    border-top: 1px solid var(--c-line);
+  }
+  .contact-row {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 26px;
+    padding: 26px 0;
+    border-bottom: 1px solid var(--c-soft);
+  }
+  .contact-index {
+    color: var(--c-brass);
+    font:
+      800 11px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.1em;
+  }
+  .contact-content h3 {
+    margin: 0 0 7px;
+    color: var(--c-ink);
+    font:
+      600 clamp(22px, 2.8vw, 31px)/1 Georgia,
+      "Times New Roman",
+      serif;
+    letter-spacing: -0.035em;
+  }
+  .contact-content p {
+    max-width: 55ch;
+    margin: 0;
+    color: var(--c-copy);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 15px;
+    border: 1px solid var(--c-line);
+    border-radius: 3px;
+    color: var(--c-ink);
+    font:
+      800 11px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .contact-link:hover {
+    border-color: var(--c-green);
+    background: var(--c-wash);
+    color: var(--c-green);
+  }
+  .contact-link.primary {
+    border-color: var(--c-green);
+    background: var(--c-green);
+    color: #fff;
+  }
+  .dark .contact-link.primary {
+    color: #10211c;
+  }
+  .contact-link i {
+    font-size: 12px;
+  }
+  .contact-link .arrow {
+    transition: transform 0.16s ease;
+  }
+  .contact-link:hover .arrow {
+    transform: translateX(3px);
+  }
+  .elsewhere {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--c-line);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .social-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 12px;
+    min-height: 125px;
+    padding: 20px 19px;
+    border-right: 1px solid var(--c-soft);
+  }
+  .social-link:last-child {
+    border-right: 0;
+  }
+  .social-link:hover {
+    background: var(--c-wash);
+  }
+  .social-name {
+    display: block;
+    color: var(--c-ink);
+    font:
+      600 20px/1 Georgia,
+      "Times New Roman",
+      serif;
+  }
+  .social-handle {
+    display: block;
+    margin-top: 8px;
+    color: var(--c-muted);
+    font:
+      11px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    overflow-wrap: anywhere;
+  }
+  .social-arrow {
+    color: var(--c-green);
+    font-size: 12px;
+    transition: transform 0.16s ease;
+  }
+  .social-link:hover .social-arrow {
+    transform: translate(3px, -3px);
+  }
+  .closing {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 40px;
+    padding: 43px 0 0;
+  }
+  .closing-copy {
+    max-width: 570px;
+    color: var(--c-copy);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .closing-copy p {
+    margin: 0;
+  }
+  .closing-copy p + p {
+    margin-top: 12px;
+  }
+  .signature {
+    align-self: end;
+    padding-left: 20px;
+    border-left: 1px solid var(--c-line);
+  }
+  .signature-name {
+    margin: 0 0 8px;
+    color: var(--c-ink);
+    font:
+      italic 36px/1 Georgia,
+      "Times New Roman",
+      serif;
+  }
+  .signature-detail {
+    margin: 0;
+    color: var(--c-muted);
+    font:
+      800 10px/1.2 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 850px) {
+    .intro {
+      grid-template-columns: 1fr;
+      gap: 36px;
     }
-    50% {
-      transform: translateY(-10px);
+    .intro-side {
+      padding: 22px 0 0;
+      border-top: 1px solid var(--c-line);
+      border-left: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .side-entry {
+      padding: 0 12px 0 0;
+      margin: 0;
+      border: 0;
+      border-right: 1px solid var(--c-soft);
+    }
+    .side-entry:last-child {
+      border: 0;
+    }
+    .contact-row {
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 20px;
+    }
+    .contact-link {
+      grid-column: 2;
+      justify-self: start;
+    }
+    .elsewhere {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .social-link:nth-child(2) {
+      border-right: 0;
+    }
+    .social-link:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--c-soft);
     }
   }
-
-  .gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
-
-  .card-hover {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .card-hover:hover {
-    transform: translateY(-8px) scale(1.02);
-  }
-
-  .social-hover {
-    transition: all 0.3s ease;
-  }
-
-  .social-hover:hover {
-    transform: translateY(-2px);
-  }
-
-  .icon-bounce:hover {
-    animation: bounce 0.6s;
+  @media (max-width: 600px) {
+    .correspondence {
+      padding: 22px 16px 52px;
+    }
+    .masthead {
+      font-size: 9px;
+    }
+    .intro {
+      padding: 48px 0 38px;
+      gap: 30px;
+    }
+    .intro h1 {
+      font-size: clamp(62px, 20vw, 105px);
+    }
+    .intro-copy {
+      font-size: 18px;
+    }
+    .intro-side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 22px;
+    }
+    .side-entry {
+      padding: 0 0 16px;
+      border-right: 0;
+      border-bottom: 1px solid var(--c-soft);
+    }
+    .side-entry:last-child {
+      padding: 0;
+      border: 0;
+    }
+    .section-heading {
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 12px;
+      padding-top: 36px;
+    }
+    .section-note {
+      grid-column: 2;
+    }
+    .contact-row {
+      grid-template-columns: 40px 1fr;
+      gap: 14px;
+      padding: 22px 0;
+    }
+    .contact-content h3 {
+      font-size: 24px;
+    }
+    .contact-link {
+      font-size: 10px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .elsewhere {
+      grid-template-columns: 1fr;
+    }
+    .social-link,
+    .social-link:nth-child(-n + 2) {
+      min-height: 95px;
+      border-right: 0;
+      border-bottom: 1px solid var(--c-soft);
+    }
+    .social-link:last-child {
+      border-bottom: 0;
+    }
+    .closing {
+      grid-template-columns: 1fr;
+      gap: 26px;
+      padding-top: 34px;
+    }
+    .signature {
+      padding: 20px 0 0;
+      border-left: 0;
+      border-top: 1px solid var(--c-line);
+    }
   }
 </style>
-{% endblock %} {% block content %}
-<div class="min-h-screen">
-  <!-- Hero Section -->
-  <div class="relative overflow-hidden">
-    <div
-      class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"
-    ></div>
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
-      <div class="text-center">
-        <div
-          class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-8 animate-float"
-        >
-          <i class="fas fa-code text-white text-2xl"></i>
-        </div>
-        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-          Talk to me.
-          <span
-            class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-            >I've got you!</span
-          >
-        </h1>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Hi, my name is
-          <strong
-            class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-            >Evans Adu.</strong
-          >
-          I'm a <span class="text-amber-700">Software Engineer</span> who is
-          passionate about creating exceptional digital experiences. Whether you
-          have a project in mind, need consultation, or just want to connect,
-          I'd love to hear from you.
-        </p>
-      </div>
-    </div>
+
+<div class="correspondence">
+  <div class="masthead">
+    <span class="masthead-mark">Correspondence</span
+    ><span>GMT · 09:00–17:00 · Kumasi, Ghana</span>
   </div>
 
-  <!-- Contact Methods Grid -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-      <!-- Email Card -->
-      <div
-        class="card-hover bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-blue-200"
-      >
-        <div class="text-center">
-          <div
-            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mb-6 icon-bounce"
-          >
-            <i class="fas fa-envelope text-white text-xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-3">Email Me</h3>
-          <p class="text-gray-600 mb-6 leading-relaxed">
-            Drop me a line and I'll get back to you within 24 hours. Perfect for
-            detailed project discussions and proposals.
-          </p>
-          <a
-            href="mailto:web4adu@gmail.com"
-            class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            <i class="fas fa-paper-plane mr-2"></i>
-            web4adu@gmail.com
-          </a>
-        </div>
-      </div>
-
-      <!-- Phone Card -->
-      <div
-        class="card-hover bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-green-200"
-      >
-        <div class="text-center">
-          <div
-            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full mb-6 icon-bounce"
-          >
-            <i class="fas fa-phone text-white text-xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-3">Call Me</h3>
-          <p class="text-gray-600 mb-6 leading-relaxed">
-            Prefer to talk? Give me a call during business hours (9 AM - 5 PM
-            GMT) for immediate consultation.
-          </p>
-          <a
-            href="tel:0240659972"
-            class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            <i class="fas fa-phone-alt mr-2"></i>
-            0240659972
-          </a>
-        </div>
-      </div>
-
-      <!-- WhatsApp Card -->
-      <div
-        class="card-hover bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-emerald-200 md:col-span-2 lg:col-span-1"
-      >
-        <div class="text-center">
-          <div
-            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full mb-6 icon-bounce"
-          >
-            <i class="fab fa-whatsapp text-white text-xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-3">WhatsApp</h3>
-          <p class="text-gray-600 mb-6 leading-relaxed">
-            Need a quick response? Send me a WhatsApp message for faster
-            communication and response.
-          </p>
-          <a
-            href="https://wa.me/0240659972"
-            class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            <i class="fab fa-whatsapp mr-2"></i>
-            Message on WhatsApp
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Social Media Section -->
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-        Connect With Me
-      </h2>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-        Follow my journey, see my latest work, and stay updated with industry
-        insights across these platforms.
+  <section class="intro">
+    <div>
+      <p class="intro-kicker">
+        A direct <em>link</em> to the person behind the work
+      </p>
+      <h1>Evans<span>Adu</span></h1>
+      <p class="intro-copy">
+        I build digital products for schools and small teams. If you have a
+        project in mind, need a second opinion, or simply want to
+        <strong>talk shop</strong>, write to me.
       </p>
     </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-      <!-- LinkedIn -->
-      <div
-        class="social-hover bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg"
-      >
-        <a
-          href="https://www.linkedin.com/in/ev-ans-adu"
-          target="_blank"
-          class="block text-center"
-        >
-          <div
-            class="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-lg mb-4"
-          >
-            <i class="fab fa-linkedin-in text-white text-lg"></i>
-          </div>
-          <h4 class="font-semibold text-gray-900 mb-2">LinkedIn</h4>
-          <p class="text-sm text-gray-600">
-            Professional network & career updates
-          </p>
-        </a>
+    <aside class="intro-side" aria-label="At a glance">
+      <div class="side-entry">
+        <span class="side-label">Currently</span
+        ><span class="side-value">Building EduSync SMS</span>
       </div>
-
-      <!-- GitHub -->
-      <div
-        class="social-hover bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg"
-      >
-        <a
-          href="https://github.com/quabena"
-          target="_blank"
-          class="block text-center"
-        >
-          <div
-            class="inline-flex items-center justify-center w-12 h-12 bg-gray-900 rounded-lg mb-4"
-          >
-            <i class="fab fa-github text-white text-lg"></i>
-          </div>
-          <h4 class="font-semibold text-gray-900 mb-2">GitHub</h4>
-          <p class="text-sm text-gray-600">
-            Checkout my other projects and code repositories
-          </p>
-        </a>
+      <div class="side-entry">
+        <span class="side-label">Based in</span
+        ><span class="side-value">Kumasi, Ghana</span>
       </div>
-
-      <!-- Twitter -->
-      <div
-        class="social-hover bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg"
-      >
-        <a
-          href="https://x.com/ivanzcorby"
-          target="_blank"
-          class="block text-center"
-        >
-          <div
-            class="inline-flex items-center justify-center w-12 h-12 bg-sky-500 rounded-lg mb-4"
-          >
-            <i class="fab fa-x text-white text-lg"></i>
-          </div>
-          <h4 class="font-semibold text-gray-900 mb-2">X</h4>
-          <p class="text-sm text-gray-600">Tech thoughts & industry insights</p>
-        </a>
+      <div class="side-entry">
+        <span class="side-label">Reply time</span
+        ><span class="side-value">1-3 hours</span
+        ><span class="side-status">Open for work</span>
       </div>
+    </aside>
+  </section>
 
-      <!-- Instagram -->
-      <div
-        class="social-hover bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg"
-      >
-        <a
-          href="https://instagram.com/ev_ans_1"
-          target="_blank"
-          class="block text-center"
-        >
-          <div
-            class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mb-4"
-          >
-            <i class="fab fa-instagram text-white text-lg"></i>
-          </div>
-          <h4 class="font-semibold text-gray-900 mb-2">Instagram</h4>
-          <p class="text-sm text-gray-600">
-            Behind the scenes & personal updates
-          </p>
-        </a>
-      </div>
-    </div>
-
-    <!-- Availability Banner -->
-    <div
-      class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-8 md:p-12 text-center shadow-2xl"
-    >
-      <div class="absolute inset-0 bg-black/10"></div>
-      <div class="relative">
-        <div
-          class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-6 animate-pulse-slow"
-        >
-          <i class="fas fa-rocket text-white text-xl"></i>
-        </div>
-        <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">
-          Currently Available for New Projects
-        </h3>
-        <p class="text-lg text-blue-100 max-w-2xl mx-auto mb-8 leading-relaxed">
-          I'm accepting new client work and would love to hear about your
-          project. Let's collaborate and build something extraordinary together!
+  <div class="section-heading">
+    <span class="section-number">01</span>
+    <h2>Choose your route</h2>
+    <span class="section-note">No wrong door</span>
+  </div>
+  <div class="contact-list">
+    <div class="contact-row">
+      <span class="contact-index">01 ·</span>
+      <div class="contact-content">
+        <h3>Email</h3>
+        <p>
+          Best for detailed conversations, proposals, and anything with a
+          document attached.
         </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="mailto:web4adu@gmail.com"
-            class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            <i class="fas fa-envelope mr-2"></i>
-            Start a Project
-          </a>
-          <a
-            href="tel:0240659972"
-            class="inline-flex items-center justify-center px-8 py-4 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-all duration-300 transform hover:scale-105 border border-white/20"
-          >
-            <i class="fas fa-phone mr-2"></i>
-            Schedule a Call
-          </a>
-        </div>
       </div>
+      <a class="contact-link primary" href="mailto:web4adu@gmail.com"
+        ><span>web4adu@gmail.com</span><i class="fas fa-arrow-right arrow"></i
+      ></a>
     </div>
-
-    <!-- Response Time Info -->
-    <div class="mt-12 text-center">
-      <div
-        class="inline-flex items-center px-6 py-3 bg-green-50 border border-green-200 rounded-full"
-      >
-        <div class="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-        <span class="text-green-800 font-medium"
-          >I typically respond within 2-4 hours</span
-        >
+    <div class="contact-row">
+      <span class="contact-index">02 ·</span>
+      <div class="contact-content">
+        <h3>Voice</h3>
+        <p>
+          Prefer to talk it through? Call during business hours for a live
+          conversation.
+        </p>
       </div>
+      <a class="contact-link" href="tel:+233240659972"
+        ><span>+233 24 065 9972</span><i class="fas fa-arrow-right arrow"></i
+      ></a>
+    </div>
+    <div class="contact-row">
+      <span class="contact-index">03 ·</span>
+      <div class="contact-content">
+        <h3>WhatsApp</h3>
+        <p>
+          Quickest route for a short question or to coordinate a follow-up call.
+        </p>
+      </div>
+      <a
+        class="contact-link"
+        href="https://wa.me/233240659972"
+        target="_blank"
+        rel="noopener"
+        ><span>Open a chat</span
+        ><i class="fas fa-arrow-up-right-from-square arrow"></i
+      ></a>
     </div>
   </div>
+
+  <div class="section-heading">
+    <span class="section-number">02</span>
+    <h2>Elsewhere</h2>
+    <span class="section-note">Come say hi</span>
+  </div>
+  <div class="elsewhere">
+    <a
+      class="social-link"
+      href="https://www.linkedin.com/in/ev-ans-adu"
+      target="_blank"
+      rel="noopener"
+      ><span
+        ><span class="social-name">LinkedIn</span
+        ><span class="social-handle">in/ev-ans-adu</span></span
+      ><i class="fas fa-arrow-up-right-from-square social-arrow"></i></a
+    ><a
+      class="social-link"
+      href="https://github.com/quabena"
+      target="_blank"
+      rel="noopener"
+      ><span
+        ><span class="social-name">GitHub</span
+        ><span class="social-handle">@quabena</span></span
+      ><i class="fas fa-arrow-up-right-from-square social-arrow"></i></a
+    ><a
+      class="social-link"
+      href="https://x.com/ivanzcorby"
+      target="_blank"
+      rel="noopener"
+      ><span
+        ><span class="social-name">X</span
+        ><span class="social-handle">@ivanzcorby</span></span
+      ><i class="fas fa-arrow-up-right-from-square social-arrow"></i></a
+    ><a
+      class="social-link"
+      href="https://instagram.com/ev_ans_1"
+      target="_blank"
+      rel="noopener"
+      ><span
+        ><span class="social-name">Instagram</span
+        ><span class="social-handle">@ev_ans_1</span></span
+      ><i class="fas fa-arrow-up-right-from-square social-arrow"></i
+    ></a>
+  </div>
+
+  <footer class="closing">
+    <div class="closing-copy">
+      <p>
+        I read every message myself. If it is a project, a question about the
+        work on this page, or a simple introduction, write to me the way you
+        would write to anyone else and I will write back the same way.
+      </p>
+      <p>Thanks for stopping by.</p>
+    </div>
+    <div class="signature">
+      <p class="signature-name">Evans</p>
+      <p class="signature-detail">Evans Adu · Kumasi</p>
+    </div>
+  </footer>
 </div>
 {% endblock %}

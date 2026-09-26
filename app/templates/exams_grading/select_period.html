@@ -7,12 +7,6 @@
 {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
-
-  /* ==========================================================
-     Select Grading Period — Dashboard design language.
-     Fraunces (display), Inter (body), JetBrains Mono (labels).
-     ========================================================== */
   .select-period-page {
     --ink: #1a2226;
     --copy: #4a5459;
@@ -406,7 +400,7 @@
     <h1>Choose academic period</h1>
     <p>
       Select the term and year to open the grading sheet for
-      <strong>{{ class_.name }}</strong> — <strong>{{ subject.name }}</strong>.
+      <strong>{{ class_.name }}</strong> - <strong>{{ subject.name }}</strong>.
     </p>
     <div class="hero-stamps">
       <span class="hero-stamp violet">{{ class_.name }}</span>
@@ -418,10 +412,8 @@
   <section class="dash-card">
     <div class="dash-card-head">
       <div>
-        <p class="section-kicker">01 · Grading period</p>
         <h2>Select term and year</h2>
       </div>
-      <span class="head-meta">Required to continue</span>
     </div>
 
     <form id="periodForm">
@@ -431,12 +423,12 @@
           <label class="field-label" for="term">Academic term</label>
           <select id="term" name="term" required class="field-select">
             <option value="">Select term</option>
-            {% set current_term = 'Term 1' if current_month <= 4 else ('Term 2' if current_month <= 8 else 'Term 3') %}
+            {% set current_term = 'Term 1' if current_month <= 12 else ('Term 2' if current_month <= 4 else 'Term 3') %}
             <option value="Term 1" {{ 'selected' if current_term == 'Term 1' else '' }}>Term 1</option>
             <option value="Term 2" {{ 'selected' if current_term == 'Term 2' else '' }}>Term 2</option>
             <option value="Term 3" {{ 'selected' if current_term == 'Term 3' else '' }}>Term 3</option>
           </select>
-          <p class="field-hint">Term 1: Jan–Apr · Term 2: May–Aug · Term 3: Sep–Dec.</p>
+          <p class="field-hint">Term 1: Sep–Dec · Term 2: Jan–Apr · Term 3: May–Jul.</p>
         </div>
 
         <!-- Year -->
@@ -471,39 +463,6 @@
         </div>
       </div>
     </form>
-  </section>
-
-  <!-- Quick info -->
-  <section class="dash-card">
-    <div class="dash-card-head">
-      <div>
-        <p class="section-kicker">Reference</p>
-        <h2>Grading period at a glance</h2>
-      </div>
-    </div>
-
-    <div class="info-grid">
-      <div class="info-cell">
-        <span class="info-label">Current term</span>
-        <span class="info-value">
-          {% set current_term = 'Term 1' if current_month <= 4 else ('Term 2' if current_month <= 8 else 'Term 3') %}
-          {{ current_term }}
-        </span>
-        <span class="info-foot">Auto-selected based on today's date.</span>
-      </div>
-
-      <div class="info-cell">
-        <span class="info-label">Class</span>
-        <span class="info-value">{{ class_.name }}</span>
-        <span class="info-foot">The class you are grading.</span>
-      </div>
-
-      <div class="info-cell">
-        <span class="info-label">Subject</span>
-        <span class="info-value">{{ subject.name }}</span>
-        <span class="info-foot">The subject you are grading.</span>
-      </div>
-    </div>
   </section>
 </div>
 

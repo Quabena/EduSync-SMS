@@ -1,573 +1,1533 @@
 {% extends "base.html" %} {% block title %}Database Backup - Namong SDA JHS{%
 endblock %} {% block content %}
-<div class="space-y-8">
-  <!-- Header -->
-  <div
-    class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 shadow-2xl"
-  >
-    <div
-      class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')]"
-    ></div>
-
-    <div class="relative p-8">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-4xl font-bold text-white">Database Backup</h1>
-          <p class="mt-2 text-lg text-blue-100">
-            Manage database backups and USB transfers
-          </p>
-        </div>
-        <div class="mt-4 sm:mt-0 flex items-center space-x-3">
-          <span
-            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white backdrop-blur-sm"
-          >
-            System Admin
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <!-- Create Backup -->
-    <div
-      class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl p-6 text-center hover:shadow-2xl transition-all duration-300"
-    >
-      <div
-        class="p-3 bg-green-100 dark:bg-green-900/50 rounded-xl w-12 h-12 mx-auto mb-4"
-      >
-        <svg
-          class="w-6 h-6 text-green-600 dark:text-green-400 mx-auto"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0h6m-6 0l-2 2m8-2l2 2m-2-2v6a2 2 0 01-2 2H8a2 2 0 01-2-2v-6"
-          />
-        </svg>
-      </div>
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-        Create Backup
-      </h3>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Create a new database backup
-      </p>
-      <form method="POST" action="{{ url_for('main.create_backup') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <button
-          type="submit"
-          class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-        >
-          Create Now
-        </button>
-      </form>
-    </div>
-
-    <!-- Refresh USB -->
-    <div
-      class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl p-6 text-center hover:shadow-2xl transition-all duration-300"
-    >
-      <div
-        class="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-xl w-12 h-12 mx-auto mb-4"
-      >
-        <svg
-          class="w-6 h-6 text-blue-600 dark:text-blue-400 mx-auto"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-          />
-        </svg>
-      </div>
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-        Refresh USB
-      </h3>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Scan for connected USB drives
-      </p>
-      <button
-        onclick="refreshUSBDrives()"
-        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-      >
-        Refresh
-      </button>
-    </div>
-
-    <!-- Export to USB -->
-    <div
-      class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl p-6 text-center hover:shadow-2xl transition-all duration-300"
-    >
-      <div
-        class="p-3 bg-purple-100 dark:bg-purple-900/50 rounded-xl w-12 h-12 mx-auto mb-4"
-      >
-        <svg
-          class="w-6 h-6 text-purple-600 dark:text-purple-400 mx-auto"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-          />
-        </svg>
-      </div>
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-        Export to USB
-      </h3>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Export database to USB drive
-      </p>
-      <button
-        onclick="showExportModal()"
-        class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-      >
-        Export
-      </button>
-    </div>
-
-    <!-- Import from USB -->
-    <div
-      class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl p-6 text-center hover:shadow-2xl transition-all duration-300"
-    >
-      <div
-        class="p-3 bg-orange-100 dark:bg-orange-900/50 rounded-xl w-12 h-12 mx-auto mb-4"
-      >
-        <svg
-          class="w-6 h-6 text-orange-600 dark:text-orange-400 mx-auto"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-          />
-        </svg>
-      </div>
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-        Import from USB
-      </h3>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Import database from USB drive
-      </p>
-      <button
-        onclick="showImportModal()"
-        class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-      >
-        Import
-      </button>
-    </div>
-  </div>
-
-  <!-- Existing Backups -->
-  <div
-    class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-xl overflow-hidden"
-  >
-    <div class="p-6 border-b border-gray-200/50 dark:border-gray-700/50">
-      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-        Existing Backups
-      </h2>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-        Manage your database backup files
-      </p>
-    </div>
-
-    <div class="p-6">
-      {% if backups %}
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead>
-            <tr class="border-b border-gray-200/50 dark:border-gray-700/50">
-              <th
-                class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400"
-              >
-                Backup File
-              </th>
-              <th
-                class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400"
-              >
-                Size
-              </th>
-              <th
-                class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400"
-              >
-                Created
-              </th>
-              <th
-                class="text-right py-3 text-sm font-semibold text-gray-600 dark:text-gray-400"
-              >
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for backup in backups %}
-            <tr
-              class="border-b border-gray-200/30 dark:border-gray-700/30 hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
-            >
-              <td class="py-4">
-                <div class="flex items-center space-x-3">
-                  <div class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                    <svg
-                      class="w-4 h-4 text-blue-600 dark:text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                  <span class="font-medium text-gray-900 dark:text-white"
-                    >{{ backup.name }}</span
-                  >
-                </div>
-              </td>
-              <td class="py-4 text-sm text-gray-600 dark:text-gray-400">
-                {{ "%.1f"|format(backup.size / 1024 / 1024) }} MB
-              </td>
-              <td class="py-4 text-sm text-gray-600 dark:text-gray-400">
-                {{ backup.created.strftime('%Y-%m-%d %H:%M:%S') }}
-              </td>
-              <td class="py-4 text-right">
-                <div class="flex justify-end space-x-2">
-                  <form
-                    method="POST"
-                    action="{{ url_for('main.restore_backup', backup_name=backup.name) }}"
-                    class="inline"
-                  >
-                    <input
-                      type="hidden"
-                      name="csrf_token"
-                      value="{{ csrf_token() }}"
-                    />
-                    <button
-                      type="submit"
-                      onclick="return confirm('Are you sure you want to restore from this backup? This will replace your current database.')"
-                      class="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-1 px-3 rounded transition-colors duration-200"
-                    >
-                      Restore
-                    </button>
-                  </form>
-                  <form
-                    method="POST"
-                    action="{{ url_for('main.delete_backup', backup_name=backup.name) }}"
-                    class="inline"
-                  >
-                    <input
-                      type="hidden"
-                      name="csrf_token"
-                      value="{{ csrf_token() }}"
-                    />
-                    <button
-                      type="submit"
-                      onclick="return confirm('Are you sure you want to delete this backup?')"
-                      class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-1 px-3 rounded transition-colors duration-200"
-                    >
-                      Delete
-                    </button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-      <div class="text-center py-12">
-        <svg
-          class="w-16 h-16 text-gray-400 mx-auto mb-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          No Backups Found
-        </h3>
-        <p class="text-gray-600 dark:text-gray-400">
-          Create your first backup to get started
-        </p>
-      </div>
-      {% endif %}
-    </div>
-  </div>
-</div>
-
-<!-- Export Modal -->
-<div
-  id="exportModal"
-  class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50"
->
-  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md">
-    <div class="p-6 border-b border-gray-200/50 dark:border-gray-700/50">
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-        Export to USB
-      </h3>
-    </div>
-    <div class="p-6">
-      <form
-        id="exportForm"
-        method="POST"
-        action="{{ url_for('main.export_to_usb_route') }}"
-      >
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <div class="mb-4">
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >Select USB Drive</label
-          >
-          <select
-            name="drive_path"
-            required
-            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="">Select a drive...</option>
-            {% for drive in usb_drives %}
-            <option value="{{ drive }}">{{ drive }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4">
-          <div class="flex items-center">
-            <svg
-              class="w-5 h-5 text-blue-500 dark:text-blue-400 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span class="text-sm text-blue-700 dark:text-blue-300"
-              >This will export the database and all documents</span
-            >
-          </div>
-        </div>
-      </form>
-    </div>
-    <div
-      class="p-6 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-end space-x-3"
-    >
-      <button
-        onclick="closeModal('exportModal')"
-        class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors duration-200"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        form="exportForm"
-        class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg transition-colors duration-200"
-      >
-        Export
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Import Modal -->
-<div
-  id="importModal"
-  class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50"
->
-  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md">
-    <div class="p-6 border-b border-gray-200/50 dark:border-gray-700/50">
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-        Import from USB
-      </h3>
-    </div>
-    <div class="p-6">
-      <form
-        id="importForm"
-        method="POST"
-        action="{{ url_for('main.import_from_usb_route') }}"
-      >
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <div class="mb-4">
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >Select USB Drive</label
-          >
-          <select
-            name="drive_path"
-            required
-            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-          >
-            <option value="">Select a drive...</option>
-            {% for drive in usb_drives %}
-            <option value="{{ drive }}">{{ drive }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 mb-4">
-          <div class="flex items-center">
-            <svg
-              class="w-5 h-5 text-orange-500 dark:text-orange-400 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <span class="text-sm text-orange-700 dark:text-orange-300"
-              >Warning: This will replace your current database</span
-            >
-          </div>
-        </div>
-      </form>
-    </div>
-    <div
-      class="p-6 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-end space-x-3"
-    >
-      <button
-        onclick="closeModal('importModal')"
-        class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors duration-200"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        form="importForm"
-        onclick="return confirm('Are you sure you want to import from USB? This will replace your current database.')"
-        class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors duration-200"
-      >
-        Import
-      </button>
-    </div>
-  </div>
-</div>
-
-<script>
-  function showExportModal() {
-    const modal = document.getElementById("exportModal");
-    modal.classList.remove("hidden");
-  }
-
-  function showImportModal() {
-    const modal = document.getElementById("importModal");
-    modal.classList.remove("hidden");
-  }
-
-  function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.add("hidden");
-  }
-
-  async function refreshUSBDrives() {
-    try {
-      const response = await fetch('{{ url_for("main.refresh_usb_drive") }}', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-
-      // Update both modal dropdowns
-      const selects = document.querySelectorAll('select[name="drive_path"]');
-      selects.forEach((select) => {
-        // Clear existing options except the first one
-        while (select.children.length > 1) {
-          select.removeChild(select.lastChild);
-        }
-
-        // Add new drives
-        data.drives.forEach((drive) => {
-          const option = document.createElement("option");
-          option.value = drive;
-          option.textContent = drive;
-          select.appendChild(option);
-        });
-      });
-
-      if (data.drives.length > 0) {
-        showToast(`Found ${data.drives.length} USB drive(s)`, "success");
-      } else {
-        showToast("No USB drives found", "warning");
-      }
-    } catch (error) {
-      showToast("Failed to refresh USB drives", "error");
-      console.error("Error refreshing USB drives:", error);
-    }
-  }
-
-  function showToast(message, type) {
-    // Simple toast notification implementation
-    const toast = document.createElement("div");
-    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
-      type === "success"
-        ? "bg-green-500 text-white"
-        : type === "error"
-        ? "bg-red-500 text-white"
-        : "bg-yellow-500 text-white"
-    }`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      document.body.removeChild(toast);
-    }, 3000);
-  }
-
-  // Close modals when clicking outside
-  document.addEventListener("click", function (event) {
-    if (event.target.id === "exportModal") {
-      closeModal("exportModal");
-    }
-    if (event.target.id === "importModal") {
-      closeModal("importModal");
-    }
-  });
-</script>
 
 <style>
-  @media (max-width: 768px) {
-    .grid-cols-4 {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  .backup-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SFMono-Regular", "SF Mono", Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  @media (max-width: 480px) {
-    .grid-cols-4 {
+  .dark .backup-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
+  }
+
+  .backup-page *,
+  .backup-page *::before,
+  .backup-page *::after {
+    box-sizing: border-box;
+  }
+  .backup-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .backup-page .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* ---------- Hero ---------- */
+  .page-hero {
+    padding: 24px 28px 22px 32px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--violet);
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .page-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.8vw, 28px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .page-hero p {
+    margin: 0;
+    max-width: 660px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .hero-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--copy);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .hero-stamp.violet {
+    border-color: var(--violet-edge);
+    background: var(--violet-wash);
+    color: var(--violet);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    border-color: var(--ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: progress;
+  }
+  .btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .btn.primary {
+    color: #131817;
+  }
+  .btn.primary:hover:not(:disabled) {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .btn.primary:hover:not(:disabled) {
+    color: #131817;
+  }
+  .btn.sm {
+    padding: 7px 12px;
+    font-size: 12.5px;
+  }
+  .btn.danger {
+    color: var(--red);
+    border-color: var(--red-edge);
+    background: var(--surface);
+  }
+  .btn.danger:hover {
+    background: var(--red-wash);
+    border-color: var(--red);
+  }
+  .btn.block {
+    width: 100%;
+  }
+
+  /* ---------- Action grid ---------- */
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .action-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px 20px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .action-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .action-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid;
+  }
+  .action-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .action-icon.is-green {
+    background: var(--green-wash);
+    color: var(--green);
+    border-color: var(--green-edge);
+  }
+  .action-icon.is-violet {
+    background: var(--violet-wash);
+    color: var(--violet);
+    border-color: var(--violet-edge);
+  }
+  .action-icon.is-brass {
+    background: var(--brass-wash);
+    color: var(--brass);
+    border-color: var(--brass-edge);
+  }
+  .action-icon.is-slate {
+    background: var(--slate-wash);
+    color: var(--slate);
+    border-color: var(--slate-edge);
+  }
+
+  .action-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .action-copy {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--copy);
+    flex: 1;
+  }
+
+  /* ---------- Card ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .card-body {
+    padding: 22px;
+  }
+
+  /* ---------- Backups table ---------- */
+  .table-wrap {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) var(--surface-alt);
+  }
+  .table-wrap::-webkit-scrollbar {
+    height: 10px;
+  }
+  .table-wrap::-webkit-scrollbar-track {
+    background: var(--surface-alt);
+  }
+  .table-wrap::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 4px;
+  }
+
+  .backups-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    font-size: 13px;
+  }
+  .backups-table thead {
+    background: var(--surface-alt);
+  }
+  .backups-table th {
+    padding: 12px 18px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .backups-table th.right {
+    text-align: right;
+  }
+  .backups-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: middle;
+    color: var(--ink);
+  }
+  .backups-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .backups-table tbody tr:hover td {
+    background: var(--surface-alt);
+  }
+
+  .backup-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+  .backup-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: var(--violet-wash);
+    border: 1px solid var(--violet-edge);
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .backup-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+  .backup-name {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+  .backup-meta {
+    padding: 14px 18px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--copy);
+    white-space: nowrap;
+  }
+  .backup-meta strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .row-actions form {
+    display: inline;
+    margin: 0;
+  }
+
+  /* ---------- Empty state ---------- */
+  .empty {
+    padding: 56px 24px;
+    text-align: center;
+  }
+  .empty-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--violet-wash);
+    color: var(--violet);
+  }
+  .empty-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  .empty h3 {
+    margin: 0 0 7px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+  }
+  .empty p {
+    max-width: 440px;
+    margin: 0 auto;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 30, 29, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 60;
+  }
+  .modal-backdrop[hidden] {
+    display: none;
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 50px rgba(28, 47, 45, 0.25);
+    overflow: hidden;
+  }
+  .modal-head {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .modal-head h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .modal-close {
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-close:hover {
+    border-color: var(--line);
+    color: var(--ink);
+  }
+  .modal-close:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .modal-body {
+    padding: 18px 22px 20px;
+  }
+  .modal-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 22px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-alt);
+  }
+
+  /* ---------- Fields ---------- */
+  .field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .field-select-wrap {
+    position: relative;
+  }
+  .field-select-wrap .chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    display: flex;
+  }
+  .field-select-wrap .chevron svg {
+    width: 12px;
+    height: 12px;
+  }
+  .field-select {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 34px 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field-select:focus {
+    outline: 0;
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 0 0 2px var(--green-wash);
+  }
+  .field-select:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .field-hint {
+    margin: 7px 0 0;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  /* ---------- Notice ---------- */
+  .notice {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid;
+    border-radius: 3px;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-top: 14px;
+  }
+  .notice svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .notice.is-info {
+    background: var(--slate-wash);
+    border-color: var(--slate-edge);
+    color: var(--slate);
+  }
+  .notice.is-warning {
+    background: var(--brass-wash);
+    border-color: var(--brass-edge);
+    color: var(--brass);
+  }
+
+  /* ---------- Toast ---------- */
+  .toast-region {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    --ink: #1a2226;
+    --surface: #ffffff;
+    --line: #d7dfdb;
+    --green: #1f6259;
+    --red: #9a5148;
+    --brass: #8a632e;
+  }
+  .dark .toast-region {
+    --ink: #eef2ef;
+    --surface: #1a201f;
+    --line: #33403e;
+    --green: #6fbfa7;
+    --red: #e0907a;
+    --brass: #d9b273;
+  }
+  .toast {
+    padding: 11px 16px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+    border-left-width: 3px;
+    background: var(--surface);
+    box-shadow: 0 8px 24px rgba(28, 47, 45, 0.15);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--ink);
+    max-width: 340px;
+    transform: translateX(calc(100% + 30px));
+    transition: transform 0.25s ease;
+  }
+  .toast.is-visible {
+    transform: translateX(0);
+  }
+  .toast.is-success {
+    border-left-color: var(--green);
+  }
+  .toast.is-error {
+    border-left-color: var(--red);
+  }
+  .toast.is-warning {
+    border-left-color: var(--brass);
+  }
+
+  /* Screen-reader helper */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .action-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 700px) {
+    .backup-page {
+      padding: 20px 14px 40px;
+    }
+    .page-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .card-head {
+      padding: 14px 16px 12px;
+    }
+    .card-body {
+      padding: 18px;
+    }
+    .backups-table th,
+    .backups-table td {
+      padding: 12px 14px;
+    }
+    .action-grid {
       grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .modal-foot {
+      flex-direction: column-reverse;
+    }
+    .modal-foot .btn {
+      width: 100%;
     }
   }
 </style>
+
+{# ---------- Format a byte count into a human-readable size ---------- #} {%
+macro format_size(bytes) -%} {%- if bytes is none -%}—{%- else -%} {%- set mb =
+bytes / 1024 / 1024 -%} {%- if mb >= 1024 -%} {{ "%.2f"|format(mb / 1024) }} GB
+{%- elif mb >= 1 -%} {{ "%.1f"|format(mb) }} MB {%- else -%} {{
+"%.0f"|format(bytes / 1024) }} KB {%- endif -%} {%- endif -%} {%- endmacro %}
+
+<div class="backup-page">
+  <!-- Hero -->
+  <header class="page-hero">
+    <p class="dash-kicker">System admin · Data management</p>
+    <h1>Database backup</h1>
+    <p>
+      Create, restore, and move database snapshots. Export to or import from USB
+      drives for offline storage and transfer.
+    </p>
+    <div class="hero-meta">
+      <span class="hero-stamp violet">Administrator</span>
+      <span class="hero-stamp"
+        >{{ backups|length if backups else 0 }} backup{% if (backups|length if
+        backups else 0) != 1 %}s{% endif %} on disk</span
+      >
+      {% if usb_drives %}
+      <span class="hero-stamp"
+        >{{ usb_drives|length }} USB drive{% if usb_drives|length != 1 %}s{%
+        endif %} detected</span
+      >
+      {% else %}
+      <span class="hero-stamp">No USB drives detected</span>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Actions -->
+  <section class="action-grid" aria-label="Backup actions">
+    <!-- Create -->
+    <article class="action-card">
+      <div class="action-head">
+        <span class="action-icon is-green" aria-hidden="true">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+            />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+        </span>
+      </div>
+      <h3 class="action-title">Create backup</h3>
+      <p class="action-copy">
+        Snapshot the database and document store into a timestamped archive.
+      </p>
+      <form method="POST" action="{{ url_for('main.create_backup') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <button type="submit" class="btn primary block">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Create now
+        </button>
+      </form>
+    </article>
+
+    <!-- Refresh USB -->
+    <article class="action-card">
+      <div class="action-head">
+        <span class="action-icon is-slate" aria-hidden="true">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12a9 9 0 0 1-9 9" />
+            <polyline points="21 3 21 9 15 9" />
+            <path d="M3 12a9 9 0 0 1 9-9" />
+            <polyline points="3 21 3 15 9 15" />
+            <path d="M21 12a9 9 0 0 0-9-9" />
+            <polyline points="21 15 21 21 15 21" />
+            <path d="M3 12a9 9 0 0 0 9 9" />
+            <polyline points="3 9 3 3 9 3" />
+          </svg>
+        </span>
+      </div>
+      <h3 class="action-title">Refresh USB</h3>
+      <p class="action-copy">
+        Rescan for connected USB drives and update the export and import
+        destinations.
+      </p>
+      <button type="button" class="btn block" id="refresh-usb-btn">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="23 4 23 10 17 10" />
+          <polyline points="1 20 1 14 7 14" />
+          <path
+            d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+          />
+        </svg>
+        Refresh drives
+      </button>
+    </article>
+
+    <!-- Export -->
+    <article class="action-card">
+      <div class="action-head">
+        <span class="action-icon is-violet" aria-hidden="true">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </span>
+      </div>
+      <h3 class="action-title">Export to USB</h3>
+      <p class="action-copy">
+        Write the current database and documents to a connected USB drive.
+      </p>
+      <button type="button" class="btn block" id="open-export-btn">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 19V5M5 12l7-7 7 7" />
+        </svg>
+        Export
+      </button>
+    </article>
+
+    <!-- Import -->
+    <article class="action-card">
+      <div class="action-head">
+        <span class="action-icon is-brass" aria-hidden="true">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+        </span>
+      </div>
+      <h3 class="action-title">Import from USB</h3>
+      <p class="action-copy">
+        Restore the database and documents from a backup on a USB drive.
+      </p>
+      <button type="button" class="btn block" id="open-import-btn">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 5v14M5 12l7 7 7-7" />
+        </svg>
+        Import
+      </button>
+    </article>
+  </section>
+
+  <!-- Backups -->
+  <section class="card" aria-labelledby="backups-heading">
+    <div class="card-head">
+      <div>
+        <p class="section-kicker">Registry</p>
+        <h2 id="backups-heading">Existing backups</h2>
+      </div>
+      <span class="head-meta">
+        {{ backups|length if backups else 0 }} file{% if (backups|length if
+        backups else 0) != 1 %}s{% endif %}
+      </span>
+    </div>
+
+    {% if backups %}
+    <div class="table-wrap">
+      <table class="backups-table">
+        <caption class="sr-only">
+          Database backup files with size, creation date, and restore or delete
+          actions.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Backup file</th>
+            <th scope="col">Size</th>
+            <th scope="col">Created</th>
+            <th scope="col" class="right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for backup in backups %}
+          <tr>
+            <td>
+              <div class="backup-name-cell">
+                <span class="backup-icon" aria-hidden="true">
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="9" y1="15" x2="15" y2="15" />
+                    <line x1="9" y1="11" x2="15" y2="11" />
+                  </svg>
+                </span>
+                <span class="backup-name">{{ backup.name }}</span>
+              </div>
+            </td>
+            <td class="backup-meta tabular">
+              <strong>{{ format_size(backup.size) }}</strong>
+            </td>
+            <td class="backup-meta tabular">
+              {% if backup.created %} {{ backup.created.strftime('%Y-%m-%d') }}
+              <br />
+              <span style="color: var(--muted)"
+                >{{ backup.created.strftime('%H:%M') }}</span
+              >
+              {% else %} — {% endif %}
+            </td>
+            <td>
+              <div class="row-actions">
+                <form
+                  method="POST"
+                  action="{{ url_for('main.restore_backup', backup_name=backup.name) }}"
+                  data-confirm="Restore from {{ backup.name }}? This will replace your current database with the contents of this backup."
+                >
+                  <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                  />
+                  <button type="submit" class="btn sm">
+                    <svg
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="1 4 1 10 7 10" />
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                    </svg>
+                    Restore
+                  </button>
+                </form>
+                <form
+                  method="POST"
+                  action="{{ url_for('main.delete_backup', backup_name=backup.name) }}"
+                  data-confirm="Delete {{ backup.name }}? This cannot be undone."
+                >
+                  <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                  />
+                  <button type="submit" class="btn sm danger">
+                    <svg
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                      />
+                    </svg>
+                    Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% else %}
+    <div class="empty">
+      <div class="empty-icon" aria-hidden="true">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+          />
+          <polyline points="14 2 14 8 20 8" />
+        </svg>
+      </div>
+      <h3>No backups found</h3>
+      <p>
+        Create your first backup using the button above. Backups are stored on
+        the server and can be downloaded, restored, or exported to USB.
+      </p>
+    </div>
+    {% endif %}
+  </section>
+</div>
+
+<!-- Export modal -->
+<div class="modal-backdrop" id="export-modal" hidden>
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="export-title"
+  >
+    <div class="modal-head">
+      <h3 id="export-title">Export to USB</h3>
+      <button
+        type="button"
+        class="modal-close"
+        data-close="export-modal"
+        aria-label="Close"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <form
+      id="export-form"
+      method="POST"
+      action="{{ url_for('main.export_to_usb_route') }}"
+    >
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+      <div class="modal-body">
+        <div class="field">
+          <label class="field-label" for="export-drive">USB drive</label>
+          <div class="field-select-wrap">
+            <select
+              id="export-drive"
+              name="drive_path"
+              class="field-select"
+              required
+              data-drive-select
+            >
+              <option value="">Select a drive…</option>
+              {% for drive in usb_drives %}
+              <option value="{{ drive }}">{{ drive }}</option>
+              {% endfor %}
+            </select>
+            <span class="chevron" aria-hidden="true">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </span>
+          </div>
+          <p class="field-hint">
+            {% if not usb_drives %} No drives detected. Connect a drive and use
+            <em>Refresh drives</em>. {% else %} The database and all documents
+            will be written to this drive. {% endif %}
+          </p>
+        </div>
+
+        <div class="notice is-info">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <span>Exports the database and every uploaded document.</span>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn" data-close="export-modal">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn primary"
+          {%
+          if
+          not
+          usb_drives
+          %}disabled{%
+          endif
+          %}
+        >
+          Export
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Import modal -->
+<div class="modal-backdrop" id="import-modal" hidden>
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="import-title"
+  >
+    <div class="modal-head">
+      <h3 id="import-title">Import from USB</h3>
+      <button
+        type="button"
+        class="modal-close"
+        data-close="import-modal"
+        aria-label="Close"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <form
+      id="import-form"
+      method="POST"
+      action="{{ url_for('main.import_from_usb_route') }}"
+      data-confirm="Import from USB? This will replace your current database with the contents of the selected drive."
+    >
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+      <div class="modal-body">
+        <div class="field">
+          <label class="field-label" for="import-drive">USB drive</label>
+          <div class="field-select-wrap">
+            <select
+              id="import-drive"
+              name="drive_path"
+              class="field-select"
+              required
+              data-drive-select
+            >
+              <option value="">Select a drive…</option>
+              {% for drive in usb_drives %}
+              <option value="{{ drive }}">{{ drive }}</option>
+              {% endfor %}
+            </select>
+            <span class="chevron" aria-hidden="true">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </span>
+          </div>
+          <p class="field-hint">
+            {% if not usb_drives %} No drives detected. Connect a drive and use
+            <em>Refresh drives</em>. {% else %} The current database will be
+            replaced with the one on this drive. {% endif %}
+          </p>
+        </div>
+
+        <div class="notice is-warning">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <span
+            >This will replace your current database. Consider creating a fresh
+            backup first.</span
+          >
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn" data-close="import-modal">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn danger"
+          {%
+          if
+          not
+          usb_drives
+          %}disabled{%
+          endif
+          %}
+        >
+          Import and replace
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast region -->
+<div
+  class="toast-region"
+  id="toast-region"
+  aria-live="polite"
+  aria-atomic="true"
+></div>
+
+<script>
+  "use strict";
+
+  (function () {
+    const toastRegion = document.getElementById("toast-region");
+    const refreshBtn = document.getElementById("refresh-usb-btn");
+    const exportBtn = document.getElementById("open-export-btn");
+    const importBtn = document.getElementById("open-import-btn");
+
+    /* ---------- Toast ---------- */
+    function showToast(message, type = "info") {
+      if (!toastRegion) return;
+      const toast = document.createElement("div");
+      toast.className = `toast is-${type}`;
+      toast.setAttribute("role", "status");
+      toast.textContent = message;
+      toastRegion.appendChild(toast);
+
+      requestAnimationFrame(() => toast.classList.add("is-visible"));
+
+      setTimeout(() => {
+        toast.classList.remove("is-visible");
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
+
+    /* ---------- Modals ---------- */
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.hidden = false;
+      // Focus the first focusable element inside the modal (usually the
+      // close button) so keyboard users land somewhere useful.
+      const focusable = modal.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable) focusable.focus();
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.hidden = true;
+    }
+
+    if (exportBtn) {
+      exportBtn.addEventListener("click", () => openModal("export-modal"));
+    }
+    if (importBtn) {
+      importBtn.addEventListener("click", () => openModal("import-modal"));
+    }
+
+    // Delegate close actions for every [data-close]
+    document.addEventListener("click", function (e) {
+      const closer = e.target.closest("[data-close]");
+      if (closer) {
+        closeModal(closer.dataset.close);
+        return;
+      }
+      // Click on the backdrop closes the corresponding modal.
+      if (e.target.classList.contains("modal-backdrop")) {
+        e.target.hidden = true;
+      }
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      document
+        .querySelectorAll(".modal-backdrop:not([hidden])")
+        .forEach((m) => {
+          m.hidden = true;
+        });
+    });
+
+    /* ---------- Confirmation for destructive forms ---------- */
+    // A single delegated submit handler reads data-confirm from any form
+    // and prompts the user. Replaces the inline onclick="return confirm()"
+    // handlers and works for any form added later.
+    document.addEventListener("submit", function (e) {
+      const form = e.target;
+      if (!(form instanceof HTMLFormElement)) return;
+      const message = form.dataset.confirm;
+      if (!message) return;
+      if (!window.confirm(message)) {
+        e.preventDefault();
+      }
+    });
+
+    /* ---------- Refresh USB drives ---------- */
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", async function () {
+        refreshBtn.disabled = true;
+        const original = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = "Scanning…";
+
+        try {
+          const csrf =
+            document.querySelector('meta[name="csrf-token"]')?.content ||
+            document.querySelector('input[name="csrf_token"]')?.value ||
+            "";
+
+          const response = await fetch(
+            '{{ url_for("main.refresh_usb_drive") }}',
+            {
+              method: "POST",
+              credentials: "same-origin",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf,
+                "X-CSRF-Token": csrf,
+              },
+              body: JSON.stringify({ csrf_token: csrf }),
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+          }
+
+          const data = await response.json();
+          const drives = Array.isArray(data.drives) ? data.drives : [];
+
+          // Rebuild the option list on every drive select (both modals).
+          document.querySelectorAll("[data-drive-select]").forEach((select) => {
+            while (select.options.length > 1) {
+              select.remove(1);
+            }
+            for (const drive of drives) {
+              const option = document.createElement("option");
+              option.value = drive;
+              option.textContent = drive;
+              select.appendChild(option);
+            }
+            // Re-enable the submit if drives were found; disable if not.
+            const submitBtn = select
+              .closest("form")
+              ?.querySelector('button[type="submit"]');
+            if (submitBtn && submitBtn.type === "submit") {
+              submitBtn.disabled = drives.length === 0;
+            }
+          });
+
+          if (drives.length > 0) {
+            showToast(
+              `Found ${drives.length} drive${drives.length === 1 ? "" : "s"}`,
+              "success",
+            );
+          } else {
+            showToast("No USB drives detected", "warning");
+          }
+        } catch (error) {
+          console.error("Refresh USB failed:", error);
+          showToast("Could not refresh USB drives", "error");
+        } finally {
+          refreshBtn.disabled = false;
+          refreshBtn.innerHTML = original;
+        }
+      });
+    }
+  })();
+</script>
+
 {% endblock %}

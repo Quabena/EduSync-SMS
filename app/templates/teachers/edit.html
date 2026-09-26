@@ -2,15 +2,6 @@
 Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
-
-  /* ==========================================================
-     Edit Teacher — Fraunces + Inter + JetBrains Mono.
-     Fraunces    → headings (editorial voice)
-     Inter       → body, labels, inputs, buttons
-     JetBrains   → kickers, hints, meta, numeric data
-     Includes dark mode.
-     ========================================================== */
   :root {
     --e-ink: #1a2226;
     --e-copy: #4a5459;
@@ -70,8 +61,8 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     padding: 28px 26px 60px;
     color: var(--e-ink);
     font-family: var(--e-sans);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.55;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
   .edit-teacher *,
@@ -112,29 +103,29 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   }
   .edit-header h1 {
     font-family: var(--e-display);
-    font-size: clamp(24px, 2.8vw, 32px);
+    font-size: clamp(26px, 2.9vw, 34px);
     font-weight: 600;
     font-variation-settings: "opsz" 60;
     letter-spacing: -0.025em;
     line-height: 1.1;
     color: var(--e-ink);
-    margin: 0 0 6px;
+    margin: 0 0 8px;
   }
   .edit-header h1 + p {
     color: var(--e-copy);
     font-family: var(--e-sans);
-    font-size: 14px;
+    font-size: 15px;
     margin: 0 0 4px;
   }
   .edit-header .kicker {
     display: block;
     font-family: var(--e-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--e-muted);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
   }
 
   .edit-back-btn {
@@ -168,7 +159,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    margin-top: 14px;
+    margin-top: 16px;
     padding: 12px 16px;
     background: var(--e-surface-alt);
     border: 1px solid var(--e-line);
@@ -176,7 +167,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   }
   .edit-progress-label {
     font-family: var(--e-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -187,14 +178,14 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 5px 10px;
+    padding: 5px 11px;
     border: 1px solid var(--e-line);
     border-radius: 3px;
     background: var(--e-surface);
     font-family: var(--e-mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
-    color: var(--e-muted);
+    color: var(--e-copy);
   }
   .edit-progress .dot {
     width: 6px;
@@ -240,7 +231,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
 
   .edit-section-head h2 {
     font-family: var(--e-display);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     font-variation-settings: "opsz" 24;
     letter-spacing: -0.015em;
@@ -249,19 +240,19 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   }
   .edit-section-head p {
     font-family: var(--e-sans);
-    font-size: 12.5px;
+    font-size: 13.5px;
     color: var(--e-muted);
-    margin: 3px 0 0;
+    margin: 4px 0 0;
   }
   .edit-section-head .kicker {
     display: block;
     font-family: var(--e-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--e-muted);
-    margin: 0 0 4px;
+    margin: 0 0 6px;
   }
 
   .edit-section-body {
@@ -286,33 +277,33 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   .form-group label {
     display: block;
     font-family: var(--e-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--e-muted);
-    margin-bottom: 6px;
+    margin-bottom: 7px;
   }
   .form-group input,
   .form-group select,
   .form-group textarea {
     width: 100%;
-    min-height: 40px;
+    min-height: 42px;
     border: 1px solid var(--e-line);
     border-radius: 3px;
     background: var(--e-input-bg);
     color: var(--e-ink);
-    padding: 9px 12px;
+    padding: 10px 12px;
     font-family: var(--e-sans);
-    font-size: 14px;
-    line-height: 1.35;
+    font-size: 15px;
+    line-height: 1.4;
     transition:
       border-color 0.15s ease,
       box-shadow 0.15s ease;
   }
   .form-group input[type="date"] {
     font-family: var(--e-mono);
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: -0.01em;
   }
   .form-group select {
@@ -331,10 +322,11 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     background-image: none;
     padding-right: 12px;
     padding: 6px;
-    min-height: 120px;
+    min-height: 130px;
+    font-size: 14px;
   }
   .form-group select[multiple] option {
-    padding: 4px 6px;
+    padding: 5px 6px;
   }
   .form-group input::placeholder,
   .form-group textarea::placeholder {
@@ -356,9 +348,11 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   .form-group .errors {
     color: var(--e-red);
     font-family: var(--e-mono);
-    font-size: 11px;
-    margin-top: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
     letter-spacing: 0.02em;
+    line-height: 1.5;
   }
   .form-group .errors p {
     margin: 0;
@@ -367,22 +361,22 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   .form-group .hint {
     color: var(--e-muted);
     font-family: var(--e-mono);
-    font-size: 11px;
-    margin-top: 5px;
+    font-size: 12px;
+    margin-top: 6px;
     letter-spacing: 0.02em;
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
   /* ---------- Subsection headers ---------- */
   .edit-subhead {
     font-family: var(--e-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--e-muted);
-    margin: 0 0 14px;
-    padding-bottom: 8px;
+    color: var(--e-copy);
+    margin: 0 0 16px;
+    padding-bottom: 9px;
     border-bottom: 1px solid var(--e-line-soft);
   }
 
@@ -422,7 +416,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 10px 12px;
+    padding: 11px 13px;
     margin-bottom: 8px;
     background: var(--e-surface-alt);
     border: 1px solid var(--e-line);
@@ -433,7 +427,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     align-items: center;
     gap: 10px;
     font-family: var(--e-mono);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--e-ink);
     min-width: 0;
@@ -453,10 +447,10 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 6px 10px;
+    padding: 6px 11px;
     border-radius: 3px;
     font-family: var(--e-sans);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     border: 1px solid var(--e-line);
     background: var(--e-surface);
@@ -497,14 +491,14 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   }
 
   .edit-cert-empty {
-    padding: 20px;
+    padding: 22px;
     background: var(--e-surface-alt);
     border: 1px dashed var(--e-line);
     border-radius: 3px;
     text-align: center;
     color: var(--e-muted);
     font-family: var(--e-mono);
-    font-size: 12px;
+    font-size: 13px;
     margin-bottom: 8px;
   }
 
@@ -512,7 +506,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   .edit-teacher input[type="file"] {
     cursor: pointer;
     font-family: var(--e-sans);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--e-copy);
     padding: 8px 12px;
   }
@@ -524,7 +518,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     background: var(--e-surface);
     color: var(--e-ink);
     font-family: var(--e-sans);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition:
@@ -552,14 +546,14 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
   .edit-actions button {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 18px;
+    gap: 7px;
+    padding: 11px 20px;
     border: 1px solid var(--e-line);
     border-radius: 3px;
     background: var(--e-surface);
     color: var(--e-ink);
     font-family: var(--e-sans);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
@@ -591,8 +585,8 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
     cursor: not-allowed;
   }
   .edit-actions svg {
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
   }
 
   /* ---------- Spinner ---------- */
@@ -675,7 +669,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
       </svg>
     </a>
     <div class="edit-header-copy">
-      <p class="kicker">Staff Directory · Editing Record</p>
+      <p class="kicker">Editing Staff Record</p>
       <h1>Edit Teacher Profile</h1>
       <p>Update information for {{ teacher.full_name }}</p>
 
@@ -1394,7 +1388,7 @@ Teacher Management - Namong SDA JHS{% endblock %} {% block content %}
         if (!submitButton) return;
         submitButton.disabled = true;
         submitButton.innerHTML =
-          '<svg class="edit-spin" width="14" height="14" fill="none" viewBox="0 0 24 24">' +
+          '<svg class="edit-spin" width="15" height="15" fill="none" viewBox="0 0 24 24">' +
           '<circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
           '<path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>' +
           "</svg>" +

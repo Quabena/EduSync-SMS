@@ -2,388 +2,823 @@
 {% block page_title %}Graduation Statistics{% endblock %} {% block
 page_description %}Analytics and insights on alumni data{% endblock %} {% block
 content %}
-<div class="space-y-8">
-  <!-- Header Section -->
-  <div
-    class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4"
-  >
-    <div>
-      <h1
-        class="text-3xl lg:text-4xl font-bold text-slate-800 dark:text-white mb-2"
-      >
-        Graduation Statistics
-      </h1>
-      <p class="text-slate-600 dark:text-slate-300 text-lg">
-        Analytics and insights on alumni data
+
+<style>
+  .stats-page {
+    --ink: #1a2226;
+    --copy: #4a5459;
+    --muted: #7a8589;
+    --surface: #ffffff;
+    --surface-alt: #f5f7f5;
+    --paper: #f4f5f3;
+    --line: #d7dfdb;
+    --line-soft: #e8ecea;
+
+    --green: #1f6259;
+    --green-hover: #185048;
+    --green-wash: #e6efe9;
+    --green-edge: #c2d5c8;
+
+    --red: #9a5148;
+    --red-wash: #f3e5e1;
+    --red-edge: #dcc1b9;
+
+    --brass: #8a632e;
+    --brass-wash: #f2ead8;
+    --brass-edge: #d9c8a4;
+
+    --slate: #5d7076;
+    --slate-wash: #ebefee;
+    --slate-edge: #c5d0d0;
+
+    --violet: #4c3d7a;
+    --violet-wash: #ece8f2;
+    --violet-edge: #c8bfd8;
+
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+      Consolas, "Liberation Mono", monospace;
+
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 26px 60px;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .dark .stats-page {
+    --ink: #eef2ef;
+    --copy: #b8c1bd;
+    --muted: #8f9a96;
+    --surface: #1a201f;
+    --surface-alt: #1e2524;
+    --paper: #131817;
+    --line: #33403e;
+    --line-soft: #2a3533;
+
+    --green: #6fbfa7;
+    --green-hover: #8ed4bd;
+    --green-wash: #1c2b27;
+    --green-edge: #2d5a4b;
+
+    --red: #e0907a;
+    --red-wash: #3a251f;
+    --red-edge: #5a3a2f;
+
+    --brass: #d9b273;
+    --brass-wash: #2c2620;
+    --brass-edge: #4a3e2d;
+
+    --slate: #8fa2a8;
+    --slate-wash: #253032;
+    --slate-edge: #3d4d51;
+
+    --violet: #b8a4dd;
+    --violet-wash: #262038;
+    --violet-edge: #4a3d6b;
+  }
+
+  .stats-page *,
+  .stats-page *::before,
+  .stats-page *::after {
+    box-sizing: border-box;
+  }
+  .stats-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .stats-page .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* ---------- Hero ---------- */
+  .page-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 28px 22px 32px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--violet);
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .dash-kicker,
+  .section-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .page-hero h1 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.8vw, 28px);
+    font-weight: 600;
+    font-variation-settings: "opsz" 60;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .page-hero p {
+    margin: 0;
+    max-width: 660px;
+    color: var(--copy);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    border-color: var(--ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .btn.primary {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .dark .btn.primary {
+    color: #131817;
+  }
+  .btn.primary:hover {
+    background: var(--green-hover);
+    border-color: var(--green-hover);
+  }
+  .dark .btn.primary:hover {
+    color: #131817;
+  }
+
+  /* ---------- Stats strip ---------- */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .stats-cell {
+    padding: 18px 22px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .stats-cell:last-child {
+    border-right: 0;
+  }
+  .stats-cell::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--violet);
+  }
+  .stats-cell:nth-child(1)::before {
+    background: var(--violet);
+  }
+  .stats-cell:nth-child(2)::before {
+    background: var(--green);
+  }
+  .stats-cell:nth-child(3)::before {
+    background: var(--slate);
+  }
+  .stats-cell:nth-child(4)::before {
+    background: var(--brass);
+  }
+  .stats-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .stats-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .stats-value.is-sm {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .stats-foot {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* ---------- Two-column layout ---------- */
+  .stats-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 16px;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .card-head .head-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .card-body {
+    padding: 22px;
+  }
+
+  /* ---------- Year distribution bars ---------- */
+  .bar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bar-row-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .bar-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+  .bar-value {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .bar-track {
+    height: 6px;
+    background: var(--surface-alt);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 1px;
+    background: var(--violet);
+    transition: width 0.4s ease;
+  }
+  .bar-fill.is-year {
+    background: var(--violet);
+  }
+  .bar-fill.is-male {
+    background: var(--slate);
+  }
+  .bar-fill.is-female {
+    background: var(--brass);
+  }
+
+  /* ---------- Gender rows ---------- */
+  .gender-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .gender-row:last-of-type {
+    border-bottom: 0;
+  }
+  .gender-id {
+    min-width: 0;
+    flex: 1;
+  }
+  .gender-name {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .gender-pct {
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .gender-count {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  .total-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 18px;
+    margin-top: 6px;
+    border-top: 1px solid var(--line);
+  }
+  .total-line .total-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .total-line .total-value {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  /* ---------- Class distribution grid ---------- */
+  .class-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .class-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 18px 18px;
+    background: var(--surface-alt);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .class-cell-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .class-cell-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+    line-height: 1.25;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .class-cell-pct {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--green);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .class-cell-count {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .class-cell-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- Empty state ---------- */
+  .empty {
+    padding: 56px 24px;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .empty-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--violet-wash);
+    color: var(--violet);
+  }
+  .empty-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  .empty h3 {
+    margin: 0 0 7px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variation-settings: "opsz" 24;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+  }
+  .empty p {
+    max-width: 440px;
+    margin: 0 auto 18px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  /* Screen-reader helper */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .stats-layout {
+      grid-template-columns: 1fr;
+    }
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .stats-cell:nth-child(2) {
+      border-right: 0;
+    }
+    .stats-cell:nth-child(1),
+    .stats-cell:nth-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+  }
+  @media (max-width: 700px) {
+    .stats-page {
+      padding: 20px 14px 40px;
+    }
+    .page-hero {
+      padding: 20px 18px 20px 22px;
+    }
+    .card-head {
+      padding: 14px 16px 12px;
+    }
+    .card-body {
+      padding: 18px;
+    }
+    .class-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 460px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .stats-cell {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-cell:last-child {
+      border-bottom: 0;
+    }
+  }
+</style>
+
+{# ---------- Derived values ---------- #} {# Year counts: sum of every
+graduation year's count, plus the max for bar scaling. #} {% set
+total_graduations = namespace(count=0) %} {% set max_year_count =
+namespace(value=0) %} {% for year, count in year_counts %} {% set
+total_graduations.count = total_graduations.count + (count or 0) %} {% if (count
+or 0) > max_year_count.value %} {% set max_year_count.value = count or 0 %} {%
+endif %} {% endfor %} {# Gender totals #} {% set gender_total =
+namespace(count=0) %} {% for gender, count in gender_distribution %} {% set
+gender_total.count = gender_total.count + (count or 0) %} {% endfor %} {# Class
+totals #} {% set class_total = namespace(count=0) %} {% for class_name, count in
+class_distribution %} {% set class_total.count = class_total.count + (count or
+0) %} {% endfor %} {# Most recent year = first item in year_counts, assuming the
+query orders newest first. #} {% set latest_year_display = (year_counts[0][0] if
+year_counts else none) %}
+
+<div class="stats-page">
+  <!-- Hero -->
+  <header class="page-hero">
+    <div class="hero-copy">
+      <p class="dash-kicker">Academic records · Alumni office</p>
+      <h1>Graduation statistics</h1>
+      <p>
+        Historical counts, gender split, and class distribution across every
+        graduation year in the archive.
       </p>
     </div>
-    <a
-      href="{{ url_for('graduation.graduation_management') }}"
-      class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-slate-600 rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl font-medium glass hover-lift"
-    >
+    <a href="{{ url_for('graduation.graduation_management') }}" class="btn">
       <svg
-        class="w-5 h-5 mr-2"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M15 19l-7-7 7-7"
-        ></path>
+        <path d="M15 19l-7-7 7-7" />
       </svg>
-      Back to Management
+      Back to management
     </a>
-  </div>
+  </header>
 
   {% if year_counts %}
-  <!-- Statistics Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-    <!-- Graduations by Year Card -->
-    <div class="professional-card overflow-hidden">
-      <div class="bg-gradient-to-r from-cyan-300 to-cyan-500 px-6 py-5">
-        <div class="flex items-center">
-          <div
-            class="w-12 h-12 dark:text-white bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-4 ring-2 ring-white/30"
-          >
-            <svg
-              class="w-6 h-6 text-slate-600 dark:text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              ></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-xl font-bold text-slate-600 dark:text-white">
-              Graduations by Year
-            </h2>
-            <p class="text-slate-500 text-sm dark:text-white">
-              Historical graduation counts
-            </p>
-          </div>
+  <!-- Stats strip -->
+  <section class="stats-grid" aria-label="Graduation statistics summary">
+    <div class="stats-cell">
+      <span class="stats-label">Total graduations</span>
+      <strong class="stats-value">{{ total_graduations.count }}</strong>
+      <span class="stats-foot">Across every year in the archive</span>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Years recorded</span>
+      <strong class="stats-value">{{ year_counts|length }}</strong>
+      <span class="stats-foot">Distinct graduation years</span>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Latest year</span>
+      <strong class="stats-value is-sm">
+        {{ latest_year_display if latest_year_display else '—' }}
+      </strong>
+      <span class="stats-foot">
+        {% if year_counts and year_counts[0][1] %} {{ year_counts[0][1] }}
+        graduate{% if year_counts[0][1] != 1 %}s{% endif %} {% else %} No data
+        yet {% endif %}
+      </span>
+    </div>
+    <div class="stats-cell">
+      <span class="stats-label">Peak year</span>
+      <strong class="stats-value"> {{ max_year_count.value }} </strong>
+      <span class="stats-foot">Largest single-year cohort</span>
+    </div>
+  </section>
+
+  <!-- Two-column layout: year bars + gender -->
+  <div class="stats-layout">
+    <!-- Year distribution -->
+    <section class="card" aria-labelledby="year-heading">
+      <div class="card-head">
+        <div>
+          <h2 id="year-heading">Graduations by year</h2>
         </div>
+        <span class="head-meta">
+          {{ year_counts|length }} year{% if year_counts|length != 1 %}s{% endif
+          %}
+        </span>
       </div>
-      <div class="p-6">
-        <div class="space-y-5">
-          {% set max_count = year_counts|map(attribute=1)|max %} {% for year,
-          count in year_counts %}
-          <div class="group">
-            <div class="flex items-center justify-between mb-3">
-              <span
-                class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200"
-              >
-                {{ year }}
-              </span>
-              <span
-                class="text-2xl font-bold text-primary-600 dark:text-primary-400"
-              >
-                {{ count }}
-              </span>
+
+      <div class="card-body">
+        <div class="bar-list">
+          {% for year, count in year_counts %} {% set pct = ((count or 0) /
+          max_year_count.value * 100) if max_year_count.value > 0 else 0 %}
+          <div class="bar-row">
+            <div class="bar-row-head">
+              <span class="bar-label">{{ year }}</span>
+              <span class="bar-value">{{ count or 0 }}</span>
             </div>
             <div
-              class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden"
+              class="bar-track"
+              role="img"
+              aria-label="{{ year }}: {{ count or 0 }} graduate{% if (count or 0) != 1 %}s{% endif %}"
             >
-              <div
-                class="bg-gradient-to-r from-cyan-300 to-cyan-400 h-3 rounded-full transition-all duration-500 group-hover:from-primary-600 group-hover:to-primary-700"
-                style="width: {{ (count / max_count * 100) if max_count > 0 else 0 }}%"
-              ></div>
+              <div class="bar-fill is-year" style="width: {{ pct }}%"></div>
             </div>
           </div>
           {% endfor %}
         </div>
       </div>
-    </div>
+    </section>
 
+    <!-- Gender distribution -->
     {% if latest_year and gender_distribution %}
-    <!-- Gender Distribution Card -->
-    <div class="professional-card overflow-hidden">
-      <div class="bg-gradient-to-r from-pink-400 to-purple-700 px-6 py-5">
-        <div class="flex items-center">
-          <div
-            class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-4 ring-2 ring-white/30"
-          >
-            <svg
-              class="w-6 h-6 text-slate-500 dark:text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
-              ></path>
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
-              ></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-xl font-bold text-slate-600">
-              Gender Distribution
-            </h2>
-            <p class="text-slate-500 text-sm">Class of {{ latest_year }}</p>
-          </div>
+    <section class="card" aria-labelledby="gender-heading">
+      <div class="card-head">
+        <div>
+          <h2 id="gender-heading">Gender distribution</h2>
         </div>
+        <span class="head-meta">Class of {{ latest_year }}</span>
       </div>
-      <div class="p-6">
-        {% set total = gender_distribution|map(attribute=1)|sum %}
-        <div class="space-y-6">
-          {% for gender, count in gender_distribution %}
-          <div class="group">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center">
-                {% if gender == 'Male' %}
-                <div
-                  class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mr-4 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors duration-200"
-                >
-                  <svg
-                    class="w-6 h-6 text-blue-600 dark:text-blue-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    ></path>
-                  </svg>
-                </div>
-                {% else %}
-                <div
-                  class="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-xl flex items-center justify-center mr-4 group-hover:bg-pink-200 dark:group-hover:bg-pink-800/50 transition-colors duration-200"
-                >
-                  <svg
-                    class="w-6 h-6 text-pink-600 dark:text-pink-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    ></path>
-                  </svg>
-                </div>
-                {% endif %}
-                <div>
-                  <span
-                    class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200"
-                  >
-                    {{ gender }}
-                  </span>
-                  <p class="text-sm text-slate-500 dark:text-slate-400">
-                    {{ "%.1f"|format((count / total * 100) if total > 0 else 0)
-                    }}%
-                  </p>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="text-2xl font-bold text-slate-800 dark:text-white">
-                  {{ count }}
-                </p>
-              </div>
-            </div>
-            <div
-              class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden"
-            >
-              <div
-                class="{% if gender == 'Male' %}bg-gradient-to-r from-blue-500 to-blue-600{% else %}bg-gradient-to-r from-pink-500 to-pink-600{% endif %} h-3 rounded-full transition-all duration-500 group-hover:opacity-90"
-                style="width: {{ (count / total * 100) if total > 0 else 0 }}%"
-              ></div>
-            </div>
-          </div>
-          {% endfor %}
 
-          <div class="pt-4 border-t border-slate-200 dark:border-slate-700">
-            <div class="flex items-center justify-between">
-              <span class="text-slate-600 dark:text-slate-300 font-medium"
-                >Total Graduates</span
-              >
-              <span
-                class="text-3xl font-bold text-primary-600 dark:text-primary-400"
-                >{{ total }}</span
-              >
+      <div class="card-body">
+        {% for gender, count in gender_distribution %} {% set pct = ((count or
+        0) / gender_total.count * 100) if gender_total.count > 0 else 0 %}
+        <div class="gender-row">
+          <div class="gender-id">
+            <div class="gender-name">{{ gender }}</div>
+            <div class="gender-pct">
+              {{ "%.1f"|format(pct) }}% of the cohort
             </div>
           </div>
+          <div class="gender-count">{{ count or 0 }}</div>
+        </div>
+        {% endfor %}
+
+        <div class="total-line">
+          <span class="total-label">Total graduates</span>
+          <span class="total-value">{{ gender_total.count }}</span>
         </div>
       </div>
-    </div>
+    </section>
     {% endif %}
   </div>
 
+  <!-- Class distribution -->
   {% if latest_year and class_distribution %}
-  <!-- Class Distribution Card -->
-  <div class="professional-card overflow-hidden mt-4">
-    <div class="bg-gradient-to-r from-accent-emerald to-emerald-700 px-6 py-5">
-      <div class="flex items-center">
-        <div
-          class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-4 ring-2 ring-white/30"
-        >
-          <svg
-            class="w-6 h-6 text-slate-400 dark:text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-            ></path>
-          </svg>
-        </div>
-        <div>
-          <h2 class="text-xl font-bold text-slate-500">Class Distribution</h2>
-          <p class="text-slate-400 text-sm">
-            Graduates by final class - {{ latest_year }}
-          </p>
-        </div>
+  <section class="card" aria-labelledby="class-heading">
+    <div class="card-head">
+      <div>
+        <h2 id="class-heading">Graduates by final class</h2>
       </div>
+      <span class="head-meta">Class of {{ latest_year }}</span>
     </div>
-    <div class="p-6">
-      {% set total_classes = class_distribution|map(attribute=1)|sum %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for class_name, count in class_distribution %}
-        <div class="professional-card p-6 hover-lift group">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors duration-200"
-            >
-              <svg
-                class="w-6 h-6 text-emerald-600 dark:text-emerald-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                ></path>
-              </svg>
-            </div>
-            <span
-              class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-semibold"
-            >
-              {{ "%.1f"|format((count / total_classes * 100) if total_classes >
-              0 else 0) }}%
-            </span>
+
+    <div class="card-body">
+      <div class="class-grid">
+        {% for class_name, count in class_distribution %} {% set pct = ((count
+        or 0) / class_total.count * 100) if class_total.count > 0 else 0 %}
+        <div class="class-cell">
+          <div class="class-cell-head">
+            <span class="class-cell-name">{{ class_name }}</span>
+            <span class="class-cell-pct">{{ "%.1f"|format(pct) }}%</span>
           </div>
-          <h3
-            class="text-lg font-bold text-slate-800 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-200"
-          >
-            {{ class_name }}
-          </h3>
-          <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-            {{ count }}
-          </p>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            graduates
-          </p>
+          <div class="class-cell-count">{{ count or 0 }}</div>
+          <div class="class-cell-label">
+            Graduate{% if (count or 0) != 1 %}s{% endif %}
+          </div>
         </div>
         {% endfor %}
       </div>
     </div>
-  </div>
+  </section>
   {% endif %} {% else %}
-  <!-- Empty State -->
-  <div class="professional-card text-center py-16 px-6">
-    <div
-      class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center"
-    >
+  <!-- Empty state -->
+  <div class="empty">
+    <div class="empty-icon" aria-hidden="true">
       <svg
-        class="w-12 h-12 text-slate-400 dark:text-slate-500"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-        ></path>
+        <path d="M3 17l6-6 4 4 8-8" />
+        <path d="M21 7h-6m6 0v6" />
       </svg>
     </div>
-    <h3 class="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">
-      No Statistics Available
-    </h3>
-    <p class="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
-      There are no graduation records to display statistics for yet.
+    <h3>No statistics available</h3>
+    <p>
+      There are no graduation records yet, so there is nothing to chart. Once
+      students are graduated, their data appears here.
     </p>
     <a
       href="{{ url_for('graduation.graduation_management') }}"
-      class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl font-medium glass hover-lift"
+      class="btn primary"
     >
       <svg
-        class="w-5 h-5 mr-2"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-        ></path>
+        <path d="M22 10L12 5 2 10l10 5 10-5z" />
+        <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5" />
       </svg>
-      Graduate Students
+      Graduate students
     </a>
   </div>
   {% endif %}
 </div>
 
-<style>
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .professional-card {
-    animation: fadeIn 0.6s ease-out forwards;
-  }
-
-  .grid > .professional-card:nth-child(1) {
-    animation-delay: 0.1s;
-  }
-  .grid > .professional-card:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-  .grid > .professional-card:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-  .grid > .professional-card:nth-child(4) {
-    animation-delay: 0.4s;
-  }
-  .grid > .professional-card:nth-child(5) {
-    animation-delay: 0.5s;
-  }
-</style>
 {% endblock %}

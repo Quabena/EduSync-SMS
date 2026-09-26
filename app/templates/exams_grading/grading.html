@@ -2,13 +2,6 @@
 {{ subject.name }}{% endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
-
-  /* ==========================================================
-     Grade Students — Dashboard design language.
-     Fraunces (display), Inter (body), JetBrains Mono (labels).
-     Flat surfaces, hairline borders, restrained palette.
-     ========================================================== */
   .grade-page {
     --ink: #1a2226;
     --copy: #4a5459;
@@ -764,7 +757,7 @@
       <p class="dash-kicker">Academic records · Grading sheet</p>
       <h1>Grade students</h1>
       <p class="hero-sub">
-        <strong>{{ class_.name }}</strong> — <strong>{{ subject.name }}</strong>
+        <strong>{{ class_.name }}</strong> - <strong>{{ subject.name }}</strong>
       </p>
       <div class="hero-meta">
         <span class="hero-stamp violet">{{ term }} {{ year }}</span>
@@ -815,10 +808,8 @@
   <section class="dash-card">
     <div class="dash-card-head">
       <div>
-        <p class="section-kicker">Reference</p>
         <h2>Grading instructions</h2>
       </div>
-      <span class="head-meta">Score weights and maximums</span>
     </div>
 
     <div class="instruction-grid">
@@ -846,9 +837,9 @@
 
     <div class="instruction-note">
       <strong>Total scoring:</strong> Class Total = Individual Test + Group Work
-      + Class Test + Project (max 60). Exam Score is out of 100. Total Score is
-      calculated automatically as 50% of scaled class work plus 50% of scaled
-      exam.
+      + Class Test + Project (max 60). Exam Score is out of 100.<br />Total
+      Score is calculated automatically as 50% of scaled class work plus 50% of
+      scaled exam.
     </div>
   </section>
 
@@ -856,7 +847,6 @@
   <section class="dash-card">
     <div class="dash-card-head">
       <div>
-        <p class="section-kicker">Roster</p>
         <h2>Student scores</h2>
       </div>
       <span class="head-meta"

@@ -4,12 +4,6 @@ page_description %}Promote multiple students from one class to another{%
 endblock %} {% block content %}
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
-
-  /* ==========================================================
-     Bulk Promotion — Dashboard design language.
-     Fraunces (display), Inter (body), JetBrains Mono (labels).
-     ========================================================== */
   .bulk-promo {
     --ink: #1a2226;
     --copy: #4a5459;
@@ -666,7 +660,6 @@ initials(first, last) -%} {%- set f = (first or '').strip() -%} {%- set l =
     <h1>Promote students</h1>
     <p>
       Choose a source class and target class, then select the students to move.
-      Every promotion is recorded with a timestamp and your account.
     </p>
     {% if current_class %}
     <div class="hero-meta">
@@ -682,12 +675,11 @@ initials(first, last) -%} {%- set f = (first or '').strip() -%} {%- set l =
   <section class="card" aria-labelledby="step1-heading">
     <div class="card-head">
       <div>
-        <p class="section-kicker">01 · Setup</p>
         <h2 id="step1-heading">Choose classes</h2>
       </div>
       <span class="head-meta">Pick source, then destination</span>
     </div>
-
+    <!-- prettier-ignore -->
     <div class="card-body">
       <form id="class-selection-form" method="GET" class="class-selector">
         <!-- Current class -->
@@ -704,8 +696,7 @@ initials(first, last) -%} {%- set f = (first or '').strip() -%} {%- set l =
               if
               current_class
               and
-              class.id=""
-              ="current_class.id"
+              class.id=="current_class.id"
               %}selected{%
               endif
               %}
@@ -756,8 +747,7 @@ initials(first, last) -%} {%- set f = (first or '').strip() -%} {%- set l =
               if
               target_class
               and
-              class.id=""
-              ="target_class.id"
+              class.id=="target_class.id"
               %}selected{%
               endif
               %}
@@ -935,15 +925,12 @@ initials(first, last) -%} {%- set f = (first or '').strip() -%} {%- set l =
           </div>
 
           <div class="field">
-            <label class="field-label" for="promotion_notes"
-              >Promotion notes</label
-            >
             <textarea
               class="field-textarea"
               name="promotion_notes"
               id="promotion_notes"
               rows="3"
-              placeholder="Add any context that should be recorded with this promotion…"
+              placeholder="Promotion Notes  - add any context that should be recorded with this promotion…"
             ></textarea>
           </div>
         </div>
